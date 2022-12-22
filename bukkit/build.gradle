@@ -1,0 +1,10 @@
+dependencies {
+    compileOnly project(path: ':core')
+    compileOnly project(path: ':mc-1-17', configuration: 'reobf')
+    compileOnly project(path: ':mc-1-18', configuration: 'reobf')
+    compileOnly project(path: ':mc-1-18-2', configuration: 'reobf')
+    compileOnly project(path: ':mc-1-19', configuration: 'reobf')
+    compileOnly project(path: ':mc-1-19-3', configuration: 'reobf')
+}
+
+defaultTasks 'build'

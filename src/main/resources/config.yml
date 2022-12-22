@@ -1,0 +1,115 @@
+Options:
+  experimental features: false #Turn on experimental features
+  bungeecord: false
+  commands: #Disable or enable plugin commands
+    skinoverlay: true
+  updater:
+    enabled: true
+    download: false
+    restart: false
+  # None, MySQL, PostgreSQL, SQLite, MongoDB
+  # Select in what type you want your data to be stored
+  # SQLite is recommended
+  #SQL section is for MySQL(or MariaDB) and PostgreSQL
+  #Default PostgreSQL port: 5432
+  #Default MySQL and MariaDB port: 3306
+  database:
+    type: SQLite
+    SQLite:
+      file name: skinoverlay
+    SQL:
+      host: localhost
+      port: 3306
+      user: youruser
+      password: "yourpassword"
+      database: SkinOverlay
+      table name: "skinoverlay_users"
+  overlays:
+    policeman:
+      hat: true
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    mustache:
+      hat: true
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    alley:
+      hat: false
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    bubbo_transparent:
+      hat: false
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    fire_demon:
+      hat: true
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    flame:
+      hat: true
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    glare:
+      hat: true
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    hoodie:
+      hat: true
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    migrator:
+      hat: true
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    pirate:
+      hat: true
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true
+    smoking:
+      hat: true
+      right_sleeve: true
+      left_sleeve: true
+      jacket: true
+      right_pants: true
+      left_pants: true
+      cape: true

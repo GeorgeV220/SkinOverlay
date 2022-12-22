@@ -1,0 +1,14 @@
+plugins {
+    id "io.papermc.paperweight.userdev" version "1.4.0"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.18.2-R0.1-SNAPSHOT")
+
+    implementation project(path: ':core')
+}
