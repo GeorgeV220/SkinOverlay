@@ -2,7 +2,6 @@ package com.georgev22.skinoverlay.utilities.interfaces;
 
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.skinoverlay.utilities.player.User;
-import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -18,7 +17,8 @@ public interface IDatabaseType {
     void setupUser(User user, Callback<Boolean> callback) throws Exception;
 
     default void reset(@NotNull User user) throws Exception {
-//TODO RESET
+        user.append("skinName", "default")
+                .append("skinProperty", user.getDefaultSkinProperty());
         save(user);
     }
 
