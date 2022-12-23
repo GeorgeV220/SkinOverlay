@@ -1,9 +1,12 @@
 package com.georgev22.skinoverlay;
 
 import co.aikar.commands.BungeeCommandManager;
+import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
+import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -36,12 +39,20 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
             public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
-                //TODO BUNGEECORD
+                if (reset) {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("reset", playerObject.playerUUID().toString(), "default");
+                } else {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("change", playerObject.playerUUID().toString(), skinName);
+                }
             }
 
             @Override
             public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
-                //TODO BUNGEECORD
+                if (reset) {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), "default", property.getName(), property.getValue(), property.getSignature());
+                } else {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), skinName, property.getName(), property.getValue(), property.getSignature());
+                }
             }
 
             @Override
@@ -50,6 +61,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
             }
         });
         SkinOverlay.getInstance().onEnable();
+        BungeeMinecraftUtils.registerListeners(this, new PlayerListeners());
         enabled = true;
     }
 
