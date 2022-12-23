@@ -97,8 +97,9 @@ public class Utilities {
                             Utilities.updateSkin(playerObject, true, false);
                             skinOverlay.getLogger().log(Level.INFO, Utils.placeHolder(MessagesUtil.DONE.getMessages()[0], new HashObjectMap<String, String>().append("%url%", texture.get("url").getAsString()), true));
                         }
+                        default ->
+                                skinOverlay.getLogger().log(Level.SEVERE, "Unknown error code: " + request.getHttpCode());
                     }
-                    skinOverlay.getLogger().log(Level.SEVERE, "Unknown error code: " + request.getHttpCode());
                 }
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
