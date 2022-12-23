@@ -5,7 +5,6 @@ import com.georgev22.library.database.DatabaseType;
 import com.georgev22.library.database.DatabaseWrapper;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.scheduler.Scheduler;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
@@ -21,14 +20,11 @@ import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.mongodb.client.MongoClient;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -41,9 +37,6 @@ public class SkinOverlay {
     private static SkinOverlay instance = null;
 
     @Getter
-    private Scheduler scheduler;
-
-    @Getter
     private SkinOverlayImpl skinOverlay;
 
     @Getter
@@ -51,8 +44,7 @@ public class SkinOverlay {
     private SkinHandler skinHandler;
 
     @Getter
-    private final FileManager fileManager = FileManager.getInstance();
-
+    private FileManager fileManager;
 
     @Getter
     private DatabaseWrapper databaseWrapper = null;
@@ -87,26 +79,20 @@ public class SkinOverlay {
     private File skinsDataFolder;
 
     @Getter
+    @Setter
     private CommandManager<?, ?, ?, ?, ?, ?> commandManager;
 
-    @SneakyThrows
     public static SkinOverlay getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException("SkinOverlay has not been initialized yet!!");
-        }
-        return instance;
+        return instance == null ? (instance = new SkinOverlay()) : instance;
     }
 
-    public void onLoad(@NotNull SkinOverlayImpl skinOverlay, CommandManager<?, ?, ?, ?, ?, ?> commandManager) {
-        BungeeCommandManager bungeeCommandManager;
-        PaperCommandManager paperCommandManager;
-        instance = this;
+    public void onLoad(SkinOverlayImpl skinOverlay) {
         this.skinOverlay = skinOverlay;
-        scheduler = SchedulerManager.getScheduler();
     }
 
 
     public void onEnable() {
+        fileManager = FileManager.getInstance();
         try {
             fileManager.loadFiles(getLogger(), this.getClass());
         } catch (Exception e) {
@@ -223,14 +209,10 @@ public class SkinOverlay {
     private void setupDatabase() throws Exception {
         ObjectMap<String, ObjectMap.Pair<String, String>> map = new HashObjectMap<String, ObjectMap.Pair<String, String>>()
                 .append("uuid", ObjectMap.Pair.create("VARCHAR(38)", "NULL"))
-                .append("name", ObjectMap.Pair.create("VARCHAR(18)", "NULL"))
-                .append("votes", ObjectMap.Pair.create("INT(10)", "0"))
-                .append("time", ObjectMap.Pair.create("BIGINT(30)", "0"))
-                .append("voteparty", ObjectMap.Pair.create("INT(10)", "0"))
-                .append("daily", ObjectMap.Pair.create("INT(10)", "0"))
-                .append("services", ObjectMap.Pair.create("TEXT", "NULL"))
-                .append("servicesLastVote", ObjectMap.Pair.create("TEXT", "NULL"))
-                .append("totalvotes", ObjectMap.Pair.create("INT(10)", "0"));//TODO FIX THAT SHIT
+                .append("skinName", ObjectMap.Pair.create("VARCHAR(18)", "NULL"))
+                .append("property-name", ObjectMap.Pair.create("LONGTEXT", "NULL"))
+                .append("property-value", ObjectMap.Pair.create("LONGTEXT", "NULL"))
+                .append("property-signature", ObjectMap.Pair.create("LONGTEXT", "NULL"));
         switch (OptionsUtil.DATABASE_TYPE.getStringValue()) {
             case "MySQL" -> {
                 if (connection == null || connection.isClosed()) {
@@ -330,7 +312,7 @@ public class SkinOverlay {
     }
 
     private void unregisterCommands() {
-        if (isBungee())
+        if (!isBungee())
             if (OptionsUtil.COMMAND_SKINOVERLAY.getBooleanValue())
                 ((PaperCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
     }
@@ -345,7 +327,7 @@ public class SkinOverlay {
                 ((PaperCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
             }
             commandManager.usePerIssuerLocale(true);
-        } catch (IOException | InvalidConfigurationException e) {
+        } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Failed to load language config 'lang_en.yaml': ", e);
         }
     }

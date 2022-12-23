@@ -9,10 +9,6 @@ import java.util.logging.Logger;
 
 public interface SkinOverlayImpl {
 
-    void onEnable();
-
-    void onDisable();
-
     boolean isBungee();
 
     File getDataFolder();
