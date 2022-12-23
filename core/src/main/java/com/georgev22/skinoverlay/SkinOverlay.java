@@ -48,7 +48,7 @@ public class SkinOverlay {
 
     @Getter
     @Setter
-    private SkinHandler skinHandler;//TODO SKIN HANDLERS
+    private SkinHandler skinHandler;
 
     @Getter
     private final FileManager fileManager = FileManager.getInstance();

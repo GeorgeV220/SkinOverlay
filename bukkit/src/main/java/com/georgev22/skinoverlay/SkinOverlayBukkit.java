@@ -28,10 +28,10 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     @Override
     public void onLoad() {
         SkinOverlay.getInstance().onLoad(this, new PaperCommandManager(this));
+        Bukkit.getScheduler().runTaskTimer(this, () -> SkinOverlay.getInstance().getScheduler().mainThreadHeartbeat(Bukkit.getCurrentTick()), 0, 1);
     }
 
     public void onEnable() {
-        Bukkit.getScheduler().runTaskTimer(this, () -> SkinOverlay.getInstance().getScheduler().mainThreadHeartbeat(Bukkit.getCurrentTick()), 0, 1);
         if (getCurrentVersion().equals(V1_17_R1)) {
             SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_17());
         } else if (getCurrentVersion().equals(V1_18_R1)) {
