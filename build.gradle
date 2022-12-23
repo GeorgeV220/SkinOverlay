@@ -95,6 +95,7 @@ repositories {
 dependencies {
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
     implementation 'co.aikar:acf-bungee:0.5.1-SNAPSHOT'
+    implementation 'com.georgev22:martexlibrary:8.3.0'
     implementation 'com.georgev22.api:libraryloader:1.3.0'
     implementation project(path: ':core')
     implementation project(path: ':bukkit')
@@ -111,7 +112,8 @@ shadowJar {
     relocate 'co.aikar.commands', "${packageName}.commands.acf"
     relocate 'co.aikar.locales', "${packageName}.commands.acf.locales"
     relocate 'org.bstats', "${packageName}.bstats"
-    relocate 'com.georgev22.api.libraryloader', "${packageName}.api.libraryloader"
+    relocate 'com.georgev22.api.libraryloader', "${packageName}.libraryloader"
+    relocate 'com.georgev22.library', "${packageName}.library"
 }
 
 tasks.build.dependsOn(shadowJar)
