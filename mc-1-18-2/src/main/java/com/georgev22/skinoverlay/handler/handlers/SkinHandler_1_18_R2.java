@@ -64,7 +64,7 @@ public class SkinHandler_1_18_R2 extends SkinHandler {
 
         sendPacket(entityPlayer, respawn);
 
-        SynchedEntityData synchedEntityData = new SynchedEntityData(entityPlayer);
+        SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
 
         if (reset | skinName.equalsIgnoreCase("default")) {
             synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), (byte) (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40));

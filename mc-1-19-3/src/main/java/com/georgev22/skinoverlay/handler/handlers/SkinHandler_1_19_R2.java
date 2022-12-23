@@ -65,7 +65,7 @@ public class SkinHandler_1_19_R2 extends SkinHandler {
 
         sendPacket(entityPlayer, respawn);
 
-        SynchedEntityData synchedEntityData = new SynchedEntityData(entityPlayer);
+        SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
 
         EntityDataAccessor<Byte> entityDataAccessor;
 
@@ -74,13 +74,13 @@ public class SkinHandler_1_19_R2 extends SkinHandler {
         } else {
             synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE),
                     (byte)
-                            ((fileConfiguration.getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x0) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x0) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x0) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x0) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x0) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x0) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x0))
+                            ((fileConfiguration.getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x00) |
+                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x00) |
+                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x00) |
+                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x00) |
+                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x00) |
+                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x00) |
+                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x00))
             );
         }
 
