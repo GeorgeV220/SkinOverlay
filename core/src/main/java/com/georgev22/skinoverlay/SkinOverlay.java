@@ -27,10 +27,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class SkinOverlay {
 
@@ -200,6 +200,10 @@ public class SkinOverlay {
         return fileManager.getConfig().getFileConfiguration();
     }
 
+    public List<String> getOverlayList() {
+        return Arrays.stream(Objects.requireNonNull(getSkinsDataFolder().listFiles())).map(File::getName).filter(file -> file.endsWith(".png")).map(file -> file.substring(0, file.length() - 4)).collect(Collectors.toList());
+    }
+
     /**
      * Setup database Values: File, MySQL, SQLite
      *
@@ -307,8 +311,10 @@ public class SkinOverlay {
 
         loadCommandLocales();
 
-        if (OptionsUtil.COMMAND_SKINOVERLAY.getBooleanValue())
+        if (OptionsUtil.COMMAND_SKINOVERLAY.getBooleanValue()) {
             commandManager.registerCommand(new SkinOverlayCommand());
+            commandManager.getCommandCompletions().registerCompletion("overlays", context -> getOverlayList());
+        }
     }
 
     private void unregisterCommands() {
