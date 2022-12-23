@@ -18,7 +18,6 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +53,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     @Override
     public void onEnable() {
-        ProxyServer.getInstance().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
+        getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
         SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
@@ -82,6 +81,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         });
         SkinOverlay.getInstance().onEnable();
         BungeeMinecraftUtils.registerListeners(this, new PlayerListeners());
+        getProxy().registerChannel("skinoverlay:bungee");
         enabled = true;
     }
 
@@ -127,13 +127,13 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     @Override
     public boolean isOnlineMode() {
-        return ProxyServer.getInstance().getConfig().isOnlineMode();
+        return getProxy().getConfig().isOnlineMode();
     }
 
     @Override
     public List<PlayerObject> onlinePlayers() {
         List<PlayerObject> playerObjects = new ArrayList<>();
-        ProxyServer.getInstance().getPlayers().forEach(proxiedPlayer -> playerObjects.add(new PlayerObjectBungee(proxiedPlayer)));
+        getProxy().getPlayers().forEach(proxiedPlayer -> playerObjects.add(new PlayerObjectBungee(proxiedPlayer)));
         return playerObjects;
     }
 }
