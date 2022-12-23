@@ -126,7 +126,7 @@ public class SkinOverlayCommand extends BaseCommand {
         Optional<PlayerObject> target;
         if (args.length > 1) {
             if (issuer.hasPermission("skinoverlay.wear.overlay.others")) {
-                target = skinOverlay.getSkinOverlay().onlinePlayers().stream().filter(playerObject -> playerObject.playerName().equalsIgnoreCase(args[0])).findFirst();
+                target = skinOverlay.getSkinOverlay().onlinePlayers().stream().filter(playerObject -> playerObject.playerName().equalsIgnoreCase(args[1])).findFirst();
                 if (target.isEmpty()) {
                     MessagesUtil.OFFLINE_PLAYER.msg(issuer.getIssuer(), new HashObjectMap<String, String>().append("%player%", args[1]), true);
                     return;
