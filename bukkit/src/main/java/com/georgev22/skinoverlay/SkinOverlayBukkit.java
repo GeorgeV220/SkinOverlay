@@ -1,10 +1,14 @@
 package com.georgev22.skinoverlay;
 
 import co.aikar.commands.PaperCommandManager;
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
+import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_Unsupported;
 import com.georgev22.skinoverlay.handler.handlers.*;
+import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
+import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
@@ -47,6 +51,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         }
 
         SkinOverlay.getInstance().onEnable();
+        BukkitMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
     }
 
     public void onDisable() {

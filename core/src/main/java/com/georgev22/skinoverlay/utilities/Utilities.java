@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -80,16 +79,14 @@ public class Utilities {
                     canvas.drawImage(skin, 0, 0, null);
                     canvas.drawImage(overlay, 0, 0, null);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    ImageIO.write((RenderedImage) image, "PNG", stream);
+                    ImageIO.write(image, "PNG", stream);
                     canvas.dispose();
                     String boundary = "*****";
                     String crlf = "\r\n";
                     String twoHyphens = "--";
                     Request request = new Request("https://api.mineskin.org/generate/upload?visibility=1").postRequest().setProperty(ObjectMap.Pair.create("Content-Type", ("multipart/form-data;boundary=" + boundary))).writeToOutputStream(twoHyphens + boundary + crlf, "Content-Disposition: form-data; name=\"file\";filename=\"file.png\"" + crlf, crlf).writeToOutputStream(new byte[][]{stream.toByteArray()}).writeToOutputStream(crlf, twoHyphens + boundary + twoHyphens + crlf).closeOutputStream().finalizeRequest();
                     switch (request.getHttpCode()) {
-                        case 429 -> {
-                            skinOverlay.getLogger().log(Level.SEVERE, "Too many requests");
-                        }
+                        case 429 -> skinOverlay.getLogger().log(Level.SEVERE, "Too many requests");
                         case 200 -> {
                             JsonElement response = JsonParser.parseString(new String(request.getBytes()));
                             JsonObject texture = response.getAsJsonObject().getAsJsonObject("data").getAsJsonObject("texture");
@@ -98,7 +95,7 @@ public class Utilities {
                             userData.setSkinName(skinName);
                             userData.setProperty(new Property("textures", texturesValue, texturesSignature));
                             Utilities.updateSkin(playerObject, true, false);
-                            skinOverlay.getLogger().log(Level.INFO, Utils.placeHolder(MessagesUtil.DONE.getMessages()[0], new HashObjectMap<String, String>().append("%url%", texture.get("url").getAsString()), (boolean) true));
+                            skinOverlay.getLogger().log(Level.INFO, Utils.placeHolder(MessagesUtil.DONE.getMessages()[0], new HashObjectMap<String, String>().append("%url%", texture.get("url").getAsString()), true));
                         }
                     }
                     skinOverlay.getLogger().log(Level.SEVERE, "Unknown error code: " + request.getHttpCode());
@@ -145,23 +142,10 @@ public class Utilities {
 
     public static @NotNull GameProfile createGameProfile(@NotNull PlayerObject playerObject) {
         GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
-        if (!gameProfile.getProperties().containsKey("textures")) {
-            UserData userData = UserData.getUser(playerObject);
-            if (userData.getSkinProperty() != null) {
-                gameProfile.getProperties().put("textures", userData.getSkinProperty());
-            } else if (playerObject.isBedrock()) {
-                try {
-                    gameProfile.getProperties().put("textures", skinOverlay.getSkinHandler().getXUIDSkin(skinOverlay.getSkinHandler().getXUID(playerObject)));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                try {
-                    gameProfile.getProperties().put("textures", skinOverlay.getSkinHandler().getJavaSkin(playerObject));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        try {
+            gameProfile.getProperties().put("textures", skinOverlay.getSkinHandler().getSkin(playerObject));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return gameProfile;
     }
