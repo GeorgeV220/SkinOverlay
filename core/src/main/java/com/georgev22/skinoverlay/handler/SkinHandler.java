@@ -137,7 +137,7 @@ public abstract class SkinHandler {
 
         @Override
         protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
-            GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), ((org.bukkit.entity.Player) playerObject.getPlayer()).getName());
+            GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
             if (!gameProfile.getProperties().containsKey("textures")) {
                 if (playerObject.isBedrock()) {
                     try {

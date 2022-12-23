@@ -143,5 +143,28 @@ public class Utilities {
         }, 20L);
     }
 
+    public static @NotNull GameProfile createGameProfile(@NotNull PlayerObject playerObject) {
+        GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
+        if (!gameProfile.getProperties().containsKey("textures")) {
+            UserData userData = UserData.getUser(playerObject);
+            if (userData.getSkinProperty() != null) {
+                gameProfile.getProperties().put("textures", userData.getSkinProperty());
+            } else if (playerObject.isBedrock()) {
+                try {
+                    gameProfile.getProperties().put("textures", skinOverlay.getSkinHandler().getXUIDSkin(skinOverlay.getSkinHandler().getXUID(playerObject)));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                try {
+                    gameProfile.getProperties().put("textures", skinOverlay.getSkinHandler().getJavaSkin(playerObject));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return gameProfile;
+    }
+
 
 }
