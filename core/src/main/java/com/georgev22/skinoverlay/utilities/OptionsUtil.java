@@ -15,7 +15,10 @@ import static com.georgev22.library.utilities.Utils.Assertions.notNull;
 
 public enum OptionsUtil {
 
+    BUNGEE("bungeecord", false, Optional.empty()),
+
     COMMAND_SKINOVERLAY("commands.skinoverlay", true, Optional.empty()),
+
     DATABASE_HOST("database.SQL.host", "localhost", Optional.empty()),
 
     DATABASE_PORT("database.SQL.port", 3306, Optional.empty()),
@@ -133,12 +136,10 @@ public enum OptionsUtil {
      */
     public @NotNull String getPath() {
         if (mainPlugin.getConfig().get("Options." + getDefaultPath()) == null) {
-            if (getOldPaths().length > 0) {
-                for (Optional<String> path : getOldPaths()) {
-                    if (path.isPresent()) {
-                        if (mainPlugin.getConfig().get("Options." + path.get()) != null) {
-                            return "Options." + path.get();
-                        }
+            for (Optional<String> path : getOldPaths()) {
+                if (path.isPresent()) {
+                    if (mainPlugin.getConfig().get("Options." + path.get()) != null) {
+                        return "Options." + path.get();
                     }
                 }
             }
