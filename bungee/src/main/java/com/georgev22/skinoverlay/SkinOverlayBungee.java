@@ -10,6 +10,7 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.Utilities;
@@ -80,7 +81,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
             }
         });
         SkinOverlay.getInstance().onEnable();
-        BungeeMinecraftUtils.registerListeners(this, new PlayerListeners());
+        BungeeMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         getProxy().registerChannel("skinoverlay:bungee");
         enabled = true;
     }
