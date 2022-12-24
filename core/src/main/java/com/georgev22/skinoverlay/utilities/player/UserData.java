@@ -9,13 +9,19 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.IDatabaseType;
 import com.mojang.authlib.properties.Property;
+import com.mongodb.BasicDBObject;
+import com.mongodb.Block;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.result.DeleteResult;
+import org.bson.BsonDocument;
+import org.bson.BsonString;
+import org.bson.Document;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -253,27 +259,159 @@ public record UserData(User user) {
             ResultSet resultSet = skinOverlay.getDatabaseWrapper().getSQLDatabase().querySQL("SELECT * FROM `" + OptionsUtil.DATABASE_TABLE_NAME.getStringValue() + "`");
             while (resultSet.next()) {
                 UserData userData = UserData.getUser(UUID.fromString(resultSet.getString("uuid")));
-                userData.load(new Callback<Boolean>() {
-                    @Override
-                    public Boolean onSuccess() {
-                        map.append(userData.user().getUniqueId(), userData.user());
-                        return true;
-                    }
-
-                    @Contract(pure = true)
-                    @Override
-                    public @NotNull Boolean onFailure() {
-                        return true;
-                    }
-
-                    @Override
-                    public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
-                        throwable.printStackTrace();
-                        return onFailure();
-                    }
-                });
+                load0(map, userData);
             }
             return map;
         }
     }
+
+    /**
+     * All Mongo Utils for the user
+     * Everything here must run asynchronously
+     * Expect shits to happen
+     */
+    public static class MongoDBUtils implements IDatabaseType {
+
+        /**
+         * Save all user's data
+         */
+        public void save(@NotNull User user) {
+            BasicDBObject query = new BasicDBObject();
+            query.append("uuid", user.getUniqueId().toString());
+
+            BasicDBObject updateObject = new BasicDBObject();
+            updateObject.append("$set", new BasicDBObject()
+                    .append("uuid", user.getUniqueId().toString())
+                    .append("property-name", user.getSkinProperty().getName())
+                    .append("property-value", user.getSkinProperty().getValue())
+                    .append("property-signature", user.getSkinProperty().getSignature())
+                    .append("skinName", user.getSkinName())
+            );
+
+            skinOverlay.getMongoDatabase().getCollection(OptionsUtil.DATABASE_MONGO_COLLECTION.getStringValue()).updateOne(query, updateObject);
+        }
+
+        /**
+         * Load user data
+         *
+         * @param user     User
+         * @param callback Callback
+         */
+        public void load(User user, Callback<Boolean> callback) {
+            setupUser(user, new Callback<>() {
+                @Override
+                public Boolean onSuccess() {
+                    BasicDBObject searchQuery = new BasicDBObject();
+                    searchQuery.append("uuid", user.getUniqueId().toString());
+                    FindIterable<Document> findIterable = skinOverlay.getMongoDatabase().getCollection(OptionsUtil.DATABASE_MONGO_COLLECTION.getStringValue()).find(searchQuery);
+                    Document document = findIterable.first();
+                    if (document == null) {
+                        return callback.onFailure(new Throwable("Document is null!!"));
+                    }
+                    user
+                            .append("skinProperty", new Property(document.getString("property-name"), document.getString("property-value"), document.getString("property-signature")))
+                            .append("skinName", document.getString("skinName"));
+                    return callback.onSuccess();
+                }
+
+                @Contract(pure = true)
+                @Override
+                public @NotNull Boolean onFailure() {
+                    return false;
+                }
+
+                @Override
+                public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
+                    callback.onFailure(throwable.getCause());
+                    return onFailure();
+                }
+            });
+        }
+
+        /**
+         * Set up the user
+         *
+         * @param user     User object
+         * @param callback Callback
+         */
+        public void setupUser(User user, Callback<Boolean> callback) {
+            if (!playerExists(user)) {
+                skinOverlay.getMongoDatabase().getCollection(OptionsUtil.DATABASE_MONGO_COLLECTION.getStringValue()).insertOne(new Document()
+                        .append("uuid", user.getUniqueId().toString())
+                        .append("property-name", user.getDefaultSkinProperty().getName())
+                        .append("property-value", user.getDefaultSkinProperty().getValue())
+                        .append("property-signature", user.getDefaultSkinProperty().getSignature())
+                        .append("skinName", user.getSkinName())
+                );
+            }
+            callback.onSuccess();
+        }
+
+        /**
+         * Check if the user exists
+         *
+         * @return true if user exists or false when is not
+         */
+        public boolean playerExists(@NotNull User user) {
+            long count = skinOverlay.getMongoDatabase().getCollection(OptionsUtil.DATABASE_MONGO_COLLECTION.getStringValue()).count(new BsonDocument("uuid", new BsonString(user.getUniqueId().toString())));
+            return count > 0;
+        }
+
+        /**
+         * Remove user's data from database.
+         */
+        public void delete(@NotNull User user) {
+            BasicDBObject theQuery = new BasicDBObject();
+            theQuery.put("uuid", user.getUniqueId().toString());
+            DeleteResult result = skinOverlay.getMongoDatabase().getCollection(OptionsUtil.DATABASE_MONGO_COLLECTION.getStringValue()).deleteMany(theQuery);
+            if (result.getDeletedCount() > 0) {
+                allUsersMap.remove(user.getUniqueId());
+            }
+        }
+
+
+        /**
+         * Get all users from the database
+         *
+         * @return all the users from the database
+         */
+        public ObjectMap<UUID, User> getAllUsers() {
+            ObjectMap<UUID, User> map = new ConcurrentObjectMap<>();
+            FindIterable<Document> iterable = skinOverlay.getMongoDatabase().getCollection(OptionsUtil.DATABASE_MONGO_COLLECTION.getStringValue()).find();
+            iterable.forEach((Block<Document>) document -> {
+                UserData userData = UserData.getUser(UUID.fromString(document.getString("uuid")));
+                try {
+                    load0(map, userData);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            return map;
+        }
+
+    }
+
+    private static void load0(ObjectMap<UUID, User> map, @NotNull UserData userData) throws Exception {
+        userData.load(new Callback<>() {
+            @Override
+            public Boolean onSuccess() {
+                map.append(userData.user().getUniqueId(), userData.user());
+                return true;
+            }
+
+            @Contract(pure = true)
+            @Override
+            public @NotNull Boolean onFailure() {
+                return false;
+            }
+
+            @Override
+            public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
+                throwable.printStackTrace();
+                return onFailure();
+            }
+        });
+    }
+
+
 }

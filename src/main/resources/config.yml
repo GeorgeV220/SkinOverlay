@@ -24,6 +24,13 @@ Options:
       password: "yourpassword"
       database: SkinOverlay
       table name: "skinoverlay_users"
+    MongoDB:
+      host: "localhost"
+      port: 27017
+      user: youruser
+      password: "yourpassword"
+      database: "skinoverlay"
+      collection: "skinoverlay_users"
   overlays:
     policeman:
       hat: true

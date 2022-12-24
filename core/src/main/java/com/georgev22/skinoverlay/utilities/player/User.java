@@ -2,10 +2,12 @@ package com.georgev22.skinoverlay.utilities.player;
 
 import com.georgev22.library.maps.ConcurrentObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.skinoverlay.SkinOverlay;
 import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public class User extends ConcurrentObjectMap<String, Object> {
@@ -44,16 +46,19 @@ public class User extends ConcurrentObjectMap<String, Object> {
     }
 
     public String getSkinName() {
-        return getString("skinName");
+        return getString("skinName", "default");
     }
 
     public Property getSkinProperty() {
         return get("skinProperty", Property.class);
     }
 
-    @Nullable
     public Property getDefaultSkinProperty() {
-        return get("defaultSkinProperty", Property.class);
+        try {
+            return get("defaultSkinProperty", SkinOverlay.getInstance().getSkinHandler().getSkin(new PlayerObject.PlayerObjectWrapper(uuid, SkinOverlay.getInstance().isBungee()).getPlayerObject()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

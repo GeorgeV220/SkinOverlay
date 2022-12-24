@@ -18,11 +18,11 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.sql.Connection;
@@ -73,7 +73,10 @@ public class SkinOverlay {
      * @return {@link com.georgev22.library.database.mongo.MongoDB} instance
      */
     @Getter
-    private @Nullable MongoClient mongoClient = null;
+    private MongoClient mongoClient = null;
+
+    @Getter
+    private MongoDatabase mongoDatabase = null;
 
     @Getter
     private File skinsDataFolder;
@@ -261,14 +264,17 @@ public class SkinOverlay {
                         OptionsUtil.DATABASE_MONGO_PORT.getStringValue(),
                         OptionsUtil.DATABASE_MONGO_USER.getStringValue(),
                         OptionsUtil.DATABASE_MONGO_PASSWORD.getStringValue(),
-                        OptionsUtil.DATABASE_MONGO_DATABASE.getStringValue());
-                //iDatabaseType = new UserData.MongoDBUtils();//TODO MONGO
-                mongoClient = databaseWrapper.connect().getMongoClient();
+                        OptionsUtil.DATABASE_MONGO_DATABASE.getStringValue())
+                        .connect();
+                iDatabaseType = new UserData.MongoDBUtils();
+                mongoClient = databaseWrapper.getMongoClient();
+                mongoDatabase = databaseWrapper.getMongoDatabase();
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MongoDB");
             }
             default -> {
                 databaseWrapper = null;
                 mongoClient = null;
+                mongoDatabase = null;
                 iDatabaseType = null;
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: Cache");
             }
