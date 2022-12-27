@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/GeorgeV220/SkinOverlay/compare/v1.0.0...v1.0.1) (2022-12-27)
+
+
+### Bug Fixes
+
+* Removed unused class ([b8f2d90](https://github.com/GeorgeV220/SkinOverlay/commit/b8f2d904f2c72400447180fd217f3a79eb0950c5))
+
 # 1.0.0 (2022-12-27)
 
 
