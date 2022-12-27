@@ -119,4 +119,16 @@ shadowJar {
 tasks.build.dependsOn(shadowJar)
 tasks.publish.dependsOn(shadowJar)
 
+processResources {
+    filesMatching('**.yml') {
+        project.properties.put('pluginName', this.pluginName)
+        project.properties.put("version", this.version)
+        project.properties.put("bungeeMain", this.bungeeMain)
+        project.properties.put("author", this.author)
+        expand project.properties
+        filteringCharset 'UTF-8'
+        expand project.properties
+    }
+}
+
 defaultTasks 'build'
