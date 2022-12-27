@@ -45,7 +45,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.georgev22:skinoverlay:1.0.0"
+    compileOnly "com.georgev22:skinoverlay:1.0.1"
 }
 ```
 
