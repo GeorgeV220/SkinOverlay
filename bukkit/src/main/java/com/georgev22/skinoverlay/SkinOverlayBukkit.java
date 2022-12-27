@@ -7,10 +7,11 @@ import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
 import com.georgev22.skinoverlay.handler.handlers.*;
 import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
+import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
@@ -32,6 +33,7 @@ import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVers
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
 public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
 
+    private int tick = 0;
 
     @Override
     public void onLoad() {
@@ -46,29 +48,29 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     }
 
     public void onEnable() {
-        Bukkit.getScheduler().runTaskTimer(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(Bukkit.getCurrentTick()), 0, 1L);
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            tick++;
+            SchedulerManager.getScheduler().mainThreadHeartbeat(tick);
+        }, 0, 1L);
         SkinOverlay.getInstance().setCommandManager(new PaperCommandManager(this));
-        if (getCurrentVersion().equals(V1_17_R1)) {
-            SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_17());
-        } else if (getCurrentVersion().equals(V1_18_R1)) {
-            SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_18());
-        } else if (getCurrentVersion().equals(V1_18_R2)) {
-            SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_18_R2());
-        } else if (getCurrentVersion().equals(V1_19_R1)) {
-            SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19());
-        } else if (getCurrentVersion().equals(V1_19_R2)) {
-            SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19_R2());
-        } else {
-            SkinOverlay.getInstance().setSkinHandler(new SkinHandler.SkinHandler_Unsupported());
+        switch (getCurrentVersion()) {
+            case V1_17_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_17());
+            case V1_18_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_18());
+            case V1_18_R2 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_18_R2());
+            case V1_19_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19());
+            case V1_19_R2 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19_R2());
+            default -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_());
         }
 
         SkinOverlay.getInstance().onEnable();
         BukkitMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
-        Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "skinoverlay:bungee", new PlayerListeners());
+        if (OptionsUtil.BUNGEE.getBooleanValue())
+            Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "skinoverlay:bungee", new PlayerListeners());
     }
 
     public void onDisable() {
         SkinOverlay.getInstance().onDisable();
+        Bukkit.getScheduler().cancelTasks(this);
     }
 
 

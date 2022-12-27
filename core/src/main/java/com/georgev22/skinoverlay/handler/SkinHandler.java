@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay.handler;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.gson.*;
 import com.mojang.authlib.GameProfile;
@@ -30,16 +31,12 @@ public abstract class SkinHandler {
                                     @NotNull final String skinName,
                                     final Property property);
 
-    protected abstract <T> GameProfile getGameProfile0(@NotNull final PlayerObject playerObject);
+    protected abstract <T> GameProfile getGameProfile0(@NotNull final PlayerObject playerObject) throws IOException;
 
     public GameProfile getGameProfile(@NotNull final PlayerObject playerObject) throws IOException {
         final GameProfile gameProfile = this.getGameProfile0(playerObject);
         if (!gameProfile.getProperties().containsKey("textures")) {
-            if (playerObject.isBedrock()) {
-                gameProfile.getProperties().put("textures", this.getXUIDSkin(this.getXUID(playerObject)));
-            } else {
-                gameProfile.getProperties().put("textures", this.getJavaSkin(playerObject));
-            }
+            gameProfile.getProperties().put("textures", this.getSkin(playerObject));
         }
         return gameProfile;
     }
@@ -124,34 +121,36 @@ public abstract class SkinHandler {
         return playerObject.isBedrock() ? this.getXUIDSkin(this.getXUID(playerObject)) : this.getJavaSkin(playerObject);
     }
 
-    public static class SkinHandler_Unsupported extends SkinHandler {
+    public static class SkinHandler_ extends SkinHandler {
         @Override
         public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
-            SkinOverlay.getInstance().getLogger().log(Level.WARNING, "[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
+            if (SkinOverlay.getInstance().isBungee()) {
+                if (reset) {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("reset", playerObject.playerUUID().toString(), "default");
+                } else {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("change", playerObject.playerUUID().toString(), skinName);
+                }
+            } else
+                SkinOverlay.getInstance().getLogger().log(Level.WARNING, "[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
         }
 
         @Override
         public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
-            SkinOverlay.getInstance().getLogger().log(Level.WARNING, "[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
+            if (SkinOverlay.getInstance().isBungee()) {
+                if (reset) {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), "default", property.getName(), property.getValue(), property.getSignature());
+                } else {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), skinName, property.getName(), property.getValue(), property.getSignature());
+                }
+            } else
+                SkinOverlay.getInstance().getLogger().log(Level.WARNING, "[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
         }
 
         @Override
-        protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
+        protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException {
             GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
             if (!gameProfile.getProperties().containsKey("textures")) {
-                if (playerObject.isBedrock()) {
-                    try {
-                        gameProfile.getProperties().put("textures", this.getXUIDSkin(this.getXUID(playerObject)));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    try {
-                        gameProfile.getProperties().put("textures", this.getJavaSkin(playerObject));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                gameProfile.getProperties().put("textures", this.getSkin(playerObject));
             }
             return gameProfile;
         }

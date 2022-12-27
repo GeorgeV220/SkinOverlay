@@ -141,15 +141,4 @@ public class Utilities {
         }, 20L);
     }
 
-    public static @NotNull GameProfile createGameProfile(@NotNull PlayerObject playerObject) {
-        GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
-        try {
-            gameProfile.getProperties().put("textures", skinOverlay.getSkinHandler().getSkin(playerObject));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return gameProfile;
-    }
-
-
 }

@@ -22,6 +22,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerListeners implements Listener, PluginMessageListener {
@@ -53,11 +54,12 @@ public class PlayerListeners implements Listener, PluginMessageListener {
                     return true;
                 }
 
-                public Boolean onFailure() {
+                @Contract(pure = true)
+                public @NotNull Boolean onFailure() {
                     return false;
                 }
 
-                public Boolean onFailure(Throwable throwable) {
+                public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
                     throwable.printStackTrace();
                     return onFailure();
                 }
@@ -81,17 +83,19 @@ public class PlayerListeners implements Listener, PluginMessageListener {
                 return true;
             }
 
-            public Boolean onFailure() {
+            @Contract(pure = true)
+            public @NotNull Boolean onFailure() {
                 return false;
             }
 
-            public Boolean onFailure(Throwable throwable) {
+            public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
                 throwable.printStackTrace();
                 return onFailure();
             }
         });
     }
 
+    @Override
     public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte @NotNull [] message) {
         if (!channel.equalsIgnoreCase("skinoverlay:bungee")) {
             return;
