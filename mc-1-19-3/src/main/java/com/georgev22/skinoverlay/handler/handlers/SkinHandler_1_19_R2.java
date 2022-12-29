@@ -4,7 +4,6 @@ package com.georgev22.skinoverlay.handler.handlers;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.google.common.collect.ImmutableList;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.network.protocol.Packet;
@@ -22,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 public class SkinHandler_1_19_R2 extends SkinHandler {
@@ -38,9 +38,8 @@ public class SkinHandler_1_19_R2 extends SkinHandler {
         final ServerPlayer entityPlayer = craftPlayer.getHandle();
 
 
-        ClientboundPlayerInfoRemovePacket removePlayer = new ClientboundPlayerInfoRemovePacket(ImmutableList.of(entityPlayer.getUUID()));
-        ClientboundPlayerInfoUpdatePacket addPlayer = new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, entityPlayer);
-
+        ClientboundPlayerInfoRemovePacket removePlayer = new ClientboundPlayerInfoRemovePacket(List.of(entityPlayer.getUUID()));
+        ClientboundPlayerInfoUpdatePacket addPlayer = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityPlayer));
         ServerLevel world = entityPlayer.getLevel();
         ServerPlayerGameMode gamemode = entityPlayer.gameMode;
 
