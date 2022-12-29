@@ -1,3 +1,11 @@
+## [1.0.2](https://github.com/GeorgeV220/SkinOverlay/compare/v1.0.1...v1.0.2) (2022-12-29)
+
+
+### Bug Fixes
+
+* **1_19_R2:** Fix player re-add packet ([de0bc3a](https://github.com/GeorgeV220/SkinOverlay/commit/de0bc3a96a294661a0b3aade8ae5152bfb95f709))
+* **ServerConnectedEvent:** Fixed a bug when a player disconnects immediately after login. ([9d0d0ae](https://github.com/GeorgeV220/SkinOverlay/commit/9d0d0aedf3cc2fe8dba3de8d926bc73260325dc6))
+
 ## [1.0.1](https://github.com/GeorgeV220/SkinOverlay/compare/v1.0.0...v1.0.1) (2022-12-27)
 
 

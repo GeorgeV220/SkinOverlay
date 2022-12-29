@@ -26,7 +26,7 @@ You can have your project depend on SkinOverlay as a dependency through the foll
         <dependency>
             <groupId>com.georgev22</groupId>
             <artifactId>skinoverlay</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -45,7 +45,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.georgev22:skinoverlay:1.0.1"
+    compileOnly "com.georgev22:skinoverlay:1.0.2"
 }
 ```
 
