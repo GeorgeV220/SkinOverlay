@@ -3,7 +3,6 @@ package com.georgev22.skinoverlay.handler;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.gson.*;
 import com.mojang.authlib.GameProfile;
@@ -124,26 +123,12 @@ public abstract class SkinHandler {
     public static class SkinHandler_ extends SkinHandler {
         @Override
         public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
-            if (SkinOverlay.getInstance().isBungee()) {
-                if (reset) {
-                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("reset", playerObject.playerUUID().toString(), "default");
-                } else {
-                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("change", playerObject.playerUUID().toString(), skinName);
-                }
-            } else
-                SkinOverlay.getInstance().getLogger().log(Level.WARNING, "[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
+            SkinOverlay.getInstance().getLogger().log(Level.WARNING, "[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
         }
 
         @Override
         public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
-            if (SkinOverlay.getInstance().isBungee()) {
-                if (reset) {
-                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), "default", property.getName(), property.getValue(), property.getSignature());
-                } else {
-                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), skinName, property.getName(), property.getValue(), property.getSignature());
-                }
-            } else
-                SkinOverlay.getInstance().getLogger().log(Level.WARNING, "[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
+            SkinOverlay.getInstance().getLogger().log(Level.WARNING, "[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
         }
 
         @Override

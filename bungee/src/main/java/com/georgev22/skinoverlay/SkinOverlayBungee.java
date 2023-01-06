@@ -8,13 +8,19 @@ import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
+import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
+import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.connection.InitialHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -51,7 +57,36 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     public void onEnable() {
         getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
         SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
-        SkinOverlay.getInstance().setSkinHandler(new SkinHandler.SkinHandler_());
+        SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
+            @Override
+            public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
+                if (reset) {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("reset", playerObject.playerUUID().toString(), "default");
+                } else {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("change", playerObject.playerUUID().toString(), skinName);
+                }
+            }
+
+            @Override
+            public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
+                if (reset) {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), "default", property.getName(), property.getValue(), property.getSignature());
+                } else {
+                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), skinName, property.getName(), property.getValue(), property.getSignature());
+                }
+            }
+
+            @Override
+            protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
+                GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
+                if (!gameProfile.getProperties().containsKey("textures")) {
+                    for (net.md_5.bungee.protocol.Property property : ((InitialHandler) ((ProxiedPlayer) playerObject.getPlayer()).getPendingConnection()).getLoginProfile().getProperties()) {
+                        gameProfile.getProperties().put(property.getName(), new Property(property.getName(), property.getValue(), property.getSignature()));
+                    }
+                }
+                return gameProfile;
+            }
+        });
         SkinOverlay.getInstance().onEnable();
         BungeeMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         getProxy().registerChannel("skinoverlay:bungee");
@@ -65,8 +100,8 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     }
 
     @Override
-    public boolean isBungee() {
-        return true;
+    public Type type() {
+        return Type.BUNGEE;
     }
 
     @Override
@@ -108,5 +143,10 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         List<PlayerObject> playerObjects = new ArrayList<>();
         getProxy().getPlayers().forEach(proxiedPlayer -> playerObjects.add(new PlayerObjectBungee(proxiedPlayer)));
         return playerObjects;
+    }
+
+    @Override
+    public Object getPlugin() {
+        return this;
     }
 }
