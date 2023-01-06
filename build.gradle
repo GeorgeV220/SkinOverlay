@@ -1,3 +1,5 @@
+import java.util.regex.Pattern
+
 buildscript {
     repositories {
         mavenCentral()
@@ -8,6 +10,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
     id 'kr.entree.spigradle' version '2.4.3'
     id 'io.freefair.lombok' version '6.6.1'
+    id "net.kyori.blossom" version "1.3.1"
     id 'java'
     id 'jacoco'
     id 'idea'
@@ -48,6 +51,7 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'io.freefair.lombok'
     apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'net.kyori.blossom'
 
     group project.property("group")
 
@@ -66,10 +70,13 @@ allprojects {
     dependencies {
         compileOnly 'io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT'
         compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
+        compileOnly 'net.md-5:bungeecord-proxy:1.19-R0.1-SNAPSHOT'
+        compileOnly 'com.velocitypowered:velocity-api:3.1.1'
 
         compileOnly 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
         compileOnly 'co.aikar:acf-bungee:0.5.1-SNAPSHOT'
-        compileOnly 'com.georgev22:martexlibrary:8.4.0'
+        compileOnly 'co.aikar:acf-velocity:0.5.1-SNAPSHOT'
+        compileOnly 'com.georgev22:martexlibrary:8.5.0'
         compileOnly 'com.georgev22.api:libraryloader:1.3.0'
         compileOnly 'org.jetbrains:annotations:23.1.0'
         compileOnly 'commons-codec:commons-codec:1.15'
@@ -95,11 +102,13 @@ repositories {
 dependencies {
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
     implementation 'co.aikar:acf-bungee:0.5.1-SNAPSHOT'
-    implementation 'com.georgev22:martexlibrary:8.4.0'
+    implementation 'co.aikar:acf-velocity:0.5.1-SNAPSHOT'
+    implementation 'com.georgev22:martexlibrary:8.5.0'
     implementation 'com.georgev22.api:libraryloader:1.3.0'
     implementation project(path: ':core')
     implementation project(path: ':bukkit')
     implementation project(path: ':bungee')
+    implementation project(path: ':velocity')
     implementation project(path: ':mc-1-17', configuration: 'reobf')
     implementation project(path: ':mc-1-18', configuration: 'reobf')
     implementation project(path: ':mc-1-18-2', configuration: 'reobf')
