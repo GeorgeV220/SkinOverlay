@@ -163,8 +163,8 @@ public class SkinOverlay {
         SchedulerManager.getScheduler().cancelTasks(this.getClass());
     }
 
-    public boolean isBungee() {
-        return skinOverlay.isBungee();
+    public SkinOverlayImpl.Type type() {
+        return skinOverlay.type();
     }
 
     public File getDataFolder() {
@@ -324,7 +324,7 @@ public class SkinOverlay {
     }
 
     private void unregisterCommands() {
-        if (!isBungee())
+        if (type().equals(SkinOverlayImpl.Type.PAPER))
             if (OptionsUtil.COMMAND_SKINOVERLAY.getBooleanValue())
                 ((PaperCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
     }
@@ -333,10 +333,12 @@ public class SkinOverlay {
         try {
             saveResource("lang_en.yml", true);
             commandManager.getLocales().setDefaultLocale(Locale.ENGLISH);
-            if (isBungee()) {
-                ((BungeeCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
-            } else {
-                ((PaperCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
+            switch (type()) {
+                case BUNGEE ->
+                        ((BungeeCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
+                case PAPER ->
+                        ((PaperCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
+                case VELOCITY -> ((VelocityCommandManager) commandManager).getLocales().loadLanguages();
             }
             commandManager.usePerIssuerLocale(true);
         } catch (Exception e) {

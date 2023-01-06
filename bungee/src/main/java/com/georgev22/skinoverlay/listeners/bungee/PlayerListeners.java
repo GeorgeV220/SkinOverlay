@@ -23,7 +23,7 @@ public class PlayerListeners implements Listener {
     public void onConnect(ServerConnectedEvent serverConnectedEvent) {
         if (!serverConnectedEvent.getPlayer().isConnected())
             return;
-        final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(serverConnectedEvent.getPlayer().getUniqueId(), this.skinOverlay.isBungee()).getPlayerObject();
+        final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(serverConnectedEvent.getPlayer().getUniqueId(), this.skinOverlay.type()).getPlayerObject();
         final UserData userData = UserData.getUser(playerObject);
         try {
             userData.load(new Utils.Callback<>() {
@@ -61,7 +61,7 @@ public class PlayerListeners implements Listener {
 
     @EventHandler
     public void onQuit(PlayerDisconnectEvent playerDisconnectEvent) {
-        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(playerDisconnectEvent.getPlayer().getUniqueId(), this.skinOverlay.isBungee()).getPlayerObject();
+        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(playerDisconnectEvent.getPlayer().getUniqueId(), this.skinOverlay.type()).getPlayerObject();
         final UserData userData = UserData.getUser(playerObject);
         userData.save(true, new Utils.Callback<>() {
 

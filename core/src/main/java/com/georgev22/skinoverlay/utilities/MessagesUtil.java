@@ -10,6 +10,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 
 import java.util.Map;
 
+import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import org.jetbrains.annotations.NotNull;
 
 public enum MessagesUtil {
@@ -84,12 +85,12 @@ public enum MessagesUtil {
 
     public void msg(CommandIssuer issuer, Map<String, String> map, boolean ignoreCase) {
         if (this.isMultiLined()) {
-            if (SkinOverlay.getInstance().isBungee()) {
+            if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
                 BungeeMinecraftUtils.msg(issuer.getIssuer(), this.getMessages(), map, ignoreCase);
             } else {
                 BukkitMinecraftUtils.msg(issuer.getIssuer(), this.getMessages(), map, ignoreCase);
             }
-        } else if (SkinOverlay.getInstance().isBungee()) {
+        } else if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
             BungeeMinecraftUtils.msg(issuer.getIssuer(), this.getMessages()[0], map, ignoreCase);
         } else {
             BukkitMinecraftUtils.msg(issuer.getIssuer(), this.getMessages()[0], map, ignoreCase);
@@ -98,12 +99,12 @@ public enum MessagesUtil {
 
     public void msgAll() {
         if (this.isMultiLined()) {
-            if (SkinOverlay.getInstance().isBungee()) {
+            if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
                 SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BungeeMinecraftUtils.msg((net.md_5.bungee.api.CommandSender) playerObject.getPlayer(), this.getMessages()));
             } else {
                 SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BukkitMinecraftUtils.msg((org.bukkit.command.CommandSender) playerObject.getPlayer(), this.getMessages()));
             }
-        } else if (SkinOverlay.getInstance().isBungee()) {
+        } else if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
             SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BungeeMinecraftUtils.msg((net.md_5.bungee.api.CommandSender) playerObject.getPlayer(), this.getMessages()[0]));
         } else {
             SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BukkitMinecraftUtils.msg((org.bukkit.command.CommandSender) playerObject.getPlayer(), this.getMessages()[0]));
@@ -112,12 +113,12 @@ public enum MessagesUtil {
 
     public void msgAll(Map<String, String> map, boolean ignoreCase) {
         if (this.isMultiLined()) {
-            if (SkinOverlay.getInstance().isBungee()) {
+            if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
                 SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BungeeMinecraftUtils.msg((net.md_5.bungee.api.CommandSender) playerObject.getPlayer(), this.getMessages()));
             } else {
                 SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BukkitMinecraftUtils.msg((org.bukkit.command.CommandSender) playerObject.getPlayer(), this.getMessages()[0], map, ignoreCase));
             }
-        } else if (SkinOverlay.getInstance().isBungee()) {
+        } else if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
             SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BungeeMinecraftUtils.msg((net.md_5.bungee.api.CommandSender) playerObject.getPlayer(), this.getMessages(), map, ignoreCase));
         } else {
             SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BukkitMinecraftUtils.msg((org.bukkit.command.CommandSender) playerObject.getPlayer(), this.getMessages()[0], map, ignoreCase));

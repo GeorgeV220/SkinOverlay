@@ -1,7 +1,9 @@
 package com.georgev22.skinoverlay.utilities.player;
 
+import java.util.List;
 import java.util.UUID;
 
+import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class PlayerObjectBungee implements PlayerObject {
@@ -24,5 +26,20 @@ public class PlayerObjectBungee implements PlayerObject {
     @Override
     public String playerName() {
         return this.proxiedPlayer.getName();
+    }
+
+    @Override
+    public void sendMessage(String input) {
+        BungeeMinecraftUtils.msg(proxiedPlayer, input);
+    }
+
+    @Override
+    public void sendMessage(List<String> input) {
+        BungeeMinecraftUtils.msg(proxiedPlayer, input);
+    }
+
+    @Override
+    public void sendMessage(String... input) {
+        BungeeMinecraftUtils.msg(proxiedPlayer, input);
     }
 }

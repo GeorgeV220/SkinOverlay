@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
+import co.aikar.commands.VelocityCommandManager;
 import co.aikar.commands.annotation.*;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
@@ -13,11 +14,14 @@ import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
 import com.georgev22.skinoverlay.utilities.player.UserData;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -35,22 +39,15 @@ public class SkinOverlayCommand extends BaseCommand {
     @Description("{@@commands.descriptions.skinoverlay.help}")
     @CommandPermission("skinoverlay.default")
     public void onHelp(final @NotNull CommandIssuer issuer) {
-        if (skinOverlay.isBungee()) {
-            BungeeMinecraftUtils.msg(issuer.getIssuer(), "&c&l(!)&c Commands &c&l(!)");
-            BungeeMinecraftUtils.msg(issuer.getIssuer(), "&6/skinoverlay reload");
-            BungeeMinecraftUtils.msg(issuer.getIssuer(), "&6/skinoverlay overlay");
-            BungeeMinecraftUtils.msg(issuer.getIssuer(), "&6/skinoverlay url");
-            BungeeMinecraftUtils.msg(issuer.getIssuer(), "&6/skinoverlay clear");
-            BungeeMinecraftUtils.msg(issuer.getIssuer(), "&c&l==============");
-        } else {
-            BukkitMinecraftUtils.msg(issuer.getIssuer(), "&c&l(!)&c Commands &c&l(!)");
-            BukkitMinecraftUtils.msg(issuer.getIssuer(), "&6/skinoverlay reload");
-            BukkitMinecraftUtils.msg(issuer.getIssuer(), "&6/skinoverlay overlay");
-            BukkitMinecraftUtils.msg(issuer.getIssuer(), "&6/skinoverlay url");
-            BukkitMinecraftUtils.msg(issuer.getIssuer(), "&6/skinoverlay clear");
-            BukkitMinecraftUtils.msg(issuer.getIssuer(), "&c&l==============");
+        for (String input : Arrays.asList(
+                "&c&l(!)&c Commands &c&l(!)",
+                "&6/skinoverlay reload",
+                "&6/skinoverlay overlay",
+                "&6/skinoverlay url",
+                "&6/skinoverlay clear",
+                "&c&l==============")) {
+            issuer.sendMessage(LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacy('&').deserialize(input)));
         }
-
     }
 
     @Subcommand("reload")
@@ -67,7 +64,7 @@ public class SkinOverlayCommand extends BaseCommand {
                                 @Override
                                 public Boolean onSuccess() {
                                     atomicBoolean.set(true);
-                                    Utilities.updateSkin(new PlayerObject.PlayerObjectWrapper(uuid, skinOverlay.isBungee()).getPlayerObject(), true, false);
+                                    Utilities.updateSkin(new PlayerObject.PlayerObjectWrapper(uuid, skinOverlay.type()).getPlayerObject(), true, false);
                                     return atomicBoolean.get();
                                 }
 
@@ -104,10 +101,9 @@ public class SkinOverlayCommand extends BaseCommand {
         skinOverlay.getFileManager().getData().reloadFile();
         skinOverlay.getFileManager().getMessages().reloadFile();
         MessagesUtil.repairPaths(fm.getMessages());
-        if (skinOverlay.isBungee()) {
-            BungeeMinecraftUtils.msg(issuer.getIssuer(), "&a&l(!)&a Plugin reloaded!");
-        } else {
-            BukkitMinecraftUtils.msg(issuer.getIssuer(), "&a&l(!)&a Plugin reloaded!");
+        switch (skinOverlay.type()) {
+            case PAPER -> BukkitMinecraftUtils.msg(issuer.getIssuer(), "&a&l(!)&a Plugin reloaded!");
+            case BUNGEE -> BungeeMinecraftUtils.msg(issuer.getIssuer(), "&a&l(!)&a Plugin reloaded!");
         }
 
     }
@@ -140,9 +136,9 @@ public class SkinOverlayCommand extends BaseCommand {
                 MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer.getIssuer(), new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
                 return;
             }
-            target = Optional.of(new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.isBungee()).getPlayerObject());
+            target = Optional.of(new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()).getPlayerObject());
         }
-        Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), overlay, new PlayerObject.PlayerObjectWrapper(target.get().playerUUID(), skinOverlay.isBungee()).getPlayerObject());
+        Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), overlay, new PlayerObject.PlayerObjectWrapper(target.get().playerUUID(), skinOverlay.type()).getPlayerObject());
     }
 
     @Subcommand("clear")
@@ -161,7 +157,7 @@ public class SkinOverlayCommand extends BaseCommand {
             return;
         }
         if (args.length == 0) {
-            Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.isBungee()).getPlayerObject());
+            Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()).getPlayerObject());
         } else {
             clear0(issuer.getIssuer(), args[0]);
         }
@@ -174,6 +170,6 @@ public class SkinOverlayCommand extends BaseCommand {
             MessagesUtil.OFFLINE_PLAYER.msg(issuer.getIssuer(), new HashObjectMap<String, String>().append("%player%", target), true);
             return;
         }
-        Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(optionalPlayerObject.get().playerUUID(), skinOverlay.isBungee()).getPlayerObject());
+        Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(optionalPlayerObject.get().playerUUID(), skinOverlay.type()).getPlayerObject());
     }
 }

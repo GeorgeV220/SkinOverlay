@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public interface SkinOverlayImpl {
 
-    boolean isBungee();
+    Type type();
 
     File getDataFolder();
 
@@ -27,7 +27,15 @@ public interface SkinOverlayImpl {
 
     List<PlayerObject> onlinePlayers();
 
+    Object getPlugin();
+
     record Description(String name, String version, String main, List<String> authors) {
+    }
+
+    enum Type {
+        PAPER,
+        BUNGEE,
+        VELOCITY
     }
 
 }

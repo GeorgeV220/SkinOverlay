@@ -7,6 +7,7 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SkinHandler.Request;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
+import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.google.gson.JsonArray;
@@ -121,17 +122,17 @@ public class Utilities {
             Property property = pm.get("textures").iterator().next();
             pm.remove("textures", property);
             pm.put("textures", userData.getSkinProperty());
-            if (!skinOverlay.isBungee()) {
+            if (skinOverlay.type().equals(SkinOverlayImpl.Type.PAPER)) {
                 SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
                     org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.getPlayer();
-                    player.hidePlayer(player);
-                    player.showPlayer(player);
+                    player.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().getPlugin(), player);
+                    player.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().getPlugin(), player);
                     skinOverlay.getSkinHandler().updateSkin(skinOverlay.getConfig(), playerObject, reset, userData.getSkinName());
                     if (forOthers) {
                         skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
                             org.bukkit.entity.Player p = (org.bukkit.entity.Player) playerObjects.getPlayer();
-                            p.hidePlayer(player);
-                            p.showPlayer(player);
+                            p.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().getPlugin(), player);
+                            p.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().getPlugin(), player);
                         });
                     }
                 }, 20L);

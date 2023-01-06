@@ -33,7 +33,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         if (OptionsUtil.BUNGEE.getBooleanValue()) {
             return;
         }
-        final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(event.getPlayer().getUniqueId(), skinOverlay.isBungee()).getPlayerObject();
+        final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(event.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
         final UserData userData = UserData.getUser(playerObject);
         try {
             userData.load(new Utils.Callback<>() {
@@ -74,7 +74,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         if (OptionsUtil.BUNGEE.getBooleanValue()) {
             return;
         }
-        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(event.getPlayer().getUniqueId(), skinOverlay.isBungee()).getPlayerObject();
+        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(event.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
         final UserData userData = UserData.getUser(playerObject);
         userData.save(true, new Utils.Callback<>() {
 
@@ -104,7 +104,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         String subChannel = in.readUTF();
         String uuid = in.readUTF();
         String skinName = in.readUTF();
-        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(UUID.fromString(Objects.requireNonNull(uuid)), skinOverlay.isBungee()).getPlayerObject();
+        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(UUID.fromString(Objects.requireNonNull(uuid)), skinOverlay.type()).getPlayerObject();
         if (subChannel.equalsIgnoreCase("change")) {
             Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skinName + ".png")), skinName, playerObject);
         } else if (subChannel.equalsIgnoreCase("reset")) {

@@ -75,8 +75,8 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
 
 
     @Override
-    public boolean isBungee() {
-        return false;
+    public Type type() {
+        return Type.PAPER;
     }
 
     @Override
@@ -100,5 +100,10 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         List<PlayerObject> playerObjects = new ArrayList<>();
         Bukkit.getOnlinePlayers().forEach(player -> playerObjects.add(new PlayerObjectBukkit(player)));
         return playerObjects;
+    }
+
+    @Override
+    public Object getPlugin() {
+        return this;
     }
 }

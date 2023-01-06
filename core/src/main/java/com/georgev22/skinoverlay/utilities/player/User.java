@@ -55,7 +55,7 @@ public class User extends ConcurrentObjectMap<String, Object> {
 
     public Property getDefaultSkinProperty() {
         try {
-            return get("defaultSkinProperty", SkinOverlay.getInstance().getSkinHandler().getSkin(new PlayerObject.PlayerObjectWrapper(uuid, SkinOverlay.getInstance().isBungee()).getPlayerObject()));
+            return get("defaultSkinProperty", SkinOverlay.getInstance().getSkinHandler().getSkin(new PlayerObject.PlayerObjectWrapper(uuid, SkinOverlay.getInstance().type()).getPlayerObject()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
