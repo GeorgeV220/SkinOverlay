@@ -1,3 +1,24 @@
+# [2.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v1.0.2...v2.0.0) (2023-01-06)
+
+
+### Bug Fixes
+
+* **gradle.yml:** Bump to node v18 ([c2df873](https://github.com/GeorgeV220/SkinOverlay/commit/c2df873951327230afe3f8ab814d12bde76118fa))
+
+
+### Features
+
+* **MessagesUtil:** Send messages correctly ([7a9a3ae](https://github.com/GeorgeV220/SkinOverlay/commit/7a9a3aee6037e9443f76327b6b3a5878db294207))
+* **SkinOverlayBungee:** BungeeCord SkinHandler ([029f4c0](https://github.com/GeorgeV220/SkinOverlay/commit/029f4c0cc665347bc07ae78b35a62944c7983de6))
+* **SkinOverlayBungee:** Types ([5048f2e](https://github.com/GeorgeV220/SkinOverlay/commit/5048f2ebb3f1a210f832f53e9f132f392664219f))
+* **SkinOverlayCommand:** Send messages correctly ([2e86822](https://github.com/GeorgeV220/SkinOverlay/commit/2e8682269d9d20706e20d4f1ed2c7cc6e2f5d0fa))
+* **Velocity:** Velocity support!! ([816d005](https://github.com/GeorgeV220/SkinOverlay/commit/816d005d1711ff426e73edf76a392374a3af02f3))
+
+
+### BREAKING CHANGES
+
+* **Velocity:** A lot of APIs changed
+
 ## [1.0.2](https://github.com/GeorgeV220/SkinOverlay/compare/v1.0.1...v1.0.2) (2022-12-29)
 
 
