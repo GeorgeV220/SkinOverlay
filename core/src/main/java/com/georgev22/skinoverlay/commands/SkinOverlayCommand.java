@@ -2,19 +2,15 @@ package com.georgev22.skinoverlay.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
-import co.aikar.commands.VelocityCommandManager;
 import co.aikar.commands.annotation.*;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.minecraft.BungeeMinecraftUtils;
-import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -101,10 +97,7 @@ public class SkinOverlayCommand extends BaseCommand {
         skinOverlay.getFileManager().getData().reloadFile();
         skinOverlay.getFileManager().getMessages().reloadFile();
         MessagesUtil.repairPaths(fm.getMessages());
-        switch (skinOverlay.type()) {
-            case PAPER -> BukkitMinecraftUtils.msg(issuer.getIssuer(), "&a&l(!)&a Plugin reloaded!");
-            case BUNGEE -> BungeeMinecraftUtils.msg(issuer.getIssuer(), "&a&l(!)&a Plugin reloaded!");
-        }
+        issuer.sendMessage(LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacy('&').deserialize("&a&l(!)&a Plugin reloaded!")));
 
     }
 
@@ -116,6 +109,7 @@ public class SkinOverlayCommand extends BaseCommand {
     @Syntax("overlay <overlay> [player]")
     public void overlay(@NotNull CommandIssuer issuer, String @NotNull [] args) {
         if (args.length == 0) {
+            MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer.getIssuer(), new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
             return;
         }
         String overlay = args[0];
