@@ -2,16 +2,16 @@ package com.georgev22.skinoverlay.utilities;
 
 import co.aikar.commands.CommandIssuer;
 import com.georgev22.library.maps.HashObjectMap;
-import com.georgev22.library.minecraft.BukkitMinecraftUtils;
-import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.configmanager.CFG;
 import com.georgev22.skinoverlay.SkinOverlay;
 
 import java.util.Map;
 
-import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
+
+import static com.georgev22.library.utilities.Utils.placeHolder;
 
 public enum MessagesUtil {
     NO_PERMISSION("Messages.No Permission", "&c&l(!)&c You do not have the correct permissions to do this!"),
@@ -80,48 +80,40 @@ public enum MessagesUtil {
     }
 
     public void msg(@NotNull CommandIssuer issuer) {
-        this.msg(issuer.getIssuer(), new HashObjectMap<String, String>(), false);
+        this.msg(issuer.getIssuer(), new HashObjectMap<>(), false);
     }
 
     public void msg(CommandIssuer issuer, Map<String, String> map, boolean ignoreCase) {
         if (this.isMultiLined()) {
-            if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
-                BungeeMinecraftUtils.msg(issuer.getIssuer(), this.getMessages(), map, ignoreCase);
-            } else {
-                BukkitMinecraftUtils.msg(issuer.getIssuer(), this.getMessages(), map, ignoreCase);
+            for (String message : messages) {
+                issuer.sendMessage(LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacy('&').deserialize(placeHolder(message, map, ignoreCase))));
             }
-        } else if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
-            BungeeMinecraftUtils.msg(issuer.getIssuer(), this.getMessages()[0], map, ignoreCase);
         } else {
-            BukkitMinecraftUtils.msg(issuer.getIssuer(), this.getMessages()[0], map, ignoreCase);
+            issuer.sendMessage(LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacy('&').deserialize(placeHolder(this.getMessages()[0], map, ignoreCase))));
         }
     }
 
     public void msgAll() {
         if (this.isMultiLined()) {
-            if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
-                SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BungeeMinecraftUtils.msg((net.md_5.bungee.api.CommandSender) playerObject.getPlayer(), this.getMessages()));
-            } else {
-                SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BukkitMinecraftUtils.msg((org.bukkit.command.CommandSender) playerObject.getPlayer(), this.getMessages()));
-            }
-        } else if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BungeeMinecraftUtils.msg((net.md_5.bungee.api.CommandSender) playerObject.getPlayer(), this.getMessages()[0]));
+            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> {
+                playerObject.sendMessage(this.getMessages());
+            });
         } else {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BukkitMinecraftUtils.msg((org.bukkit.command.CommandSender) playerObject.getPlayer(), this.getMessages()[0]));
+            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> {
+                playerObject.sendMessage(this.getMessages()[0]);
+            });
         }
     }
 
     public void msgAll(Map<String, String> map, boolean ignoreCase) {
         if (this.isMultiLined()) {
-            if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
-                SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BungeeMinecraftUtils.msg((net.md_5.bungee.api.CommandSender) playerObject.getPlayer(), this.getMessages()));
-            } else {
-                SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BukkitMinecraftUtils.msg((org.bukkit.command.CommandSender) playerObject.getPlayer(), this.getMessages()[0], map, ignoreCase));
-            }
-        } else if (SkinOverlay.getInstance().type().equals(SkinOverlayImpl.Type.BUNGEE)) {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BungeeMinecraftUtils.msg((net.md_5.bungee.api.CommandSender) playerObject.getPlayer(), this.getMessages(), map, ignoreCase));
+            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> {
+                playerObject.sendMessage(placeHolder(this.getMessages(), map, ignoreCase));
+            });
         } else {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> BukkitMinecraftUtils.msg((org.bukkit.command.CommandSender) playerObject.getPlayer(), this.getMessages()[0], map, ignoreCase));
+            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> {
+                playerObject.sendMessage(placeHolder(this.getMessages()[0], map, ignoreCase));
+            });
         }
     }
 
