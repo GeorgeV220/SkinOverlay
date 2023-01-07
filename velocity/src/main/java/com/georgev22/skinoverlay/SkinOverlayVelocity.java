@@ -99,7 +99,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     public void onEnable() {
         getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
-        SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this));
+        SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, getDataFolder()));
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
             public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
