@@ -109,7 +109,7 @@ public class SkinOverlayCommand extends BaseCommand {
     @Syntax("overlay <overlay> [player]")
     public void overlay(@NotNull CommandIssuer issuer, String @NotNull [] args) {
         if (args.length == 0) {
-            MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer.getIssuer(), new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
+            MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
             return;
         }
         String overlay = args[0];
@@ -118,16 +118,16 @@ public class SkinOverlayCommand extends BaseCommand {
             if (issuer.hasPermission("skinoverlay.wear.overlay.others")) {
                 target = skinOverlay.getSkinOverlay().onlinePlayers().stream().filter(playerObject -> playerObject.playerName().equalsIgnoreCase(args[1])).findFirst();
                 if (target.isEmpty()) {
-                    MessagesUtil.OFFLINE_PLAYER.msg(issuer.getIssuer(), new HashObjectMap<String, String>().append("%player%", args[1]), true);
+                    MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", args[1]), true);
                     return;
                 }
             } else {
-                MessagesUtil.NO_PERMISSION.msg(issuer.getIssuer());
+                MessagesUtil.NO_PERMISSION.msg(issuer);
                 return;
             }
         } else {
             if (!(issuer.isPlayer())) {
-                MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer.getIssuer(), new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
+                MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
                 return;
             }
             target = Optional.of(new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()).getPlayerObject());
@@ -144,16 +144,16 @@ public class SkinOverlayCommand extends BaseCommand {
     public void clear(@NotNull CommandIssuer issuer, String[] args) {
         if (!issuer.isPlayer()) {
             if (args.length == 0) {
-                MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer.getIssuer(), new HashObjectMap<String, String>().append("%command%", "wear clear <player>"), true);
+                MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear clear <player>"), true);
                 return;
             }
-            clear0(issuer.getIssuer(), args[0]);
+            clear0(issuer, args[0]);
             return;
         }
         if (args.length == 0) {
             Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()).getPlayerObject());
         } else {
-            clear0(issuer.getIssuer(), args[0]);
+            clear0(issuer, args[0]);
         }
 
     }
@@ -161,7 +161,7 @@ public class SkinOverlayCommand extends BaseCommand {
     private void clear0(@NotNull CommandIssuer issuer, String target) {
         Optional<PlayerObject> optionalPlayerObject = skinOverlay.getSkinOverlay().onlinePlayers().stream().filter(playerObject -> playerObject.playerName().equalsIgnoreCase(target)).findFirst();
         if (optionalPlayerObject.isEmpty()) {
-            MessagesUtil.OFFLINE_PLAYER.msg(issuer.getIssuer(), new HashObjectMap<String, String>().append("%player%", target), true);
+            MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", target), true);
             return;
         }
         Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(optionalPlayerObject.get().playerUUID(), skinOverlay.type()).getPlayerObject());
