@@ -1,6 +1,6 @@
 Options:
   experimental features: false #Turn on experimental features
-  bungeecord: false
+  proxy: false
   commands: #Disable or enable plugin commands
     skinoverlay: true
   updater:

@@ -15,7 +15,7 @@ import static com.georgev22.library.utilities.Utils.Assertions.notNull;
 
 public enum OptionsUtil {
 
-    BUNGEE("bungeecord", false, Optional.empty()),
+    PROXY("proxy", false, Optional.of("bungeecord")),
 
     COMMAND_SKINOVERLAY("commands.skinoverlay", true, Optional.empty()),
 

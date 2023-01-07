@@ -313,6 +313,9 @@ public class SkinOverlay {
 
 
     private void setupCommands() {
+        if (OptionsUtil.PROXY.getBooleanValue())
+            return;
+        //noinspection deprecation
         commandManager.enableUnstableAPI("help");
 
         loadCommandLocales();
@@ -324,9 +327,12 @@ public class SkinOverlay {
     }
 
     private void unregisterCommands() {
-        if (type().equals(SkinOverlayImpl.Type.PAPER))
-            if (OptionsUtil.COMMAND_SKINOVERLAY.getBooleanValue())
-                ((PaperCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
+        if (!OptionsUtil.PROXY.getBooleanValue())
+            switch (type()) {
+                case PAPER -> ((PaperCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
+                case BUNGEE -> ((BungeeCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
+                case VELOCITY -> ((VelocityCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
+            }
     }
 
     private void loadCommandLocales() {
@@ -338,7 +344,8 @@ public class SkinOverlay {
                         ((BungeeCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
                 case PAPER ->
                         ((PaperCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
-                case VELOCITY -> ((VelocityCommandManager) commandManager).getLocales().loadLanguages();
+                case VELOCITY ->
+                        ((VelocityCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
             }
             commandManager.usePerIssuerLocale(true);
         } catch (Exception e) {

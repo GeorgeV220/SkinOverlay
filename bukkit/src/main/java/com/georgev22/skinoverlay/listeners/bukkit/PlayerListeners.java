@@ -30,7 +30,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if (OptionsUtil.BUNGEE.getBooleanValue()) {
+        if (OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
         final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(event.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
@@ -71,7 +71,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        if (OptionsUtil.BUNGEE.getBooleanValue()) {
+        if (OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
         PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(event.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
