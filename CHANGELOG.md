@@ -1,3 +1,17 @@
+# [2.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v2.0.0...v2.1.0) (2023-01-07)
+
+
+### Bug Fixes
+
+* **Command:** Fixed messages ([f72d5d4](https://github.com/GeorgeV220/SkinOverlay/commit/f72d5d4a99c203846cfc59fb859af4e9c5f84366))
+* **Velocity:** ACF Locates for velocity ([1fa59a2](https://github.com/GeorgeV220/SkinOverlay/commit/1fa59a2453f29992cbf502a88c09ed733b3f5b24))
+
+
+### Features
+
+* Added SkinOverlayImpl#getServerImpl ([b143b2e](https://github.com/GeorgeV220/SkinOverlay/commit/b143b2e5724fbe204947922eb8bc4a703843ea5f))
+* **Options:** Changed BUNGEE to PROXY ([6a0024a](https://github.com/GeorgeV220/SkinOverlay/commit/6a0024a567dfb814c655a61b9285b526861151cc))
+
 # [2.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v1.0.2...v2.0.0) (2023-01-06)
 
 
