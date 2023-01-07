@@ -132,7 +132,7 @@ public class SkinOverlayCommand extends BaseCommand {
             }
             target = Optional.of(new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()).getPlayerObject());
         }
-        Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), overlay, new PlayerObject.PlayerObjectWrapper(target.get().playerUUID(), skinOverlay.type()).getPlayerObject());
+        Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), overlay, new PlayerObject.PlayerObjectWrapper(target.get().playerUUID(), skinOverlay.type()).getPlayerObject(), issuer);
     }
 
     @Subcommand("clear")
@@ -151,7 +151,7 @@ public class SkinOverlayCommand extends BaseCommand {
             return;
         }
         if (args.length == 0) {
-            Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()).getPlayerObject());
+            Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()).getPlayerObject(), issuer);
         } else {
             clear0(issuer, args[0]);
         }
@@ -164,6 +164,6 @@ public class SkinOverlayCommand extends BaseCommand {
             MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", target), true);
             return;
         }
-        Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(optionalPlayerObject.get().playerUUID(), skinOverlay.type()).getPlayerObject());
+        Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(optionalPlayerObject.get().playerUUID(), skinOverlay.type()).getPlayerObject(), issuer);
     }
 }

@@ -7,6 +7,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlayVelocity;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -61,7 +62,8 @@ public class PlayerListeners {
 
     @Subscribe
     public void onQuit(DisconnectEvent playerDisconnectEvent) {
-        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(playerDisconnectEvent.getPlayer().getUniqueId(), this.skinOverlay.type()).getPlayerObject();
+        //Wrapper won't work here
+        PlayerObject playerObject = new PlayerObjectVelocity(playerDisconnectEvent.getPlayer());
         final UserData userData = UserData.getUser(playerObject);
         userData.save(true, new Utils.Callback<>() {
 

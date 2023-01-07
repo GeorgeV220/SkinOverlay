@@ -106,4 +106,9 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     public Object getPlugin() {
         return this;
     }
+
+    @Override
+    public Object getServerImpl() {
+        return getServer();
+    }
 }

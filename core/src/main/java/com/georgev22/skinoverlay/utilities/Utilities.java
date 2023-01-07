@@ -1,9 +1,9 @@
 package com.georgev22.skinoverlay.utilities;
 
+import co.aikar.commands.CommandIssuer;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SkinHandler.Request;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
@@ -19,6 +19,7 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -43,7 +44,7 @@ public class Utilities {
         updateSkin(playerObject, true, false);
     }
 
-    public static void setSkin(ImageSupplier imageSupplier, String skinName, PlayerObject playerObject) {
+    public static void setSkin(ImageSupplier imageSupplier, String skinName, PlayerObject playerObject, @Nullable CommandIssuer commandIssuer) {
         SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
             Image overlay;
             try {
@@ -68,6 +69,11 @@ public class Utilities {
                         userData.setSkinName(skinName);
                         userData.setProperty(new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         Utilities.updateSkin(playerObject, true, true);
+                        if (commandIssuer == null) {
+                            MessagesUtil.RESET.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
+                        } else {
+                            MessagesUtil.RESET.msg(commandIssuer, new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
+                        }
                         break;
                     }
                     String base64 = object.getAsJsonObject().get("value").getAsString();
@@ -96,7 +102,12 @@ public class Utilities {
                             userData.setSkinName(skinName);
                             userData.setProperty(new Property("textures", texturesValue, texturesSignature));
                             Utilities.updateSkin(playerObject, true, false);
-                            skinOverlay.getLogger().log(Level.INFO, Utils.placeHolder(MessagesUtil.DONE.getMessages()[0], new HashObjectMap<String, String>().append("%url%", texture.get("url").getAsString()), true));
+                            if (commandIssuer == null) {
+                                MessagesUtil.DONE.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
+                            } else {
+                                MessagesUtil.DONE.msg(commandIssuer, new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
+                            }
+
                         }
                         default ->
                                 skinOverlay.getLogger().log(Level.SEVERE, "Unknown error code: " + request.getHttpCode());

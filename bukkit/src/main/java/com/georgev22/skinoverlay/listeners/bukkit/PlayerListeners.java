@@ -106,9 +106,9 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         String skinName = in.readUTF();
         PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(UUID.fromString(Objects.requireNonNull(uuid)), skinOverlay.type()).getPlayerObject();
         if (subChannel.equalsIgnoreCase("change")) {
-            Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skinName + ".png")), skinName, playerObject);
+            Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skinName + ".png")), skinName, playerObject, null);
         } else if (subChannel.equalsIgnoreCase("reset")) {
-            Utilities.setSkin(() -> null, skinName, playerObject);
+            Utilities.setSkin(() -> null, skinName, playerObject, null);
         } else if (subChannel.equalsIgnoreCase("changeWithProperties")) {
             String name = in.readUTF();
             String value = in.readUTF();

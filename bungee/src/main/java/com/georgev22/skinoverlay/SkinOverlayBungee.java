@@ -18,6 +18,7 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.connection.InitialHandler;
@@ -148,5 +149,10 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     @Override
     public Object getPlugin() {
         return this;
+    }
+
+    @Override
+    public ProxyServer getServerImpl() {
+        return getProxy();
     }
 }

@@ -2,9 +2,7 @@ package com.georgev22.skinoverlay.utilities.player;
 
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
-import com.velocitypowered.api.proxy.ProxyServer;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,11 +41,7 @@ public interface PlayerObject {
                     return new PlayerObjectBukkit(org.bukkit.Bukkit.getOfflinePlayer(this.uuid));
                 }
                 case VELOCITY -> {
-                    try {
-                        return new PlayerObjectVelocity(((ProxyServer) SkinOverlay.getInstance().getSkinOverlay().getPlugin().getClass().getMethod("getProxy").invoke(SkinOverlay.getInstance().getSkinOverlay().getPlugin())).getPlayer(this.uuid).get());
-                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
+                    return new PlayerObjectVelocity(((com.velocitypowered.api.proxy.ProxyServer) SkinOverlay.getInstance().getSkinOverlay().getServerImpl()).getPlayer(this.uuid).get());
                 }
                 default -> {
                     return null;

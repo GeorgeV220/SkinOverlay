@@ -208,4 +208,9 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     public Object getPlugin() {
         return this;
     }
+
+    @Override
+    public ProxyServer getServerImpl() {
+        return server;
+    }
 }

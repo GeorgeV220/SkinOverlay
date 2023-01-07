@@ -29,6 +29,8 @@ public interface SkinOverlayImpl {
 
     Object getPlugin();
 
+    Object getServerImpl();
+
     record Description(String name, String version, String main, List<String> authors) {
     }
 
