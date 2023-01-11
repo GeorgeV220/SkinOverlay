@@ -1,3 +1,21 @@
+# [3.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v2.1.0...v3.0.0) (2023-01-11)
+
+
+### Bug Fixes
+
+* Changed SkinHandler fromProperties boolean to Property ([6fc4532](https://github.com/GeorgeV220/SkinOverlay/commit/6fc45320cad197e0200430f06b85782b8d09f1d9))
+
+
+### Features
+
+* Moved SkinHandler.Request to Utilities ([b8bb9d9](https://github.com/GeorgeV220/SkinOverlay/commit/b8bb9d95a6dc5c3c07e3dfe1198381a5ebca42b2))
+* **SkinHandler_Legacy:** Added SkinHandler_Legacy ([31a49c0](https://github.com/GeorgeV220/SkinOverlay/commit/31a49c005a92c4bcd8692d4b0d5db51a82aff9e3))
+
+
+### BREAKING CHANGES
+
+* **SkinHandler_Legacy:** Added new methods and change of the old ones.
+
 # [2.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v2.0.0...v2.1.0) (2023-01-07)
 
 
