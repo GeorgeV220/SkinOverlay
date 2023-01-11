@@ -5,7 +5,6 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.handler.SkinHandler.Request;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -18,14 +17,17 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import org.apache.commons.lang.Validate;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
+import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.Collection;
@@ -54,7 +56,7 @@ public class Utilities {
             }
             UserData userData = UserData.getUser(playerObject);
             try {
-                byte[] profileBytes = skinOverlay.getSkinHandler().getProfileBytes(playerObject, userData.getDefaultSkinProperty() != null);
+                byte[] profileBytes = skinOverlay.getSkinHandler().getProfileBytes(playerObject, userData.getDefaultSkinProperty());
                 JsonElement json = JsonParser.parseString(new String(profileBytes));
                 JsonArray properties = json.getAsJsonObject().get("properties").getAsJsonArray();
                 for (JsonElement object : properties) {
@@ -91,7 +93,14 @@ public class Utilities {
                     String boundary = "*****";
                     String crlf = "\r\n";
                     String twoHyphens = "--";
-                    Request request = new Request("https://api.mineskin.org/generate/upload?visibility=1").postRequest().setProperty(ObjectMap.Pair.create("Content-Type", ("multipart/form-data;boundary=" + boundary))).writeToOutputStream(twoHyphens + boundary + crlf, "Content-Disposition: form-data; name=\"file\";filename=\"file.png\"" + crlf, crlf).writeToOutputStream(new byte[][]{stream.toByteArray()}).writeToOutputStream(crlf, twoHyphens + boundary + twoHyphens + crlf).closeOutputStream().finalizeRequest();
+                    Request request = new Request()
+                            .openConnection("https://api.mineskin.org/generate/upload?visibility=1")
+                            .postRequest()
+                            .setProperty(ObjectMap.Pair.create("Content-Type", ("multipart/form-data;boundary=" + boundary)))
+                            .writeToOutputStream(twoHyphens + boundary + crlf, "Content-Disposition: form-data; name=\"file\";filename=\"file.png\"" + crlf, crlf)
+                            .writeToOutputStream(new byte[][]{stream.toByteArray()}).writeToOutputStream(crlf, twoHyphens + boundary + twoHyphens + crlf)
+                            .closeOutputStream()
+                            .finalizeRequest();
                     switch (request.getHttpCode()) {
                         case 429 -> skinOverlay.getLogger().log(Level.SEVERE, "Too many requests");
                         case 200 -> {
@@ -151,6 +160,90 @@ public class Utilities {
                 skinOverlay.getSkinHandler().updateSkin(skinOverlay.getConfig(), playerObject, reset, userData.getSkinName(), userData.getSkinProperty());
             }
         }, 20L);
+    }
+
+    public static class Request {
+        private String address;
+        private byte[] bytes;
+        private int httpCode;
+        private HttpsURLConnection httpsURLConnection;
+
+        public Request getRequest() throws ProtocolException {
+            this.httpsURLConnection.setRequestMethod("GET");
+            this.httpsURLConnection.setRequestProperty("User-Agent", "SkinOverlay");
+            return this;
+        }
+
+        public Request postRequest() throws ProtocolException {
+            this.httpsURLConnection.setRequestMethod("POST");
+            this.httpsURLConnection.setRequestProperty("Connection", "Keep-Alive");
+            this.httpsURLConnection.setRequestProperty("Cache-Control", "no-cache");
+            this.httpsURLConnection.setRequestProperty("User-Agent", "SkinOverlay");
+            this.httpsURLConnection.setDoOutput(true);
+            return this;
+        }
+
+        public Request openConnection(String address) throws IOException {
+            this.address = address;
+            final URL url = new URL(address);
+            this.httpsURLConnection = (HttpsURLConnection) url.openConnection();
+            return this;
+        }
+
+        public Request setRequestProperty(String key, String value) {
+            this.httpsURLConnection.setRequestProperty(key, value);
+            return this;
+        }
+
+        @SafeVarargs
+        @Contract("_ -> this")
+        public final Request setProperty(final ObjectMap.Pair<String, String> @NotNull ... pairs) {
+            for (final ObjectMap.Pair<String, String> pair : pairs) {
+                this.httpsURLConnection.setRequestProperty(pair.key(), pair.value());
+            }
+            return this;
+        }
+
+        public Request writeToOutputStream(final String @NotNull ... data) throws IOException {
+            for (final String str : data) {
+                this.httpsURLConnection.getOutputStream().write(str.getBytes());
+            }
+            return this;
+        }
+
+        public Request writeToOutputStream(final byte @NotNull []... data) throws IOException {
+            for (final byte[] bytes : data) {
+                this.httpsURLConnection.getOutputStream().write(bytes);
+            }
+            return this;
+        }
+
+        public Request closeOutputStream() throws IOException {
+            this.httpsURLConnection.getOutputStream().close();
+            return this;
+        }
+
+        public Request finalizeRequest() throws IOException {
+            this.httpCode = this.httpsURLConnection.getResponseCode();
+            this.bytes = this.httpsURLConnection.getInputStream().readAllBytes();
+            return this;
+        }
+
+        public int getHttpCode() {
+            return this.httpCode;
+        }
+
+        public byte[] getBytes() {
+            return this.bytes;
+        }
+
+        public String getAddress() {
+            return this.address;
+        }
+
+        public HttpsURLConnection getHttpsURLConnection() {
+            return httpsURLConnection;
+        }
     }
 
 }
