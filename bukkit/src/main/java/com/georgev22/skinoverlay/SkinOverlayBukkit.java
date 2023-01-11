@@ -7,7 +7,6 @@ import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
 import com.georgev22.skinoverlay.handler.handlers.*;
 import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
@@ -37,12 +36,12 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
 
     @Override
     public void onLoad() {
-        if (getCurrentVersion().isBelow(V1_16_R3)) {
-            try {
+        try {
+            if (getCurrentVersion().isBelow(V1_16_R3)) {
                 new LibraryLoader(this.getClass(), this.getDataFolder()).loadAll();
-            } catch (InvalidDependencyException | UnknownDependencyException e) {
-                throw new RuntimeException(e);
             }
+        } catch (InvalidDependencyException | UnknownDependencyException e) {
+            throw new RuntimeException(e);
         }
         SkinOverlay.getInstance().onLoad(this);
     }
@@ -59,7 +58,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
             case V1_18_R2 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_18_R2());
             case V1_19_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19());
             case V1_19_R2 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19_R2());
-            default -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_());
+            default -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Legacy());
         }
 
         SkinOverlay.getInstance().onEnable();
