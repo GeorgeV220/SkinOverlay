@@ -1,3 +1,15 @@
+# [3.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.0.0...v3.1.0) (2023-01-12)
+
+
+### Bug Fixes
+
+* **SkinOverlayBukkit:** UNKNOWN case for the SkinHandler ([b36d6be](https://github.com/GeorgeV220/SkinOverlay/commit/b36d6be4c0510b301d2ad906f17f1b9a7cbc50dc))
+
+
+### Features
+
+* **UserData:** Cache UserData database type ([19e9c7a](https://github.com/GeorgeV220/SkinOverlay/commit/19e9c7a23021a19842dee035d9bbb18d5455be19))
+
 # [3.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v2.1.0...v3.0.0) (2023-01-11)
 
 
