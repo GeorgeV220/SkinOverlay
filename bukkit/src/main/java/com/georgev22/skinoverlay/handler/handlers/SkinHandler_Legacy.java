@@ -4,7 +4,6 @@ import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.yaml.file.FileConfiguration;
-import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
@@ -108,7 +107,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
                 try {
                     difficulty = fetchField(world.getClass(), world, "difficulty");
                 } catch (NoSuchFieldException ignore) {
-                    SkinOverlay.getInstance().getLogger().info(world.getClass().getSimpleName() + " does not have getDifficulty method or difficulty field!!");
+                    skinOverlay.getLogger().info(world.getClass().getSimpleName() + " does not have getDifficulty method or difficulty field!!");
                     difficulty = null;
                 }
 
@@ -121,7 +120,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
                 try {
                     worldData = fetchField(world.getClass(), world, "worldData");
                 } catch (Exception ignored2) {
-                    SkinOverlay.getInstance().getLogger().info(world.getClass().getSimpleName() + " does not have getWorldData method or worldData field!!");
+                    skinOverlay.getLogger().info(world.getClass().getSimpleName() + " does not have getWorldData method or worldData field!!");
                 }
             }
 
@@ -267,7 +266,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
                     throw new RuntimeException(e);
                 }
             } else {
-                SkinOverlay.getInstance().getLogger().log(Level.WARNING, "DataWatcher is null!!");
+                skinOverlay.getLogger().log(Level.WARNING, "DataWatcher is null!!");
             }
 
             fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
@@ -280,7 +279,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
             fetchMethodAndInvoke(entityPlayer.getClass(), "triggerHealthUpdate", entityPlayer, new Object[0], new Class[0]);
 
             if (player.isOp()) {
-                SchedulerManager.getScheduler().runTask(SkinOverlay.getInstance().getClass(), () -> {
+                SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
                     player.setOp(false);
                     player.setOp(true);
                 });
@@ -288,6 +287,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
         } catch (ReflectionException | InvocationTargetException | IllegalAccessException | NoSuchMethodException |
                  NoSuchFieldException e) {
             e.printStackTrace();
+            super.updateSkin(fileConfiguration, playerObject, reset, skinName);
         }
     }
 

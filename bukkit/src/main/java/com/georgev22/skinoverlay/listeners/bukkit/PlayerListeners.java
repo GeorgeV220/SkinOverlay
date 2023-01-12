@@ -29,11 +29,11 @@ public class PlayerListeners implements Listener, PluginMessageListener {
     SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
+    public void onJoin(PlayerJoinEvent playerJoinEvent) {
         if (OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
-        final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(event.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
+        final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(playerJoinEvent.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
         final UserData userData = UserData.getUser(playerObject);
         try {
             userData.load(new Utils.Callback<>() {
@@ -70,11 +70,11 @@ public class PlayerListeners implements Listener, PluginMessageListener {
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
+    public void onQuit(PlayerQuitEvent playerQuitEvent) {
         if (OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
-        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(event.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
+        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(playerQuitEvent.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
         final UserData userData = UserData.getUser(playerObject);
         userData.save(true, new Utils.Callback<>() {
 

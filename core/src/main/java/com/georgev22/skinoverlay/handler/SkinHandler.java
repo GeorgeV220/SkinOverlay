@@ -13,9 +13,11 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public abstract class SkinHandler {
+
+    protected SkinOverlay skinOverlay = SkinOverlay.getInstance();
+
     public abstract void updateSkin(@NotNull final FileConfiguration fileConfiguration,
                                     @NotNull final PlayerObject playerObject,
                                     final boolean reset,
@@ -49,7 +51,7 @@ public abstract class SkinHandler {
                         .openConnection(
                                 String.format(
                                         "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false",
-                                        (SkinOverlay.getInstance().isOnlineMode() ?
+                                        (skinOverlay.isOnlineMode() ?
                                                 playerObject.playerUUID() :
                                                 getUUID(playerObject.playerName()))
                                                 .toString().replaceAll("-", "")))
@@ -146,7 +148,7 @@ public abstract class SkinHandler {
     public static class SkinHandler_ extends SkinHandler {
         @Override
         public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
-            SkinOverlay.getInstance().getLogger().log(Level.WARNING, "[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
+            throw new UnsupportedOperationException("[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
         }
 
         @Override

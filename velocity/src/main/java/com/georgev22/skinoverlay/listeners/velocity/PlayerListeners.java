@@ -11,6 +11,7 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -21,10 +22,11 @@ public class PlayerListeners {
     SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     @Subscribe
-    public void onConnect(ServerConnectedEvent serverConnectedEvent) {
-        if (!serverConnectedEvent.getPlayer().isActive())
+    public void onLogin(LoginEvent loginEvent) {
+        if (!loginEvent.getPlayer().isActive())
             return;
-        final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(serverConnectedEvent.getPlayer().getUniqueId(), this.skinOverlay.type()).getPlayerObject();
+        //Wrapper won't work here
+        final PlayerObject playerObject = new PlayerObjectVelocity(loginEvent.getPlayer());
         final UserData userData = UserData.getUser(playerObject);
         try {
             userData.load(new Utils.Callback<>() {
@@ -37,10 +39,6 @@ public class PlayerListeners {
                             throw new RuntimeException(e);
                         }
                         VelocityMinecraftUtils.printMsg(SkinOverlayVelocity.getInstance().getProxy(), userData.getSkinProperty().getName() + " " + userData.getSkinProperty().getValue() + " " + userData.getSkinProperty().getSignature());
-                        if (userData.getSkinName().equals("default")) {
-                            return;
-                        }
-                        Utilities.updateSkin(playerObject, true, false);
                     });
                     return true;
                 }
@@ -58,6 +56,19 @@ public class PlayerListeners {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Subscribe
+    public void onChange(ServerConnectedEvent serverConnectedEvent) {
+        if (!serverConnectedEvent.getPlayer().isActive())
+            return;
+        //Wrapper won't work here
+        final PlayerObject playerObject = new PlayerObjectVelocity(serverConnectedEvent.getPlayer());
+        final UserData userData = UserData.getUser(playerObject);
+        if (userData.getSkinName().equals("default")) {
+            return;
+        }
+        Utilities.updateSkin(playerObject, true, false);
     }
 
     @Subscribe
