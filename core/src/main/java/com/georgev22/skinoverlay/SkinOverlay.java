@@ -275,7 +275,7 @@ public class SkinOverlay {
                 databaseWrapper = null;
                 mongoClient = null;
                 mongoDatabase = null;
-                iDatabaseType = null;
+                iDatabaseType = new UserData.Cache();
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: Cache");
             }
         }

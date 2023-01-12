@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.utilities.player;
 
 
 import com.georgev22.library.maps.ConcurrentObjectMap;
+import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils.Callback;
@@ -22,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -411,6 +414,63 @@ public record UserData(User user) {
                 return onFailure();
             }
         });
+    }
+
+    public static class Cache implements IDatabaseType {
+
+        private final List<User> userList = new ArrayList<>();
+
+        @Override
+        public void save(User user) throws Exception {
+
+        }
+
+        @Override
+        public void load(User user, Callback<Boolean> callback) throws Exception {
+            setupUser(user, new Callback<>() {
+                @Override
+                public Boolean onSuccess() {
+                    return userList.add(user);
+                }
+
+                @Override
+                public Boolean onFailure() {
+                    return false;
+                }
+
+                @Override
+                public Boolean onFailure(Throwable throwable) {
+                    return super.onFailure(throwable);
+                }
+            });
+        }
+
+        @Override
+        public void setupUser(User user, Callback<Boolean> callback) {
+            if (!playerExists(user)) {
+                userList.add(user);
+                callback.onSuccess();
+            }
+        }
+
+        @Override
+        public void delete(User user) {
+            userList.remove(user);
+        }
+
+        @Override
+        public boolean playerExists(User user) {
+            return userList.contains(user);
+        }
+
+        @Override
+        public ObjectMap<UUID, User> getAllUsers() {
+            ObjectMap<UUID, User> map = new ConcurrentObjectMap<>();
+            for (User user : userList) {
+                map.append(user.getUniqueId(), user);
+            }
+            return map;
+        }
     }
 
 
