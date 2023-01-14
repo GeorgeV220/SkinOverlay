@@ -6,6 +6,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
@@ -33,7 +34,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         if (OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
-        final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(playerJoinEvent.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
+        final PlayerObject playerObject = new PlayerObjectWrapper(playerJoinEvent.getPlayer().getUniqueId(), skinOverlay.type());
         final UserData userData = UserData.getUser(playerObject);
         try {
             userData.load(new Utils.Callback<>() {
@@ -74,7 +75,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         if (OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
-        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(playerQuitEvent.getPlayer().getUniqueId(), skinOverlay.type()).getPlayerObject();
+        PlayerObject playerObject = new PlayerObjectWrapper(playerQuitEvent.getPlayer().getUniqueId(), skinOverlay.type());
         final UserData userData = UserData.getUser(playerObject);
         userData.save(true, new Utils.Callback<>() {
 
@@ -104,7 +105,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         String subChannel = in.readUTF();
         String uuid = in.readUTF();
         String skinName = in.readUTF();
-        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(UUID.fromString(Objects.requireNonNull(uuid)), skinOverlay.type()).getPlayerObject();
+        PlayerObject playerObject = new PlayerObjectWrapper(UUID.fromString(Objects.requireNonNull(uuid)), skinOverlay.type());
         if (subChannel.equalsIgnoreCase("change")) {
             Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skinName + ".png")), skinName, playerObject, null);
         } else if (subChannel.equalsIgnoreCase("reset")) {

@@ -5,7 +5,6 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -55,7 +54,7 @@ public class User extends ConcurrentObjectMap<String, Object> {
 
     public Property getDefaultSkinProperty() {
         try {
-            return get("defaultSkinProperty", SkinOverlay.getInstance().getSkinHandler().getSkin(new PlayerObject.PlayerObjectWrapper(uuid, SkinOverlay.getInstance().type()).getPlayerObject()));
+            return get("defaultSkinProperty", SkinOverlay.getInstance().getSkinHandler().getSkin(new PlayerObjectWrapper(uuid, SkinOverlay.getInstance().type())));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

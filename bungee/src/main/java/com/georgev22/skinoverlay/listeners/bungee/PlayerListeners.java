@@ -6,6 +6,7 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
@@ -23,7 +24,7 @@ public class PlayerListeners implements Listener {
     public void onConnect(ServerConnectedEvent serverConnectedEvent) {
         if (!serverConnectedEvent.getPlayer().isConnected())
             return;
-        final PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(serverConnectedEvent.getPlayer().getUniqueId(), this.skinOverlay.type()).getPlayerObject();
+        final PlayerObject playerObject = new PlayerObjectWrapper(serverConnectedEvent.getPlayer().getUniqueId(), this.skinOverlay.type());
         final UserData userData = UserData.getUser(playerObject);
         try {
             userData.load(new Utils.Callback<>() {
@@ -35,7 +36,7 @@ public class PlayerListeners implements Listener {
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                        BungeeMinecraftUtils.printMsg((userData.getSkinProperty().getName() + " " + userData.getSkinProperty().getValue() + " " + userData.getSkinProperty().getSignature()));
+                        BungeeMinecraftUtils.printMsg("Player name: " + playerObject.playerName() + "\n Property name: " + userData.getSkinProperty().getName() + "\n value: " + userData.getSkinProperty().getValue() + "\n signature: " + userData.getSkinProperty().getSignature());
                         if (userData.getSkinName().equals("default")) {
                             return;
                         }
@@ -61,7 +62,7 @@ public class PlayerListeners implements Listener {
 
     @EventHandler
     public void onQuit(PlayerDisconnectEvent playerDisconnectEvent) {
-        PlayerObject playerObject = new PlayerObject.PlayerObjectWrapper(playerDisconnectEvent.getPlayer().getUniqueId(), this.skinOverlay.type()).getPlayerObject();
+        PlayerObject playerObject = new PlayerObjectWrapper(playerDisconnectEvent.getPlayer().getUniqueId(), this.skinOverlay.type());
         final UserData userData = UserData.getUser(playerObject);
         userData.save(true, new Utils.Callback<>() {
 

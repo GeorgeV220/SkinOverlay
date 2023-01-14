@@ -11,6 +11,7 @@ import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,7 @@ public class SkinOverlayCommand extends BaseCommand {
                                 @Override
                                 public Boolean onSuccess() {
                                     atomicBoolean.set(true);
-                                    Utilities.updateSkin(new PlayerObject.PlayerObjectWrapper(uuid, skinOverlay.type()).getPlayerObject(), true, false);
+                                    Utilities.updateSkin(new PlayerObjectWrapper(uuid, skinOverlay.type()), true, false);
                                     return atomicBoolean.get();
                                 }
 
@@ -106,7 +107,7 @@ public class SkinOverlayCommand extends BaseCommand {
     @CommandCompletion("@overlays @players ")
     @Description("{@@commands.descriptions.skinoverlay.overlay}")
     @CommandPermission("skinoverlay.wear.overlay")
-    @Syntax("overlay <overlay> [player]")
+    @Syntax("wear <overlay> [player]")
     public void overlay(@NotNull CommandIssuer issuer, String @NotNull [] args) {
         if (args.length == 0) {
             MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
@@ -130,9 +131,9 @@ public class SkinOverlayCommand extends BaseCommand {
                 MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
                 return;
             }
-            target = Optional.of(new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()).getPlayerObject());
+            target = Optional.of(new PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()));
         }
-        Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), overlay, new PlayerObject.PlayerObjectWrapper(target.get().playerUUID(), skinOverlay.type()).getPlayerObject(), issuer);
+        Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), overlay, new PlayerObjectWrapper(target.get().playerUUID(), skinOverlay.type()), issuer);
     }
 
     @Subcommand("clear")
@@ -151,7 +152,7 @@ public class SkinOverlayCommand extends BaseCommand {
             return;
         }
         if (args.length == 0) {
-            Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()).getPlayerObject(), issuer);
+            Utilities.setSkin(() -> null, "default", new PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()), issuer);
         } else {
             clear0(issuer, args[0]);
         }
@@ -164,6 +165,6 @@ public class SkinOverlayCommand extends BaseCommand {
             MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", target), true);
             return;
         }
-        Utilities.setSkin(() -> null, "default", new PlayerObject.PlayerObjectWrapper(optionalPlayerObject.get().playerUUID(), skinOverlay.type()).getPlayerObject(), issuer);
+        Utilities.setSkin(() -> null, "default", new PlayerObjectWrapper(optionalPlayerObject.get().playerUUID(), skinOverlay.type()), issuer);
     }
 }

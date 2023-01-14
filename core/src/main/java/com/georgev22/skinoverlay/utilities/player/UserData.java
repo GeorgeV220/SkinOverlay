@@ -241,7 +241,7 @@ public record UserData(User user) {
         public void setupUser(User user, Callback<Boolean> callback) {
             try {
                 if (!this.playerExists(user)) {
-                    Property property = skinOverlay.getSkinHandler().getGameProfile(new PlayerObject.PlayerObjectWrapper(user.getUniqueId(), skinOverlay.type()).getPlayerObject()).getProperties().get("textures").iterator().next();
+                    Property property = skinOverlay.getSkinHandler().getGameProfile(new PlayerObjectWrapper(user.getUniqueId(), skinOverlay.type())).getProperties().get("textures").iterator().next();
                     skinOverlay.getDatabaseWrapper().getSQLDatabase().updateSQL("INSERT INTO `" + OptionsUtil.DATABASE_TABLE_NAME.getStringValue() + "` (`uuid`, `skinName`, `property-name`, `property-value`, `property-signature`) VALUES ('" + user.getUniqueId().toString() + "', 'default', '" + property.getName() + "', '" + property.getValue() + "', '" + property.getSignature() + "');");
                 }
                 callback.onSuccess();
