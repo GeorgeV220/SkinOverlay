@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay.utilities.player;
 
+import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.VelocityMinecraftUtils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.google.common.collect.Lists;
@@ -224,5 +225,25 @@ public class PlayerObjectVelocity implements PlayerObject {
     @Override
     public void sendMessage(String @NotNull ... input) {
         VelocityMinecraftUtils.msg(player, input);
+    }
+
+    @Override
+    public void sendMessage(String input, ObjectMap<String, String> placeholders, boolean ignoreCase) {
+        VelocityMinecraftUtils.msg(player, input, placeholders, ignoreCase);
+    }
+
+    @Override
+    public void sendMessage(List<String> input, ObjectMap<String, String> placeholders, boolean ignoreCase) {
+        VelocityMinecraftUtils.msg(player, input, placeholders, ignoreCase);
+    }
+
+    @Override
+    public void sendMessage(String[] input, ObjectMap<String, String> placeholders, boolean ignoreCase) {
+        VelocityMinecraftUtils.msg(player, input, placeholders, ignoreCase);
+    }
+
+    @Override
+    public boolean isOnline() {
+        return player.isActive();
     }
 }

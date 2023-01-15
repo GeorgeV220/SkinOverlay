@@ -1,0 +1,44 @@
+import org.spongepowered.gradle.plugin.config.PluginLoaders
+import org.spongepowered.plugin.metadata.model.PluginDependency
+
+plugins {
+    id("org.spongepowered.gradle.plugin") version "2.1.1"
+}
+
+dependencies {
+    compileOnly project(path: ':core')
+}
+
+sponge {
+    apiVersion("9.0.0")
+    loader {
+        name(PluginLoaders.JAVA_PLAIN)
+        version("1.0")
+    }
+    license("GPLv3")
+    plugin("${artifact}") {
+        displayName("${artifact}")
+        version("${project.properties.get("version")}")
+        entrypoint("${spongeMain}")
+        description("SkinOverlay")
+        links {
+            homepage("https://spongepowered.org")
+            source("https://spongepowered.org/source")
+            issues("https://spongepowered.org/issues")
+        }
+        contributor("GeorgeV22") {
+            description("Lead Developer")
+        }
+        dependency("spongeapi") {
+            loadOrder(PluginDependency.LoadOrder.AFTER)
+            optional(true)
+        }
+    }
+}
+
+blossom {
+    var constants = "src/main/java/com/georgev22/skinoverlay/SkinOverlaySponge.java"
+    replaceToken('${version}', this.version, constants)
+    replaceToken('${pluginName}', this.pluginName, constants)
+    replaceToken('${author}', this.author, constants)
+}

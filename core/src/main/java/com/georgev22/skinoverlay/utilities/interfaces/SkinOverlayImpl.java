@@ -37,7 +37,8 @@ public interface SkinOverlayImpl {
     enum Type {
         PAPER,
         BUNGEE,
-        VELOCITY
+        VELOCITY,
+        SPONGE
     }
 
 }
