@@ -47,7 +47,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     @Override
     public void onLoad() {
         try {
-            new LibraryLoader(this.getClass(), this.getDataFolder()).loadAll();
+            new LibraryLoader(this.getClass(), this.getDataFolder()).loadAll(true);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }

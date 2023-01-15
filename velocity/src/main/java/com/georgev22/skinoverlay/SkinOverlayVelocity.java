@@ -89,7 +89,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     public void onLoad() {
         try {
-            new LibraryLoader(this.getClass(), this.getDataFolder()).loadAll();
+            new LibraryLoader(this.getClass(), this.getDataFolder()).loadAll(true);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }

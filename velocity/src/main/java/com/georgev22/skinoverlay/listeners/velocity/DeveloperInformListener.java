@@ -3,15 +3,14 @@ package com.georgev22.skinoverlay.listeners.velocity;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlayVelocity;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
+import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
 import com.google.common.collect.Lists;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
-import com.velocitypowered.api.proxy.Player;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,9 +24,9 @@ public class DeveloperInformListener {
 
     @Subscribe
     public void onJoin(PostLoginEvent e) {
-        Player player = e.getPlayer();
-        UUID uuid = player.getUniqueId();
-        String name = player.getUsername();
+        PlayerObject playerObject = new PlayerObjectWrapper(e.getPlayer().getUsername(), e.getPlayer().getUniqueId(), SkinOverlay.getInstance().type());
+        UUID uuid = playerObject.playerUUID();
+        String name = playerObject.playerName();
 
         final ObjectMap.Pair<String, UUID> pair = ObjectMap.Pair.create(name, uuid);
 
@@ -49,18 +48,18 @@ public class DeveloperInformListener {
         }
 
         SchedulerManager.getScheduler().runTaskLater(this.skinOverlay.getClass(), () -> {
-            if (!player.isActive()) {
+            if (!playerObject.isOnline()) {
                 return;
             }
-            new PlayerObjectVelocity(player).sendMessage(Utils.placeHolder(joinMessage, new HashObjectMap<String, String>()
-                    .append("%player%", player.getUsername())
+            playerObject.sendMessage(joinMessage, new HashObjectMap<String, String>()
+                    .append("%player%", name)
                     .append("%version%", skinOverlay.getDescription().version())
                     .append("%package%", skinOverlay.getClass().getPackage().getName())
                     .append("%name%", skinOverlay.getDescription().name())
                     .append("%author%", String.join(", ", skinOverlay.getDescription().authors()))
                     .append("%main%", skinOverlay.getDescription().main())
                     .append("%javaversion%", System.getProperty("java.version"))
-                    .append("%serverversion%", SkinOverlayVelocity.getInstance().getProxy().getVersion().getName() + "-" + SkinOverlayVelocity.getInstance().getProxy().getVersion().getVersion()), false));
+                    .append("%serverversion%", SkinOverlayVelocity.getInstance().getProxy().getVersion().getName() + "-" + SkinOverlayVelocity.getInstance().getProxy().getVersion().getVersion()), false);
         }, 200L);
     }
 

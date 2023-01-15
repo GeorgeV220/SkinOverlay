@@ -2,23 +2,19 @@ package com.georgev22.skinoverlay.listeners.bungee;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
 import com.google.common.collect.Lists;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-
-import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+
+import java.util.List;
+import java.util.UUID;
 
 public class DeveloperInformListener implements Listener {
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
@@ -29,9 +25,9 @@ public class DeveloperInformListener implements Listener {
 
     @EventHandler
     public void onJoin(PostLoginEvent e) {
-        ProxiedPlayer player = e.getPlayer();
-        UUID uuid = player.getUniqueId();
-        String name = player.getName();
+        PlayerObject playerObject = new PlayerObjectWrapper(e.getPlayer().getName(), e.getPlayer().getUniqueId(), SkinOverlay.getInstance().type());
+        UUID uuid = playerObject.playerUUID();
+        String name = playerObject.playerName();
 
         final ObjectMap.Pair<String, UUID> pair = ObjectMap.Pair.create(name, uuid);
 
@@ -53,11 +49,11 @@ public class DeveloperInformListener implements Listener {
         }
 
         SchedulerManager.getScheduler().runTaskLater(this.skinOverlay.getClass(), () -> {
-            if (!player.isConnected()) {
+            if (!playerObject.isOnline()) {
                 return;
             }
-            BungeeMinecraftUtils.msg(Objects.requireNonNull(player), joinMessage, new HashObjectMap<String, String>()
-                    .append("%player%", player.getName())
+            playerObject.sendMessage(joinMessage, new HashObjectMap<String, String>()
+                    .append("%player%", name)
                     .append("%version%", skinOverlay.getDescription().version())
                     .append("%package%", skinOverlay.getClass().getPackage().getName())
                     .append("%name%", skinOverlay.getDescription().name())

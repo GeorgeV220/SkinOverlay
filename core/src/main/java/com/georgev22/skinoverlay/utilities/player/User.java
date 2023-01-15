@@ -49,7 +49,7 @@ public class User extends ConcurrentObjectMap<String, Object> {
     }
 
     public Property getSkinProperty() {
-        return get("skinProperty", Property.class);
+        return get("skinProperty", getDefaultSkinProperty());
     }
 
     public Property getDefaultSkinProperty() {
