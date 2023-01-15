@@ -5,13 +5,13 @@ import com.georgev22.api.libraryloader.LibraryLoader;
 import com.georgev22.api.libraryloader.annotations.MavenLibrary;
 import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
+import com.georgev22.library.minecraft.SpongeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.LoggerWrapper;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.listeners.sponge.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.sponge.PlayerListeners;
-import com.georgev22.skinoverlay.listeners.sponge.TestListener;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectSponge;
@@ -60,34 +60,49 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
         this.pluginContainer = container;
         this.dataFolder = new File(configDir.toUri());
         this.pluginManager = Sponge.pluginManager();
+        onInit();
     }
 
-    @Listener
-    public void onLoad(final @NotNull StartingEngineEvent<Server> event) {
-        this.server = event.engine();
+    public void onInit() {
         try {
-            new LibraryLoader(this.getClass(), server.getClass().getClassLoader().getParent(), this.getDataFolder(), getLogger()).loadAll(false);
+            new LibraryLoader(this.getClass(), Sponge.game().getClass().getClassLoader().getParent(), this.getDataFolder(), getLogger()).loadAll(false);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
-        server.scheduler().submit(Task.builder().plugin(pluginContainer).execute(() -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).interval(50L, TimeUnit.MILLISECONDS).build());
-        SkinOverlay.getInstance().onLoad(this);
-        Sponge.eventManager()
-                .registerListeners(pluginContainer, new TestListener())
-                .registerListeners(pluginContainer, new PlayerListeners())
-                .registerListeners(pluginContainer, new DeveloperInformListener());
         SkinOverlay.getInstance().setCommandManager(new SpongeCommandManager(pluginContainer, getDataFolder()));
+        SkinOverlay.getInstance().onLoad(this);
+        SpongeMinecraftUtils.registerListeners(pluginContainer,
+                new PlayerListeners(),
+                new DeveloperInformListener());
     }
 
     @Listener
-    public void onEnable(final @NotNull StartedEngineEvent<Server> event) {
+    public void onStartingEngine(final @NotNull StartingEngineEvent<Server> event) {
+        this.server = event.engine();
+        onLoad();
+    }
+
+    @Listener
+    public void onStartedEngine(final @NotNull StartedEngineEvent<Server> event) {
+        onEnable();
+    }
+
+    @Listener
+    public void onStoppingEngine(final @NotNull StoppingEngineEvent<Server> event) {
+        onDisable();
+    }
+
+    public void onLoad() {
+        server.scheduler().submit(Task.builder().plugin(pluginContainer).execute(() -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).interval(50L, TimeUnit.MILLISECONDS).build());
+    }
+
+    public void onEnable() {
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler.SkinHandler_());
         SkinOverlay.getInstance().onEnable();
         this.isEnabled = true;
     }
 
-    @Listener
-    public void onDisable(final @NotNull StoppingEngineEvent<Server> event) {
+    public void onDisable() {
         SkinOverlay.getInstance().onDisable();
         this.isEnabled = false;
     }
@@ -114,7 +129,12 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
 
     @Override
     public boolean setEnable(boolean enable) {
-        return isEnabled = enable;
+        if (enable) {
+            onEnable();
+        } else {
+            onDisable();
+        }
+        return isEnabled();
     }
 
     @Override
@@ -139,9 +159,7 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
     @Override
     public List<PlayerObject> onlinePlayers() {
         List<PlayerObject> playerObjects = Lists.newArrayList();
-        server.onlinePlayers().forEach(serverPlayer -> {
-            playerObjects.add(new PlayerObjectSponge(serverPlayer.user()));
-        });
+        server.onlinePlayers().forEach(serverPlayer -> playerObjects.add(new PlayerObjectSponge(serverPlayer.user())));
         return playerObjects;
     }
 

@@ -5,6 +5,7 @@ import com.georgev22.api.libraryloader.LibraryLoader;
 import com.georgev22.api.libraryloader.annotations.MavenLibrary;
 import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
+import com.georgev22.library.minecraft.VelocityMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
@@ -93,13 +94,13 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
+        SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, getDataFolder()));
         SkinOverlay.getInstance().onLoad(this);
         onEnable();
     }
 
     public void onEnable() {
         getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
-        SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, getDataFolder()));
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
             public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
@@ -129,9 +130,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
             }
         });
         SkinOverlay.getInstance().onEnable();
-        //BungeeMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
-        getProxy().getEventManager().register(this, new DeveloperInformListener());
-        getProxy().getEventManager().register(this, new PlayerListeners());
+        VelocityMinecraftUtils.registerListeners(getProxy(), this, new DeveloperInformListener(), new PlayerListeners());
         enabled = true;
     }
 

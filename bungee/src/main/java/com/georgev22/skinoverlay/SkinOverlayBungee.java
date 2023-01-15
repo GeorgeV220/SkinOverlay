@@ -51,13 +51,13 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
+        SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
         SkinOverlay.getInstance().onLoad(this);
     }
 
     @Override
     public void onEnable() {
         getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
-        SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
             public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {

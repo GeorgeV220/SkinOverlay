@@ -44,6 +44,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
+        SkinOverlay.getInstance().setCommandManager(new PaperCommandManager(this));
         SkinOverlay.getInstance().onLoad(this);
     }
 
@@ -52,7 +53,6 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
             tick++;
             SchedulerManager.getScheduler().mainThreadHeartbeat(tick);
         }, 0, 1L);
-        SkinOverlay.getInstance().setCommandManager(new PaperCommandManager(this));
         switch (getCurrentVersion()) {
             case V1_17_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_17());
             case V1_18_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_18());

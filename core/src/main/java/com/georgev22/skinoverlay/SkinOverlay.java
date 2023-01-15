@@ -91,10 +91,6 @@ public class SkinOverlay {
 
     public void onLoad(SkinOverlayImpl skinOverlay) {
         this.skinOverlay = skinOverlay;
-    }
-
-
-    public void onEnable() {
         fileManager = FileManager.getInstance();
         try {
             fileManager.loadFiles(getLogger(), this.getClass());
@@ -102,7 +98,11 @@ public class SkinOverlay {
             throw new RuntimeException(e);
         }
         MessagesUtil.repairPaths(fileManager.getMessages());
+        setupCommands();
+    }
 
+
+    public void onEnable() {
         this.skinsDataFolder = new File(this.getDataFolder(), "skins");
         if (!this.skinsDataFolder.exists()) {
             if (this.skinsDataFolder.mkdirs()) {
@@ -124,7 +124,6 @@ public class SkinOverlay {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        setupCommands();
     }
 
     public void onDisable() {
