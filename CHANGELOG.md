@@ -1,3 +1,17 @@
+# [3.2.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.1.0...v3.2.0) (2023-01-15)
+
+
+### Bug Fixes
+
+* **PlayerObjectWrapper:** Fixed wrapper issues with velocity ([d8dfc52](https://github.com/GeorgeV220/SkinOverlay/commit/d8dfc520d5a16509adf06232a6e18fa4ef23f315))
+* **Sponge:** Fixed commands on Sponge ([78a72ab](https://github.com/GeorgeV220/SkinOverlay/commit/78a72abcf400b663c5c0d9eeeec3447f4691dc93))
+* **Sponge:** Small changes on how to construct the plugin ([c1fbc6e](https://github.com/GeorgeV220/SkinOverlay/commit/c1fbc6ec5b817e45872ce9e0c3f2c2404c3b1fab))
+
+
+### Features
+
+* **Sponge:** Added Sponge8-9 support ([5c4437f](https://github.com/GeorgeV220/SkinOverlay/commit/5c4437fcbdb24da88cce0f1efd40eb63a2f61cbf))
+
 # [3.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.0.0...v3.1.0) (2023-01-12)
 
 
