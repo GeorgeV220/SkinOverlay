@@ -45,36 +45,32 @@ import java.util.concurrent.TimeUnit;
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
 @Plugin("${pluginName}")
 public class SkinOverlaySponge implements SkinOverlayImpl {
+    private final File dataFolder;
+    private final Logger logger;
+    private final PluginManager pluginManager;
+    private final PluginContainer pluginContainer;
 
     private Server server;
-    private File dataFolder;
     private int tick = 0;
-
-    @Inject
-    private Logger logger;
-
-    @Inject
-    @ConfigDir(sharedRoot = false)
-    private Path privateConfigDir;
-
-    private PluginManager pluginManager;
-
-    private PluginContainer pluginContainer;
-
     private boolean isEnabled;
+
+    @Inject
+    public SkinOverlaySponge(Logger logger, PluginContainer container, @ConfigDir(sharedRoot = false) @NotNull Path configDir) {
+        this.logger = logger;
+        this.pluginContainer = container;
+        this.dataFolder = new File(configDir.toUri());
+        this.pluginManager = Sponge.pluginManager();
+    }
 
     @Listener
     public void onLoad(final @NotNull StartingEngineEvent<Server> event) {
         this.server = event.engine();
-        this.dataFolder = new File(privateConfigDir.toUri());
-        this.pluginManager = Sponge.pluginManager();
-        this.pluginContainer = pluginManager.plugin("skinoverlay").orElseThrow();
-        server.scheduler().submit(Task.builder().plugin(pluginContainer).execute(() -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).interval(50L, TimeUnit.MILLISECONDS).build());
         try {
             new LibraryLoader(this.getClass(), server.getClass().getClassLoader().getParent(), this.getDataFolder(), getLogger()).loadAll(false);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
+        server.scheduler().submit(Task.builder().plugin(pluginContainer).execute(() -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).interval(50L, TimeUnit.MILLISECONDS).build());
         SkinOverlay.getInstance().onLoad(this);
         Sponge.eventManager()
                 .registerListeners(pluginContainer, new TestListener())
