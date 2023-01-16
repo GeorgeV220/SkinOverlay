@@ -1,3 +1,16 @@
+# [3.3.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.2.0...v3.3.0) (2023-01-16)
+
+
+### Bug Fixes
+
+* **SkinOverlay:** call setupCommands method ([5afd1cd](https://github.com/GeorgeV220/SkinOverlay/commit/5afd1cd1b081aa3689dc6630ae0b29d7aa0b5082))
+
+
+### Features
+
+* **PlayerObject:** Added gameProfile method ([b5de2f2](https://github.com/GeorgeV220/SkinOverlay/commit/b5de2f2731e41da51ada1003bbfc1295933ad637))
+* **SkinHandler:** Sponge SkinHandler (WIP) ([79606a0](https://github.com/GeorgeV220/SkinOverlay/commit/79606a040b86b9a8c54726240d08e7ebed157d57))
+
 # [3.2.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.1.0...v3.2.0) (2023-01-15)
 
 
