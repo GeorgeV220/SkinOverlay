@@ -16,8 +16,6 @@ import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
 public class PlayerListeners {
     SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
@@ -32,12 +30,8 @@ public class PlayerListeners {
                 public Boolean onSuccess() {
                     UserData.getAllUsersMap().append(userData.user().getUniqueId(), userData.user());
                     SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
-                        try {
-                            userData.setDefaultSkinProperty(skinOverlay.getSkinHandler().getGameProfile(playerObject).getProperties().get("textures").iterator().next());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        VelocityMinecraftUtils.printMsg(SkinOverlayVelocity.getInstance().getProxy(), "Player name: "+playerObject.playerName() + "\n Property name: " + userData.getSkinProperty().getName() + "\n value: " + userData.getSkinProperty().getValue() + "\n signature: " + userData.getSkinProperty().getSignature());
+                        userData.setDefaultSkinProperty(playerObject.gameProfile().getProperties().get("textures").iterator().next());
+                        VelocityMinecraftUtils.printMsg(SkinOverlayVelocity.getInstance().getProxy(), "Player name: " + playerObject.playerName() + "\n Property name: " + userData.getSkinProperty().getName() + "\n value: " + userData.getSkinProperty().getValue() + "\n signature: " + userData.getSkinProperty().getSignature());
                     });
                     return true;
                 }

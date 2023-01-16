@@ -131,13 +131,7 @@ public class Utilities {
     public static void updateSkin(@NotNull PlayerObject playerObject, boolean forOthers, boolean reset) {
         SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
             UserData userData = UserData.getUser(playerObject);
-            GameProfile gameProfile;
-            try {
-                gameProfile = skinOverlay.getSkinHandler().getGameProfile(playerObject);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
+            GameProfile gameProfile = playerObject.gameProfile();
             PropertyMap pm = gameProfile.getProperties();
             Property property = pm.get("textures").iterator().next();
             pm.remove("textures", property);

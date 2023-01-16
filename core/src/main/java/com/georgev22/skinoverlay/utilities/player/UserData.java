@@ -2,7 +2,6 @@ package com.georgev22.skinoverlay.utilities.player;
 
 
 import com.georgev22.library.maps.ConcurrentObjectMap;
-import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils.Callback;
@@ -20,7 +19,6 @@ import org.bson.Document;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -241,11 +239,11 @@ public record UserData(User user) {
         public void setupUser(User user, Callback<Boolean> callback) {
             try {
                 if (!this.playerExists(user)) {
-                    Property property = skinOverlay.getSkinHandler().getGameProfile(new PlayerObjectWrapper(user.getUniqueId(), skinOverlay.type())).getProperties().get("textures").iterator().next();
+                    Property property = new PlayerObjectWrapper(user.getUniqueId(), skinOverlay.type()).gameProfile().getProperties().get("textures").iterator().next();
                     skinOverlay.getDatabaseWrapper().getSQLDatabase().updateSQL("INSERT INTO `" + OptionsUtil.DATABASE_TABLE_NAME.getStringValue() + "` (`uuid`, `skinName`, `property-name`, `property-value`, `property-signature`) VALUES ('" + user.getUniqueId().toString() + "', 'default', '" + property.getName() + "', '" + property.getValue() + "', '" + property.getSignature() + "');");
                 }
                 callback.onSuccess();
-            } catch (ClassNotFoundException | SQLException | IOException throwables) {
+            } catch (ClassNotFoundException | SQLException throwables) {
                 callback.onFailure(throwables.getCause());
             }
         }

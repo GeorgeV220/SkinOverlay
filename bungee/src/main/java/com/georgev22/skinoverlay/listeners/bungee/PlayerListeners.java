@@ -15,7 +15,6 @@ import net.md_5.bungee.event.EventHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 
 public class PlayerListeners implements Listener {
     SkinOverlay skinOverlay = SkinOverlay.getInstance();
@@ -31,11 +30,7 @@ public class PlayerListeners implements Listener {
                 public Boolean onSuccess() {
                     UserData.getAllUsersMap().append(userData.user().getUniqueId(), userData.user());
                     SchedulerManager.getScheduler().runTask(PlayerListeners.this.skinOverlay.getClass(), () -> {
-                        try {
-                            userData.setDefaultSkinProperty(PlayerListeners.this.skinOverlay.getSkinHandler().getGameProfile(playerObject).getProperties().get("textures").iterator().next());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        userData.setDefaultSkinProperty(playerObject.gameProfile().getProperties().get("textures").iterator().next());
                         BungeeMinecraftUtils.printMsg("Player name: " + playerObject.playerName() + "\n Property name: " + userData.getSkinProperty().getName() + "\n value: " + userData.getSkinProperty().getValue() + "\n signature: " + userData.getSkinProperty().getSignature());
                         if (userData.getSkinName().equals("default")) {
                             return;

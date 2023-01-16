@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftReflection.getNMSClass;
@@ -297,7 +298,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
     }
 
     @Override
-    protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException {
+    protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         try {
             Class<?> craftPlayerClass = getOBCClass("entity.CraftPlayer");
             org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.getPlayer();

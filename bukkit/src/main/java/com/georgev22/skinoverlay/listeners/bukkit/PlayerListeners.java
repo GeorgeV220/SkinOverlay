@@ -12,7 +12,6 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 import javax.imageio.ImageIO;
@@ -42,11 +41,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
                 public Boolean onSuccess() {
                     UserData.getAllUsersMap().append(userData.user().getUniqueId(), userData.user());
                     SchedulerManager.getScheduler().runTask(SkinOverlay.getInstance().getClass(), () -> {
-                        try {
-                            userData.setDefaultSkinProperty(skinOverlay.getSkinHandler().getGameProfile(playerObject).getProperties().get("textures").iterator().next());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        userData.setDefaultSkinProperty(playerObject.gameProfile().getProperties().get("textures").iterator().next());
                         if (userData.getSkinName().equals("default")) {
                             return;
                         }

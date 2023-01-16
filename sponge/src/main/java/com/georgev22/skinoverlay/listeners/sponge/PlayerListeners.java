@@ -13,27 +13,21 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
-import java.io.IOException;
-
 public class PlayerListeners {
     SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     @Listener
-    public void onLogin(ServerSideConnectionEvent.Login loginEvent) {
-        if (!loginEvent.user().isOnline())
+    public void onLogin(ServerSideConnectionEvent.Join joinEvent) {
+        if (!joinEvent.player().isOnline())
             return;
-        final PlayerObject playerObject = new PlayerObjectWrapper(loginEvent.user().name(), loginEvent.user().uniqueId(), SkinOverlay.getInstance().type());
+        final PlayerObject playerObject = new PlayerObjectWrapper(joinEvent.player().name(), joinEvent.player().uniqueId(), SkinOverlay.getInstance().type());
         final UserData userData = UserData.getUser(playerObject);
         try {
             userData.load(new Utils.Callback<>() {
                 public Boolean onSuccess() {
                     UserData.getAllUsersMap().append(userData.user().getUniqueId(), userData.user());
                     SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
-                        try {
-                            userData.setDefaultSkinProperty(skinOverlay.getSkinHandler().getGameProfile(playerObject).getProperties().get("textures").iterator().next());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        userData.setDefaultSkinProperty(playerObject.gameProfile().getProperties().get("textures").iterator().next());
                         if (userData.getSkinName().equals("default")) {
                             return;
                         }
