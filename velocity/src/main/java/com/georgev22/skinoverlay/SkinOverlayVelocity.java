@@ -94,7 +94,6 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
-        SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, getDataFolder()));
         SkinOverlay.getInstance().onLoad(this);
         onEnable();
     }
@@ -129,7 +128,9 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
                 return gameProfile;
             }
         });
+        SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, getDataFolder()));
         SkinOverlay.getInstance().onEnable();
+        SkinOverlay.getInstance().setupCommands();
         VelocityMinecraftUtils.registerListeners(getProxy(), this, new DeveloperInformListener(), new PlayerListeners());
         enabled = true;
     }

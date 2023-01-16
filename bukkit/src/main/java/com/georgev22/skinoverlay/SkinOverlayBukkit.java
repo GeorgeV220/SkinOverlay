@@ -44,7 +44,6 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
-        SkinOverlay.getInstance().setCommandManager(new PaperCommandManager(this));
         SkinOverlay.getInstance().onLoad(this);
     }
 
@@ -62,8 +61,9 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
             case UNKNOWN -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_());
             default -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Legacy());
         }
-
+        SkinOverlay.getInstance().setCommandManager(new PaperCommandManager(this));
         SkinOverlay.getInstance().onEnable();
+        SkinOverlay.getInstance().setupCommands();
         BukkitMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         if (OptionsUtil.PROXY.getBooleanValue())
             Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "skinoverlay:bungee", new PlayerListeners());

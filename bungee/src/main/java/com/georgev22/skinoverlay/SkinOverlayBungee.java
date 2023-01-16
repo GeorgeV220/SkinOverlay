@@ -51,7 +51,6 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
-        SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
         SkinOverlay.getInstance().onLoad(this);
     }
 
@@ -88,7 +87,9 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
                 return gameProfile;
             }
         });
+        SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
         SkinOverlay.getInstance().onEnable();
+        SkinOverlay.getInstance().setupCommands();
         BungeeMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         getProxy().registerChannel("skinoverlay:bungee");
         enabled = true;

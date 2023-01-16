@@ -98,7 +98,6 @@ public class SkinOverlay {
             throw new RuntimeException(e);
         }
         MessagesUtil.repairPaths(fileManager.getMessages());
-        setupCommands();
     }
 
 
@@ -311,7 +310,7 @@ public class SkinOverlay {
     }
 
 
-    private void setupCommands() {
+    public void setupCommands() {
         if (OptionsUtil.PROXY.getBooleanValue())
             return;
         //noinspection deprecation
