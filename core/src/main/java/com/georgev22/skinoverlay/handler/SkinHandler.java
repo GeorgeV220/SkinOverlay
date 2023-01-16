@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public abstract class SkinHandler {
 
@@ -29,9 +30,9 @@ public abstract class SkinHandler {
                                     @NotNull final String skinName,
                                     final Property property);
 
-    protected abstract <T> GameProfile getGameProfile0(@NotNull final PlayerObject playerObject) throws IOException;
+    protected abstract <T> GameProfile getGameProfile0(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException;
 
-    public GameProfile getGameProfile(@NotNull final PlayerObject playerObject) throws IOException {
+    public GameProfile getGameProfile(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         final GameProfile gameProfile = this.getGameProfile0(playerObject);
         if (!gameProfile.getProperties().containsKey("textures")) {
             gameProfile.getProperties().put("textures", this.getSkin(playerObject));
@@ -39,11 +40,11 @@ public abstract class SkinHandler {
         return gameProfile;
     }
 
-    public byte[] getProfileBytes(@NotNull final PlayerObject playerObject, @Nullable Property property) throws IOException {
+    public byte[] getProfileBytes(@NotNull final PlayerObject playerObject, @Nullable Property property) throws IOException, ExecutionException, InterruptedException {
         return playerObject.isBedrock() ? this.getBedrockProfileBytes(playerObject, property) : this.getJavaProfileBytes(playerObject, property);
     }
 
-    public byte[] getJavaProfileBytes(@NotNull final PlayerObject playerObject, @Nullable Property property) throws IOException {
+    public byte[] getJavaProfileBytes(@NotNull final PlayerObject playerObject, @Nullable Property property) throws IOException, ExecutionException, InterruptedException {
         return property != null ?
                 new ByteArrayInputStream(this.createJsonFromProperty(playerObject, property)
                         .getAsJsonObject().toString().getBytes()).readAllBytes() :
@@ -60,7 +61,7 @@ public abstract class SkinHandler {
                         .getBytes();
     }
 
-    public byte[] getBedrockProfileBytes(@NotNull final PlayerObject playerObject, final Property property) throws IOException {
+    public byte[] getBedrockProfileBytes(@NotNull final PlayerObject playerObject, final Property property) throws IOException, ExecutionException, InterruptedException {
         return property != null ?
                 new ByteArrayInputStream(this.createJsonFromProperty(playerObject, property).getAsJsonObject().toString().getBytes()).readAllBytes() :
                 new ByteArrayInputStream(this.createJsonForBedrock(playerObject).getAsJsonObject().toString().getBytes()).readAllBytes();
@@ -82,7 +83,7 @@ public abstract class SkinHandler {
         return jsonObject;
     }
 
-    public JsonObject createJsonFromProperty(@NotNull final PlayerObject playerObject, @Nullable Property property) throws IOException {
+    public JsonObject createJsonFromProperty(@NotNull final PlayerObject playerObject, @Nullable Property property) throws IOException, ExecutionException, InterruptedException {
         if (property == null)
             property = this.getGameProfile(playerObject).getProperties().get("textures").iterator().next();
         final JsonArray properties = new JsonArray();
@@ -129,7 +130,7 @@ public abstract class SkinHandler {
         return new Property("textures", json.getAsJsonObject().get("value").getAsString(), json.getAsJsonObject().get("signature").getAsString());
     }
 
-    public Property getJavaSkin(final PlayerObject playerObject) throws IOException {
+    public Property getJavaSkin(final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         final JsonElement json = JsonParser.parseString(new String(this.getProfileBytes(playerObject, null)));
         final JsonArray properties = json.getAsJsonObject().get("properties").getAsJsonArray();
         Property property = null;
@@ -141,7 +142,7 @@ public abstract class SkinHandler {
         return property;
     }
 
-    public Property getSkin(@NotNull final PlayerObject playerObject) throws IOException {
+    public Property getSkin(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         return playerObject.isBedrock() ? this.getXUIDSkin(this.getXUID(playerObject)) : this.getJavaSkin(playerObject);
     }
 
@@ -157,7 +158,7 @@ public abstract class SkinHandler {
         }
 
         @Override
-        protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException {
+        protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
             GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
             if (!gameProfile.getProperties().containsKey("textures")) {
                 gameProfile.getProperties().put("textures", this.getSkin(playerObject));

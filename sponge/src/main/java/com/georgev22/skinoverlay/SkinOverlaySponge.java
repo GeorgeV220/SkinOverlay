@@ -9,7 +9,7 @@ import com.georgev22.library.minecraft.SpongeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.LoggerWrapper;
 import com.georgev22.library.utilities.Utils;
-import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.handler.handlers.SkinHandler_Sponge;
 import com.georgev22.skinoverlay.listeners.sponge.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.sponge.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
@@ -71,6 +71,7 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
         }
         SkinOverlay.getInstance().setCommandManager(new SpongeCommandManager(pluginContainer, getDataFolder()));
         SkinOverlay.getInstance().onLoad(this);
+        SkinOverlay.getInstance().setupCommands();
         SpongeMinecraftUtils.registerListeners(pluginContainer,
                 new PlayerListeners(),
                 new DeveloperInformListener());
@@ -97,7 +98,7 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
     }
 
     public void onEnable() {
-        SkinOverlay.getInstance().setSkinHandler(new SkinHandler.SkinHandler_());
+        SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Sponge());
         SkinOverlay.getInstance().onEnable();
         this.isEnabled = true;
     }
