@@ -1,3 +1,16 @@
+# [3.4.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.3.0...v3.4.0) (2023-01-17)
+
+
+### Bug Fixes
+
+* **Property:** Get correct GameProfile property ([2245006](https://github.com/GeorgeV220/SkinOverlay/commit/224500641b7e26234593b16932ed2b8b7bf2c20b))
+* Show if experimental features are enabled ([9257ad5](https://github.com/GeorgeV220/SkinOverlay/commit/9257ad503c4a40d7fa246a683cade37621f38fbe))
+
+
+### Features
+
+* **SkinHandler:** Sponge SkinHandler ([1aeafb1](https://github.com/GeorgeV220/SkinOverlay/commit/1aeafb1f046248ba6453fd6d80eaeb08a6cacf10))
+
 # [3.3.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.2.0...v3.3.0) (2023-01-16)
 
 
