@@ -2,7 +2,6 @@ package com.georgev22.skinoverlay.utilities;
 
 import co.aikar.commands.CommandIssuer;
 import com.georgev22.library.maps.HashObjectMap;
-import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
@@ -17,7 +16,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import org.apache.commons.lang.Validate;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +28,6 @@ import java.io.IOException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.logging.Level;
 
 public class Utilities {
@@ -64,8 +61,7 @@ public class Utilities {
                     if (overlay == null) {
                         GameProfile gameProfile = skinOverlay.getSkinHandler().getGameProfile(playerObject);
                         PropertyMap pm = gameProfile.getProperties();
-                        Collection<Property> gameProfileProperties = pm.get("textures");
-                        Property property = pm.get("textures").iterator().next();
+                        Property property = pm.get("textures").stream().filter(gameProfileProperty -> gameProfileProperty.getName().equals("textures")).findFirst().orElseThrow();
                         pm.remove("textures", property);
                         pm.put("textures", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         userData.setSkinName(skinName);
@@ -96,7 +92,7 @@ public class Utilities {
                     Request request = new Request()
                             .openConnection("https://api.mineskin.org/generate/upload?visibility=1")
                             .postRequest()
-                            .setProperty(ObjectMap.Pair.create("Content-Type", ("multipart/form-data;boundary=" + boundary)))
+                            .setRequestProperty("Content-Type", ("multipart/form-data;boundary=" + boundary))
                             .writeToOutputStream(twoHyphens + boundary + crlf, "Content-Disposition: form-data; name=\"file\";filename=\"file.png\"" + crlf, crlf)
                             .writeToOutputStream(new byte[][]{stream.toByteArray()}).writeToOutputStream(crlf, twoHyphens + boundary + twoHyphens + crlf)
                             .closeOutputStream()
@@ -133,7 +129,7 @@ public class Utilities {
             UserData userData = UserData.getUser(playerObject);
             GameProfile gameProfile = playerObject.gameProfile();
             PropertyMap pm = gameProfile.getProperties();
-            Property property = pm.get("textures").iterator().next();
+            Property property = pm.get("textures").stream().filter(profileProperty -> profileProperty.getName().equals("textures")).findFirst().orElseThrow();
             pm.remove("textures", property);
             pm.put("textures", userData.getSkinProperty());
             if (skinOverlay.type().equals(SkinOverlayImpl.Type.PAPER)) {
@@ -186,15 +182,6 @@ public class Utilities {
 
         public Request setRequestProperty(String key, String value) {
             this.httpsURLConnection.setRequestProperty(key, value);
-            return this;
-        }
-
-        @SafeVarargs
-        @Contract("_ -> this")
-        public final Request setProperty(final ObjectMap.Pair<String, String> @NotNull ... pairs) {
-            for (final ObjectMap.Pair<String, String> pair : pairs) {
-                this.httpsURLConnection.setRequestProperty(pair.key(), pair.value());
-            }
             return this;
         }
 
