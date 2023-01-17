@@ -49,6 +49,7 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
     private final Logger logger;
     private final PluginManager pluginManager;
     private final PluginContainer pluginContainer;
+    private static SkinOverlaySponge skinOverlaySponge;
 
     private Server server;
     private int tick = 0;
@@ -60,6 +61,7 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
         this.pluginContainer = container;
         this.dataFolder = new File(configDir.toUri());
         this.pluginManager = Sponge.pluginManager();
+        skinOverlaySponge = this;
         onInit();
     }
 
@@ -180,5 +182,9 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
 
     public PluginManager getPluginManager() {
         return pluginManager;
+    }
+
+    public static SkinOverlaySponge getInstance() {
+        return skinOverlaySponge;
     }
 }
