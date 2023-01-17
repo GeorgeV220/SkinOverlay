@@ -1,3 +1,10 @@
+## [3.4.1](https://github.com/GeorgeV220/SkinOverlay/compare/v3.4.0...v3.4.1) (2023-01-17)
+
+
+### Bug Fixes
+
+* **Sponge:** Fixed Sponge_SkinHandler for versions below 1.18 ([87bfd7f](https://github.com/GeorgeV220/SkinOverlay/commit/87bfd7f0fa5819166dcfe9c6b5604c5608b01e09))
+
 # [3.4.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.3.0...v3.4.0) (2023-01-17)
 
 
