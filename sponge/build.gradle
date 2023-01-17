@@ -1,16 +1,26 @@
 import org.spongepowered.gradle.plugin.config.PluginLoaders
+import org.spongepowered.gradle.vanilla.repository.MinecraftPlatform
 import org.spongepowered.plugin.metadata.model.PluginDependency
 
 plugins {
     id("org.spongepowered.gradle.plugin") version "2.1.1"
+    id("org.spongepowered.gradle.vanilla") version "0.2+"
 }
 
 dependencies {
     compileOnly project(path: ':core')
+    compileOnly("org.spongepowered:mixin:0.8.3")
+}
+
+
+minecraft {
+    version("1.19.3")
+    platform(MinecraftPlatform.SERVER)
+    injectRepositories(false)
 }
 
 sponge {
-    apiVersion("9.1.0-SNAPSHOT")
+    apiVersion("8.0.0")
     loader {
         name(PluginLoaders.JAVA_PLAIN)
         version("1.0")

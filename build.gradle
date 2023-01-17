@@ -77,7 +77,7 @@ allprojects {
         compileOnly 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-sponge8:0.5.1-G-1.0-SNAPSHOT'
-        compileOnly 'com.georgev22:martexlibrary:8.12.0'
+        compileOnly 'com.georgev22:martexlibrary:8.13.0'
         compileOnly 'com.georgev22.api:libraryloader:1.4.0'
         compileOnly 'org.jetbrains:annotations:23.1.0'
         compileOnly 'commons-codec:commons-codec:1.15'
@@ -106,7 +106,7 @@ dependencies {
     implementation 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
     implementation 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
     implementation 'co.aikar:acf-sponge8:0.5.1-G-1.0-SNAPSHOT'
-    implementation 'com.georgev22:martexlibrary:8.12.0'
+    implementation 'com.georgev22:martexlibrary:8.13.0'
     implementation 'com.georgev22.api:libraryloader:1.4.0'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation project(path: ':core')
@@ -129,6 +129,12 @@ shadowJar {
     relocate 'org.bstats', "${packageName}.bstats"
     relocate 'com.georgev22.api.libraryloader', "${packageName}.libraryloader"
     relocate 'com.georgev22.library', "${packageName}.library"
+}
+
+jar {
+    manifest {
+        attributes["MixinConfigs"] = "mixins.skinoverlay.json"
+    }
 }
 
 tasks.build.dependsOn(shadowJar)

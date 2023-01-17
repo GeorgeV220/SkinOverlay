@@ -1,8 +1,10 @@
 package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.exceptions.ReflectionException;
+import com.georgev22.library.minecraft.SpongeMinecraftUtils;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
+import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlaySponge;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -12,7 +14,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
@@ -23,6 +24,7 @@ import org.spongepowered.math.vector.Vector3d;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
 
@@ -37,7 +39,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
     private final Class<?> respawnPacketClass;
     private final Class<?> entityDataPacketClass;
     private final Class<?> entityDataSerializersClass;
-    private final Class<?> entityDataAccesorClass;
+    private final Class<?> entityDataAccessorClass;
 
     private final Class<?> packet;
 
@@ -48,7 +50,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         respawnPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundRespawnPacket", classLoader);
         entityDataPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket", classLoader);
         entityDataSerializersClass = Utils.Reflection.getClass("net.minecraft.network.syncher.EntityDataSerializers", classLoader);
-        entityDataAccesorClass = Utils.Reflection.getClass("net.minecraft.network.syncher.EntityDataAccessor", classLoader);
+        entityDataAccessorClass = Utils.Reflection.getClass("net.minecraft.network.syncher.EntityDataAccessor", classLoader);
         packet = Utils.Reflection.getClass("net.minecraft.network.protocol.Packet", classLoader);
     }
 
@@ -94,10 +96,9 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         Object respawnPacket;
         //Respawn packet
         try {
-            Object deathLocation = fetchMethodAndInvoke(serverPlayerClass, "getLastDeathLocation", serverPlayer, new Object[]{}, new Class[]{});
 
-            switch (Sponge.platform().minecraftVersion().name()) {
-                case "1.19.3" -> respawnPacket = invokeConstructor(
+            switch (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion()) {
+                case V1_19_R2, UNKNOWN -> respawnPacket = invokeConstructor(
                         respawnPacketClass,
                         dimensionType,
                         dimension,
@@ -107,9 +108,9 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                         fetchMethodAndInvoke(serverWorldClass, "isDebug", serverWorld, new Object[]{}, new Class[]{}),
                         fetchMethodAndInvoke(serverWorldClass, "isFlat", serverWorld, new Object[]{}, new Class[]{}),
                         (byte) 3,
-                        deathLocation
+                        fetchMethodAndInvoke(serverPlayerClass, "getLastDeathLocation", serverPlayer, new Object[]{}, new Class[]{})
                 );
-                case "1.19.2" -> respawnPacket = invokeConstructor(
+                case V1_19_R1 -> respawnPacket = invokeConstructor(
                         respawnPacketClass,
                         dimensionType,
                         dimension,
@@ -119,7 +120,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                         fetchMethodAndInvoke(serverWorldClass, "isDebug", serverWorld, new Object[]{}, new Class[]{}),
                         fetchMethodAndInvoke(serverWorldClass, "isFlat", serverWorld, new Object[]{}, new Class[]{}),
                         true,
-                        deathLocation
+                        fetchMethodAndInvoke(serverPlayerClass, "getLastDeathLocation", serverPlayer, new Object[]{}, new Class[]{})
                 );
                 default -> respawnPacket = invokeConstructor(
                         respawnPacketClass,
@@ -146,8 +147,8 @@ public class SkinHandler_Sponge extends SkinHandler_ {
             fetchMethodAndInvoke(synchedEntityData.getClass(), "set", synchedEntityData,
                     new Object[]{
                             entityDataAccessor = invokeConstructor(
-                                    entityDataAccesorClass,
-                                    17,
+                                    entityDataAccessorClass,
+                                    SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(SpongeMinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
                                     fetchField(entityDataSerializersClass, null, "BYTE")),
                             (byte) (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40)
                     },
@@ -159,8 +160,8 @@ public class SkinHandler_Sponge extends SkinHandler_ {
             fetchMethodAndInvoke(synchedEntityData.getClass(), "set", synchedEntityData,
                     new Object[]{
                             entityDataAccessor = invokeConstructor(
-                                    entityDataAccesorClass,
-                                    17,
+                                    entityDataAccessorClass,
+                                    SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(SpongeMinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
                                     fetchField(entityDataSerializersClass, null, "BYTE")),
                             (byte)
                                     ((fileConfiguration.getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x00) |
@@ -176,8 +177,12 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                             Object.class
                     });
         }
-        if (Sponge.platform().minecraftVersion().name().equals("1.19.3")) {
+        try {
+            fetchMethodAndInvoke(synchedEntityData.getClass(), "markDirty", synchedEntityData, new Object[]{entityDataAccessor}, new Class[]{entityDataAccessorClass});
+        } catch (Exception ignore) {
             markDirty(synchedEntityData, entityDataAccessor);
+        }
+        if (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().equals(SpongeMinecraftUtils.MinecraftVersion.V1_19_R2)) {
             entityDataPacket = invokeConstructor(entityDataPacketClass,
                     fetchMethodAndInvoke(serverPlayerClass, "getId", serverPlayer, new Object[]{}, new Class[]{}),
                     fetchMethodAndInvoke(synchedEntityData.getClass(), "packDirty", synchedEntityData, new Object[]{}, new Class[]{})
@@ -186,7 +191,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
             entityDataPacket = invokeConstructor(entityDataPacketClass,
                     fetchMethodAndInvoke(serverPlayerClass, "getId", serverPlayer, new Object[]{}, new Class[]{}),
                     synchedEntityData,
-                    true
+                    false
             );
         }
 
@@ -204,6 +209,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
 
         Object playerConnection = getFieldByType(serverPlayer, "ServerGamePacketListenerImpl");
         sendPacket(playerConnection, respawnPacket);
+        SkinOverlay.getInstance().getLogger().info("EntityDataPacket: " + Arrays.toString(entityDataPacket.getClass().getConstructors()) + "\n" + "Accessor: " + entityDataAccessor);
         sendPacket(playerConnection, entityDataPacket);
 
         Object playerPositionPacket;
@@ -211,16 +217,41 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         try {
             Class<?> playerPositionPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket", classLoader);
             Class<?> playerCarriedItemPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket", classLoader);
+            switch (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion()) {
+                case V1_19_R2, V1_19_R1, V1_18_R2, V1_18_R1 ->
+                        playerPositionPacket = invokeConstructor(playerPositionPacketClass,
+                                serverLocation.x(),
+                                serverLocation.y(),
+                                serverLocation.z(),
+                                (float) rotation.y(),
+                                (float) rotation.x(),
+                                new HashSet<>(),
+                                0,
+                                false);
+                case V1_17_R1 -> playerPositionPacket = invokeConstructor(playerPositionPacketClass,
+                        serverLocation.x(),
+                        serverLocation.y(),
+                        serverLocation.z(),
+                        (float) rotation.y(),
+                        (float) rotation.x(),
+                        false);
+                case V1_16_R3, V1_16_R2 -> playerPositionPacket = invokeConstructor(playerPositionPacketClass,
+                        serverLocation.x(),
+                        serverLocation.y(),
+                        serverLocation.z(),
+                        (float) rotation.y(),
+                        (float) rotation.x(),
+                        new HashSet<>(),
+                        0);
+                default -> playerPositionPacket = invokeConstructor(playerPositionPacketClass,
+                        serverLocation.x(),
+                        serverLocation.y(),
+                        serverLocation.z(),
+                        (float) rotation.y(),
+                        (float) rotation.x(),
+                        new HashSet<>());
+            }
 
-            playerPositionPacket = invokeConstructor(playerPositionPacketClass,
-                    serverLocation.x(),
-                    serverLocation.y(),
-                    serverLocation.z(),
-                    (float) rotation.y(),
-                    (float) rotation.x(),
-                    new HashSet<>(),
-                    0,
-                    false);
             playerCarriedItemPacket = invokeConstructor(playerCarriedItemPacketClass,
                     receiver.inventory().hotbar().selectedSlotIndex()
             );
@@ -255,8 +286,8 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         fetchMethodAndInvoke(playerConnection.getClass(), "send", playerConnection, new Object[]{packet}, new Class<?>[]{this.packet});
     }
 
-    private void markDirty(@NotNull Object obj, @NotNull Object datawatcherobject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
-        Object getItem = fetchDeclaredMethodAndInvoke(obj.getClass(), "getItem", obj, new Object[]{datawatcherobject}, new Class[]{datawatcherobject.getClass()});
+    private void markDirty(@NotNull Object obj, @NotNull Object dataWatcherObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
+        Object getItem = fetchDeclaredMethodAndInvoke(obj.getClass(), "getItem", obj, new Object[]{dataWatcherObject}, new Class[]{entityDataAccessorClass});
         fetchMethodAndInvoke(getItem.getClass(), "setDirty", getItem, new Object[]{true}, new Class[]{boolean.class});
         setDeclaredFieldValue(obj.getClass(), obj, "isDirty", true);
     }

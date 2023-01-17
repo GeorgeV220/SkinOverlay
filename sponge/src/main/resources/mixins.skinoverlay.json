@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8.3",
+  "package": "com.georgev22.skinoverlay.mixin.sponge",
+  "refmap": "mixins.skinoverlay.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_11",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "SynchedEntityData_Mixin"
+  ]
+}
