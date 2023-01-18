@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.minecraft.SpongeMinecraftUtils;
+import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.SkinOverlay;
@@ -9,14 +10,15 @@ import com.georgev22.skinoverlay.SkinOverlaySponge;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.UserData;
+import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.effect.VanishState;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
@@ -24,8 +26,7 @@ import org.spongepowered.math.vector.Vector3d;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.georgev22.library.utilities.Utils.Reflection.*;
@@ -41,6 +42,8 @@ public class SkinHandler_Sponge extends SkinHandler_ {
     private final Class<?> entityDataSerializersClass;
     private final Class<?> entityDataAccessorClass;
 
+    private final Class<?> addPlayerPacketClass;
+    private final Class<?> removePlayerPacketClass;
     private final Class<?> packet;
 
     public SkinHandler_Sponge() {
@@ -51,6 +54,13 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         entityDataPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket", classLoader);
         entityDataSerializersClass = Utils.Reflection.getClass("net.minecraft.network.syncher.EntityDataSerializers", classLoader);
         entityDataAccessorClass = Utils.Reflection.getClass("net.minecraft.network.syncher.EntityDataAccessor", classLoader);
+        if (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().equals(SpongeMinecraftUtils.MinecraftVersion.V1_19_R2)) {
+            removePlayerPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket", classLoader);
+            addPlayerPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", classLoader);
+        } else {
+            removePlayerPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket", classLoader);
+            addPlayerPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket", classLoader);
+        }
         packet = Utils.Reflection.getClass("net.minecraft.network.protocol.Packet", classLoader);
     }
 
@@ -92,6 +102,27 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         if (previousGameModeForPlayer == null) {
             previousGameModeForPlayer = gameModeForPlayer;
         }
+
+        Object addPlayer;
+        Object removePlayer;
+        //Add remove player packet
+        if (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().equals(SpongeMinecraftUtils.MinecraftVersion.V1_19_R2)) {
+            removePlayer = invokeConstructor(removePlayerPacketClass, List.of(receiver.uniqueId()));
+            addPlayer = fetchMethodAndInvoke(addPlayerPacketClass, "createPlayerInitializing", null,
+                    new Object[]{List.of(serverPlayer)},
+                    new Class[]{Collection.class}
+            );
+
+        } else {
+            removePlayer = invokeConstructor(removePlayerPacketClass,
+                    getEnum(Utils.Reflection.getClass(removePlayerPacketClass.getName() + "$Action", classLoader), "REMOVE_PLAYER"),
+                    ImmutableList.of(serverPlayer));
+            addPlayer = invokeConstructor(addPlayerPacketClass,
+                    getEnum(Utils.Reflection.getClass(addPlayerPacketClass.getName() + "$Action", classLoader), "ADD_PLAYER"),
+                    ImmutableList.of(serverPlayer));
+        }
+
+        SkinOverlay.getInstance().getLogger().info(removePlayer + "\n" + addPlayer);
 
         Object respawnPacket;
         //Respawn packet
@@ -191,26 +222,14 @@ public class SkinHandler_Sponge extends SkinHandler_ {
             entityDataPacket = invokeConstructor(entityDataPacketClass,
                     fetchMethodAndInvoke(serverPlayerClass, "getId", serverPlayer, new Object[]{}, new Class[]{}),
                     synchedEntityData,
-                    false
+                    true
             );
         }
-
-        receiver.tabList().removeEntry(receiver.uniqueId());
-        receiver.tabList().addEntry(TabListEntry.builder()
-                .displayName(receiver.displayName().get())
-                .latency(receiver.connection().latency())
-                .list(receiver.tabList())
-                .gameMode(receiver.gameMode().get())
-                .profile(receiver.profile())
-                .build());
 
         ServerLocation serverLocation = receiver.serverLocation();
         Vector3d rotation = receiver.rotation();
 
         Object playerConnection = getFieldByType(serverPlayer, "ServerGamePacketListenerImpl");
-        sendPacket(playerConnection, respawnPacket);
-        SkinOverlay.getInstance().getLogger().info("EntityDataPacket: " + Arrays.toString(entityDataPacket.getClass().getConstructors()) + "\n" + "Accessor: " + entityDataAccessor);
-        sendPacket(playerConnection, entityDataPacket);
 
         Object playerPositionPacket;
         Object playerCarriedItemPacket;
@@ -260,10 +279,24 @@ public class SkinHandler_Sponge extends SkinHandler_ {
             return;
         }
 
-        /*receiver.offer(Keys.VANISH_STATE, VanishState.vanished());
-        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> receiver.offer(Keys.VANISH_STATE, VanishState.unvanished()), 1L);*/
+        sendPacketToAll(removePlayer);
+        sendPacketToAll(addPlayer);
+
+        sendPacket(playerConnection, respawnPacket);
+        sendPacket(playerConnection, entityDataPacket);
+        receiver.offer(Keys.VANISH_STATE, VanishState.vanished());
+        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> receiver.offer(Keys.VANISH_STATE, VanishState.unvanished()), 1L);
+        fetchMethodAndInvoke(serverPlayerClass, "onUpdateAbilities", serverPlayer, new Object[]{}, new Class[]{});
         sendPacket(playerConnection, playerPositionPacket);
         sendPacket(playerConnection, playerCarriedItemPacket);
+
+        if (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().isAboveOrEqual(SpongeMinecraftUtils.MinecraftVersion.V1_17_R1)) {
+            Object container = fetchDeclaredField(serverPlayerClass.getSuperclass(), serverPlayer, "containerMenu");
+            fetchMethodAndInvoke(container.getClass(), "sendAllDataToRemote", container, new Object[]{}, new Class[]{});
+        } else {
+            Object container = fetchDeclaredField(serverPlayerClass.getSuperclass(), serverPlayer, "activeContainer");
+            fetchMethodAndInvoke(serverPlayerClass, "updateInventory", serverPlayer, new Object[]{container}, new Class[]{container.getClass()});
+        }
 
         fetchMethodAndInvoke(serverPlayerClass, "resetSentInfo", serverPlayer, new Object[]{}, new Class[]{});
     }
@@ -284,6 +317,19 @@ public class SkinHandler_Sponge extends SkinHandler_ {
 
     private void sendPacket(Object playerConnection, Object packet) throws ReflectionException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         fetchMethodAndInvoke(playerConnection.getClass(), "send", playerConnection, new Object[]{packet}, new Class<?>[]{this.packet});
+    }
+
+    private void sendPacketToAll(Object packet) {
+        SkinOverlay.getInstance().onlinePlayers().forEach(playerObject -> {
+            ServerPlayer spongeServerPlayer = (ServerPlayer) playerObject.getPlayer();
+            Object serverPlayer = serverPlayerClass.cast(spongeServerPlayer);
+            Object playerConnection = getFieldByType(serverPlayer, "ServerGamePacketListenerImpl");
+            try {
+                sendPacket(playerConnection, packet);
+            } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private void markDirty(@NotNull Object obj, @NotNull Object dataWatcherObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {

@@ -2,13 +2,13 @@ package com.georgev22.skinoverlay.listeners.sponge;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.minecraft.SpongeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
 import com.google.common.collect.Lists;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
@@ -59,7 +59,7 @@ public class DeveloperInformListener {
                     .append("%author%", String.join(", ", skinOverlay.getDescription().authors()))
                     .append("%main%", skinOverlay.getDescription().main())
                     .append("%javaversion%", System.getProperty("java.version"))
-                    .append("%serverversion%", Sponge.platform().type().name())
+                    .append("%serverversion%", SpongeMinecraftUtils.MinecraftVersion.getCurrentVersionName())
                     .append("%experimental%", String.valueOf(OptionsUtil.EXPERIMENTAL_FEATURES.getBooleanValue())), true);
         }, 200L);
     }
