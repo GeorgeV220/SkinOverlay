@@ -7,7 +7,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlayVelocity;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
 import com.google.common.collect.Lists;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
@@ -24,7 +24,7 @@ public class DeveloperInformListener {
 
     @Subscribe
     public void onJoin(PostLoginEvent e) {
-        PlayerObject playerObject = new PlayerObjectWrapper(e.getPlayer().getUsername(), e.getPlayer().getUniqueId(), SkinOverlay.getInstance().type());
+        PlayerObject playerObject = new PlayerObjectVelocity(e.getPlayer());
         UUID uuid = playerObject.playerUUID();
         String name = playerObject.playerName();
 

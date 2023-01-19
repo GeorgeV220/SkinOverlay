@@ -7,7 +7,7 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class PlayerObjectBungee implements PlayerObject {
+public class PlayerObjectBungee extends PlayerObject {
     private final ProxiedPlayer proxiedPlayer;
 
     public PlayerObjectBungee(final ProxiedPlayer proxiedPlayer) {

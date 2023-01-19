@@ -8,7 +8,7 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import org.bukkit.OfflinePlayer;
 
-public class PlayerObjectBukkit implements PlayerObject {
+public class PlayerObjectBukkit extends PlayerObject {
     private final OfflinePlayer offlinePlayer;
 
     public PlayerObjectBukkit(final OfflinePlayer offlinePlayer) {

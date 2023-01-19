@@ -35,6 +35,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
 @MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.22")
@@ -43,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 @MavenLibrary(groupId = "commons-codec", artifactId = "commons-codec", version = "1.15")
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
+@MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
 @Plugin("${pluginName}")
 public class SkinOverlaySponge implements SkinOverlayImpl {
     private final File dataFolder;
@@ -161,9 +163,7 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
 
     @Override
     public List<PlayerObject> onlinePlayers() {
-        List<PlayerObject> playerObjects = Lists.newArrayList();
-        server.onlinePlayers().forEach(serverPlayer -> playerObjects.add(new PlayerObjectSponge(serverPlayer.user())));
-        return playerObjects;
+        return server.onlinePlayers().stream().map(PlayerObjectSponge::new).collect(Collectors.toList());
     }
 
     @Override

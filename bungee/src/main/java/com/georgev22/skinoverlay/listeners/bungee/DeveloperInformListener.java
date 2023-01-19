@@ -6,7 +6,7 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -25,7 +25,7 @@ public class DeveloperInformListener implements Listener {
 
     @EventHandler
     public void onJoin(PostLoginEvent e) {
-        PlayerObject playerObject = new PlayerObjectWrapper(e.getPlayer().getName(), e.getPlayer().getUniqueId(), SkinOverlay.getInstance().type());
+        PlayerObject playerObject = new PlayerObjectBungee(e.getPlayer());
         UUID uuid = playerObject.playerUUID();
         String name = playerObject.playerName();
 

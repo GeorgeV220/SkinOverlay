@@ -24,10 +24,10 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.connection.InitialHandler;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
 @MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.22")
@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 @MavenLibrary(groupId = "commons-codec", artifactId = "commons-codec", version = "1.15")
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
+@MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
 public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     private int tick = 0;
@@ -142,9 +143,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     @Override
     public List<PlayerObject> onlinePlayers() {
-        List<PlayerObject> playerObjects = new ArrayList<>();
-        getProxy().getPlayers().forEach(proxiedPlayer -> playerObjects.add(new PlayerObjectBungee(proxiedPlayer)));
-        return playerObjects;
+        return getProxy().getPlayers().stream().map(PlayerObjectBungee::new).collect(Collectors.toList());
     }
 
     @Override

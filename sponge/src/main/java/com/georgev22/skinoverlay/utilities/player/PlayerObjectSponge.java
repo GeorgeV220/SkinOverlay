@@ -8,9 +8,13 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerObjectSponge implements PlayerObject {
+public class PlayerObjectSponge extends PlayerObject {
 
     private final User user;
+
+    public PlayerObjectSponge(ServerPlayer serverPlayer) {
+        this.user = serverPlayer.user();
+    }
 
     public PlayerObjectSponge(User user) {
         this.user = user;

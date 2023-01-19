@@ -16,7 +16,6 @@ import com.georgev22.skinoverlay.utilities.VelocityPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -36,6 +35,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
 @MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.22")
@@ -46,6 +46,7 @@ import java.util.logging.Logger;
 @MavenLibrary(groupId = "commons-codec", artifactId = "commons-codec", version = "1.15")
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
+@MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
 @Plugin(id = "skinoverlay", name = "${pluginName}", version = "${version}", description = "SkinOverlay", authors = {"${author}"})
 public class SkinOverlayVelocity implements SkinOverlayImpl {
 
@@ -189,11 +190,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     @Override
     public List<PlayerObject> onlinePlayers() {
-        List<PlayerObject> playerObjects = Lists.newArrayList();
-        for (Player player : server.getAllPlayers()) {
-            playerObjects.add(new PlayerObjectVelocity(player));
-        }
-        return playerObjects;
+        return server.getAllPlayers().stream().map(PlayerObjectVelocity::new).collect(Collectors.toList());
     }
 
     public Path getDataDirectory() {

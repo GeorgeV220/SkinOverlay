@@ -11,7 +11,6 @@ import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +60,7 @@ public class SkinOverlayCommand extends BaseCommand {
                                 @Override
                                 public Boolean onSuccess() {
                                     atomicBoolean.set(true);
-                                    Utilities.updateSkin(new PlayerObjectWrapper(uuid, skinOverlay.type()), true, false);
+                                    Utilities.updateSkin(skinUser.getPlayer().orElseThrow(), true, false);
                                     return atomicBoolean.get();
                                 }
 
@@ -117,7 +116,7 @@ public class SkinOverlayCommand extends BaseCommand {
         Optional<PlayerObject> target;
         if (args.length > 1) {
             if (issuer.hasPermission("skinoverlay.wear.overlay.others")) {
-                target = skinOverlay.getSkinOverlay().onlinePlayers().stream().filter(playerObject -> playerObject.playerName().equalsIgnoreCase(args[1])).findFirst();
+                target = skinOverlay.isOnline(args[1]) ? skinOverlay.getPlayer(args[1]) : Optional.empty();
                 if (target.isEmpty()) {
                     MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", args[1]), true);
                     return;
@@ -131,9 +130,9 @@ public class SkinOverlayCommand extends BaseCommand {
                 MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
                 return;
             }
-            target = Optional.of(new PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()));
+            target = skinOverlay.getPlayer(issuer.getUniqueId());
         }
-        Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), overlay, new PlayerObjectWrapper(target.get().playerUUID(), skinOverlay.type()), issuer);
+        Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), overlay, target.orElseThrow(), issuer);
     }
 
     @Subcommand("clear")
@@ -152,7 +151,7 @@ public class SkinOverlayCommand extends BaseCommand {
             return;
         }
         if (args.length == 0) {
-            Utilities.setSkin(() -> null, "default", new PlayerObjectWrapper(issuer.getUniqueId(), skinOverlay.type()), issuer);
+            Utilities.setSkin(() -> null, "default", skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow(), issuer);
         } else {
             clear0(issuer, args[0]);
         }
@@ -160,11 +159,11 @@ public class SkinOverlayCommand extends BaseCommand {
     }
 
     private void clear0(@NotNull CommandIssuer issuer, String target) {
-        Optional<PlayerObject> optionalPlayerObject = skinOverlay.getSkinOverlay().onlinePlayers().stream().filter(playerObject -> playerObject.playerName().equalsIgnoreCase(target)).findFirst();
+        Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(target);
         if (optionalPlayerObject.isEmpty()) {
             MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", target), true);
             return;
         }
-        Utilities.setSkin(() -> null, "default", new PlayerObjectWrapper(optionalPlayerObject.get().playerUUID(), skinOverlay.type()), issuer);
+        Utilities.setSkin(() -> null, "default", optionalPlayerObject.orElseThrow(), issuer);
     }
 }

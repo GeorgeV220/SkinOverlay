@@ -7,7 +7,7 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectWrapper;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectSponge;
 import com.google.common.collect.Lists;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
@@ -24,7 +24,7 @@ public class DeveloperInformListener {
 
     @Listener
     public void onLogin(ServerSideConnectionEvent.Join loginEvent) {
-        PlayerObject playerObject = new PlayerObjectWrapper(loginEvent.player().name(), loginEvent.player().uniqueId(), SkinOverlay.getInstance().type());
+        PlayerObject playerObject = new PlayerObjectSponge(loginEvent.player().user());
         UUID uuid = playerObject.playerUUID();
         String name = playerObject.playerName();
 

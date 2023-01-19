@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.InetSocketAddress;
 import java.util.*;
 
-public class PlayerObjectVelocity implements PlayerObject {
+public class PlayerObjectVelocity extends PlayerObject {
 
     private final Player player;
 

@@ -20,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.*;
 
@@ -31,6 +32,7 @@ import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVers
 @MavenLibrary(groupId = "commons-io", artifactId = "commons-io", version = "2.11.0")
 @MavenLibrary(groupId = "commons-codec", artifactId = "commons-codec", version = "1.15")
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
+@MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
 public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
 
     private int tick = 0;
@@ -98,9 +100,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
 
     @Override
     public List<PlayerObject> onlinePlayers() {
-        List<PlayerObject> playerObjects = new ArrayList<>();
-        Bukkit.getOnlinePlayers().forEach(player -> playerObjects.add(new PlayerObjectBukkit(player)));
-        return playerObjects;
+        return Bukkit.getOnlinePlayers().stream().map(PlayerObjectBukkit::new).collect(Collectors.toList());
     }
 
     @Override
