@@ -1,3 +1,13 @@
+# [3.5.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.4.2...v3.5.0) (2023-01-19)
+
+
+### Features
+
+* Added User#getPlayer ([0621811](https://github.com/GeorgeV220/SkinOverlay/commit/06218112e85a45f7ec6b610d0148075fcf220832))
+* new PlayerObject implementation ([46462f6](https://github.com/GeorgeV220/SkinOverlay/commit/46462f6ca8c475b558e920ea94bd89cae10f0868))
+* Removed PlayerObjectWrapper ([3bf806a](https://github.com/GeorgeV220/SkinOverlay/commit/3bf806a3fb6a5cd785f1dd06cb19ef01428549da))
+* **SkinOverlay:** getPlayer and isOnline methods ([21f78da](https://github.com/GeorgeV220/SkinOverlay/commit/21f78da56186610c02513ced414d39147b2d98ac))
+
 ## [3.4.2](https://github.com/GeorgeV220/SkinOverlay/compare/v3.4.1...v3.4.2) (2023-01-18)
 
 
