@@ -7,6 +7,7 @@ import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -55,10 +56,14 @@ public class User extends ConcurrentObjectMap<String, Object> {
 
     public Property getDefaultSkinProperty() {
         try {
-            return get("defaultSkinProperty", SkinOverlay.getInstance().getSkinHandler().getSkin(new PlayerObjectWrapper(uuid, SkinOverlay.getInstance().type())));
+            return get("defaultSkinProperty", SkinOverlay.getInstance().getSkinHandler().getSkin(getPlayer().orElseThrow()));
         } catch (IOException | ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Optional<PlayerObject> getPlayer() {
+        return get("playerObject", SkinOverlay.getInstance().getPlayer(uuid));
     }
 
 }
