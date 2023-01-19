@@ -197,6 +197,22 @@ public class SkinOverlay {
         return skinOverlay.onlinePlayers();
     }
 
+    public boolean isOnline(String playerName) {
+        return onlinePlayers().stream().anyMatch(playerObject -> playerObject.playerName().equalsIgnoreCase(playerName));
+    }
+
+    public boolean isOnline(UUID uuid) {
+        return onlinePlayers().stream().anyMatch(playerObject -> playerObject.playerUUID().equals(uuid));
+    }
+
+    public Optional<PlayerObject> getPlayer(String playerName) {
+        return onlinePlayers().stream().filter(playerObject -> playerObject.playerName().equalsIgnoreCase(playerName)).findFirst();
+    }
+
+    public Optional<PlayerObject> getPlayer(UUID uuid) {
+        return onlinePlayers().stream().filter(playerObject -> playerObject.playerUUID().equals(uuid)).findFirst();
+    }
+
     public FileConfiguration getConfig() {
         return fileManager.getConfig().getFileConfiguration();
     }
