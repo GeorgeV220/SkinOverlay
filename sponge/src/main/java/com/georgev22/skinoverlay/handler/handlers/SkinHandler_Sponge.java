@@ -122,8 +122,6 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                     ImmutableList.of(serverPlayer));
         }
 
-        SkinOverlay.getInstance().getLogger().info(removePlayer + "\n" + addPlayer);
-
         Object respawnPacket;
         //Respawn packet
         try {

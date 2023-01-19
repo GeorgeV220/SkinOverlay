@@ -10,7 +10,6 @@ import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.IDatabaseType;
 import com.mojang.authlib.properties.Property;
 import com.mongodb.BasicDBObject;
-import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.BsonDocument;
@@ -24,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Used to handle all user's data and anything related to them.
@@ -239,7 +239,7 @@ public record UserData(User user) {
         public void setupUser(User user, Callback<Boolean> callback) {
             try {
                 if (!this.playerExists(user)) {
-                    Property property = new PlayerObjectWrapper(user.getUniqueId(), skinOverlay.type()).gameProfile().getProperties().get("textures").iterator().next();
+                    Property property = user.getPlayer().orElseThrow().gameProfile().getProperties().get("textures").stream().filter(profileProperty -> profileProperty.getName().equals("textures")).findFirst().orElseThrow();
                     skinOverlay.getDatabaseWrapper().getSQLDatabase().updateSQL("INSERT INTO `" + OptionsUtil.DATABASE_TABLE_NAME.getStringValue() + "` (`uuid`, `skinName`, `property-name`, `property-value`, `property-signature`) VALUES ('" + user.getUniqueId().toString() + "', 'default', '" + property.getName() + "', '" + property.getValue() + "', '" + property.getSignature() + "');");
                 }
                 callback.onSuccess();
@@ -379,7 +379,7 @@ public record UserData(User user) {
         public ObjectMap<UUID, User> getAllUsers() {
             ObjectMap<UUID, User> map = new ConcurrentObjectMap<>();
             FindIterable<Document> iterable = skinOverlay.getMongoDatabase().getCollection(OptionsUtil.DATABASE_MONGO_COLLECTION.getStringValue()).find();
-            iterable.forEach((Block<Document>) document -> {
+            iterable.forEach((Consumer<Document>) document -> {
                 UserData userData = UserData.getUser(UUID.fromString(document.getString("uuid")));
                 try {
                     load0(map, userData);
@@ -419,8 +419,7 @@ public record UserData(User user) {
         private final List<User> userList = new ArrayList<>();
 
         @Override
-        public void save(User user) throws Exception {
-
+        public void save(User user) {
         }
 
         @Override
