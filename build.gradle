@@ -67,17 +67,14 @@ allprojects {
     }
 
     dependencies {
-        compileOnly 'io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT'
-        compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
-        compileOnly 'net.md-5:bungeecord-proxy:1.19-R0.1-SNAPSHOT'
-        compileOnly 'com.velocitypowered:velocity-api:3.1.1'
-        compileOnly 'org.spongepowered:spongeapi:8.0.0'
-
+        compileOnly 'net.kyori:adventure-api:4.12.0'
+        compileOnly 'net.kyori:adventure-text-serializer-legacy:4.12.0'
+        compileOnly 'com.google.code.gson:gson:2.10.1'
         compileOnly 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-sponge8:0.5.1-G-1.0-SNAPSHOT'
-        compileOnly 'com.georgev22:martexlibrary:8.13.0'
+        compileOnly 'com.georgev22:martexlibrary:8.14.0'
         compileOnly 'com.georgev22.api:libraryloader:1.4.0'
         compileOnly 'org.jetbrains:annotations:23.1.0'
         compileOnly 'commons-codec:commons-codec:1.15'
@@ -106,7 +103,7 @@ dependencies {
     implementation 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
     implementation 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
     implementation 'co.aikar:acf-sponge8:0.5.1-G-1.0-SNAPSHOT'
-    implementation 'com.georgev22:martexlibrary:8.13.0'
+    implementation 'com.georgev22:martexlibrary:8.14.0'
     implementation 'com.georgev22.api:libraryloader:1.4.0'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation project(path: ':core')

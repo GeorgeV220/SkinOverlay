@@ -26,6 +26,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.scheduler.ScheduledTask;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,6 +59,9 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     private final File dataFolder;
 
     private final Plugin pluginAnnotation;
+
+    private ScheduledTask scheduledTask;
+
     private int tick = 0;
 
     private boolean enabled = false;
@@ -71,6 +75,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     @Contract(pure = true)
     @Inject
     public SkinOverlayVelocity(@NotNull ProxyServer server, @NotNull Logger logger, @DataDirectory @NotNull Path dataDirectory) {
+        VelocityMinecraftUtils.setServer(server);
         instance = this;
         this.server = server;
         this.logger = logger;
@@ -100,7 +105,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     }
 
     public void onEnable() {
-        getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
+        this.scheduledTask = getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
             public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
@@ -138,6 +143,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     public void onDisable() {
         SkinOverlay.getInstance().onDisable();
+        scheduledTask.cancel();
         enabled = false;
     }
 

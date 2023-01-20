@@ -111,14 +111,14 @@ public enum MessagesUtil {
                 case BUNGEE ->
                         BungeeMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
                 case VELOCITY ->
-                        VelocityMinecraftUtils.printMsg((com.velocitypowered.api.proxy.ProxyServer) SkinOverlay.getInstance().getSkinOverlay().getServerImpl(), Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
+                        VelocityMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
             }
         } else {
             switch (SkinOverlay.getInstance().type()) {
                 case PAPER -> BukkitMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
                 case BUNGEE -> BungeeMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
                 case VELOCITY ->
-                        VelocityMinecraftUtils.printMsg((com.velocitypowered.api.proxy.ProxyServer) SkinOverlay.getInstance().getSkinOverlay().getServerImpl(), Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
+                        VelocityMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
             }
         }
     }

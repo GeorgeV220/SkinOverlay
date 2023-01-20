@@ -1,17 +1,12 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.georgev22.library.minecraft.xseries.XMaterial;
 import com.georgev22.library.minecraft.colors.Color;
-import com.georgev22.library.minecraft.inventory.ItemBuilder;
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.google.common.collect.Lists;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-
-import static com.georgev22.library.utilities.Utils.Assertions.notNull;
+import java.util.stream.Collectors;
 
 public enum OptionsUtil {
 
@@ -96,37 +91,13 @@ public enum OptionsUtil {
         return mainPlugin.getConfig().getStringList(getPath());
     }
 
-    public ItemStack getItemStack(boolean isSavedAsItemStack) {
-        if (isSavedAsItemStack) {
-            return (ItemStack) mainPlugin.getConfig().get(getPath(), getDefaultValue());
-        } else {
-            if (mainPlugin.getConfig().get(getPath()) == null) {
-                return (ItemStack) getDefaultValue();
-            }
-            ItemBuilder itemBuilder = new ItemBuilder(
-                    notNull("Material", Objects.requireNonNull(XMaterial.valueOf(mainPlugin.getConfig().getString(getPath() + ".item")).parseMaterial())))
-                    .amount(mainPlugin.getConfig().getInt(getPath() + ".amount"))
-                    .title(mainPlugin.getConfig().getString(getPath() + ".title"))
-                    .lores(mainPlugin.getConfig().getStringList(getPath() + ".lores"))
-                    .showAllAttributes(
-                            mainPlugin.getConfig().getBoolean(getPath() + ".show all attributes"))
-                    .glow(mainPlugin.getConfig().getBoolean(getPath() + ".glow"));
-            return itemBuilder.build();
-        }
-    }
-
     /**
      * Converts and return a String List of color codes to a List of Color classes that represent the colors.
      *
      * @return a List of Color classes that represent the colors.
      */
     public @NotNull List<Color> getColors() {
-        List<Color> colors = Lists.newArrayList();
-        for (String stringColor : getStringList()) {
-            colors.add(Color.from(stringColor));
-        }
-
-        return colors;
+        return getStringList().stream().map(Color::from).collect(Collectors.toList());
     }
 
     /**
