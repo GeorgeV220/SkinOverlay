@@ -77,7 +77,7 @@ allprojects {
         compileOnly 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-sponge8:0.5.1-G-1.0-SNAPSHOT'
-        compileOnly 'com.georgev22:martexlibrary:8.13.0'
+        compileOnly 'com.georgev22:martexlibrary:8.15.0'
         compileOnly 'com.georgev22.api:libraryloader:1.4.0'
         compileOnly 'org.jetbrains:annotations:23.1.0'
         compileOnly 'commons-codec:commons-codec:1.15'
