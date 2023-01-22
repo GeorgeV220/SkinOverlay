@@ -1,3 +1,10 @@
+# [3.6.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.5.0...v3.6.0) (2023-01-22)
+
+
+### Features
+
+* **Sponge7:** Sponge7 support ([ed0c892](https://github.com/GeorgeV220/SkinOverlay/commit/ed0c892966b1f5cd2dfa988514918466961c9106))
+
 # [3.5.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.4.2...v3.5.0) (2023-01-19)
 
 
