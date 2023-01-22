@@ -2,15 +2,15 @@ package com.georgev22.skinoverlay.listeners.sponge;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.minecraft.Sponge8MinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectSponge;
+import com.georgev22.skinoverlay.utilities.player.PlayerObjectSponge7;
 import com.google.common.collect.Lists;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,8 +23,8 @@ public class DeveloperInformListener {
     );
 
     @Listener
-    public void onLogin(ServerSideConnectionEvent.Join loginEvent) {
-        PlayerObject playerObject = new PlayerObjectSponge(loginEvent.player().user());
+    public void onLogin(ClientConnectionEvent.Login loginEvent) {
+        PlayerObject playerObject = new PlayerObjectSponge7(loginEvent.getTargetUser());
         UUID uuid = playerObject.playerUUID();
         String name = playerObject.playerName();
 
@@ -59,7 +59,7 @@ public class DeveloperInformListener {
                     .append("%author%", String.join(", ", skinOverlay.getDescription().authors()))
                     .append("%main%", skinOverlay.getDescription().main())
                     .append("%javaversion%", System.getProperty("java.version"))
-                    .append("%serverversion%", Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersionName())
+                    .append("%serverversion%", Sponge.getGame().getPlatform().getMinecraftVersion().getName())
                     .append("%experimental%", String.valueOf(OptionsUtil.EXPERIMENTAL_FEATURES.getBooleanValue())), true);
         }, 200L);
     }

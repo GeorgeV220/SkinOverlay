@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.exceptions.ReflectionException;
-import com.georgev22.library.minecraft.SpongeMinecraftUtils;
+import com.georgev22.library.minecraft.Sponge8MinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
@@ -54,7 +54,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         entityDataPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket", classLoader);
         entityDataSerializersClass = Utils.Reflection.getClass("net.minecraft.network.syncher.EntityDataSerializers", classLoader);
         entityDataAccessorClass = Utils.Reflection.getClass("net.minecraft.network.syncher.EntityDataAccessor", classLoader);
-        if (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().equals(SpongeMinecraftUtils.MinecraftVersion.V1_19_R2)) {
+        if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().equals(Sponge8MinecraftUtils.MinecraftVersion.V1_19_R2)) {
             removePlayerPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket", classLoader);
             addPlayerPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", classLoader);
         } else {
@@ -67,8 +67,12 @@ public class SkinHandler_Sponge extends SkinHandler_ {
     @SneakyThrows
     @Override
     public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
-        Property property = UserData.getUser(playerObject.playerUUID()).getSkinProperty();
+        updateSkin(fileConfiguration, playerObject, reset, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty());
+    }
 
+    @SneakyThrows
+    @Override
+    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
         ServerPlayer receiver = (ServerPlayer) playerObject.getPlayer();
 
         receiver.user().offer(Keys.UPDATE_GAME_PROFILE, true);
@@ -106,7 +110,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         Object addPlayer;
         Object removePlayer;
         //Add remove player packet
-        if (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().equals(SpongeMinecraftUtils.MinecraftVersion.V1_19_R2)) {
+        if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().equals(Sponge8MinecraftUtils.MinecraftVersion.V1_19_R2)) {
             removePlayer = invokeConstructor(removePlayerPacketClass, List.of(receiver.uniqueId()));
             addPlayer = fetchMethodAndInvoke(addPlayerPacketClass, "createPlayerInitializing", null,
                     new Object[]{List.of(serverPlayer)},
@@ -126,7 +130,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         //Respawn packet
         try {
 
-            switch (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion()) {
+            switch (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion()) {
                 case V1_19_R2, UNKNOWN -> respawnPacket = invokeConstructor(
                         respawnPacketClass,
                         dimensionType,
@@ -177,7 +181,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                     new Object[]{
                             entityDataAccessor = invokeConstructor(
                                     entityDataAccessorClass,
-                                    SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(SpongeMinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
+                                    Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
                                     fetchField(entityDataSerializersClass, null, "BYTE")),
                             (byte) (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40)
                     },
@@ -190,7 +194,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                     new Object[]{
                             entityDataAccessor = invokeConstructor(
                                     entityDataAccessorClass,
-                                    SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(SpongeMinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
+                                    Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
                                     fetchField(entityDataSerializersClass, null, "BYTE")),
                             (byte)
                                     ((fileConfiguration.getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x00) |
@@ -211,7 +215,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         } catch (Exception ignore) {
             markDirty(synchedEntityData, entityDataAccessor);
         }
-        if (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().equals(SpongeMinecraftUtils.MinecraftVersion.V1_19_R2)) {
+        if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().equals(Sponge8MinecraftUtils.MinecraftVersion.V1_19_R2)) {
             entityDataPacket = invokeConstructor(entityDataPacketClass,
                     fetchMethodAndInvoke(serverPlayerClass, "getId", serverPlayer, new Object[]{}, new Class[]{}),
                     fetchMethodAndInvoke(synchedEntityData.getClass(), "packDirty", synchedEntityData, new Object[]{}, new Class[]{})
@@ -234,7 +238,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         try {
             Class<?> playerPositionPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket", classLoader);
             Class<?> playerCarriedItemPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket", classLoader);
-            switch (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion()) {
+            switch (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion()) {
                 case V1_19_R2, V1_19_R1, V1_18_R2, V1_18_R1 ->
                         playerPositionPacket = invokeConstructor(playerPositionPacketClass,
                                 serverLocation.x(),
@@ -288,7 +292,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         sendPacket(playerConnection, playerPositionPacket);
         sendPacket(playerConnection, playerCarriedItemPacket);
 
-        if (SpongeMinecraftUtils.MinecraftVersion.getCurrentVersion().isAboveOrEqual(SpongeMinecraftUtils.MinecraftVersion.V1_17_R1)) {
+        if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isAboveOrEqual(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1)) {
             Object container = fetchDeclaredField(serverPlayerClass.getSuperclass(), serverPlayer, "containerMenu");
             fetchMethodAndInvoke(container.getClass(), "sendAllDataToRemote", container, new Object[]{}, new Class[]{});
         } else {
@@ -297,11 +301,6 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         }
 
         fetchMethodAndInvoke(serverPlayerClass, "resetSentInfo", serverPlayer, new Object[]{}, new Class[]{});
-    }
-
-    @Override
-    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
-        updateSkin(fileConfiguration, playerObject, reset, skinName);
     }
 
     @Override

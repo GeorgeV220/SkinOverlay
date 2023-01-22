@@ -23,4 +23,5 @@ include 'mc-1-17'
 include 'bungee'
 include 'velocity'
 include 'sponge'
+include 'sponge7'
 

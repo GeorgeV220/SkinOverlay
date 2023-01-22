@@ -2,9 +2,7 @@ package com.georgev22.skinoverlay.utilities;
 
 import co.aikar.commands.CommandIssuer;
 import com.georgev22.library.maps.HashObjectMap;
-import com.georgev22.library.minecraft.BukkitMinecraftUtils;
-import com.georgev22.library.minecraft.BungeeMinecraftUtils;
-import com.georgev22.library.minecraft.VelocityMinecraftUtils;
+import com.georgev22.library.minecraft.*;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.configmanager.CFG;
 import com.georgev22.skinoverlay.SkinOverlay;
@@ -112,6 +110,10 @@ public enum MessagesUtil {
                         BungeeMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
                 case VELOCITY ->
                         VelocityMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
+                case SPONGE7 ->
+                        Sponge7MinecraftUtils.printMsg(SkinOverlay.getInstance().getLogger(), Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
+                case SPONGE8 ->
+                        Sponge8MinecraftUtils.printMsg(SkinOverlay.getInstance().getLogger(), Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
             }
         } else {
             switch (SkinOverlay.getInstance().type()) {
@@ -119,31 +121,27 @@ public enum MessagesUtil {
                 case BUNGEE -> BungeeMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
                 case VELOCITY ->
                         VelocityMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
+                case SPONGE7 ->
+                        Sponge7MinecraftUtils.printMsg(SkinOverlay.getInstance().getLogger(), Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
+                case SPONGE8 ->
+                        Sponge8MinecraftUtils.printMsg(SkinOverlay.getInstance().getLogger(), Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
             }
         }
     }
 
     public void msgAll() {
         if (this.isMultiLined()) {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> {
-                playerObject.sendMessage(this.getMessages());
-            });
+            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()));
         } else {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> {
-                playerObject.sendMessage(this.getMessages()[0]);
-            });
+            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()[0]));
         }
     }
 
     public void msgAll(Map<String, String> map, boolean ignoreCase) {
         if (this.isMultiLined()) {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> {
-                playerObject.sendMessage(placeHolder(this.getMessages(), map, ignoreCase));
-            });
+            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages(), map, ignoreCase)));
         } else {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> {
-                playerObject.sendMessage(placeHolder(this.getMessages()[0], map, ignoreCase));
-            });
+            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages()[0], map, ignoreCase)));
         }
     }
 

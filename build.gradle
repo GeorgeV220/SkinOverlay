@@ -67,14 +67,23 @@ allprojects {
     }
 
     dependencies {
+        compileOnly "com.georgev22.library:database:${libraryVersion}:all"
+        compileOnly "com.georgev22.library:maps:${libraryVersion}:all"
+        compileOnly "com.georgev22.library:scheduler:${libraryVersion}:all"
+        compileOnly "com.georgev22.library:utilities:${libraryVersion}:all"
+        compileOnly "com.georgev22.library:yaml:${libraryVersion}:all"
+        compileOnly "com.georgev22.library:minecraft:${libraryVersion}"
+
+
+        compileOnly 'org.apache.logging.log4j:log4j-api:2.17.0'
         compileOnly 'net.kyori:adventure-api:4.12.0'
         compileOnly 'net.kyori:adventure-text-serializer-legacy:4.12.0'
         compileOnly 'com.google.code.gson:gson:2.10.1'
         compileOnly 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
+        compileOnly 'co.aikar:acf-sponge:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-sponge8:0.5.1-G-1.0-SNAPSHOT'
-        compileOnly 'com.georgev22:martexlibrary:8.14.0'
         compileOnly 'com.georgev22.api:libraryloader:1.4.0'
         compileOnly 'org.jetbrains:annotations:23.1.0'
         compileOnly 'commons-codec:commons-codec:1.15'
@@ -99,11 +108,18 @@ repositories {
 }
 
 dependencies {
+    implementation "com.georgev22.library:database:${libraryVersion}"
+    implementation "com.georgev22.library:maps:${libraryVersion}"
+    implementation "com.georgev22.library:scheduler:${libraryVersion}"
+    implementation "com.georgev22.library:utilities:${libraryVersion}"
+    implementation "com.georgev22.library:yaml:${libraryVersion}"
+    implementation "com.georgev22.library:minecraft:${libraryVersion}"
+
     implementation 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
     implementation 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
     implementation 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
+    implementation 'co.aikar:acf-sponge:0.5.1-G-1.0-SNAPSHOT'
     implementation 'co.aikar:acf-sponge8:0.5.1-G-1.0-SNAPSHOT'
-    implementation 'com.georgev22:martexlibrary:8.14.0'
     implementation 'com.georgev22.api:libraryloader:1.4.0'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation project(path: ':core')
@@ -111,6 +127,7 @@ dependencies {
     implementation project(path: ':bungee')
     implementation project(path: ':velocity')
     implementation project(path: ':sponge')
+    implementation project(path: ':sponge7')
     implementation project(path: ':mc-1-17', configuration: 'reobf')
     implementation project(path: ':mc-1-18', configuration: 'reobf')
     implementation project(path: ':mc-1-18-2', configuration: 'reobf')

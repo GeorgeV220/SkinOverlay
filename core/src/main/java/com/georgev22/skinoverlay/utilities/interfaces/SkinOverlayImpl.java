@@ -38,7 +38,8 @@ public interface SkinOverlayImpl {
         PAPER,
         BUNGEE,
         VELOCITY,
-        SPONGE
+        SPONGE8,
+        SPONGE7
     }
 
 }

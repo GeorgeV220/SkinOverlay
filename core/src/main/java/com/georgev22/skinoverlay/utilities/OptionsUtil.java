@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.georgev22.library.minecraft.colors.Color;
+import com.georgev22.library.utilities.Color;
 import com.georgev22.skinoverlay.SkinOverlay;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

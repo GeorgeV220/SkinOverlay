@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.utilities.player;
 
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.minecraft.SpongeMinecraftUtils;
+import com.georgev22.library.minecraft.Sponge8MinecraftUtils;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
@@ -37,32 +37,32 @@ public class PlayerObjectSponge extends PlayerObject {
 
     @Override
     public void sendMessage(String input) {
-        SpongeMinecraftUtils.msg(getPlayer(), input);
+        Sponge8MinecraftUtils.msg(getPlayer(), input);
     }
 
     @Override
     public void sendMessage(List<String> input) {
-        SpongeMinecraftUtils.msg(getPlayer(), input);
+        Sponge8MinecraftUtils.msg(getPlayer(), input);
     }
 
     @Override
     public void sendMessage(String... input) {
-        SpongeMinecraftUtils.msg(getPlayer(), input);
+        Sponge8MinecraftUtils.msg(getPlayer(), input);
     }
 
     @Override
     public void sendMessage(String input, ObjectMap<String, String> placeholders, boolean ignoreCase) {
-        SpongeMinecraftUtils.msg(getPlayer(), input, placeholders, ignoreCase);
+        Sponge8MinecraftUtils.msg(getPlayer(), input, placeholders, ignoreCase);
     }
 
     @Override
     public void sendMessage(List<String> input, ObjectMap<String, String> placeholders, boolean ignoreCase) {
-        SpongeMinecraftUtils.msg(getPlayer(), input, placeholders, ignoreCase);
+        Sponge8MinecraftUtils.msg(getPlayer(), input, placeholders, ignoreCase);
     }
 
     @Override
     public void sendMessage(String[] input, ObjectMap<String, String> placeholders, boolean ignoreCase) {
-        SpongeMinecraftUtils.msg(getPlayer(), input, placeholders, ignoreCase);
+        Sponge8MinecraftUtils.msg(getPlayer(), input, placeholders, ignoreCase);
     }
 
     @Override
