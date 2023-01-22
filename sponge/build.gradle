@@ -10,7 +10,7 @@ plugins {
 dependencies {
     compileOnly project(path: ':core')
     compileOnly 'org.spongepowered:mixin:0.8.3'
-    compileOnly 'org.spongepowered:spongeapi:8.0.0'
+    compileOnly 'org.spongepowered:spongeapi:9.0.0'
 }
 
 
