@@ -17,21 +17,56 @@ import java.util.concurrent.ExecutionException;
 
 public abstract class SkinHandler {
 
-    protected SkinOverlay skinOverlay = SkinOverlay.getInstance();
+    protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
+    /**
+     * Update the skin for the specified {@link PlayerObject}
+     *
+     * @param fileConfiguration {@link FileConfiguration} that contains the skin options.
+     * @param playerObject      Player's {@link PlayerObject} object.
+     * @param reset             Default skin.
+     * @param skinName          Skin name (eg default or allay)
+     */
     public abstract void updateSkin(@NotNull final FileConfiguration fileConfiguration,
                                     @NotNull final PlayerObject playerObject,
                                     final boolean reset,
                                     @NotNull final String skinName);
 
+    /**
+     * Update the skin for the specified {@link PlayerObject} and {@link Property}
+     *
+     * @param fileConfiguration {@link FileConfiguration} that contains the skin options.
+     * @param playerObject      Player's {@link PlayerObject} object.
+     * @param reset             Default skin.
+     * @param skinName          Skin name (eg default or allay)
+     * @param property          {@link Property} to set
+     */
     public abstract void updateSkin(@NotNull final FileConfiguration fileConfiguration,
                                     @NotNull final PlayerObject playerObject,
                                     final boolean reset,
                                     @NotNull final String skinName,
                                     final Property property);
 
+    /**
+     * Retrieves {@link PlayerObject}'s {@link GameProfile}
+     *
+     * @param playerObject {@link PlayerObject} object
+     * @return {@link PlayerObject}'s {@link GameProfile}
+     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
+     * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
+     */
     protected abstract <T> GameProfile getGameProfile0(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException;
 
+    /**
+     * Retrieves {@link PlayerObject}'s {@link GameProfile}
+     *
+     * @param playerObject {@link PlayerObject} object
+     * @return {@link PlayerObject}'s {@link GameProfile}
+     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
+     * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
+     */
     public GameProfile getGameProfile(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         final GameProfile gameProfile = this.getGameProfile0(playerObject);
         if (!gameProfile.getProperties().containsKey("textures")) {
@@ -40,10 +75,30 @@ public abstract class SkinHandler {
         return gameProfile;
     }
 
+    /**
+     * Retrieves {@link PlayerObject}'s {@link GameProfile} bytes
+     *
+     * @param playerObject {@link PlayerObject} object
+     * @param property     If you want to use a {@link Property} instead of {@link GameProfile} ones
+     * @return {@link PlayerObject}'s {@link GameProfile} bytes
+     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
+     * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
+     */
     public byte[] getProfileBytes(@NotNull final PlayerObject playerObject, @Nullable Property property) throws IOException, ExecutionException, InterruptedException {
         return playerObject.isBedrock() ? this.getBedrockProfileBytes(playerObject, property) : this.getJavaProfileBytes(playerObject, property);
     }
 
+    /**
+     * Retrieves Java {@link PlayerObject}'s {@link GameProfile} bytes
+     *
+     * @param playerObject {@link PlayerObject} object
+     * @param property     If you want to use a {@link Property} instead of {@link GameProfile} ones
+     * @return {@link PlayerObject}'s {@link GameProfile} bytes
+     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
+     * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
+     */
     public byte[] getJavaProfileBytes(@NotNull final PlayerObject playerObject, @Nullable Property property) throws IOException, ExecutionException, InterruptedException {
         return property != null ?
                 new ByteArrayInputStream(this.createJsonFromProperty(playerObject, property)
@@ -61,12 +116,29 @@ public abstract class SkinHandler {
                         .getBytes();
     }
 
+    /**
+     * Retrieves Bedrock {@link PlayerObject}'s {@link GameProfile} bytes
+     *
+     * @param playerObject {@link PlayerObject} object
+     * @param property     If you want to use a {@link Property} instead of {@link GameProfile} ones
+     * @return {@link PlayerObject}'s {@link GameProfile} bytes
+     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
+     * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
+     */
     public byte[] getBedrockProfileBytes(@NotNull final PlayerObject playerObject, final Property property) throws IOException, ExecutionException, InterruptedException {
         return property != null ?
                 new ByteArrayInputStream(this.createJsonFromProperty(playerObject, property).getAsJsonObject().toString().getBytes()).readAllBytes() :
                 new ByteArrayInputStream(this.createJsonForBedrock(playerObject).getAsJsonObject().toString().getBytes()).readAllBytes();
     }
 
+    /**
+     * Creates a similar JSON as the Java one for the specified Bedrock Player
+     *
+     * @param playerObject {@link PlayerObject}'s object
+     * @return a JSON for the specified Bedrock Player
+     * @throws IOException When an I/O exception of some sort has occurred.
+     */
     public JsonObject createJsonForBedrock(@NotNull final PlayerObject playerObject) throws IOException {
         final byte[] profileBytes = new Request().openConnection(String.format("https://api.geysermc.org/v2/skin/%s", this.getXUID(playerObject))).getRequest().finalizeRequest().getBytes();
         final JsonElement json = JsonParser.parseString(new String(profileBytes));
@@ -83,6 +155,16 @@ public abstract class SkinHandler {
         return jsonObject;
     }
 
+    /**
+     * Creates a JSON from a {@link GameProfile} or {@link Property}
+     *
+     * @param playerObject {@link PlayerObject}'s object
+     * @param property     If you want to use a {@link Property} instead of {@link GameProfile} ones
+     * @return a JSON from a {@link GameProfile} or {@link Property}
+     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
+     * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
+     */
     public JsonObject createJsonFromProperty(@NotNull final PlayerObject playerObject, @Nullable Property property) throws IOException, ExecutionException, InterruptedException {
         if (property == null)
             property = this.getGameProfile(playerObject).getProperties().get("textures").iterator().next();
@@ -97,6 +179,13 @@ public abstract class SkinHandler {
         return jsonObject;
     }
 
+    /**
+     * Retrieves the XUID for the specified Bedrock Player
+     *
+     * @param playerObject {@link PlayerObject}'s object
+     * @return the XUID for the specified Bedrock Player
+     * @throws IOException When an I/O exception of some sort has occurred.
+     */
     public String getXUID(@NotNull final PlayerObject playerObject) throws IOException {
         Request request = new Request().openConnection(String.format("https://api.geysermc.org/v2/xbox/xuid/%s", playerObject.playerName().replace(".", ""))).getRequest().finalizeRequest();
         final int httpCode = request.getHttpCode();
@@ -111,6 +200,13 @@ public abstract class SkinHandler {
         return json.getAsJsonObject().get("xuid").getAsString();
     }
 
+    /**
+     * Retrieves the UUID for the specified Java Player
+     *
+     * @param playerName Player's name
+     * @return the UUID for the specified Java Player
+     * @throws IOException When an I/O exception of some sort has occurred.
+     */
     public UUID getUUID(final String playerName) throws IOException {
         Request request = new Request().openConnection(String.format("https://api.minetools.eu/uuid/%s", playerName)).getRequest().finalizeRequest();
         if (request.getHttpCode() != 200) {
@@ -124,12 +220,28 @@ public abstract class SkinHandler {
                 "$1-$2-$3-$4-$5"));
     }
 
+    /**
+     * Retrieves the Skin {@link Property} for the specified Bedrock Player
+     *
+     * @param xuid Player's XUID (check {@link SkinHandler#getXUID(PlayerObject)})
+     * @return the Skin {@link Property} for the specified Bedrock Player
+     * @throws IOException When an I/O exception of some sort has occurred.
+     */
     public Property getXUIDSkin(final String xuid) throws IOException {
         final Request profileBytes = new Request().openConnection(String.format("https://api.geysermc.org/v2/skin/%s", xuid)).getRequest().finalizeRequest();
         final JsonElement json = JsonParser.parseString(new String(profileBytes.getBytes()));
         return new Property("textures", json.getAsJsonObject().get("value").getAsString(), json.getAsJsonObject().get("signature").getAsString());
     }
 
+    /**
+     * Retrieves the Skin {@link Property} for the specified Java Player
+     *
+     * @param playerObject {@link PlayerObject}'s object
+     * @return the Skin {@link Property} for the specified Java Player
+     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
+     * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
+     */
     public Property getJavaSkin(final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         final JsonElement json = JsonParser.parseString(new String(this.getProfileBytes(playerObject, null)));
         final JsonArray properties = json.getAsJsonObject().get("properties").getAsJsonArray();
@@ -142,11 +254,22 @@ public abstract class SkinHandler {
         return property;
     }
 
+    /**
+     * Retrieves the Skin {@link Property} for the specified Player
+     *
+     * @param playerObject {@link PlayerObject}'s object
+     * @return the Skin {@link Property} for the specified {@link PlayerObject}
+     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
+     * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
+     */
     public Property getSkin(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         return playerObject.isBedrock() ? this.getXUIDSkin(this.getXUID(playerObject)) : this.getJavaSkin(playerObject);
     }
 
+
     public static class SkinHandler_ extends SkinHandler {
+
         @Override
         public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
             throw new UnsupportedOperationException("[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
