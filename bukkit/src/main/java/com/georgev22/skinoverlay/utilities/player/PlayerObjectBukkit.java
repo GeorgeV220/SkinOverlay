@@ -16,7 +16,7 @@ public class PlayerObjectBukkit extends PlayerObject {
     }
 
     @Override
-    public OfflinePlayer getPlayer() {
+    public OfflinePlayer player() {
         return this.offlinePlayer;
     }
 

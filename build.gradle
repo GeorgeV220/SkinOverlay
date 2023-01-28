@@ -108,11 +108,11 @@ repositories {
 }
 
 dependencies {
-    implementation "com.georgev22.library:database:${libraryVersion}"
-    implementation "com.georgev22.library:maps:${libraryVersion}"
-    implementation "com.georgev22.library:scheduler:${libraryVersion}"
-    implementation "com.georgev22.library:utilities:${libraryVersion}"
-    implementation "com.georgev22.library:yaml:${libraryVersion}"
+    implementation "com.georgev22.library:database:${libraryVersion}:all"
+    implementation "com.georgev22.library:maps:${libraryVersion}:all"
+    implementation "com.georgev22.library:scheduler:${libraryVersion}:all"
+    implementation "com.georgev22.library:utilities:${libraryVersion}:all"
+    implementation "com.georgev22.library:yaml:${libraryVersion}:all"
     implementation "com.georgev22.library:minecraft:${libraryVersion}"
 
     implementation 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'

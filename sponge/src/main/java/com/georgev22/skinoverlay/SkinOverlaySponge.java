@@ -69,11 +69,11 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
 
     public void onInit() {
         try {
-            new LibraryLoader(this.getClass(), Sponge.game().getClass().getClassLoader().getParent(), this.getDataFolder(), getLogger()).loadAll(false);
+            new LibraryLoader(this.getClass(), Sponge.game().getClass().getClassLoader().getParent(), this.dataFolder(), logger()).loadAll(false);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
-        SkinOverlay.getInstance().setCommandManager(new SpongeCommandManager(pluginContainer, getDataFolder()));
+        SkinOverlay.getInstance().setCommandManager(new SpongeCommandManager(pluginContainer, dataFolder()));
         SkinOverlay.getInstance().onLoad(this);
         SkinOverlay.getInstance().setupCommands();
         Sponge8MinecraftUtils.registerListeners(pluginContainer,
@@ -118,12 +118,12 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
     }
 
     @Override
-    public File getDataFolder() {
+    public File dataFolder() {
         return dataFolder;
     }
 
     @Override
-    public java.util.logging.Logger getLogger() {
+    public java.util.logging.Logger logger() {
         return new LoggerWrapper(logger);
     }
 
@@ -133,31 +133,31 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
     }
 
     @Override
-    public boolean setEnable(boolean enable) {
+    public boolean enable(boolean enable) {
         if (enable) {
             onEnable();
         } else {
             onDisable();
         }
-        return isEnabled();
+        return enabled();
     }
 
     @Override
-    public boolean isEnabled() {
+    public boolean enabled() {
         return isEnabled;
     }
 
     @Override
     public void saveResource(@NotNull String resource, boolean replace) {
         try {
-            Utils.saveResource(resource, replace, getDataFolder(), this.getClass());
+            Utils.saveResource(resource, replace, dataFolder(), this.getClass());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public boolean isOnlineMode() {
+    public boolean onlineMode() {
         return server.isOnlineModeEnabled();
     }
 
@@ -167,13 +167,18 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
     }
 
     @Override
-    public Object getPlugin() {
+    public Object plugin() {
         return pluginContainer;
     }
 
     @Override
-    public Server getServerImpl() {
+    public Server serverImpl() {
         return server;
+    }
+
+    @Override
+    public String serverVersion() {
+        return "Sponge " + Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersionName();
     }
 
     public PluginContainer getPluginContainer() {

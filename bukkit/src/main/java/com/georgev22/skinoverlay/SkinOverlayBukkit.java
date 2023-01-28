@@ -18,7 +18,9 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.*;
@@ -82,18 +84,33 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     }
 
     @Override
+    public File dataFolder() {
+        return getDataFolder();
+    }
+
+    @Override
+    public Logger logger() {
+        return getLogger();
+    }
+
+    @Override
     public Description description() {
         return new Description(getName(), getDescription().getVersion(), getDescription().getMain(), getDescription().getAuthors());
     }
 
     @Override
-    public boolean setEnable(boolean enable) {
+    public boolean enable(boolean enable) {
         setEnabled(enable);
+        return enabled();
+    }
+
+    @Override
+    public boolean enabled() {
         return isEnabled();
     }
 
     @Override
-    public boolean isOnlineMode() {
+    public boolean onlineMode() {
         return Bukkit.getOnlineMode();
     }
 
@@ -103,12 +120,17 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     }
 
     @Override
-    public Object getPlugin() {
+    public Object plugin() {
         return this;
     }
 
     @Override
-    public Object getServerImpl() {
+    public Object serverImpl() {
         return getServer();
+    }
+
+    @Override
+    public String serverVersion() {
+        return Bukkit.getBukkitVersion();
     }
 }

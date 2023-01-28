@@ -1,102 +1,34 @@
 package com.georgev22.skinoverlay.listeners.bukkit;
 
-import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
-import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import javax.imageio.ImageIO;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.util.UUID;
+
 public class PlayerListeners implements Listener, PluginMessageListener {
-    SkinOverlay skinOverlay = SkinOverlay.getInstance();
+    private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     @EventHandler
     public void onJoin(PlayerJoinEvent playerJoinEvent) {
-        if (OptionsUtil.PROXY.getBooleanValue()) {
-            return;
-        }
-        final PlayerObject playerObject = new PlayerObjectBukkit(playerJoinEvent.getPlayer());
-        final UserData userData = UserData.getUser(playerObject);
-        try {
-            userData.load(new Utils.Callback<>() {
-
-                public Boolean onSuccess() {
-                    UserData.getAllUsersMap().append(userData.user().getUniqueId(), userData.user());
-                    SchedulerManager.getScheduler().runTask(SkinOverlay.getInstance().getClass(), () -> {
-                        userData.user().append("playerObject", Optional.of(playerObject));
-                        try {
-                            userData.setDefaultSkinProperty(playerObject.gameProfile().getProperties().get("textures").stream().filter(property -> property.getName().equalsIgnoreCase("textures")).findFirst().orElse(skinOverlay.getSkinHandler().getSkin(playerObject)));
-                        } catch (IOException | ExecutionException | InterruptedException e) {
-                            skinOverlay.getLogger().log(Level.SEVERE, "Something went wrong:", e);
-                        }
-                        if (userData.getSkinName().equals("default")) {
-                            return;
-                        }
-                        Utilities.updateSkin(playerObject, true, false);
-                    });
-                    return true;
-                }
-
-                @Contract(pure = true)
-                public @NotNull Boolean onFailure() {
-                    return false;
-                }
-
-                public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
-                    throwable.printStackTrace();
-                    return onFailure();
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new PlayerObjectBukkit(playerJoinEvent.getPlayer()).playerJoin();
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent playerQuitEvent) {
-        if (OptionsUtil.PROXY.getBooleanValue()) {
-            return;
-        }
-        PlayerObject playerObject = new PlayerObjectBukkit(playerQuitEvent.getPlayer());
-        final UserData userData = UserData.getUser(playerObject);
-        userData.save(true, new Utils.Callback<>() {
-
-            public Boolean onSuccess() {
-                UserData.getAllUsersMap().append(userData.user().getUniqueId(), userData.user());
-                return true;
-            }
-
-            @Contract(pure = true)
-            public @NotNull Boolean onFailure() {
-                return false;
-            }
-
-            public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
-                throwable.printStackTrace();
-                return onFailure();
-            }
-        });
+        new PlayerObjectBukkit(playerQuitEvent.getPlayer()).playerQuit();
     }
 
     @Override
@@ -108,7 +40,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         String subChannel = in.readUTF();
         UUID uuid = UUID.fromString(in.readUTF());
         String skinName = in.readUTF();
-        PlayerObject playerObject = SkinOverlay.getInstance().getPlayer(uuid).orElseThrow();
+        PlayerObject playerObject = skinOverlay.getPlayer(uuid).orElseThrow();
         if (subChannel.equalsIgnoreCase("change")) {
             Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skinName + ".png")), skinName, playerObject, null);
         } else if (subChannel.equalsIgnoreCase("reset")) {

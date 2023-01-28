@@ -34,7 +34,7 @@ public class SkinHandler_Sponge7 extends SkinHandler.SkinHandler_ {
 
     @Override
     public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
-        Player receiver = (Player) playerObject.getPlayer();
+        Player receiver = (Player) playerObject.player();
 
 
         Collection<ProfileProperty> oldProperties = receiver.getProfile().getPropertyMap().get("textures");
@@ -71,7 +71,7 @@ public class SkinHandler_Sponge7 extends SkinHandler.SkinHandler_ {
 
     @Override
     protected GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
-        org.spongepowered.api.profile.GameProfile spongeGameProfile = ((Player) playerObject.getPlayer()).getProfile();
+        org.spongepowered.api.profile.GameProfile spongeGameProfile = ((Player) playerObject.player()).getProfile();
         GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
         spongeGameProfile.getPropertyMap().forEach((s, profileProperty) -> {
             gameProfile.getProperties().put(s, new Property(profileProperty.getName(), profileProperty.getValue(), profileProperty.getSignature().orElseThrow()));

@@ -168,7 +168,7 @@ public class PlayerObjectVelocity extends PlayerObject {
 
             @Override
             public InetSocketAddress getRemoteAddress() {
-                return ((ProxyServer) SkinOverlay.getInstance().getSkinOverlay().getServerImpl()).getBoundAddress();
+                return ((ProxyServer) SkinOverlay.getInstance().getSkinOverlay().serverImpl()).getBoundAddress();
             }
 
             @Override
@@ -198,7 +198,7 @@ public class PlayerObjectVelocity extends PlayerObject {
     }
 
     @Override
-    public Object getPlayer() {
+    public Object player() {
         return player;
     }
 

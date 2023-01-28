@@ -24,9 +24,11 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.connection.InitialHandler;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
@@ -81,7 +83,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
             protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
                 GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
                 if (!gameProfile.getProperties().containsKey("textures")) {
-                    for (net.md_5.bungee.protocol.Property property : ((InitialHandler) ((ProxiedPlayer) playerObject.getPlayer()).getPendingConnection()).getLoginProfile().getProperties()) {
+                    for (net.md_5.bungee.protocol.Property property : ((InitialHandler) ((ProxiedPlayer) playerObject.player()).getPendingConnection()).getLoginProfile().getProperties()) {
                         gameProfile.getProperties().put(property.getName(), new Property(property.getName(), property.getValue(), property.getSignature()));
                     }
                 }
@@ -108,22 +110,32 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     }
 
     @Override
+    public File dataFolder() {
+        return getDataFolder();
+    }
+
+    @Override
+    public Logger logger() {
+        return getLogger();
+    }
+
+    @Override
     public Description description() {
         return new Description(getDescription().getName(), getDescription().getVersion(), getDescription().getMain(), Collections.singletonList(getDescription().getAuthor()));
     }
 
     @Override
-    public boolean setEnable(boolean enable) {
+    public boolean enable(boolean enable) {
         if (enable) {
             onEnable();
         } else {
             onDisable();
         }
-        return isEnabled();
+        return enabled();
     }
 
     @Override
-    public boolean isEnabled() {
+    public boolean enabled() {
         return enabled;
     }
 
@@ -137,7 +149,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     }
 
     @Override
-    public boolean isOnlineMode() {
+    public boolean onlineMode() {
         return getProxy().getConfig().isOnlineMode();
     }
 
@@ -147,12 +159,17 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     }
 
     @Override
-    public Object getPlugin() {
+    public Object plugin() {
         return this;
     }
 
     @Override
-    public ProxyServer getServerImpl() {
+    public ProxyServer serverImpl() {
         return getProxy();
+    }
+
+    @Override
+    public String serverVersion() {
+        return getProxy().getVersion();
     }
 }

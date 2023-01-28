@@ -21,7 +21,7 @@ public class PlayerObjectSponge extends PlayerObject {
     }
 
     @Override
-    public ServerPlayer getPlayer() {
+    public ServerPlayer player() {
         return user.player().orElseThrow();
     }
 
@@ -37,32 +37,32 @@ public class PlayerObjectSponge extends PlayerObject {
 
     @Override
     public void sendMessage(String input) {
-        Sponge8MinecraftUtils.msg(getPlayer(), input);
+        Sponge8MinecraftUtils.msg(player(), input);
     }
 
     @Override
     public void sendMessage(List<String> input) {
-        Sponge8MinecraftUtils.msg(getPlayer(), input);
+        Sponge8MinecraftUtils.msg(player(), input);
     }
 
     @Override
     public void sendMessage(String... input) {
-        Sponge8MinecraftUtils.msg(getPlayer(), input);
+        Sponge8MinecraftUtils.msg(player(), input);
     }
 
     @Override
     public void sendMessage(String input, ObjectMap<String, String> placeholders, boolean ignoreCase) {
-        Sponge8MinecraftUtils.msg(getPlayer(), input, placeholders, ignoreCase);
+        Sponge8MinecraftUtils.msg(player(), input, placeholders, ignoreCase);
     }
 
     @Override
     public void sendMessage(List<String> input, ObjectMap<String, String> placeholders, boolean ignoreCase) {
-        Sponge8MinecraftUtils.msg(getPlayer(), input, placeholders, ignoreCase);
+        Sponge8MinecraftUtils.msg(player(), input, placeholders, ignoreCase);
     }
 
     @Override
     public void sendMessage(String[] input, ObjectMap<String, String> placeholders, boolean ignoreCase) {
-        Sponge8MinecraftUtils.msg(getPlayer(), input, placeholders, ignoreCase);
+        Sponge8MinecraftUtils.msg(player(), input, placeholders, ignoreCase);
     }
 
     @Override

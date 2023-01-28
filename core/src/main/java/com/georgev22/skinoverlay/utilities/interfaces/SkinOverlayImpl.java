@@ -11,25 +11,27 @@ public interface SkinOverlayImpl {
 
     Type type();
 
-    File getDataFolder();
+    File dataFolder();
 
-    Logger getLogger();
+    Logger logger();
 
     Description description();
 
-    boolean setEnable(boolean enable);
+    boolean enable(boolean enable);
 
-    boolean isEnabled();
+    boolean enabled();
 
     void saveResource(@NotNull String resource, boolean replace);
 
-    boolean isOnlineMode();
+    boolean onlineMode();
 
     List<PlayerObject> onlinePlayers();
 
-    Object getPlugin();
+    Object plugin();
 
-    Object getServerImpl();
+    Object serverImpl();
+
+    String serverVersion();
 
     record Description(String name, String version, String main, List<String> authors) {
     }
@@ -39,7 +41,11 @@ public interface SkinOverlayImpl {
         BUNGEE,
         VELOCITY,
         SPONGE8,
-        SPONGE7
+        SPONGE7;
+
+        public boolean isProxy() {
+            return this.equals(VELOCITY) || this.equals(BUNGEE);
+        }
     }
 
 }

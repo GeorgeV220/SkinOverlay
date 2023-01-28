@@ -134,15 +134,15 @@ public class Utilities {
             pm.put("textures", userData.getSkinProperty());
             if (skinOverlay.type().equals(SkinOverlayImpl.Type.PAPER)) {
                 SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
-                    org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.getPlayer();
-                    player.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().getPlugin(), player);
-                    player.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().getPlugin(), player);
+                    org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.player();
+                    player.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                    player.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                     skinOverlay.getSkinHandler().updateSkin(skinOverlay.getConfig(), playerObject, reset, userData.getSkinName());
                     if (forOthers) {
                         skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                            org.bukkit.entity.Player p = (org.bukkit.entity.Player) playerObjects.getPlayer();
-                            p.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().getPlugin(), player);
-                            p.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().getPlugin(), player);
+                            org.bukkit.entity.Player p = (org.bukkit.entity.Player) playerObjects.player();
+                            p.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                            p.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                         });
                     }
                 }, 20L);

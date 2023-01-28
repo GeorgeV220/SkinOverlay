@@ -15,7 +15,7 @@ public class PlayerObjectBungee extends PlayerObject {
     }
 
     @Override
-    public ProxiedPlayer getPlayer() {
+    public ProxiedPlayer player() {
         return this.proxiedPlayer;
     }
 

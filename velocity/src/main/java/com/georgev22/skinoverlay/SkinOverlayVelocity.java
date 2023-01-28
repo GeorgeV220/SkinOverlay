@@ -96,7 +96,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     public void onLoad() {
         try {
-            new LibraryLoader(this.getClass(), this.getDataFolder()).loadAll(true);
+            new LibraryLoader(this.getClass(), this.dataFolder()).loadAll(true);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
@@ -128,16 +128,16 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
             @Override
             protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
                 GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
-                for (com.velocitypowered.api.util.GameProfile.Property property : ((Player) playerObject.getPlayer()).getGameProfile().getProperties()) {
+                for (com.velocitypowered.api.util.GameProfile.Property property : ((Player) playerObject.player()).getGameProfile().getProperties()) {
                     gameProfile.getProperties().put(property.getName(), new Property(property.getName(), property.getValue(), property.getSignature()));
                 }
                 return gameProfile;
             }
         });
-        SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, getDataFolder()));
+        SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, dataFolder()));
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
-        VelocityMinecraftUtils.registerListeners(getProxy(), this, new DeveloperInformListener(), new PlayerListeners());
+        VelocityMinecraftUtils.registerListeners(this, new DeveloperInformListener(), new PlayerListeners());
         enabled = true;
     }
 
@@ -152,11 +152,11 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         return Type.VELOCITY;
     }
 
-    public File getDataFolder() {
+    public File dataFolder() {
         return dataFolder;
     }
 
-    public Logger getLogger() {
+    public Logger logger() {
         return logger;
     }
 
@@ -166,31 +166,31 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     }
 
     @Override
-    public boolean setEnable(boolean enable) {
+    public boolean enable(boolean enable) {
         if (enable) {
             onEnable();
         } else {
             onDisable();
         }
-        return isEnabled();
+        return enabled();
     }
 
     @Override
-    public boolean isEnabled() {
+    public boolean enabled() {
         return enabled;
     }
 
     @Override
     public void saveResource(@NotNull String resource, boolean replace) {
         try {
-            Utils.saveResource(resource, replace, getDataFolder(), this.getClass());
+            Utils.saveResource(resource, replace, dataFolder(), this.getClass());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public boolean isOnlineMode() {
+    public boolean onlineMode() {
         return server.getConfiguration().isOnlineMode();
     }
 
@@ -208,12 +208,17 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     }
 
     @Override
-    public Object getPlugin() {
+    public Object plugin() {
         return this;
     }
 
     @Override
-    public ProxyServer getServerImpl() {
+    public ProxyServer serverImpl() {
         return server;
+    }
+
+    @Override
+    public String serverVersion() {
+        return SkinOverlayVelocity.getInstance().getProxy().getVersion().getName() + "-" + SkinOverlayVelocity.getInstance().getProxy().getVersion().getVersion();
     }
 }

@@ -89,7 +89,7 @@ public class SkinOverlaySponge7 implements SkinOverlayImpl {
 
     public void onInit() {
         try {
-            new LibraryLoader(this.getClass(), Sponge.getGame().getClass().getClassLoader().getParent(), this.getDataFolder(), getLogger()).loadAll(false);
+            new LibraryLoader(this.getClass(), Sponge.getGame().getClass().getClassLoader().getParent(), this.dataFolder(), logger()).loadAll(false);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
@@ -121,12 +121,12 @@ public class SkinOverlaySponge7 implements SkinOverlayImpl {
     }
 
     @Override
-    public File getDataFolder() {
+    public File dataFolder() {
         return dataFolder;
     }
 
     @Override
-    public java.util.logging.Logger getLogger() {
+    public java.util.logging.Logger logger() {
         return new LoggerWrapper(logger);
     }
 
@@ -136,31 +136,31 @@ public class SkinOverlaySponge7 implements SkinOverlayImpl {
     }
 
     @Override
-    public boolean setEnable(boolean enable) {
+    public boolean enable(boolean enable) {
         if (enable) {
             onEnable();
         } else {
             onDisable();
         }
-        return isEnabled();
+        return enabled();
     }
 
     @Override
-    public boolean isEnabled() {
+    public boolean enabled() {
         return isEnabled;
     }
 
     @Override
     public void saveResource(@NotNull String resource, boolean replace) {
         try {
-            Utils.saveResource(resource, replace, getDataFolder(), this.getClass());
+            Utils.saveResource(resource, replace, dataFolder(), this.getClass());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public boolean isOnlineMode() {
+    public boolean onlineMode() {
         return server.getOnlineMode();
     }
 
@@ -170,13 +170,18 @@ public class SkinOverlaySponge7 implements SkinOverlayImpl {
     }
 
     @Override
-    public Object getPlugin() {
+    public Object plugin() {
         return pluginContainer;
     }
 
     @Override
-    public Server getServerImpl() {
+    public Server serverImpl() {
         return server;
+    }
+
+    @Override
+    public String serverVersion() {
+        return Sponge.getPlatform().getMinecraftVersion().getName();
     }
 
     public PluginContainer getPluginContainer() {

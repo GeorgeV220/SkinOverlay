@@ -33,7 +33,7 @@ public class SkinHandler_1_19_R2 extends SkinHandler {
     @Override
     public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
 
-        Player player = (Player) playerObject.getPlayer();
+        Player player = (Player) playerObject.player();
         final CraftPlayer craftPlayer = (CraftPlayer) player;
         final ServerPlayer entityPlayer = craftPlayer.getHandle();
 
@@ -101,7 +101,7 @@ public class SkinHandler_1_19_R2 extends SkinHandler {
 
     @Override
     public GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
-        Player player = (Player) playerObject.getPlayer();
+        Player player = (Player) playerObject.player();
         final CraftPlayer craftPlayer = (CraftPlayer) player;
         final ServerPlayer entityPlayer = craftPlayer.getHandle();
         return entityPlayer.gameProfile;

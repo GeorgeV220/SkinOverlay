@@ -47,7 +47,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
     private final Class<?> packet;
 
     public SkinHandler_Sponge() {
-        classLoader = SkinOverlaySponge.getInstance().getServerImpl().getClass().getClassLoader();
+        classLoader = SkinOverlaySponge.getInstance().serverImpl().getClass().getClassLoader();
         serverPlayerClass = Utils.Reflection.getClass("net.minecraft.server.level.ServerPlayer", classLoader);
         serverWorldClass = Utils.Reflection.getClass("net.minecraft.server.level.ServerLevel", classLoader);
         respawnPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundRespawnPacket", classLoader);
@@ -73,7 +73,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
     @SneakyThrows
     @Override
     public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
-        ServerPlayer receiver = (ServerPlayer) playerObject.getPlayer();
+        ServerPlayer receiver = (ServerPlayer) playerObject.player();
 
         receiver.user().offer(Keys.UPDATE_GAME_PROFILE, true);
         receiver.user().offer(Keys.SKIN_PROFILE_PROPERTY, ProfileProperty.of(ProfileProperty.TEXTURES, property.getValue(), property.getSignature()));
@@ -306,7 +306,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
     @Override
     protected GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         try {
-            return (GameProfile) fetchMethodAndInvoke(serverPlayerClass, "getGameProfile", playerObject.getPlayer(), new Object[]{}, new Class[]{});
+            return (GameProfile) fetchMethodAndInvoke(serverPlayerClass, "getGameProfile", playerObject.player(), new Object[]{}, new Class[]{});
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             return super.getGameProfile0(playerObject);
         }
@@ -318,7 +318,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
 
     private void sendPacketToAll(Object packet) {
         SkinOverlay.getInstance().onlinePlayers().forEach(playerObject -> {
-            ServerPlayer spongeServerPlayer = (ServerPlayer) playerObject.getPlayer();
+            ServerPlayer spongeServerPlayer = (ServerPlayer) playerObject.player();
             Object serverPlayer = serverPlayerClass.cast(spongeServerPlayer);
             Object playerConnection = getFieldByType(serverPlayer, "ServerGamePacketListenerImpl");
             try {

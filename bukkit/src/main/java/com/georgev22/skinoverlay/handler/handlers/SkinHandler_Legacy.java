@@ -82,7 +82,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
     @Override
     public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
         try {
-            Player player = (Player) playerObject.getPlayer();
+            Player player = (Player) playerObject.player();
             final Object entityPlayer = getHandleMethod.invoke(player);
             Object removePlayer;
             Object addPlayer;
@@ -301,7 +301,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
     protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         try {
             Class<?> craftPlayerClass = getOBCClass("entity.CraftPlayer");
-            org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.getPlayer();
+            org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.player();
             return (GameProfile) fetchMethodAndInvoke(craftPlayerClass, "getProfile", player, new Object[]{}, new Class[]{});
         } catch (Exception e) {
             return super.getGameProfile0(playerObject);

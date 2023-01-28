@@ -166,11 +166,11 @@ public class SkinOverlay {
     }
 
     public File getDataFolder() {
-        return skinOverlay.getDataFolder();
+        return skinOverlay.dataFolder();
     }
 
     public Logger getLogger() {
-        return skinOverlay.getLogger();
+        return skinOverlay.logger();
     }
 
     public SkinOverlayImpl.Description getDescription() {
@@ -178,11 +178,11 @@ public class SkinOverlay {
     }
 
     public boolean setEnable(boolean enable) {
-        return skinOverlay.setEnable(enable);
+        return skinOverlay.enable(enable);
     }
 
     public boolean isEnabled() {
-        return skinOverlay.isEnabled();
+        return skinOverlay.enabled();
     }
 
     public void saveResource(@NotNull String resource, boolean replace) {
@@ -190,7 +190,7 @@ public class SkinOverlay {
     }
 
     public boolean isOnlineMode() {
-        return skinOverlay.isOnlineMode();
+        return skinOverlay.onlineMode();
     }
 
     public List<PlayerObject> onlinePlayers() {
