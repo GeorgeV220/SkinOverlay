@@ -1,3 +1,12 @@
+# [3.7.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.6.0...v3.7.0) (2023-01-30)
+
+
+### Features
+
+* Added bStats Metrics ([93b91b1](https://github.com/GeorgeV220/SkinOverlay/commit/93b91b1c8ba263d979f03d3300834a2d3bb43d0d))
+* Added Updater (WIP) ([3edd6c8](https://github.com/GeorgeV220/SkinOverlay/commit/3edd6c81a676462dece5e7d237f58a0be203e8d0))
+* Listeners and dependencies. ([9ef1ba4](https://github.com/GeorgeV220/SkinOverlay/commit/9ef1ba40d3418194e051514b710e9882fbc41130))
+
 # [3.6.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.5.0...v3.6.0) (2023-01-22)
 
 
