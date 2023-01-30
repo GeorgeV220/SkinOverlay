@@ -12,12 +12,14 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.handlers.SkinHandler_Sponge;
 import com.georgev22.skinoverlay.listeners.sponge.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.sponge.PlayerListeners;
+import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectSponge;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.Logger;
+import org.bstats.sponge.Metrics;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
@@ -51,6 +53,7 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
     private final Logger logger;
     private final PluginManager pluginManager;
     private final PluginContainer pluginContainer;
+    private final Metrics.Factory metricsFactory;
     private static SkinOverlaySponge skinOverlaySponge;
 
     private Server server;
@@ -58,11 +61,12 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
     private boolean isEnabled;
 
     @Inject
-    public SkinOverlaySponge(Logger logger, PluginContainer container, @ConfigDir(sharedRoot = false) @NotNull Path configDir) {
+    public SkinOverlaySponge(Logger logger, PluginContainer container, @ConfigDir(sharedRoot = false) @NotNull Path configDir, Metrics.Factory metricsFactory) {
         this.logger = logger;
         this.pluginContainer = container;
         this.dataFolder = new File(configDir.toUri());
         this.pluginManager = Sponge.pluginManager();
+        this.metricsFactory = metricsFactory;
         skinOverlaySponge = this;
         onInit();
     }
@@ -104,6 +108,8 @@ public class SkinOverlaySponge implements SkinOverlayImpl {
     public void onEnable() {
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Sponge());
         SkinOverlay.getInstance().onEnable();
+        if(OptionsUtil.METRICS.getBooleanValue())
+            metricsFactory.make(17578);
         this.isEnabled = true;
     }
 

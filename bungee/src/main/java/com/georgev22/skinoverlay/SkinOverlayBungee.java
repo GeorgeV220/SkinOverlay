@@ -13,6 +13,7 @@ import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
+import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
@@ -22,6 +23,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.connection.InitialHandler;
+import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -95,6 +97,8 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         SkinOverlay.getInstance().setupCommands();
         BungeeMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         getProxy().registerChannel("skinoverlay:bungee");
+        if(OptionsUtil.METRICS.getBooleanValue())
+            new Metrics(this, 17475);
         enabled = true;
     }
 

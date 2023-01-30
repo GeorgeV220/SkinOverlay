@@ -15,6 +15,7 @@ import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -70,6 +71,8 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         BukkitMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         if (OptionsUtil.PROXY.getBooleanValue())
             Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "skinoverlay:bungee", new PlayerListeners());
+        if(OptionsUtil.METRICS.getBooleanValue())
+            new Metrics(this, 17474);
     }
 
     public void onDisable() {

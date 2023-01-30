@@ -12,6 +12,7 @@ import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
+import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.VelocityPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -27,6 +28,7 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
+import org.bstats.velocity.Metrics;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,6 +62,8 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     private final Plugin pluginAnnotation;
 
+    private final Metrics.Factory metricsFactory;
+
     private ScheduledTask scheduledTask;
 
     private int tick = 0;
@@ -74,7 +78,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     @Contract(pure = true)
     @Inject
-    public SkinOverlayVelocity(@NotNull ProxyServer server, @NotNull Logger logger, @DataDirectory @NotNull Path dataDirectory) {
+    public SkinOverlayVelocity(@NotNull ProxyServer server, @NotNull Logger logger, @DataDirectory @NotNull Path dataDirectory, Metrics.Factory metricsFactory) {
         VelocityMinecraftUtils.setServer(server);
         instance = this;
         this.server = server;
@@ -82,6 +86,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         this.dataDirectory = dataDirectory;
         this.dataFolder = dataDirectory.toFile();
         this.pluginAnnotation = this.getClass().getAnnotation(Plugin.class);
+        this.metricsFactory = metricsFactory;
     }
 
     @Subscribe
@@ -138,6 +143,8 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
         VelocityMinecraftUtils.registerListeners(this, new DeveloperInformListener(), new PlayerListeners());
+        if(OptionsUtil.METRICS.getBooleanValue())
+            metricsFactory.make(this,17476);
         enabled = true;
     }
 
