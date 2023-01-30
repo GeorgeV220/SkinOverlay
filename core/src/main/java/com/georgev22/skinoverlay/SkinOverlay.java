@@ -11,11 +11,12 @@ import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
 import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.interfaces.IDatabaseType;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -122,6 +123,9 @@ public class SkinOverlay {
             setupDatabase();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        if(OptionsUtil.UPDATER.getBooleanValue()) {
+            new Updater();
         }
     }
 

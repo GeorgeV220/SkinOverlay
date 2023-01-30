@@ -48,12 +48,12 @@ public enum OptionsUtil {
 
     DISCORD("discord", false, Optional.empty()),
 
-
+    UPDATER("updater.enabled", true, Optional.empty()),
     ;
+    private static final SkinOverlay mainPlugin = SkinOverlay.getInstance();
     private final String pathName;
     private final Object value;
     private final Optional<String>[] oldPaths;
-    private static final SkinOverlay mainPlugin = SkinOverlay.getInstance();
 
     @SafeVarargs
     @Contract(pure = true)
