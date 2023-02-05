@@ -1,3 +1,11 @@
+## [3.7.1](https://github.com/GeorgeV220/SkinOverlay/compare/v3.7.0...v3.7.1) (2023-02-05)
+
+
+### Bug Fixes
+
+* Callback and 1_19_R2 fix ([e15dc62](https://github.com/GeorgeV220/SkinOverlay/commit/e15dc62a076ec3f9eca6d0d397088387fc20a1d3))
+* Save only loaded users ([e9bf334](https://github.com/GeorgeV220/SkinOverlay/commit/e9bf334aaa6f2d99d20347f571f77a070a5fd772))
+
 # [3.7.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.6.0...v3.7.0) (2023-01-30)
 
 
