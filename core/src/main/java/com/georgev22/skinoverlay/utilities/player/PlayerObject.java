@@ -151,6 +151,7 @@ public abstract class PlayerObject {
                             updateSkin();
                         }
                     });
+                    UserData.getLoadedUsers().append(userData, userData.user());
                     return true;
                 }
 

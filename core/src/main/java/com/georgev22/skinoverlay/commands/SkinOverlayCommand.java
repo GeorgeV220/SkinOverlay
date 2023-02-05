@@ -50,49 +50,52 @@ public class SkinOverlayCommand extends BaseCommand {
     @CommandAlias("skinoverlayreload|soverlayreload|skinoreload|sreload")
     @CommandPermission("skinoverlay.reload")
     public void reload(final @NotNull CommandIssuer issuer) {
-        UserData.getAllUsersMap().forEach((uuid, skinUser) ->
-                UserData.getUser(uuid).save(false, new Utils.Callback<>() {
-                    @Override
-                    public Boolean onSuccess() {
-                        final AtomicBoolean atomicBoolean = new AtomicBoolean(false);
-                        try {
-                            UserData.getUser(uuid).load(new Utils.Callback<>() {
-                                @Override
-                                public Boolean onSuccess() {
-                                    atomicBoolean.set(true);
-                                    Utilities.updateSkin(skinUser.getPlayer().orElseThrow(), true, false);
-                                    return atomicBoolean.get();
-                                }
+        UserData.getLoadedUsers().forEach((userData, user) -> {
+            userData.save(false, new Utils.Callback<>() {
+                @Override
+                public Boolean onSuccess() {
+                    final AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+                    try {
+                        UserData.getLoadedUsers().remove(userData);
+                        userData.load(new Utils.Callback<>() {
+                            @Override
+                            public Boolean onSuccess() {
+                                atomicBoolean.set(true);
+                                Utilities.updateSkin(user.getPlayer().orElseThrow(), true, false);
+                                UserData.getLoadedUsers().append(userData, userData.user());
+                                return atomicBoolean.get();
+                            }
 
-                                @Override
-                                public Boolean onFailure() {
-                                    atomicBoolean.set(false);
-                                    return atomicBoolean.get();
-                                }
+                            @Override
+                            public Boolean onFailure() {
+                                atomicBoolean.set(false);
+                                return atomicBoolean.get();
+                            }
 
-                                @Override
-                                public Boolean onFailure(Throwable throwable) {
-                                    atomicBoolean.set(false);
-                                    return super.onFailure(throwable);
-                                }
-                            });
-                        } catch (Exception e) {
-                            atomicBoolean.set(false);
-                            skinOverlay.getLogger().log(Level.SEVERE, "Error: ", e);
-                        }
-                        return atomicBoolean.get();
+                            @Override
+                            public Boolean onFailure(Throwable throwable) {
+                                atomicBoolean.set(false);
+                                return super.onFailure(throwable);
+                            }
+                        });
+                    } catch (Exception e) {
+                        atomicBoolean.set(false);
+                        skinOverlay.getLogger().log(Level.SEVERE, "Error: ", e);
                     }
+                    return atomicBoolean.get();
+                }
 
-                    @Override
-                    public Boolean onFailure() {
-                        return false;
-                    }
+                @Override
+                public Boolean onFailure() {
+                    return false;
+                }
 
-                    @Override
-                    public Boolean onFailure(Throwable throwable) {
-                        return super.onFailure(throwable);
-                    }
-                }));
+                @Override
+                public Boolean onFailure(Throwable throwable) {
+                    return super.onFailure(throwable);
+                }
+            });
+        });
         skinOverlay.getFileManager().getConfig().reloadFile();
         skinOverlay.getFileManager().getData().reloadFile();
         skinOverlay.getFileManager().getMessages().reloadFile();

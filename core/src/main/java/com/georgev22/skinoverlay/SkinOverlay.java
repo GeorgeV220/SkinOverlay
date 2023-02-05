@@ -124,14 +124,13 @@ public class SkinOverlay {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(OptionsUtil.UPDATER.getBooleanValue()) {
+        if (OptionsUtil.UPDATER.getBooleanValue()) {
             new Updater();
         }
     }
 
     public void onDisable() {
-        onlinePlayers().forEach(player -> {
-            UserData userData = UserData.getUser(player.playerUUID());
+        UserData.getLoadedUsers().forEach((userData, user) -> {
             userData.save(false, new Utils.Callback<>() {
                 @Override
                 public Boolean onSuccess() {

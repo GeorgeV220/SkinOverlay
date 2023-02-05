@@ -34,6 +34,8 @@ public record UserData(User user) {
 
     private static final ObjectMap<UUID, User> allUsersMap = new ConcurrentObjectMap<>();
 
+    private static final ObjectMap<UserData, User> loadedUsers = new ConcurrentObjectMap<>();
+
     public UserData(@NotNull User user) {
         if (!allUsersMap.containsKey(user.getUniqueId())) {
             allUsersMap.append(user.getUniqueId(), new User(user.getUniqueId()));
@@ -174,6 +176,10 @@ public record UserData(User user) {
             }
         });
         return this;
+    }
+
+    public static ObjectMap<UserData, User> getLoadedUsers() {
+        return loadedUsers;
     }
 
     public static class SQLUserUtils implements IDatabaseType {
