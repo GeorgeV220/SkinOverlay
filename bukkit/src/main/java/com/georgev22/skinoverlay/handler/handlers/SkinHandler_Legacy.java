@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.handler.handlers;
 import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.yaml.file.FileConfiguration;
+import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
@@ -80,7 +80,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
     }
 
     @Override
-    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
+    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
         try {
             Player player = (Player) playerObject.player();
             final Object entityPlayer = getHandleMethod.invoke(player);
@@ -160,12 +160,13 @@ public class SkinHandler_Legacy extends SkinHandler_ {
                             }
                         }
                     } catch (InvocationTargetException | IllegalAccessException | ClassNotFoundException e2) {
-                        e2.printStackTrace();
+                        callback.onFailure(e2);
                     }
                 }
 
                 if (dimensionManager == null) {
-                    throw new ReflectionException("Could not get DimensionManager from " + worldObject.getClass().getSimpleName());
+                    callback.onFailure(new ReflectionException("Could not get DimensionManager from " + worldObject.getClass().getSimpleName()));
+                    return;
                 }
 
                 try {
@@ -225,14 +226,16 @@ public class SkinHandler_Legacy extends SkinHandler_ {
             try {
                 dataWatcher = fetchMethodAndInvoke(entityPlayer.getClass(), "getDataWatcher", entityPlayer, new Object[0], new Class[0]);
             } catch (Exception e) {
-                e.printStackTrace();
+                callback.onFailure(e);
+                return;
             }
             if (dataWatcher != null) {
                 Object dataWatcherObject;
                 try {
                     dataWatcherObject = invokeConstructor(BukkitMinecraftUtils.MinecraftReflection.getNMSClass("DataWatcherObject"), 16, fetchField(getNMSClass("DataWatcherRegistry"), null, "a"));
                 } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+                    callback.onFailure(e);
+                    return;
                 }
 
                 //send new metadata
@@ -250,13 +253,13 @@ public class SkinHandler_Legacy extends SkinHandler_ {
                             "set",
                             dataWatcher,
                             new Object[]{dataWatcherObject, (byte)
-                                    ((fileConfiguration.getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x0) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x0) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x0) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x0) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x0) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x0) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x0))},
+                                    ((skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x0) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x0) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x0) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x0) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x0) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x0) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x0))},
                             new Class[]{dataWatcherObject.getClass(), Object.class}
                     );
                 }
@@ -264,7 +267,8 @@ public class SkinHandler_Legacy extends SkinHandler_ {
                 try {
                     sendPacket(playerConnection, invokeConstructor(getNMSClass("PacketPlayOutEntityMetadata"), player.getEntityId(), dataWatcher, false));
                 } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+                    callback.onFailure(e);
+                    return;
                 }
             } else {
                 skinOverlay.getLogger().log(Level.WARNING, "DataWatcher is null!!");
@@ -285,16 +289,17 @@ public class SkinHandler_Legacy extends SkinHandler_ {
                     player.setOp(true);
                 });
             }
+            callback.onSuccess();
         } catch (ReflectionException | InvocationTargetException | IllegalAccessException | NoSuchMethodException |
                  NoSuchFieldException e) {
-            e.printStackTrace();
-            super.updateSkin(fileConfiguration, playerObject, reset, skinName);
+            callback.onFailure(e);
+            //super.updateSkin(playerObject, reset, skinName, callback);
         }
     }
 
     @Override
-    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
-        updateSkin(fileConfiguration, playerObject, reset, skinName);
+    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
+        updateSkin(playerObject, reset, skinName, callback);
     }
 
     @Override

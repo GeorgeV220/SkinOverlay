@@ -4,7 +4,6 @@ import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.minecraft.Sponge8MinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
-import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlaySponge;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
@@ -66,13 +65,13 @@ public class SkinHandler_Sponge extends SkinHandler_ {
 
     @SneakyThrows
     @Override
-    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
-        updateSkin(fileConfiguration, playerObject, reset, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty());
+    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
+        updateSkin(playerObject, reset, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty(), callback);
     }
 
     @SneakyThrows
     @Override
-    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
+    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, @NotNull final Utils.Callback<Boolean> callback) {
         ServerPlayer receiver = (ServerPlayer) playerObject.player();
 
         receiver.user().offer(Keys.UPDATE_GAME_PROFILE, true);
@@ -167,7 +166,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                         true);
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
+            callback.onFailure(exception);
             return;
         }
 
@@ -197,13 +196,13 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                                     Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
                                     fetchField(entityDataSerializersClass, null, "BYTE")),
                             (byte)
-                                    ((fileConfiguration.getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x00) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x00) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x00) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x00) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x00) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x00) |
-                                            (fileConfiguration.getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x00))
+                                    ((skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x00) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x00) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x00) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x00) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x00) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x00) |
+                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x00))
                     },
                     new Class[]{
                             entityDataAccessor.getClass(),
@@ -277,7 +276,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                     receiver.inventory().hotbar().selectedSlotIndex()
             );
         } catch (Exception exception) {
-            exception.printStackTrace();
+            callback.onFailure(exception);
             return;
         }
 
@@ -301,6 +300,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         }
 
         fetchMethodAndInvoke(serverPlayerClass, "resetSentInfo", serverPlayer, new Object[]{}, new Class[]{});
+        callback.onSuccess();
     }
 
     @Override

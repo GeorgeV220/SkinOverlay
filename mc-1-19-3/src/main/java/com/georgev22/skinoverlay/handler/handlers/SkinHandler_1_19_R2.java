@@ -1,7 +1,7 @@
 
 package com.georgev22.skinoverlay.handler.handlers;
 
-import com.georgev22.library.yaml.file.FileConfiguration;
+import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
@@ -26,77 +26,78 @@ import java.util.Objects;
 
 public class SkinHandler_1_19_R2 extends SkinHandler {
     @Override
-    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
-        this.updateSkin(fileConfiguration, playerObject, reset, skinName);
+    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, final Utils.@NotNull Callback<Boolean> callback) {
+        this.updateSkin(playerObject, reset, skinName, callback);
     }
 
     @Override
-    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
+    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, final Utils.@NotNull Callback<Boolean> callback) {
+        try {
+            Player player = (Player) playerObject.player();
+            final CraftPlayer craftPlayer = (CraftPlayer) player;
+            final ServerPlayer entityPlayer = craftPlayer.getHandle();
 
-        Player player = (Player) playerObject.player();
-        final CraftPlayer craftPlayer = (CraftPlayer) player;
-        final ServerPlayer entityPlayer = craftPlayer.getHandle();
 
+            ClientboundPlayerInfoRemovePacket removePlayer = new ClientboundPlayerInfoRemovePacket(List.of(entityPlayer.getUUID()));
+            ClientboundPlayerInfoUpdatePacket addPlayer = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityPlayer));
+            ServerLevel world = entityPlayer.getLevel();
+            ServerPlayerGameMode gamemode = entityPlayer.gameMode;
 
-        ClientboundPlayerInfoRemovePacket removePlayer = new ClientboundPlayerInfoRemovePacket(List.of(entityPlayer.getUUID()));
-        ClientboundPlayerInfoUpdatePacket addPlayer = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityPlayer));
-        ServerLevel world = entityPlayer.getLevel();
-        ServerPlayerGameMode gamemode = entityPlayer.gameMode;
-
-        ClientboundRespawnPacket respawn = new ClientboundRespawnPacket(
-                world.dimensionTypeId(),
-                world.dimension(),
-                BiomeManager.obfuscateSeed(world.getSeed()),
-                gamemode.getGameModeForPlayer(),
-                gamemode.getPreviousGameModeForPlayer(),
-                world.isDebug(),
-                world.isFlat(),
-                (byte) 3,
-                entityPlayer.getLastDeathLocation()
-        );
-
-        Location l = player.getLocation();
-        ClientboundPlayerPositionPacket pos = new ClientboundPlayerPositionPacket(l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<>(), 0, false);
-        ClientboundSetCarriedItemPacket slot = new ClientboundSetCarriedItemPacket(player.getInventory().getHeldItemSlot());
-
-        sendPacket(entityPlayer, removePlayer);
-        sendPacket(entityPlayer, addPlayer);
-
-        sendPacket(entityPlayer, respawn);
-
-        SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
-
-        EntityDataAccessor<Byte> entityDataAccessor;
-
-        if (reset | skinName.equalsIgnoreCase("default")) {
-            synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), (byte) (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40));
-        } else {
-            synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE),
-                    (byte)
-                            ((fileConfiguration.getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x00) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x00) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x00) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x00) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x00) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x00) |
-                                    (fileConfiguration.getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x00))
+            ClientboundRespawnPacket respawn = new ClientboundRespawnPacket(
+                    world.dimensionTypeId(),
+                    world.dimension(),
+                    BiomeManager.obfuscateSeed(world.getSeed()),
+                    gamemode.getGameModeForPlayer(),
+                    gamemode.getPreviousGameModeForPlayer(),
+                    world.isDebug(),
+                    world.isFlat(),
+                    (byte) 3,
+                    entityPlayer.getLastDeathLocation()
             );
+
+            Location l = player.getLocation();
+            ClientboundPlayerPositionPacket pos = new ClientboundPlayerPositionPacket(l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<>(), 0, false);
+            ClientboundSetCarriedItemPacket slot = new ClientboundSetCarriedItemPacket(player.getInventory().getHeldItemSlot());
+
+            sendPacket(entityPlayer, removePlayer);
+            sendPacket(entityPlayer, addPlayer);
+
+            sendPacket(entityPlayer, respawn);
+
+            SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
+
+            EntityDataAccessor<Byte> entityDataAccessor;
+
+            if (reset | skinName.equalsIgnoreCase("default")) {
+                synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), (byte) (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40));
+            } else {
+                synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE),
+                        (byte)
+                                ((skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x00) |
+                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x00) |
+                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x00) |
+                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x00) |
+                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x00) |
+                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x00) |
+                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x00))
+                );
+            }
+
+            synchedEntityData.markDirty(entityDataAccessor);
+
+            synchedEntityData.refresh(entityPlayer);
+
+            entityPlayer.onUpdateAbilities();
+
+            sendPacket(entityPlayer, pos);
+            sendPacket(entityPlayer, slot);
+            craftPlayer.updateScaledHealth();
+            player.updateInventory();
+            entityPlayer.resetSentInfo();
+            callback.onSuccess();
+        } catch (Exception exception) {
+            callback.onFailure(exception);
         }
-
-        synchedEntityData.markDirty(entityDataAccessor);
-
-
-        ClientboundSetEntityDataPacket clientboundSetEntityDataPacket = new ClientboundSetEntityDataPacket(entityPlayer.getId(), Objects.requireNonNull(synchedEntityData.packDirty()));
-
-        sendPacket(entityPlayer, clientboundSetEntityDataPacket);
-
-        entityPlayer.onUpdateAbilities();
-
-        sendPacket(entityPlayer, pos);
-        sendPacket(entityPlayer, slot);
-        craftPlayer.updateScaledHealth();
-        player.updateInventory();
-        entityPlayer.resetSentInfo();
     }
 
     @Override

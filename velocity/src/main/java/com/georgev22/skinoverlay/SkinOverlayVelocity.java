@@ -8,7 +8,6 @@ import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.minecraft.VelocityMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
-import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
@@ -113,16 +112,17 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         this.scheduledTask = getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
-            public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
+            public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
                 if (reset) {
                     new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "reset", playerObject.playerUUID().toString(), "default");
                 } else {
                     new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "change", playerObject.playerUUID().toString(), skinName);
                 }
+                callback.onSuccess();
             }
 
             @Override
-            public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
+            public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
                 if (reset) {
                     new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "resetWithProperties", playerObject.playerUUID().toString(), "default", property.getName(), property.getValue(), property.getSignature());
                 } else {
@@ -143,8 +143,8 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
         VelocityMinecraftUtils.registerListeners(this, new DeveloperInformListener(), new PlayerListeners());
-        if(OptionsUtil.METRICS.getBooleanValue())
-            metricsFactory.make(this,17476);
+        if (OptionsUtil.METRICS.getBooleanValue())
+            metricsFactory.make(this, 17476);
         enabled = true;
     }
 

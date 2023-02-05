@@ -2,7 +2,7 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.yaml.file.FileConfiguration;
+import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -28,12 +28,12 @@ public class SkinHandler_Sponge7 extends SkinHandler.SkinHandler_ {
     }
 
     @Override
-    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
-        updateSkin(fileConfiguration, playerObject, reset, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty());
+    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
+        updateSkin(playerObject, reset, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty(), callback);
     }
 
     @Override
-    public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
+    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
         Player receiver = (Player) playerObject.player();
 
 
@@ -66,6 +66,7 @@ public class SkinHandler_Sponge7 extends SkinHandler.SkinHandler_ {
 
         receiver.offer(Keys.VANISH, true);
         SchedulerManager.getScheduler().runTaskLater(SkinOverlay.getInstance().getClass(), () -> receiver.offer(Keys.VANISH, false), 1L);
+        callback.onSuccess();
     }
 
 

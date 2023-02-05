@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay.utilities;
 import co.aikar.commands.CommandIssuer;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
@@ -137,17 +138,37 @@ public class Utilities {
                     org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.player();
                     player.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                     player.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                    skinOverlay.getSkinHandler().updateSkin(skinOverlay.getConfig(), playerObject, reset, userData.getSkinName());
-                    if (forOthers) {
-                        skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                            org.bukkit.entity.Player p = (org.bukkit.entity.Player) playerObjects.player();
-                            p.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                            p.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                        });
-                    }
+                    skinOverlay.getSkinHandler().updateSkin(playerObject, reset, userData.getSkinName(), new Utils.Callback<>() {
+                        @Override
+                        public Boolean onSuccess() {
+                            if (forOthers) {
+                                skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                                    org.bukkit.entity.Player p = (org.bukkit.entity.Player) playerObjects.player();
+                                    p.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                                    p.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                                });
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public Boolean onFailure() {
+                            return false;
+                        }
+                    });
                 }, 20L);
             } else {
-                skinOverlay.getSkinHandler().updateSkin(skinOverlay.getConfig(), playerObject, reset, userData.getSkinName(), userData.getSkinProperty());
+                skinOverlay.getSkinHandler().updateSkin(playerObject, reset, userData.getSkinName(), userData.getSkinProperty(), new Utils.Callback<>() {
+                    @Override
+                    public Boolean onSuccess() {
+                        return true;
+                    }
+
+                    @Override
+                    public Boolean onFailure() {
+                        return false;
+                    }
+                });
             }
         }, 20L);
     }

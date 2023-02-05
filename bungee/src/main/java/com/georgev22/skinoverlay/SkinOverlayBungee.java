@@ -8,7 +8,6 @@ import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
-import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
@@ -64,21 +63,23 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
-            public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName) {
+            public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
                 if (reset) {
                     new BungeeCordPluginMessageUtils().sendDataTooAllServers("reset", playerObject.playerUUID().toString(), "default");
                 } else {
                     new BungeeCordPluginMessageUtils().sendDataTooAllServers("change", playerObject.playerUUID().toString(), skinName);
                 }
+                callback.onSuccess();
             }
 
             @Override
-            public void updateSkin(@NotNull FileConfiguration fileConfiguration, @NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property) {
+            public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
                 if (reset) {
                     new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), "default", property.getName(), property.getValue(), property.getSignature());
                 } else {
                     new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), skinName, property.getName(), property.getValue(), property.getSignature());
                 }
+                callback.onSuccess();
             }
 
             @Override
@@ -97,7 +98,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         SkinOverlay.getInstance().setupCommands();
         BungeeMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         getProxy().registerChannel("skinoverlay:bungee");
-        if(OptionsUtil.METRICS.getBooleanValue())
+        if (OptionsUtil.METRICS.getBooleanValue())
             new Metrics(this, 17475);
         enabled = true;
     }
