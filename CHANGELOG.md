@@ -1,3 +1,10 @@
+## [3.7.2](https://github.com/GeorgeV220/SkinOverlay/compare/v3.7.1...v3.7.2) (2023-02-06)
+
+
+### Bug Fixes
+
+* config.yml ([6207c04](https://github.com/GeorgeV220/SkinOverlay/commit/6207c048e9de9d23eb6abb0532c4fa330a48e948))
+
 ## [3.7.1](https://github.com/GeorgeV220/SkinOverlay/compare/v3.7.0...v3.7.1) (2023-02-05)
 
 
