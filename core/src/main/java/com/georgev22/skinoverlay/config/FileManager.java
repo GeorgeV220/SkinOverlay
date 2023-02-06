@@ -3,8 +3,6 @@ package com.georgev22.skinoverlay.config;
 import com.georgev22.library.yaml.configmanager.CFG;
 import com.georgev22.skinoverlay.SkinOverlay;
 
-import java.util.logging.Logger;
-
 public final class FileManager {
     private static FileManager instance;
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
@@ -19,10 +17,10 @@ public final class FileManager {
     private FileManager() {
     }
 
-    public void loadFiles(Logger logger, Class<?> clazz) throws Exception {
-        this.messages = new CFG("messages", this.skinOverlay.getDataFolder(), false, logger, clazz);
-        this.config = new CFG("config", this.skinOverlay.getDataFolder(), true, logger, clazz);
-        this.data = new CFG("data", this.skinOverlay.getDataFolder(), true, logger, clazz);
+    public void loadFiles() throws Exception {
+        this.messages = new CFG("messages", this.skinOverlay.getDataFolder(), false, false, skinOverlay.getLogger(), skinOverlay.getClass());
+        this.config = new CFG("config", this.skinOverlay.getDataFolder(), true, true, skinOverlay.getLogger(), skinOverlay.getClass());
+        this.data = new CFG("data", this.skinOverlay.getDataFolder(), true, true, skinOverlay.getLogger(), skinOverlay.getClass());
     }
 
     public CFG getMessages() {

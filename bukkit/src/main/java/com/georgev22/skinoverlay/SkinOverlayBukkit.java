@@ -71,7 +71,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         BukkitMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         if (OptionsUtil.PROXY.getBooleanValue())
             Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "skinoverlay:bungee", new PlayerListeners());
-        if(OptionsUtil.METRICS.getBooleanValue())
+        if (OptionsUtil.METRICS.getBooleanValue())
             new Metrics(this, 17474);
     }
 

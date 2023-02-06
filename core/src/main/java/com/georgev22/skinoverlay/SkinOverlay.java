@@ -94,7 +94,7 @@ public class SkinOverlay {
         this.skinOverlay = skinOverlay;
         fileManager = FileManager.getInstance();
         try {
-            fileManager.loadFiles(getLogger(), this.getClass());
+            fileManager.loadFiles();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
