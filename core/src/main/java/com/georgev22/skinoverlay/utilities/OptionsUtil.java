@@ -22,11 +22,11 @@ public enum OptionsUtil {
 
     DATABASE_PASSWORD("database.SQL.password", "yourpassword", Optional.empty()),
 
-    DATABASE_DATABASE("database.SQL.database", "VoteRewards", Optional.empty()),
+    DATABASE_DATABASE("database.SQL.database", "SkinOverlay", Optional.empty()),
 
-    DATABASE_TABLE_NAME("database.SQL.table name", "voterewards_users", Optional.empty()),
+    DATABASE_TABLE_NAME("database.SQL.table name", "skinoverlay_users", Optional.empty()),
 
-    DATABASE_SQLITE("database.SQLite.file name", "voterewards", Optional.empty()),
+    DATABASE_SQLITE("database.SQLite.file name", "skinoverlay", Optional.empty()),
 
     DATABASE_MONGO_HOST("database.MongoDB.host", "localhost", Optional.empty()),
 
@@ -36,9 +36,9 @@ public enum OptionsUtil {
 
     DATABASE_MONGO_PASSWORD("database.MongoDB.password", "yourpassword", Optional.empty()),
 
-    DATABASE_MONGO_DATABASE("database.MongoDB.database", "VoteRewards", Optional.empty()),
+    DATABASE_MONGO_DATABASE("database.MongoDB.database", "skinoverlay", Optional.empty()),
 
-    DATABASE_MONGO_COLLECTION("database.MongoDB.collection", "voterewards_users", Optional.empty()),
+    DATABASE_MONGO_COLLECTION("database.MongoDB.collection", "skinoverlay_users", Optional.empty()),
 
     DATABASE_TYPE("database.type", "SQLite", Optional.empty()),
 
