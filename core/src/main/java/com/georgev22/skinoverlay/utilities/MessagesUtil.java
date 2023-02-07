@@ -84,7 +84,7 @@ public enum MessagesUtil {
     }
 
     public void msg(@NotNull CommandIssuer issuer) {
-        this.msg(issuer.getIssuer(), new HashObjectMap<>(), false);
+        this.msg(issuer, new HashObjectMap<>(), false);
     }
 
     public void msg(CommandIssuer issuer, Map<String, String> map, boolean ignoreCase) {
