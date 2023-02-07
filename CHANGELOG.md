@@ -1,3 +1,10 @@
+## [3.7.3](https://github.com/GeorgeV220/SkinOverlay/compare/v3.7.2...v3.7.3) (2023-02-07)
+
+
+### Bug Fixes
+
+* **MessagesUtil:** Fixed msg(CommandIssuer) method ([11751d6](https://github.com/GeorgeV220/SkinOverlay/commit/11751d64515eb19c906e1e422b18f1bc9a091dd5))
+
 ## [3.7.2](https://github.com/GeorgeV220/SkinOverlay/compare/v3.7.1...v3.7.2) (2023-02-06)
 
 
