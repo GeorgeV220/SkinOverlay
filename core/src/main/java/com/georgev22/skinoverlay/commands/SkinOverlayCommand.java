@@ -61,7 +61,7 @@ public class SkinOverlayCommand extends BaseCommand {
                             @Override
                             public Boolean onSuccess() {
                                 atomicBoolean.set(true);
-                                Utilities.updateSkin(user.getPlayer().orElseThrow(), true, false);
+                                Utilities.updateSkin(user.getPlayer().orElseThrow(), true);
                                 UserData.getLoadedUsers().append(userData, userData.user());
                                 return atomicBoolean.get();
                             }

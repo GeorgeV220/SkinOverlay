@@ -23,13 +23,11 @@ public abstract class SkinHandler {
      * Update the skin for the specified {@link PlayerObject}
      *
      * @param playerObject Player's {@link PlayerObject} object.
-     * @param reset        Default skin.
      * @param skinName     Skin name (eg default or allay)
      * @param callback     Callback
      */
     public abstract void updateSkin(
             @NotNull final PlayerObject playerObject,
-            final boolean reset,
             @NotNull final String skinName,
             @NotNull final Utils.Callback<Boolean> callback);
 
@@ -37,13 +35,11 @@ public abstract class SkinHandler {
      * Update the skin for the specified {@link PlayerObject} and {@link Property}
      *
      * @param playerObject Player's {@link PlayerObject} object.
-     * @param reset        Default skin.
      * @param skinName     Skin name (eg default or allay)
      * @param property     {@link Property} to set
      * @param callback     Callback
      */
     public abstract void updateSkin(@NotNull final PlayerObject playerObject,
-                                    final boolean reset,
                                     @NotNull final String skinName,
                                     final Property property,
                                     @NotNull final Utils.Callback<Boolean> callback);
@@ -272,13 +268,13 @@ public abstract class SkinHandler {
     public static class SkinHandler_ extends SkinHandler {
 
         @Override
-        public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, final Utils.@NotNull Callback<Boolean> callback) {
+        public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, final Utils.@NotNull Callback<Boolean> callback) {
             throw new UnsupportedOperationException("[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
         }
 
         @Override
-        public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, final Utils.@NotNull Callback<Boolean> callback) {
-            updateSkin(playerObject, reset, skinName, callback);
+        public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, final Utils.@NotNull Callback<Boolean> callback) {
+            updateSkin(playerObject, skinName, callback);
         }
 
         @Override

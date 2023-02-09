@@ -49,6 +49,20 @@ public enum OptionsUtil {
     DISCORD("discord", false, Optional.empty()),
 
     UPDATER("updater.enabled", true, Optional.empty()),
+
+    OVERLAY_CAPE("overlays.%s.cape", false, Optional.empty()),
+
+    OVERLAY_JACKET("overlays.%s.jacket", false, Optional.empty()),
+
+    OVERLAY_LEFT_SLEEVE("overlays.%s.left_sleeve", false, Optional.empty()),
+
+    OVERLAY_RIGHT_SLEEVE("overlays.%s.right_sleeve", false, Optional.empty()),
+
+    OVERLAY_LEFT_PANTS("overlays.%s.left_pants", false, Optional.empty()),
+
+    OVERLAY_RIGHT_PANTS("overlays.%s.right_pants", false, Optional.empty()),
+
+    OVERLAY_HAT("overlays.%s.hat", false, Optional.empty()),
     ;
     private static final SkinOverlay mainPlugin = SkinOverlay.getInstance();
     private final String pathName;
@@ -97,6 +111,43 @@ public enum OptionsUtil {
      * @return a List of Color classes that represent the colors.
      */
     public @NotNull List<Color> getColors() {
+        return getStringList().stream().map(Color::from).collect(Collectors.toList());
+    }
+
+    public boolean getBooleanValue(String arg) {
+        return mainPlugin.getConfig().getBoolean(String.format(getPath(), arg), Boolean.parseBoolean(String.valueOf(getDefaultValue())));
+    }
+
+    public Object getObjectValue(String arg) {
+        return mainPlugin.getConfig().get(getPath(), getDefaultValue());
+    }
+
+    public String getStringValue(String arg) {
+        return mainPlugin.getConfig().getString(getPath(), String.valueOf(getDefaultValue()));
+    }
+
+    public @NotNull Long getLongValue(String arg) {
+        return mainPlugin.getConfig().getLong(getPath(), Long.parseLong(String.valueOf(getDefaultValue())));
+    }
+
+    public @NotNull Integer getIntValue(String arg) {
+        return mainPlugin.getConfig().getInt(getPath(), Integer.parseInt(String.valueOf(getDefaultValue())));
+    }
+
+    public @NotNull Double getDoubleValue(String arg) {
+        return mainPlugin.getConfig().getDouble(getPath(), Double.parseDouble(String.valueOf(getDefaultValue())));
+    }
+
+    public @NotNull List<String> getStringList(String arg) {
+        return mainPlugin.getConfig().getStringList(getPath());
+    }
+
+    /**
+     * Converts and return a String List of color codes to a List of Color classes that represent the colors.
+     *
+     * @return a List of Color classes that represent the colors.
+     */
+    public @NotNull List<Color> getColors(String arg) {
         return getStringList().stream().map(Color::from).collect(Collectors.toList());
     }
 

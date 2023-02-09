@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.utilities.SkinOverlays;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -22,16 +23,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 
 public class SkinHandler_1_19_R2 extends SkinHandler {
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, final Utils.@NotNull Callback<Boolean> callback) {
-        this.updateSkin(playerObject, reset, skinName, callback);
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, final Utils.@NotNull Callback<Boolean> callback) {
+        this.updateSkin(playerObject, skinName, callback);
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, final Utils.@NotNull Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, final Utils.@NotNull Callback<Boolean> callback) {
         try {
             Player player = (Player) playerObject.player();
             final CraftPlayer craftPlayer = (CraftPlayer) player;
@@ -68,20 +68,7 @@ public class SkinHandler_1_19_R2 extends SkinHandler {
 
             EntityDataAccessor<Byte> entityDataAccessor;
 
-            if (reset | skinName.equalsIgnoreCase("default")) {
-                synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), (byte) (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40));
-            } else {
-                synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE),
-                        (byte)
-                                ((skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x00) |
-                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x00) |
-                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x00) |
-                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x00) |
-                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x00) |
-                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x00) |
-                                        (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x00))
-                );
-            }
+            synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), SkinOverlays.getFlags(skinName));
 
             synchedEntityData.markDirty(entityDataAccessor);
 

@@ -7,6 +7,7 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlaySponge;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
+import com.georgev22.skinoverlay.utilities.SkinOverlays;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.google.common.collect.ImmutableList;
@@ -65,13 +66,13 @@ public class SkinHandler_Sponge extends SkinHandler_ {
 
     @SneakyThrows
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
-        updateSkin(playerObject, reset, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty(), callback);
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
+        updateSkin(playerObject, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty(), callback);
     }
 
     @SneakyThrows
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, @NotNull final Utils.Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, @NotNull final Utils.Callback<Boolean> callback) {
         ServerPlayer receiver = (ServerPlayer) playerObject.player();
 
         receiver.user().offer(Keys.UPDATE_GAME_PROFILE, true);
@@ -175,40 +176,19 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         Object synchedEntityData = fetchMethodAndInvoke(serverPlayerClass, "getEntityData", serverPlayer, new Object[]{}, new Class[]{});
         Object entityDataAccessor;
 
-        if (reset | skinName.equalsIgnoreCase("default")) {
-            fetchMethodAndInvoke(synchedEntityData.getClass(), "set", synchedEntityData,
-                    new Object[]{
-                            entityDataAccessor = invokeConstructor(
-                                    entityDataAccessorClass,
-                                    Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
-                                    fetchField(entityDataSerializersClass, null, "BYTE")),
-                            (byte) (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40)
-                    },
-                    new Class[]{
-                            entityDataAccessor.getClass(),
-                            Object.class
-                    });
-        } else {
-            fetchMethodAndInvoke(synchedEntityData.getClass(), "set", synchedEntityData,
-                    new Object[]{
-                            entityDataAccessor = invokeConstructor(
-                                    entityDataAccessorClass,
-                                    Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
-                                    fetchField(entityDataSerializersClass, null, "BYTE")),
-                            (byte)
-                                    ((skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".cape", false) ? 0x01 : 0x00) |
-                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".jacket", false) ? 0x02 : 0x00) |
-                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_sleeve", false) ? 0x04 : 0x00) |
-                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_sleeve", false) ? 0x08 : 0x00) |
-                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".left_pants", false) ? 0x10 : 0x00) |
-                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".right_pants", false) ? 0x20 : 0x00) |
-                                            (skinOverlay.getConfig().getBoolean("Options.overlays." + skinName + ".hat", false) ? 0x40 : 0x00))
-                    },
-                    new Class[]{
-                            entityDataAccessor.getClass(),
-                            Object.class
-                    });
-        }
+        fetchMethodAndInvoke(synchedEntityData.getClass(), "set", synchedEntityData,
+                new Object[]{
+                        entityDataAccessor = invokeConstructor(
+                                entityDataAccessorClass,
+                                Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
+                                fetchField(entityDataSerializersClass, null, "BYTE")),
+                        SkinOverlays.getFlags(skinName)
+                },
+                new Class[]{
+                        entityDataAccessor.getClass(),
+                        Object.class
+                });
+
         try {
             fetchMethodAndInvoke(synchedEntityData.getClass(), "markDirty", synchedEntityData, new Object[]{entityDataAccessor}, new Class[]{entityDataAccessorClass});
         } catch (Exception ignore) {

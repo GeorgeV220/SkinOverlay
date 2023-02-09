@@ -41,7 +41,7 @@ public class Utilities {
         UserData userData = UserData.getUser(playerObject);
         userData.setSkinName(skinName);
         userData.setProperty(new Property(properties[0], properties[1], properties[2]));
-        updateSkin(playerObject, true, false);
+        updateSkin(playerObject, true);
     }
 
     public static void setSkin(ImageSupplier imageSupplier, String skinName, PlayerObject playerObject, @Nullable CommandIssuer commandIssuer) {
@@ -67,7 +67,7 @@ public class Utilities {
                         pm.put("textures", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         userData.setSkinName(skinName);
                         userData.setProperty(new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
-                        Utilities.updateSkin(playerObject, true, true);
+                        Utilities.updateSkin(playerObject, true);
                         if (commandIssuer == null) {
                             MessagesUtil.RESET.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
                         } else {
@@ -107,7 +107,7 @@ public class Utilities {
                             String texturesSignature = texture.get("signature").getAsString();
                             userData.setSkinName(skinName);
                             userData.setProperty(new Property("textures", texturesValue, texturesSignature));
-                            Utilities.updateSkin(playerObject, true, false);
+                            Utilities.updateSkin(playerObject, true);
                             if (commandIssuer == null) {
                                 MessagesUtil.DONE.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
                             } else {
@@ -125,7 +125,7 @@ public class Utilities {
         });
     }
 
-    public static void updateSkin(@NotNull PlayerObject playerObject, boolean forOthers, boolean reset) {
+    public static void updateSkin(@NotNull PlayerObject playerObject, boolean forOthers) {
         SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
             UserData userData = UserData.getUser(playerObject);
             GameProfile gameProfile = playerObject.gameProfile();
@@ -138,7 +138,7 @@ public class Utilities {
                     org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.player();
                     player.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                     player.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                    skinOverlay.getSkinHandler().updateSkin(playerObject, reset, userData.getSkinName(), new Utils.Callback<>() {
+                    skinOverlay.getSkinHandler().updateSkin(playerObject, userData.getSkinName(), new Utils.Callback<>() {
                         @Override
                         public Boolean onSuccess() {
                             if (forOthers) {
@@ -158,7 +158,7 @@ public class Utilities {
                     });
                 }, 20L);
             } else {
-                skinOverlay.getSkinHandler().updateSkin(playerObject, reset, userData.getSkinName(), userData.getSkinProperty(), new Utils.Callback<>() {
+                skinOverlay.getSkinHandler().updateSkin(playerObject, userData.getSkinName(), userData.getSkinProperty(), new Utils.Callback<>() {
                     @Override
                     public Boolean onSuccess() {
                         return true;

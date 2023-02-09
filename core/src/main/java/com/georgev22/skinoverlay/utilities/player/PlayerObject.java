@@ -201,7 +201,7 @@ public abstract class PlayerObject {
         if (userData.getSkinName().equals("default")) {
             return;
         }
-        Utilities.updateSkin(playerObject(), true, false);
+        Utilities.updateSkin(playerObject(), true);
     }
 
 

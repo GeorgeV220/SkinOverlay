@@ -28,12 +28,12 @@ public class SkinHandler_Sponge7 extends SkinHandler.SkinHandler_ {
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
-        updateSkin(playerObject, reset, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty(), callback);
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
+        updateSkin(playerObject, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty(), callback);
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, boolean reset, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
         Player receiver = (Player) playerObject.player();
 
 
