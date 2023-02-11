@@ -18,6 +18,7 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -48,8 +49,17 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     private boolean enabled = false;
 
+    private BungeeAudiences adventure;
+
+    private static SkinOverlayBungee skinOverlayBungee;
+
+    public static SkinOverlayBungee getInstance() {
+        return skinOverlayBungee;
+    }
+
     @Override
     public void onLoad() {
+        skinOverlayBungee = this;
         try {
             new LibraryLoader(this.getClass(), this.getDataFolder()).loadAll(true);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
@@ -60,6 +70,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     @Override
     public void onEnable() {
+        this.adventure = BungeeAudiences.create(this);
         getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
@@ -106,6 +117,11 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     @Override
     public void onDisable() {
         SkinOverlay.getInstance().onDisable();
+        getProxy().getScheduler().cancel(this);
+        if (this.adventure != null) {
+            this.adventure.close();
+            this.adventure = null;
+        }
         enabled = false;
     }
 
@@ -176,5 +192,12 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     @Override
     public String serverVersion() {
         return getProxy().getVersion();
+    }
+
+    public @NotNull BungeeAudiences adventure() {
+        if (this.adventure == null) {
+            throw new IllegalStateException("Cannot retrieve audience provider while plugin is not enabled");
+        }
+        return this.adventure;
     }
 }

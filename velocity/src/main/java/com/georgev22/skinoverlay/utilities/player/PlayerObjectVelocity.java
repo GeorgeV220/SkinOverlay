@@ -17,6 +17,7 @@ import com.velocitypowered.api.proxy.player.TabList;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.api.util.ModInfo;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -198,7 +199,12 @@ public class PlayerObjectVelocity extends PlayerObject {
     }
 
     @Override
-    public Object player() {
+    public Player player() {
+        return player;
+    }
+
+    @Override
+    public Audience audience() {
         return player;
     }
 

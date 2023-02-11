@@ -27,8 +27,9 @@ public class PlayerObjectSponge7 extends PlayerObject {
         return user.getPlayer().orElseThrow();
     }
 
+    @Override
     public Audience audience() {
-        return SkinOverlaySponge7.getInstance().adventure().player(player());
+        return SkinOverlaySponge7.getInstance().adventure().player(user.getPlayer().orElseThrow());
     }
 
     @Override

@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
+import com.georgev22.skinoverlay.SkinOverlayBukkit;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.OfflinePlayer;
 
 public class PlayerObjectBukkit extends PlayerObject {
@@ -18,6 +20,11 @@ public class PlayerObjectBukkit extends PlayerObject {
     @Override
     public OfflinePlayer player() {
         return this.offlinePlayer;
+    }
+
+    @Override
+    public Audience audience() {
+        return SkinOverlayBukkit.getInstance().adventure().player(player().getPlayer());
     }
 
     @Override

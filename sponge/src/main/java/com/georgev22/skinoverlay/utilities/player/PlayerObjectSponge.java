@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.utilities.player;
 
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.Sponge8MinecraftUtils;
+import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
@@ -23,6 +24,11 @@ public class PlayerObjectSponge extends PlayerObject {
     @Override
     public ServerPlayer player() {
         return user.player().orElseThrow();
+    }
+
+    @Override
+    public Audience audience() {
+        return player();
     }
 
     @Override

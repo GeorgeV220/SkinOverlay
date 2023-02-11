@@ -10,6 +10,7 @@ import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
+import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +29,8 @@ public abstract class PlayerObject {
     }
 
     public abstract Object player();
+
+    public abstract Audience audience();
 
     public abstract UUID playerUUID();
 

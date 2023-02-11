@@ -15,16 +15,19 @@ import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.*;
+import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.V1_16_R3;
+import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion;
 
 @MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
 @MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.22")
@@ -39,6 +42,14 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
 
     private int tick = 0;
 
+    private BukkitAudiences adventure;
+
+    private static SkinOverlayBukkit skinOverlayBukkit;
+
+    public static SkinOverlayBukkit getInstance() {
+        return skinOverlayBukkit == null ? SkinOverlayBukkit.getPlugin(SkinOverlayBukkit.class) : skinOverlayBukkit;
+    }
+
     @Override
     public void onLoad() {
         try {
@@ -52,6 +63,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     }
 
     public void onEnable() {
+        this.adventure = BukkitAudiences.create(this);
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             tick++;
             SchedulerManager.getScheduler().mainThreadHeartbeat(tick);
@@ -78,6 +90,10 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     public void onDisable() {
         SkinOverlay.getInstance().onDisable();
         Bukkit.getScheduler().cancelTasks(this);
+        if(this.adventure != null) {
+            this.adventure.close();
+            this.adventure = null;
+        }
     }
 
 
@@ -135,5 +151,12 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     @Override
     public String serverVersion() {
         return Bukkit.getBukkitVersion();
+    }
+
+    public @NotNull BukkitAudiences adventure() {
+        if(this.adventure == null) {
+            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
+        }
+        return this.adventure;
     }
 }
