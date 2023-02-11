@@ -1,3 +1,11 @@
+# [3.8.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.7.3...v3.8.0) (2023-02-11)
+
+
+### Features
+
+* kyori Audience support ([642dec8](https://github.com/GeorgeV220/SkinOverlay/commit/642dec8576b779343e297da4610e4b28a9d5a7c2))
+* SkinOverlays and OptionsUtil changes ([cae60d7](https://github.com/GeorgeV220/SkinOverlay/commit/cae60d7dce1e25408c17e0848b6244ab72d4be3c))
+
 ## [3.7.3](https://github.com/GeorgeV220/SkinOverlay/compare/v3.7.2...v3.7.3) (2023-02-07)
 
 
