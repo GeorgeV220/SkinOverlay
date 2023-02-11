@@ -36,6 +36,11 @@ public record UserData(User user) {
 
     private static final ObjectMap<UserData, User> loadedUsers = new ConcurrentObjectMap<>();
 
+    /**
+     * Constructs a new `UserData` object for the specified `User`.
+     *
+     * @param user The `User` object for which to create the `UserData` object.
+     */
     public UserData(@NotNull User user) {
         if (!allUsersMap.containsKey(user.getUniqueId())) {
             allUsersMap.append(user.getUniqueId(), new User(user.getUniqueId()));
@@ -45,28 +50,28 @@ public record UserData(User user) {
     }
 
     /**
-     * Returns all the players in a map
+     * Returns a map of all the players, with their unique IDs as the keys and their corresponding `User` objects as the values.
      *
-     * @return all the players
+     * @return The map of all the players.
      */
     public static ObjectMap<UUID, User> getAllUsersMap() {
         return allUsersMap;
     }
 
     /**
-     * Load all users
+     * Loads all the user data.
      *
-     * @throws Exception When something goes wrong
+     * @throws Exception If something goes wrong while loading the user data.
      */
     public static void loadAllUsers() throws Exception {
         allUsersMap.putAll(skinOverlay.getIDatabaseType().getAllUsers());
     }
 
     /**
-     * Returns a copy of this UserData class for a specific user.
+     * Returns a copy of this `UserData` class for a specific user, identified by the specified `PlayerObject`.
      *
-     * @param playerObject PlayerObject object
-     * @return a copy of this UserData class for a specific user.
+     * @param playerObject The `PlayerObject` of the user for which to get the `UserData` object.
+     * @return The `UserData` object for the specified user.
      */
     @Contract("_ -> new")
     public static @NotNull UserData getUser(@NotNull PlayerObject playerObject) {
@@ -74,52 +79,82 @@ public record UserData(User user) {
     }
 
     /**
-     * Returns a copy of this UserData class for a specific user.
+     * Returns a copy of this `UserData` class for a specific user, identified by the specified unique ID.
      *
-     * @param uuid Player's Unique identifier
-     * @return a copy of this UserData class for a specific user.
+     * @param uuid The unique ID of the user for which to get the `UserData` object.
+     * @return The `UserData` object for the specified user.
      */
     @Contract("_ -> new")
     public static @NotNull UserData getUser(@NotNull UUID uuid) {
         return new UserData(new User(uuid));
     }
 
+    /**
+     * Gets the name of the skin for the user represented by this `UserData` object.
+     *
+     * @return The name of the skin for the user.
+     */
     public String getSkinName() {
         return user().getSkinName();
     }
 
+    /**
+     * Gets the `Property` object representing the skin for the user represented by this `UserData` object.
+     *
+     * @return The `Property` object representing the skin for the user.
+     */
     public Property getSkinProperty() {
         return user.getSkinProperty();
     }
 
+    /**
+     * Gets the default `Property` object representing the skin for the user represented by this `UserData` object.
+     *
+     * @return The default `Property` object representing the skin for the user.
+     */
     public Property getDefaultSkinProperty() {
         return user.getDefaultSkinProperty();
     }
 
-    public static SkinOverlay getSkinOverlay() {
-        return skinOverlay;
-    }
-
+    /**
+     * Sets the name of the skin for the user represented by this `UserData` object.
+     *
+     * @param skinName The name of the skin to set for the user.
+     * @return This `UserData` object, for method chaining.
+     */
     public UserData setSkinName(String skinName) {
         user.append("skinName", skinName);
         return this;
     }
 
+    /**
+     * Sets the `Property` object representing the skin for the user represented by this `UserData` object.
+     *
+     * @param property The `Property` object to set as the skin for the user.
+     * @return This `UserData` object, for method chaining.
+     */
     public UserData setProperty(Property property) {
         user.append("skinProperty", property);
         return this;
     }
 
+    /**
+     * Sets the default skin property of the user.
+     *
+     * @param property The property to set as the default skin property.
+     * @return The updated UserData object.
+     */
     public UserData setDefaultSkinProperty(Property property) {
         user.append("defaultSkinProperty", property);
         return this;
     }
 
     /**
-     * Load user data
+     * Loads user data from the database.
      *
-     * @param callback Callback
-     * @throws Exception When something goes wrong
+     * @param callback The callback to be executed when the data is loaded.
+     * @return The updated UserData object.
+     * @throws Exception If something goes wrong during the loading process.
      */
     public UserData load(Callback<Boolean> callback) throws Exception {
         skinOverlay.getIDatabaseType().load(user, callback);
@@ -127,9 +162,11 @@ public record UserData(User user) {
     }
 
     /**
-     * Save all user's data
+     * Saves all the user's data to the database.
      *
-     * @param async True if you want to save async
+     * @param async    A flag indicating whether the save operation should be performed asynchronously.
+     * @param callback The callback to be executed when the data is saved.
+     * @return The updated UserData object.
      */
     public UserData save(boolean async, Callback<Boolean> callback) {
         if (async) {
@@ -140,6 +177,11 @@ public record UserData(User user) {
         return this;
     }
 
+    /**
+     * Performs the actual save operation.
+     *
+     * @param callback The callback to be executed when the data is saved.
+     */
     private void save(Callback<Boolean> callback) {
         try {
             skinOverlay.getIDatabaseType().save(user);
@@ -151,7 +193,9 @@ public record UserData(User user) {
     }
 
     /**
-     * Reset user's stats
+     * Resets the user's stats in the database.
+     *
+     * @return The updated UserData object.
      */
     public UserData reset() {
         SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
@@ -165,7 +209,9 @@ public record UserData(User user) {
     }
 
     /**
-     * Delete user from database
+     * Deletes the user from the database.
+     *
+     * @return The updated UserData object.
      */
     public UserData delete() {
         SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
@@ -178,6 +224,11 @@ public record UserData(User user) {
         return this;
     }
 
+    /**
+     * Gets a map of loaded UserData objects and their corresponding User objects.
+     *
+     * @return The map of loaded UserData objects.
+     */
     public static ObjectMap<UserData, User> getLoadedUsers() {
         return loadedUsers;
     }
