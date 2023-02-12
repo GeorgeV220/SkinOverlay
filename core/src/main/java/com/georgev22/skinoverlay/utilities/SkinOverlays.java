@@ -1,6 +1,5 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.georgev22.skinoverlay.SkinOverlay;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 public class SkinOverlays {
 
     public static byte getFlags(@NotNull String skinName) {
-        SkinOverlay.getInstance().getLogger().info(OptionsUtil.OVERLAY_JACKET.getBooleanValue(skinName) + " " + String.format(OptionsUtil.OVERLAY_JACKET.getPath(), skinName));
         return skinName.equalsIgnoreCase("default") ?
                 (byte) (Overlays.CAPE.flag | Overlays.JACKET.flag | Overlays.LEFT_SLEEVE.flag | Overlays.RIGHT_SLEEVE.flag | Overlays.LEFT_PANTS.flag | Overlays.RIGHT_PANTS.flag | Overlays.HEAD.flag) :
                 (byte) ((OptionsUtil.OVERLAY_CAPE.getBooleanValue(skinName) ? Overlays.CAPE.flag : Overlays.NOTHING.flag) |
