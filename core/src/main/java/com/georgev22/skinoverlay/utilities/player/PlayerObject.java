@@ -3,21 +3,20 @@ package com.georgev22.skinoverlay.utilities.player;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.utilities.Utils;
+import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import net.kyori.adventure.audience.Audience;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -67,10 +66,8 @@ public abstract class PlayerObject {
     );
 
     public void developerInform() {
-        final UUID uuid = playerUUID();
-        final String name = playerName();
 
-        final ObjectMap.Pair<String, UUID> pair = ObjectMap.Pair.create(name, uuid);
+        final ObjectMap.Pair<String, UUID> pair = ObjectMap.Pair.create(playerName(), playerUUID());
 
         boolean found = false;
 
@@ -136,75 +133,65 @@ public abstract class PlayerObject {
         if (OptionsUtil.PROXY.getBooleanValue() & !skinOverlay.type().isProxy()) {
             return;
         }
-        UserData userData = UserData.getUser(playerObject());
-
-        try {
-            userData.load(new Utils.Callback<>() {
-
-                public Boolean onSuccess() {
-                    UserData.getAllUsersMap().append(userData.user().getUniqueId(), userData.user());
-                    SchedulerManager.getScheduler().runTask(SkinOverlay.getInstance().getClass(), () -> {
-                        userData.user().append("playerObject", Optional.of(playerObject()));
-                        try {
-                            userData.setDefaultSkinProperty(gameProfile().getProperties().get("textures").stream().filter(property -> property.getName().equalsIgnoreCase("textures")).findFirst().orElse(skinOverlay.getSkinHandler().getSkin(playerObject())));
-                        } catch (IOException | ExecutionException | InterruptedException e) {
-                            skinOverlay.getLogger().log(Level.SEVERE, "Something went wrong:", e);
-                        }
-                        if (!(skinOverlay.type().equals(SkinOverlayImpl.Type.VELOCITY) | skinOverlay.type().equals(SkinOverlayImpl.Type.BUNGEE))) {
-                            updateSkin();
-                        }
-                    });
-                    UserData.getLoadedUsers().append(userData, userData.user());
-                    return true;
+        CompletableFuture<UserManager.User> future = skinOverlay.getUserManager().getUser(playerUUID());
+        future.handleAsync((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                return null;
+            }
+            try {
+                user.addCustomData("defaultSkinProperty", gameProfile().getProperties().get("textures").stream().filter(property -> property.getName().equalsIgnoreCase("textures")).findFirst().orElse(skinOverlay.getSkinHandler().getSkin(playerObject())));
+            } catch (IOException | ExecutionException | InterruptedException e) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Something went wrong:", e);
+                return null;
+            }
+            user.addCustomDataIfNotExists("skinName", "default");
+            if (user.getCustomData("skinProperty") != null && !(user.getCustomData("skinProperty") instanceof Property)) {
+                user.addCustomData("skinProperty", Utilities.propertyFromLinkedTreeMap(user.getCustomData("skinProperty")));
+            }
+            skinOverlay.getUserManager().save(user);
+            return user;
+        }).handle((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
+                return null;
+            }
+            if (user != null)
+                if (!(skinOverlay.type().equals(SkinOverlayImpl.Type.VELOCITY) | skinOverlay.type().equals(SkinOverlayImpl.Type.BUNGEE))) {
+                    updateSkin();
                 }
-
-                @Contract(pure = true)
-                public @NotNull Boolean onFailure() {
-                    return false;
-                }
-
-                public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
-                    throwable.printStackTrace();
-                    return onFailure();
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            return user;
+        });
     }
 
     public void playerQuit() {
         if (OptionsUtil.PROXY.getBooleanValue() & !skinOverlay.type().isProxy()) {
             return;
         }
-        UserData userData = UserData.getUser(playerObject());
-        userData.save(true, new Utils.Callback<>() {
-
-            public Boolean onSuccess() {
-                UserData.getAllUsersMap().append(userData.user().getUniqueId(), userData.user());
-                return true;
+        skinOverlay.getUserManager().getUser(playerUUID()).handleAsync((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                return null;
             }
-
-            @Contract(pure = true)
-            public @NotNull Boolean onFailure() {
-                return false;
-            }
-
-            public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
-                throwable.printStackTrace();
-                return this.onFailure();
-            }
+            skinOverlay.getUserManager().save(user);
+            return user;
         });
     }
 
     public void updateSkin() {
-        UserData userData = UserData.getUser(playerObject());
-        if (!isOnline())
-            return;
-        if (userData.getSkinName().equals("default")) {
-            return;
-        }
-        Utilities.updateSkin(playerObject(), true);
+        skinOverlay.getUserManager().getUser(playerUUID()).handle((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                return null;
+            }
+            if (!isOnline())
+                return user;
+            if (user.getCustomData("skinName").equals("default")) {
+                return user;
+            }
+            Utilities.updateSkin(playerObject(), true);
+            return user;
+        });
     }
 
 

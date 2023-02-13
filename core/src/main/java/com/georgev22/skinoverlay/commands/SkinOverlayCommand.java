@@ -5,13 +5,11 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.annotation.*;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.UserData;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +17,6 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 @CommandAlias("skinoverlay|soverlay|skino")
@@ -50,49 +47,24 @@ public class SkinOverlayCommand extends BaseCommand {
     @CommandAlias("skinoverlayreload|soverlayreload|skinoreload|sreload")
     @CommandPermission("skinoverlay.reload")
     public void reload(final @NotNull CommandIssuer issuer) {
-        UserData.getLoadedUsers().forEach((userData, user) -> {
-            userData.save(false, new Utils.Callback<>() {
-                @Override
-                public Boolean onSuccess() {
-                    final AtomicBoolean atomicBoolean = new AtomicBoolean(false);
-                    try {
-                        UserData.getLoadedUsers().remove(userData);
-                        userData.load(new Utils.Callback<>() {
-                            @Override
-                            public Boolean onSuccess() {
-                                atomicBoolean.set(true);
-                                Utilities.updateSkin(user.getPlayer().orElseThrow(), true);
-                                UserData.getLoadedUsers().append(userData, userData.user());
-                                return atomicBoolean.get();
-                            }
-
-                            @Override
-                            public Boolean onFailure() {
-                                atomicBoolean.set(false);
-                                return atomicBoolean.get();
-                            }
-
-                            @Override
-                            public Boolean onFailure(Throwable throwable) {
-                                atomicBoolean.set(false);
-                                return super.onFailure(throwable);
-                            }
-                        });
-                    } catch (Exception e) {
-                        atomicBoolean.set(false);
-                        skinOverlay.getLogger().log(Level.SEVERE, "Error: ", e);
-                    }
-                    return atomicBoolean.get();
+        skinOverlay.getUserManager().getLoadedUsers().forEach((uuid, loadedUser) -> {
+            skinOverlay.getUserManager().getUser(uuid).handle((user, throwable) -> {
+                if (throwable != null) {
+                    skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
+                    return null;
                 }
-
-                @Override
-                public Boolean onFailure() {
-                    return false;
+                return user;
+            }).thenApply(user -> {
+                if (user == null) {
+                    return null;
                 }
-
-                @Override
-                public Boolean onFailure(Throwable throwable) {
-                    return super.onFailure(throwable);
+                skinOverlay.getUserManager().save(user);
+                return user;
+            }).thenAccept(user -> {
+                if (user != null) {
+                    Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
+                    if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline())
+                        Utilities.updateSkin(optionalPlayerObject.get(), true);
                 }
             });
         });

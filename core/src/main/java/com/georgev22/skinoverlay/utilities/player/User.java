@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+@Deprecated(forRemoval = true)
 public class User extends ConcurrentObjectMap<String, Object> {
 
     private final UUID uuid;

@@ -8,15 +8,16 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.internal.LinkedTreeMap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import org.apache.commons.lang.Validate;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,23 +39,44 @@ public class Utilities {
 
     public static void setSkin(String skinName, @NotNull PlayerObject playerObject, String @NotNull [] properties) {
         Validate.isTrue((properties.length == 3 ? 1 : 0) != 0, "Properties length must be 3");
-        UserData userData = UserData.getUser(playerObject);
-        userData.setSkinName(skinName);
-        userData.setProperty(new Property(properties[0], properties[1], properties[2]));
-        updateSkin(playerObject, true);
+        skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                return null;
+            }
+            return user;
+        }).thenAccept(user -> {
+            if (user == null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "User is null");
+                return;
+            }
+            user.addCustomData("skinName", skinName);
+            user.addCustomData("skinProperty", new Property(properties[0], properties[1], properties[2]));
+            updateSkin(playerObject, true);
+            skinOverlay.getUserManager().save(user);
+        });
     }
 
-    public static void setSkin(ImageSupplier imageSupplier, String skinName, PlayerObject playerObject, @Nullable CommandIssuer commandIssuer) {
-        SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
+    public static void setSkin(ImageSupplier imageSupplier, String skinName, @NotNull PlayerObject playerObject, @Nullable CommandIssuer commandIssuer) {
+        skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                return null;
+            }
+            return user;
+        }).thenApplyAsync(user -> {
+            if (user == null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user");
+                return null;
+            }
             Image overlay;
             try {
                 overlay = imageSupplier.get();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                overlay = null;
             }
-            UserData userData = UserData.getUser(playerObject);
             try {
-                byte[] profileBytes = skinOverlay.getSkinHandler().getProfileBytes(playerObject, userData.getDefaultSkinProperty());
+                byte[] profileBytes = skinOverlay.getSkinHandler().getProfileBytes(playerObject, user.getCustomData("defaultSkinProperty"));
                 JsonElement json = JsonParser.parseString(new String(profileBytes));
                 JsonArray properties = json.getAsJsonObject().get("properties").getAsJsonArray();
                 for (JsonElement object : properties) {
@@ -65,9 +87,8 @@ public class Utilities {
                         Property property = pm.get("textures").stream().filter(gameProfileProperty -> gameProfileProperty.getName().equals("textures")).findFirst().orElseThrow();
                         pm.remove("textures", property);
                         pm.put("textures", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
-                        userData.setSkinName(skinName);
-                        userData.setProperty(new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
-                        Utilities.updateSkin(playerObject, true);
+                        user.addCustomData("skinName", skinName);
+                        user.addCustomData("skinProperty", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         if (commandIssuer == null) {
                             MessagesUtil.RESET.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
                         } else {
@@ -105,9 +126,8 @@ public class Utilities {
                             JsonObject texture = response.getAsJsonObject().getAsJsonObject("data").getAsJsonObject("texture");
                             String texturesValue = texture.get("value").getAsString();
                             String texturesSignature = texture.get("signature").getAsString();
-                            userData.setSkinName(skinName);
-                            userData.setProperty(new Property("textures", texturesValue, texturesSignature));
-                            Utilities.updateSkin(playerObject, true);
+                            user.addCustomData("skinName", skinName);
+                            user.addCustomData("skinProperty", new Property("textures", texturesValue, texturesSignature));
                             if (commandIssuer == null) {
                                 MessagesUtil.DONE.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
                             } else {
@@ -122,23 +142,38 @@ public class Utilities {
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
             }
+            return user;
+        }).thenAccept(user -> {
+            if (user != null)
+                Utilities.updateSkin(playerObject, true);
+            else
+                skinOverlay.getLogger().log(Level.SEVERE, "User is null");
         });
     }
 
     public static void updateSkin(@NotNull PlayerObject playerObject, boolean forOthers) {
-        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
-            UserData userData = UserData.getUser(playerObject);
+        skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                return null;
+            }
+            return user;
+        }).thenAccept(user -> {
+            if (user == null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error(updateSkin): User is null");
+                return;
+            }
             GameProfile gameProfile = playerObject.gameProfile();
             PropertyMap pm = gameProfile.getProperties();
             Property property = pm.get("textures").stream().filter(profileProperty -> profileProperty.getName().equals("textures")).findFirst().orElseThrow();
             pm.remove("textures", property);
-            pm.put("textures", userData.getSkinProperty());
+            pm.put("textures", user.getCustomData("skinProperty"));
             if (skinOverlay.type().equals(SkinOverlayImpl.Type.PAPER)) {
                 SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
                     org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.player();
                     player.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                     player.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                    skinOverlay.getSkinHandler().updateSkin(playerObject, userData.getSkinName(), new Utils.Callback<>() {
+                    skinOverlay.getSkinHandler().updateSkin(playerObject, user.getCustomData("skinName"), new Utils.Callback<>() {
                         @Override
                         public Boolean onSuccess() {
                             if (forOthers) {
@@ -158,7 +193,7 @@ public class Utilities {
                     });
                 }, 20L);
             } else {
-                skinOverlay.getSkinHandler().updateSkin(playerObject, userData.getSkinName(), userData.getSkinProperty(), new Utils.Callback<>() {
+                skinOverlay.getSkinHandler().updateSkin(playerObject, user.getCustomData("skinName"), user.getCustomData("skinProperty"), new Utils.Callback<>() {
                     @Override
                     public Boolean onSuccess() {
                         return true;
@@ -170,7 +205,12 @@ public class Utilities {
                     }
                 });
             }
-        }, 20L);
+        });
+    }
+
+    @Contract("_ -> new")
+    public static @NotNull Property propertyFromLinkedTreeMap(@NotNull LinkedTreeMap<String, String> linkedTreeMap) {
+        return new Property(linkedTreeMap.get("name"), linkedTreeMap.get("value"), linkedTreeMap.get("signature"));
     }
 
     public static class Request {

@@ -5,8 +5,8 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +20,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Collection;
+import java.util.logging.Level;
 
 public class SkinHandler_Sponge7 extends SkinHandler.SkinHandler_ {
 
@@ -29,7 +30,16 @@ public class SkinHandler_Sponge7 extends SkinHandler.SkinHandler_ {
 
     @Override
     public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
-        updateSkin(playerObject, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty(), callback);
+        skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
+                return null;
+            }
+            return user;
+        }).thenAccept(user -> {
+            if (user != null)
+                updateSkin(playerObject, skinName, user.getCustomData("skinProperty"), callback);
+        });
     }
 
     @Override

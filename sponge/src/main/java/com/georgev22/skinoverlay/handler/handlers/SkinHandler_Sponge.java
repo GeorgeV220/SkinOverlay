@@ -8,8 +8,8 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlaySponge;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
 import com.georgev22.skinoverlay.utilities.SkinOverlays;
+import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
 import com.mojang.authlib.GameProfile;
@@ -28,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import static com.georgev22.library.utilities.Utils.Reflection.*;
 
@@ -64,10 +65,18 @@ public class SkinHandler_Sponge extends SkinHandler_ {
         packet = Utils.Reflection.getClass("net.minecraft.network.protocol.Packet", classLoader);
     }
 
-    @SneakyThrows
     @Override
     public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
-        updateSkin(playerObject, skinName, UserData.getUser(playerObject.playerUUID()).getSkinProperty(), callback);
+        skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
+                return null;
+            }
+            return user;
+        }).thenAccept(user -> {
+            if (user != null)
+                updateSkin(playerObject, skinName, user.getCustomData("skinProperty"), callback);
+        });
     }
 
     @SneakyThrows

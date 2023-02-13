@@ -6,6 +6,7 @@ import com.georgev22.library.database.DatabaseWrapper;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.utilities.UserManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
@@ -14,15 +15,12 @@ import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.Updater;
-import com.georgev22.skinoverlay.utilities.interfaces.IDatabaseType;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.UserData;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -50,30 +48,8 @@ public class SkinOverlay {
     @Getter
     private DatabaseWrapper databaseWrapper = null;
 
-    /**
-     * Return Database Type
-     *
-     * @return Database Type
-     */
-    @Getter
-    private IDatabaseType iDatabaseType = null;
-
-    /**
-     * Get Database open connection
-     *
-     * @return connection
-     */
-    @Getter
     private Connection connection = null;
 
-    /**
-     * Return MongoDB instance when MongoDB is in use.
-     * <p>
-     * Returns null if MongoDB is not in use
-     *
-     * @return {@link com.georgev22.library.database.mongo.MongoDB} instance
-     */
-    @Getter
     private MongoClient mongoClient = null;
 
     @Getter
@@ -85,6 +61,9 @@ public class SkinOverlay {
     @Getter
     @Setter
     private CommandManager<?, ?, ?, ?, ?, ?> commandManager;
+
+    @Getter
+    private UserManager userManager;
 
     public static SkinOverlay getInstance() {
         return instance == null ? (instance = new SkinOverlay()) : instance;
@@ -130,26 +109,16 @@ public class SkinOverlay {
     }
 
     public void onDisable() {
-        UserData.getLoadedUsers().forEach((userData, user) -> {
-            userData.save(false, new Utils.Callback<>() {
-                @Override
-                public Boolean onSuccess() {
-                    return true;
-                }
-
-                @Contract(pure = true)
-                @Override
-                public @NotNull Boolean onFailure() {
-                    return false;
-                }
-
-                @Override
-                public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
-                    throwable.printStackTrace();
-                    return onFailure();
-                }
-            });
-        });
+        userManager.getLoadedUsers().forEach((uuid, loadedUser) -> userManager.getUser(uuid).handle((user, throwable) -> {
+            if (throwable != null) {
+                getLogger().log(Level.SEVERE, "Error: ", throwable);
+                return null;
+            }
+            return user;
+        }).thenAccept(user -> {
+            if (user != null)
+                userManager.save(user);
+        }));
         if (connection != null) {
             try {
                 connection.close();
@@ -232,11 +201,8 @@ public class SkinOverlay {
      */
     private void setupDatabase() throws Exception {
         ObjectMap<String, ObjectMap.Pair<String, String>> map = new HashObjectMap<String, ObjectMap.Pair<String, String>>()
-                .append("uuid", ObjectMap.Pair.create("VARCHAR(38)", "NULL"))
-                .append("skinName", ObjectMap.Pair.create("VARCHAR(18)", "NULL"))
-                .append("property-name", ObjectMap.Pair.create("LONGTEXT", "NULL"))
-                .append("property-value", ObjectMap.Pair.create("LONGTEXT", "NULL"))
-                .append("property-signature", ObjectMap.Pair.create("LONGTEXT", "NULL"));
+                .append("user_id", ObjectMap.Pair.create("VARCHAR(38)", "NULL"))
+                .append("user_json", ObjectMap.Pair.create("LONGTEXT", "NULL"));
         switch (OptionsUtil.DATABASE_TYPE.getStringValue()) {
             case "MySQL" -> {
                 if (connection == null || connection.isClosed()) {
@@ -248,7 +214,7 @@ public class SkinOverlay {
                             OptionsUtil.DATABASE_DATABASE.getStringValue());
                     connection = databaseWrapper.connect().getSQLConnection();
                     databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_TABLE_NAME.getStringValue(), map);
-                    iDatabaseType = new UserData.SQLUserUtils();
+                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_TABLE_NAME.getStringValue());
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MySQL");
                 }
             }
@@ -262,7 +228,7 @@ public class SkinOverlay {
                             OptionsUtil.DATABASE_DATABASE.getStringValue());
                     connection = databaseWrapper.connect().getSQLConnection();
                     databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_TABLE_NAME.getStringValue(), map);
-                    iDatabaseType = new UserData.SQLUserUtils();
+                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_TABLE_NAME.getStringValue());
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: PostgreSQL");
                 }
             }
@@ -271,7 +237,7 @@ public class SkinOverlay {
                     databaseWrapper = new DatabaseWrapper(DatabaseType.SQLITE, getDataFolder().getAbsolutePath(), OptionsUtil.DATABASE_SQLITE.getStringValue());
                     connection = databaseWrapper.connect().getSQLConnection();
                     databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_TABLE_NAME.getStringValue(), map);
-                    iDatabaseType = new UserData.SQLUserUtils();
+                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_TABLE_NAME.getStringValue());
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: SQLite");
                 }
             }
@@ -283,47 +249,30 @@ public class SkinOverlay {
                         OptionsUtil.DATABASE_MONGO_PASSWORD.getStringValue(),
                         OptionsUtil.DATABASE_MONGO_DATABASE.getStringValue())
                         .connect();
-                iDatabaseType = new UserData.MongoDBUtils();
                 mongoClient = databaseWrapper.getMongoClient();
                 mongoDatabase = databaseWrapper.getMongoDatabase();
+                this.userManager = new UserManager(UserManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_COLLECTION.getStringValue());
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MongoDB");
             }
             default -> {
                 databaseWrapper = null;
                 mongoClient = null;
                 mongoDatabase = null;
-                iDatabaseType = new UserData.Cache();
-                getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: Cache");
+                this.userManager = new UserManager(UserManager.Type.JSON, new File(this.getDataFolder(), "userdata"), null);
+                getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: File");
             }
         }
 
-        UserData.loadAllUsers();
+        //userManager.loadAll();
 
         onlinePlayers().forEach(player -> {
-            UserData userData = UserData.getUser(player.playerUUID());
-            try {
-                userData.load(new Utils.Callback<>() {
-                    @Override
-                    public Boolean onSuccess() {
-                        UserData.getAllUsersMap().append(userData.user().getUniqueId(), userData.user());
-                        return true;
-                    }
-
-                    @Contract(pure = true)
-                    @Override
-                    public @NotNull Boolean onFailure() {
-                        return false;
-                    }
-
-                    @Override
-                    public @NotNull Boolean onFailure(@NotNull Throwable throwable) {
-                        throwable.printStackTrace();
-                        return onFailure();
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            userManager.getUser(player.playerUUID()).handle((user, throwable) -> {
+                if (throwable != null) {
+                    getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                    return null;
+                }
+                return user;
+            });
         });
 
     }
