@@ -1,3 +1,10 @@
+# [3.9.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.8.0...v3.9.0) (2023-02-13)
+
+
+### Features
+
+* Reworked the entire database ([f10ec9a](https://github.com/GeorgeV220/SkinOverlay/commit/f10ec9aea1acb652ccd62342755533700949a72f))
+
 # [3.8.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.7.3...v3.8.0) (2023-02-11)
 
 
