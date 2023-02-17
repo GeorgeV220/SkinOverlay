@@ -74,7 +74,7 @@ allprojects {
         compileOnly "com.georgev22.library:yaml:${libraryVersion}:all"
         compileOnly "com.georgev22.library:minecraft:${libraryVersion}"
 
-        compileOnly "org.bstats:bstats-bukkit:3.0.0"
+        compileOnly "org.bstats:bstats-bukkit:3.0.1"
         compileOnly "org.bstats:bstats-bungeecord:3.0.1"
         compileOnly "org.bstats:bstats-velocity:3.0.1"
         compileOnly "org.bstats:bstats-sponge:3.0.1"
@@ -119,7 +119,7 @@ dependencies {
     implementation "com.georgev22.library:yaml:${libraryVersion}:all"
     implementation "com.georgev22.library:minecraft:${libraryVersion}"
 
-    implementation "org.bstats:bstats-bukkit:3.0.0"
+    implementation "org.bstats:bstats-bukkit:3.0.1"
     implementation "org.bstats:bstats-bungeecord:3.0.1"
     implementation "org.bstats:bstats-velocity:3.0.1"
     implementation "org.bstats:bstats-sponge:3.0.1"
