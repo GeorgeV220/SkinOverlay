@@ -33,6 +33,8 @@ public interface SkinOverlayImpl {
 
     String serverVersion();
 
+    void print(String... msg);
+
     record Description(String name, String version, String main, List<String> authors) {
     }
 

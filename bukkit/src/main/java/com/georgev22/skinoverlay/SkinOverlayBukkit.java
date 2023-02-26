@@ -90,7 +90,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     public void onDisable() {
         SkinOverlay.getInstance().onDisable();
         Bukkit.getScheduler().cancelTasks(this);
-        if(this.adventure != null) {
+        if (this.adventure != null) {
             this.adventure.close();
             this.adventure = null;
         }
@@ -153,8 +153,13 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         return Bukkit.getBukkitVersion();
     }
 
+    @Override
+    public void print(String... msg) {
+        BukkitMinecraftUtils.printMsg(msg);
+    }
+
     public @NotNull BukkitAudiences adventure() {
-        if(this.adventure == null) {
+        if (this.adventure == null) {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return this.adventure;
