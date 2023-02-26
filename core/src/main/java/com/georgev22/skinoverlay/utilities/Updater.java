@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.utilities;
 
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -24,7 +25,7 @@ public class Updater {
         try {
             onlineVersion = getOnlineVersion();
         } catch (IOException e) {
-            skinOverlay.getLogger().warning("Failed to check for an update on Git.\nEither Git or you are offline or are slow to respond.");
+            skinOverlay.getSkinOverlay().print("Failed to check for an update on Git.", "Either Git or you are offline or are slow to respond.");
 
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -33,18 +34,37 @@ public class Updater {
 
     public Updater() {
         SchedulerManager.getScheduler().runTaskTimerAsynchronously(skinOverlay.getClass(), () -> {
-            skinOverlay.getLogger().info("Checking for Updates ... ");
+            skinOverlay.getSkinOverlay().print("Checking for Updates ... ");
             if (compareVersions(onlineVersion.replace("v", ""), localVersion.replace("v", "")) == 0) {
-                skinOverlay.getLogger().info("You are running the newest build.");
+                skinOverlay.getSkinOverlay().print("You are running the newest build.");
             } else if (compareVersions(onlineVersion.replace("v", ""), localVersion.replace("v", "")) == 1) {
-                skinOverlay.getLogger().info(
-                        "New stable version available!" + "\n" +
-                             "Version: " + onlineVersion + ". You are running version: " + localVersion+ "\n" +
-                             "Update at: https://github.com/GeorgeV220/SkinOverlay/releases/");
+                skinOverlay.getSkinOverlay().print(
+                        "New stable version available!",
+                        "Version: " + onlineVersion + ". You are running version: " + localVersion,
+                        "Update at: https://github.com/GeorgeV220/SkinOverlay/releases/");
             } else {
-                skinOverlay.getLogger().info("You are currently using the " + localVersion + " version which is under development." + "\n" + "Your version is " + localVersion + "\n" + "Latest released version is " + onlineVersion + "\n" + "If you have problems contact me on discord or github. Thank you for testing this version");
+                skinOverlay.getSkinOverlay().print("You are currently using the " + localVersion + " version which is under development.", "Your version is " + localVersion, "Latest released version is " + onlineVersion, "If you have problems contact me on discord or github. Thank you for testing this version");
             }
         }, 20L, 20 * 7200);
+    }
+
+    public Updater(PlayerObject playerObject) {
+        SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
+            playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6Checking for Updates ...");
+            if (compareVersions(onlineVersion.replace("v", ""), localVersion.replace("v", "")) == 0) {
+                playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6You are running the newest build.");
+            } else if (compareVersions(onlineVersion.replace("v", ""), localVersion.replace("v", "")) == 1) {
+                playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6New version available!");
+                playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6Version: &c"
+                        + onlineVersion + ". &6You are running version: &c" + localVersion);
+                playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6Update at: https://github.com/GeorgeV220/SkinOverlay/releases/");
+
+            } else {
+                playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6You are currently using the &c" + localVersion + " &6version which is under development. If you have problems contact me on discord or github");
+                playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6Your version is &c" + localVersion);
+                playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6Latest released version is &c" + onlineVersion);
+            }
+        });
     }
 
 
