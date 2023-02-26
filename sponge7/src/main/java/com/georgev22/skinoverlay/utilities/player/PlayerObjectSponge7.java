@@ -76,4 +76,9 @@ public class PlayerObjectSponge7 extends PlayerObject {
     public boolean isOnline() {
         return user.isOnline();
     }
+
+    @Override
+    public boolean permission(String permission) {
+        return isOnline() && player().hasPermission(permission);
+    }
 }

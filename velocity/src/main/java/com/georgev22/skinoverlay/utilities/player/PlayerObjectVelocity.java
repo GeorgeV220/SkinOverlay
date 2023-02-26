@@ -252,4 +252,9 @@ public class PlayerObjectVelocity extends PlayerObject {
     public boolean isOnline() {
         return player.isActive();
     }
+
+    @Override
+    public boolean permission(String permission) {
+        return isOnline() && player.hasPermission(permission);
+    }
 }

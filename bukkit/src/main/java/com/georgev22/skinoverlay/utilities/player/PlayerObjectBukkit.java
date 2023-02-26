@@ -1,14 +1,14 @@
 package com.georgev22.skinoverlay.utilities.player;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.skinoverlay.SkinOverlayBukkit;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.OfflinePlayer;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class PlayerObjectBukkit extends PlayerObject {
     private final OfflinePlayer offlinePlayer;
@@ -70,5 +70,10 @@ public class PlayerObjectBukkit extends PlayerObject {
     @Override
     public boolean isOnline() {
         return offlinePlayer.isOnline();
+    }
+
+    @Override
+    public boolean permission(String permission) {
+        return isOnline() && player().getPlayer().hasPermission(permission);
     }
 }

@@ -6,6 +6,7 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.google.common.collect.Lists;
@@ -52,6 +53,8 @@ public abstract class PlayerObject {
     public abstract void sendMessage(String[] input, ObjectMap<String, String> placeholders, boolean ignoreCase);
 
     public abstract boolean isOnline();
+
+    public abstract boolean permission(String permission);
 
     public GameProfile gameProfile() {
         try {
@@ -130,6 +133,9 @@ public abstract class PlayerObject {
     }
 
     public void playerJoin() {
+        if (permission("skinoverlay.updater")) {
+            new Updater(this);
+        }
         if (OptionsUtil.PROXY.getBooleanValue() & !skinOverlay.type().isProxy()) {
             return;
         }
