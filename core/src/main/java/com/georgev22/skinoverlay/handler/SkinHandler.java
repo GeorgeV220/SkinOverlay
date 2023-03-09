@@ -205,8 +205,10 @@ public abstract class SkinHandler {
      * @throws IOException When an I/O exception of some sort has occurred.
      */
     public UUID getUUID(final String playerName) throws IOException {
-        Request request = new Request().openConnection(String.format("https://api.minetools.eu/uuid/%s", playerName)).getRequest().finalizeRequest();
-        if (request.getHttpCode() != 200) {
+        Request request;
+        try {
+            request = new Request().openConnection(String.format("https://api.minetools.eu/uuid/%s", playerName)).getRequest().finalizeRequest();
+        } catch (IOException ioException) {
             request = new Request().openConnection(String.format("https://api.mojang.com/users/profiles/minecraft/%s", playerName)).getRequest().finalizeRequest();
         }
 
