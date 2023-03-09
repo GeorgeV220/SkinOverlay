@@ -5,7 +5,8 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public enum OptionsUtil {
@@ -63,6 +64,7 @@ public enum OptionsUtil {
     OVERLAY_RIGHT_PANTS("overlays.%s.right_pants", false, Optional.empty()),
 
     OVERLAY_HAT("overlays.%s.hat", false, Optional.empty()),
+    DEFAULT_SKIN_UUID("default skin uuid", "8667ba71-b85a-4004-af54-457a9734eed7", Optional.empty()),
     ;
     private static final SkinOverlay mainPlugin = SkinOverlay.getInstance();
     private final String pathName;

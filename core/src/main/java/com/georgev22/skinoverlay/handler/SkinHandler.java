@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.handler;
 
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.Utilities.Request;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.gson.*;
@@ -212,7 +213,7 @@ public abstract class SkinHandler {
      */
     public UUID getUUID(final String playerName) throws IOException {
         if (!isUsernamePremium(playerName)) {
-            return UUID.fromString("8667ba71-b85a-4004-af54-457a9734eed7");
+            return UUID.fromString(OptionsUtil.DEFAULT_SKIN_UUID.getStringValue());
         }
         Request request;
         try {

@@ -7,6 +7,7 @@ Options:
     enabled: true
     download: false
     restart: false
+  default skin uuid: "8667ba71-b85a-4004-af54-457a9734eed7"
   # None, MySQL, PostgreSQL, SQLite, MongoDB
   # Select in what type you want your data to be stored
   # SQLite is recommended
