@@ -1,3 +1,17 @@
+# [3.10.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.9.0...v3.10.0) (2023-03-09)
+
+
+### Bug Fixes
+
+* SSLHandshakeException ([587c304](https://github.com/GeorgeV220/SkinOverlay/commit/587c3041f3a2c7940e64584d8c7926514b3d76c3))
+
+
+### Features
+
+* New permission method ([f00b729](https://github.com/GeorgeV220/SkinOverlay/commit/f00b729d89367eee1835c01bcb48340b96f2fab9))
+* print method ([ae239ba](https://github.com/GeorgeV220/SkinOverlay/commit/ae239bae258c92f2d320b8c6f0fe2d04206e4f41))
+* **Updater:** Send the update message to player ([990bac2](https://github.com/GeorgeV220/SkinOverlay/commit/990bac2e0aad7776d52fbf2f574d6f7b1384af16))
+
 # [3.9.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.8.0...v3.9.0) (2023-02-13)
 
 
