@@ -89,7 +89,7 @@ allprojects {
         compileOnly 'co.aikar:acf-sponge:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-sponge8:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'com.georgev22.api:libraryloader:1.4.0'
-        compileOnly 'org.jetbrains:annotations:24.0.0'
+        compileOnly 'org.jetbrains:annotations:24.0.1'
         compileOnly 'commons-codec:commons-codec:1.15'
         compileOnly 'commons-io:commons-io:2.11.0'
         compileOnly 'commons-lang:commons-lang:2.6'
