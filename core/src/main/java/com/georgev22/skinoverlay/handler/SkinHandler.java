@@ -10,8 +10,12 @@ import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -198,13 +202,18 @@ public abstract class SkinHandler {
     }
 
     /**
-     * Retrieves the UUID for the specified Java Player
+     * Retrieves the UUID for the specified Java Player.
+     * <p>
+     * If the specified player is not a premium account, returns a default UUID (Steve).
      *
-     * @param playerName Player's name
-     * @return the UUID for the specified Java Player
-     * @throws IOException When an I/O exception of some sort has occurred.
+     * @param playerName The player's Minecraft username.
+     * @return The UUID for the specified Java Player.
+     * @throws IOException If an I/O exception of some sort has occurred.
      */
     public UUID getUUID(final String playerName) throws IOException {
+        if (!isUsernamePremium(playerName)) {
+            return UUID.fromString("8667ba71-b85a-4004-af54-457a9734eed7");
+        }
         Request request;
         try {
             request = new Request().openConnection(String.format("https://api.minetools.eu/uuid/%s", playerName)).getRequest().finalizeRequest();
@@ -264,6 +273,44 @@ public abstract class SkinHandler {
      */
     public Property getSkin(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         return playerObject.isBedrock() ? this.getXUIDSkin(this.getXUID(playerObject)) : this.getJavaSkin(playerObject);
+    }
+
+    /**
+     * This method checks if a Minecraft username is a premium account.
+     * A premium account is one that has paid for the game.
+     *
+     * @param username The Minecraft username to check.
+     * @return True if the username is a premium account, false otherwise.
+     */
+    public boolean isUsernamePremium(String username) {
+        try {
+            URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + username);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+
+            int status = con.getResponseCode();
+            if (status == 200) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuilder content = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                }
+                in.close();
+
+                Gson gson = new Gson();
+                JsonObject jsonObject = gson.fromJson(content.toString(), JsonObject.class);
+                return jsonObject != null && jsonObject.has("id") && jsonObject.has("name");
+            } else {
+                con.disconnect();
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
