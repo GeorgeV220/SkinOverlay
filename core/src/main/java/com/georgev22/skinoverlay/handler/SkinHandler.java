@@ -252,6 +252,9 @@ public abstract class SkinHandler {
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
     public Property getJavaSkin(final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
+        if (skinOverlay.getSkinHook() != null) {
+            return skinOverlay.getSkinHook().getProperty(playerObject);
+        }
         final JsonElement json = JsonParser.parseString(new String(this.getProfileBytes(playerObject, null)));
         final JsonArray properties = json.getAsJsonObject().get("properties").getAsJsonArray();
         Property property = null;

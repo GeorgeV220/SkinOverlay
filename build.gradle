@@ -79,6 +79,8 @@ allprojects {
         compileOnly "org.bstats:bstats-velocity:3.0.1"
         compileOnly "org.bstats:bstats-sponge:3.0.1"
 
+        compileOnly 'net.skinsrestorer:skinsrestorer-api:14.2.8'
+
         compileOnly 'org.apache.logging.log4j:log4j-api:2.20.0'
         compileOnly 'net.kyori:adventure-api:4.12.0'
         compileOnly 'net.kyori:adventure-text-serializer-legacy:4.13.0'

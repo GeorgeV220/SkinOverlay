@@ -12,6 +12,7 @@ import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
 import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.Updater;
@@ -41,6 +42,10 @@ public class SkinOverlay {
     @Getter
     @Setter
     private SkinHandler skinHandler;
+
+    @Getter
+    @Setter
+    private SkinHook skinHook;
 
     @Getter
     private FileManager fileManager;

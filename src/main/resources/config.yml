@@ -32,6 +32,10 @@ Options:
       password: "yourpassword"
       database: "skinoverlay"
       collection: "skinoverlay_users"
+  #Skin hooks are only used to retrieve player skin properties for offline players or players who have changed their skin.
+  #Currently available Skin Hooks: None, SkinsRestorer and Custom.
+  #With the custom option, you need to have your own plugin that sets the SkinOverlay.getInstance().setSkinHook(SkinHook).
+  skin hook: None
   overlays:
     policeman:
       hat: true

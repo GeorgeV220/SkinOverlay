@@ -9,6 +9,7 @@ import com.georgev22.library.minecraft.VelocityMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
@@ -139,6 +140,14 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
                 return gameProfile;
             }
         });
+        switch (OptionsUtil.SKIN_HOOK.getStringValue()) {
+            case "SkinsRestorer" -> {
+                if (getProxy().getPluginManager().getPlugin("skinsrestorer").isPresent()) {
+                    SkinOverlay.getInstance().setSkinHook(new SkinsRestorerHook());
+                }
+            }
+            default -> SkinOverlay.getInstance().setSkinHook(null);
+        }
         SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, dataFolder()));
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();

@@ -9,6 +9,7 @@ import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
@@ -104,6 +105,14 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
                 return gameProfile;
             }
         });
+        switch (OptionsUtil.SKIN_HOOK.getStringValue()) {
+            case "SkinsRestorer" -> {
+                if (getProxy().getPluginManager().getPlugin("SkinsRestorer") != null) {
+                    SkinOverlay.getInstance().setSkinHook(new SkinsRestorerHook());
+                }
+            }
+            default -> SkinOverlay.getInstance().setSkinHook(null);
+        }
         SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();

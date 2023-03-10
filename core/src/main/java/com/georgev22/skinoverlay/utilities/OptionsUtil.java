@@ -65,6 +65,7 @@ public enum OptionsUtil {
 
     OVERLAY_HAT("overlays.%s.hat", false, Optional.empty()),
     DEFAULT_SKIN_UUID("default skin uuid", "8667ba71-b85a-4004-af54-457a9734eed7", Optional.empty()),
+    SKIN_HOOK("skin hook", "SkinsRestorer", Optional.empty()),
     ;
     private static final SkinOverlay mainPlugin = SkinOverlay.getInstance();
     private final String pathName;

@@ -9,6 +9,7 @@ import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
 import com.georgev22.skinoverlay.handler.handlers.*;
+import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
@@ -76,6 +77,14 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
             case V1_19_R2 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19_R2());
             case UNKNOWN -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_());
             default -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Legacy());
+        }
+        switch (OptionsUtil.SKIN_HOOK.getStringValue()) {
+            case "SkinsRestorer" -> {
+                if (getServer().getPluginManager().isPluginEnabled("SkinsRestorer")) {
+                    SkinOverlay.getInstance().setSkinHook(new SkinsRestorerHook());
+                }
+            }
+            default -> SkinOverlay.getInstance().setSkinHook(null);
         }
         SkinOverlay.getInstance().setCommandManager(new PaperCommandManager(this));
         SkinOverlay.getInstance().onEnable();
