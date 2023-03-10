@@ -8,14 +8,14 @@ Options:
     download: false
     restart: false
   default skin uuid: "8667ba71-b85a-4004-af54-457a9734eed7"
-  # None, MySQL, PostgreSQL, SQLite, MongoDB
+  # File, MySQL, PostgreSQL, SQLite, MongoDB
   # Select in what type you want your data to be stored
-  # SQLite is recommended
+  # File is recommended
   #SQL section is for MySQL(or MariaDB) and PostgreSQL
   #Default PostgreSQL port: 5432
   #Default MySQL and MariaDB port: 3306
   database:
-    type: SQLite
+    type: File
     SQLite:
       file name: skinoverlay
     SQL:
