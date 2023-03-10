@@ -7,6 +7,7 @@ import com.georgev22.skinoverlay.utilities.SkinOverlays;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import io.papermc.lib.PaperLib;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -21,6 +22,9 @@ import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 
@@ -92,6 +96,16 @@ public class SkinHandler_1_19_R2 extends SkinHandler {
         Player player = (Player) playerObject.player();
         final CraftPlayer craftPlayer = (CraftPlayer) player;
         final ServerPlayer entityPlayer = craftPlayer.getHandle();
+        if (PaperLib.isSpigot())
+            try {
+                Field field = entityPlayer.getClass().getDeclaredField("cs");
+                if (Modifier.isPrivate(field.getModifiers())) {
+                    return (GameProfile) Utils.Reflection.fetchDeclaredField(entityPlayer.getClass().getSuperclass(), entityPlayer, "cs");
+                }
+            } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException |
+                     InvocationTargetException exception) {
+                exception.printStackTrace();
+            }
         return entityPlayer.gameProfile;
     }
 

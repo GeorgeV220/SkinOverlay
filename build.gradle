@@ -118,6 +118,7 @@ dependencies {
     implementation "com.georgev22.library:utilities:${libraryVersion}:all"
     implementation "com.georgev22.library:yaml:${libraryVersion}:all"
     implementation "com.georgev22.library:minecraft:${libraryVersion}"
+    implementation 'com.georgev22.api:libraryloader:1.4.0'
 
     implementation "org.bstats:bstats-bukkit:3.0.1"
     implementation "org.bstats:bstats-bungeecord:3.0.1"
@@ -132,8 +133,11 @@ dependencies {
     implementation 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
     implementation 'co.aikar:acf-sponge:0.5.1-G-1.0-SNAPSHOT'
     implementation 'co.aikar:acf-sponge8:0.5.1-G-1.0-SNAPSHOT'
-    implementation 'com.georgev22.api:libraryloader:1.4.0'
+
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    implementation "io.papermc:paperlib:1.0.7"
+
     implementation project(path: ':core')
     implementation project(path: ':bukkit')
     implementation project(path: ':bungee')
@@ -155,6 +159,7 @@ shadowJar {
     relocate 'org.bstats', "${packageName}.bstats"
     relocate 'com.georgev22.api.libraryloader', "${packageName}.libraryloader"
     relocate 'com.georgev22.library', "${packageName}.library"
+    relocate "io.papermc.lib", "${packageName}.paperlib"
 }
 
 jar {

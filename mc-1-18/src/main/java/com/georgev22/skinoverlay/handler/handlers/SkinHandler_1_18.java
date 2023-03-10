@@ -92,7 +92,7 @@ public class SkinHandler_1_18 extends SkinHandler {
         Player player = (Player) playerObject.player();
         final CraftPlayer craftPlayer = (CraftPlayer) player;
         final ServerPlayer entityPlayer = craftPlayer.getHandle();
-        return entityPlayer.gameProfile;
+        return entityPlayer.getGameProfile();
     }
 
     private void sendPacket(@NotNull ServerPlayer player, Packet<?> packet) {
