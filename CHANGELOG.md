@@ -1,3 +1,17 @@
+# [3.11.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.10.0...v3.11.0) (2023-03-10)
+
+
+### Bug Fixes
+
+* Check if a username is premium ([6eab834](https://github.com/GeorgeV220/SkinOverlay/commit/6eab83492232334f4398536c240ff84d6b74642d))
+* **SkinHandler:** Fixed SkinHandlers on Spigot ([a045ac6](https://github.com/GeorgeV220/SkinOverlay/commit/a045ac66dece1c7bfa1eb441bd40682fa6b512da))
+
+
+### Features
+
+* **User:** New config option for default skin UUID ([7cbef7d](https://github.com/GeorgeV220/SkinOverlay/commit/7cbef7d28ca77f6642958e5ce1052d30d470afba))
+* **User:** Removed Deprecated User class ([7711190](https://github.com/GeorgeV220/SkinOverlay/commit/7711190affe0d26ca1a39c96fb14042c7d09b9e7))
+
 # [3.10.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.9.0...v3.10.0) (2023-03-09)
 
 
