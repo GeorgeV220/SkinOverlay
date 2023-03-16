@@ -13,6 +13,7 @@ import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.VelocityPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -32,7 +33,9 @@ import org.bstats.velocity.Metrics;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
@@ -113,21 +116,38 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         this.scheduledTask = getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
-            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
-                if (skinName.equalsIgnoreCase("default")) {
-                    new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "reset", playerObject.playerUUID().toString(), "default");
-                } else {
-                    new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "change", playerObject.playerUUID().toString(), skinName);
+            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
+                try {
+                    ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                    ObjectOutputStream so = new ObjectOutputStream(bo);
+                    so.writeObject(skinOptions);
+                    so.flush();
+                    if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
+                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "reset", playerObject.playerUUID().toString(), bo.toString());
+                    } else {
+                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "change", playerObject.playerUUID().toString(), bo.toString());
+                    }
+                    callback.onSuccess();
+                } catch (Exception exception) {
+                    callback.onFailure(exception);
                 }
-                callback.onSuccess();
             }
 
             @Override
-            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
-                if (skinName.equalsIgnoreCase("default")) {
-                    new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "resetWithProperties", playerObject.playerUUID().toString(), "default", property.getName(), property.getValue(), property.getSignature());
-                } else {
-                    new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "changeWithProperties", playerObject.playerUUID().toString(), skinName, property.getName(), property.getValue(), property.getSignature());
+            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, Utils.@NotNull Callback<Boolean> callback) {
+                try {
+                    ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                    ObjectOutputStream so = new ObjectOutputStream(bo);
+                    so.writeObject(skinOptions);
+                    so.flush();
+                    if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
+                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "resetWithProperties", playerObject.playerUUID().toString(), bo.toString(), property.getName(), property.getValue(), property.getSignature());
+                    } else {
+                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "changeWithProperties", playerObject.playerUUID().toString(), bo.toString(), property.getName(), property.getValue(), property.getSignature());
+                    }
+                    callback.onSuccess();
+                } catch (Exception exception) {
+                    callback.onFailure(exception);
                 }
             }
 
