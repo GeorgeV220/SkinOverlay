@@ -138,7 +138,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.10.1'
 
-    implementation "io.papermc:paperlib:1.0.7"
+    implementation 'io.papermc:paperlib:1.0.7'
 
     implementation project(path: ':core')
     implementation project(path: ':bukkit')
@@ -161,7 +161,7 @@ shadowJar {
     relocate 'org.bstats', "${packageName}.bstats"
     relocate 'com.georgev22.api.libraryloader', "${packageName}.libraryloader"
     relocate 'com.georgev22.library', "${packageName}.library"
-    relocate "io.papermc.lib", "${packageName}.paperlib"
+    relocate 'io.papermc.lib', "${packageName}.paperlib"
 }
 
 jar {
