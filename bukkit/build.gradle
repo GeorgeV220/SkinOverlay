@@ -6,6 +6,7 @@ dependencies {
     compileOnly project(path: ':mc-1-18-2', configuration: 'reobf')
     compileOnly project(path: ':mc-1-19', configuration: 'reobf')
     compileOnly project(path: ':mc-1-19-3', configuration: 'reobf')
+    compileOnly project(path: ':mc-1-19-4', configuration: 'reobf')
 
     implementation "net.kyori:adventure-platform-bukkit:4.2.0"
 }
