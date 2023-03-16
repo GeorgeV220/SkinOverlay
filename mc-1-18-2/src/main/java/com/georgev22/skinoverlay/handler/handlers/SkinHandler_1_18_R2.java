@@ -3,14 +3,11 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.utilities.SkinOverlays;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-
-import java.util.HashSet;
-
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -25,14 +22,16 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+
 public class SkinHandler_1_18_R2 extends SkinHandler {
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, final Utils.@NotNull Callback<Boolean> callback) {
-        this.updateSkin(playerObject, skinName, callback);
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, final Utils.@NotNull Callback<Boolean> callback) {
+        this.updateSkin(playerObject, skinOptions, callback);
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, final Utils.@NotNull Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, final Utils.@NotNull Callback<Boolean> callback) {
         try {
             Player player = (Player) playerObject.player();
             final CraftPlayer craftPlayer = (CraftPlayer) player;
@@ -66,7 +65,7 @@ public class SkinHandler_1_18_R2 extends SkinHandler {
 
             SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
 
-            synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), SkinOverlays.getFlags(skinName));
+            synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skinOptions.getFlags());
 
 
             ClientboundSetEntityDataPacket clientboundSetEntityDataPacket = new ClientboundSetEntityDataPacket(entityPlayer.getId(), synchedEntityData, true);

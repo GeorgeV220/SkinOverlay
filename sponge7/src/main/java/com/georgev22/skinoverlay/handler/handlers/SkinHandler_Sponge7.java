@@ -5,7 +5,7 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.utilities.Utilities;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -29,7 +29,7 @@ public class SkinHandler_Sponge7 extends SkinHandler.SkinHandler_ {
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
         skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
@@ -38,12 +38,12 @@ public class SkinHandler_Sponge7 extends SkinHandler.SkinHandler_ {
             return user;
         }).thenAccept(user -> {
             if (user != null)
-                updateSkin(playerObject, skinName, user.getCustomData("skinProperty"), callback);
+                updateSkin(playerObject, skinOptions, user.getCustomData("skinProperty"), callback);
         });
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, Utils.@NotNull Callback<Boolean> callback) {
         Player receiver = (Player) playerObject.player();
 
 

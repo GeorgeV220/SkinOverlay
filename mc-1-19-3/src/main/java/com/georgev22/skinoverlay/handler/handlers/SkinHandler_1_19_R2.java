@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.utilities.SkinOverlays;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -30,12 +30,12 @@ import java.util.List;
 
 public class SkinHandler_1_19_R2 extends SkinHandler {
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, final Utils.@NotNull Callback<Boolean> callback) {
-        this.updateSkin(playerObject, skinName, callback);
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, final Utils.@NotNull Callback<Boolean> callback) {
+        this.updateSkin(playerObject, skinOptions, callback);
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, final Utils.@NotNull Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, final Utils.@NotNull Callback<Boolean> callback) {
         try {
             Player player = (Player) playerObject.player();
             final CraftPlayer craftPlayer = (CraftPlayer) player;
@@ -72,7 +72,7 @@ public class SkinHandler_1_19_R2 extends SkinHandler {
 
             EntityDataAccessor<Byte> entityDataAccessor;
 
-            synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), SkinOverlays.getFlags(skinName));
+            synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skinOptions.getFlags());
 
             synchedEntityData.markDirty(entityDataAccessor);
 

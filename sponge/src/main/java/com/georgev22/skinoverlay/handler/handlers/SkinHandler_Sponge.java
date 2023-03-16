@@ -7,8 +7,7 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlaySponge;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
-import com.georgev22.skinoverlay.utilities.SkinOverlays;
-import com.georgev22.skinoverlay.utilities.Utilities;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
@@ -26,7 +25,9 @@ import org.spongepowered.math.vector.Vector3d;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -66,7 +67,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
         skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
@@ -75,13 +76,13 @@ public class SkinHandler_Sponge extends SkinHandler_ {
             return user;
         }).thenAccept(user -> {
             if (user != null)
-                updateSkin(playerObject, skinName, user.getCustomData("skinProperty"), callback);
+                updateSkin(playerObject, skinOptions, user.getCustomData("skinProperty"), callback);
         });
     }
 
     @SneakyThrows
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, @NotNull final Utils.Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, @NotNull final Utils.Callback<Boolean> callback) {
         ServerPlayer receiver = (ServerPlayer) playerObject.player();
 
         receiver.user().offer(Keys.UPDATE_GAME_PROFILE, true);
@@ -191,7 +192,7 @@ public class SkinHandler_Sponge extends SkinHandler_ {
                                 entityDataAccessorClass,
                                 Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
                                 fetchField(entityDataSerializersClass, null, "BYTE")),
-                        SkinOverlays.getFlags(skinName)
+                        skinOptions.getFlags()
                 },
                 new Class[]{
                         entityDataAccessor.getClass(),

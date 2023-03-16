@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay.handler;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Utilities.Request;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.gson.*;
@@ -28,24 +29,24 @@ public abstract class SkinHandler {
      * Update the skin for the specified {@link PlayerObject}
      *
      * @param playerObject Player's {@link PlayerObject} object.
-     * @param skinName     Skin name (eg default or allay)
+     * @param skinOptions  Skin options
      * @param callback     Callback
      */
     public abstract void updateSkin(
             @NotNull final PlayerObject playerObject,
-            @NotNull final String skinName,
+            @NotNull final SkinOptions skinOptions,
             @NotNull final Utils.Callback<Boolean> callback);
 
     /**
      * Update the skin for the specified {@link PlayerObject} and {@link Property}
      *
      * @param playerObject Player's {@link PlayerObject} object.
-     * @param skinName     Skin name (eg default or allay)
+     * @param skinOptions  Skin options)
      * @param property     {@link Property} to set
      * @param callback     Callback
      */
     public abstract void updateSkin(@NotNull final PlayerObject playerObject,
-                                    @NotNull final String skinName,
+                                    @NotNull final SkinOptions skinOptions,
                                     final Property property,
                                     @NotNull final Utils.Callback<Boolean> callback);
 
@@ -321,13 +322,13 @@ public abstract class SkinHandler {
     public static class SkinHandler_ extends SkinHandler {
 
         @Override
-        public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, final Utils.@NotNull Callback<Boolean> callback) {
+        public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, final Utils.@NotNull Callback<Boolean> callback) {
             throw new UnsupportedOperationException("[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
         }
 
         @Override
-        public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, final Utils.@NotNull Callback<Boolean> callback) {
-            updateSkin(playerObject, skinName, callback);
+        public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, final Utils.@NotNull Callback<Boolean> callback) {
+            updateSkin(playerObject, skinOptions, callback);
         }
 
         @Override

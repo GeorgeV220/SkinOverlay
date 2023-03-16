@@ -14,6 +14,7 @@ import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
@@ -27,7 +28,9 @@ import net.md_5.bungee.connection.InitialHandler;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -75,23 +78,39 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
             @Override
-            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
-                if (skinName.equalsIgnoreCase("default")) {
-                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("reset", playerObject.playerUUID().toString(), "default");
-                } else {
-                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("change", playerObject.playerUUID().toString(), skinName);
+            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
+                try {
+                    ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                    ObjectOutputStream so = new ObjectOutputStream(bo);
+                    so.writeObject(skinOptions);
+                    so.flush();
+                    if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
+                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("reset", playerObject.playerUUID().toString(), bo.toString());
+                    } else {
+                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("change", playerObject.playerUUID().toString(), bo.toString());
+                    }
+                    callback.onSuccess();
+                } catch (Exception exception) {
+                    callback.onFailure(exception);
                 }
-                callback.onSuccess();
             }
 
             @Override
-            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
-                if (skinName.equalsIgnoreCase("default")) {
-                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), "default", property.getName(), property.getValue(), property.getSignature());
-                } else {
-                    new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), skinName, property.getName(), property.getValue(), property.getSignature());
+            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, Utils.@NotNull Callback<Boolean> callback) {
+                try {
+                    ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                    ObjectOutputStream so = new ObjectOutputStream(bo);
+                    so.writeObject(skinOptions);
+                    so.flush();
+                    if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
+                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), bo.toString(), property.getName(), property.getValue(), property.getSignature());
+                    } else {
+                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), bo.toString(), property.getName(), property.getValue(), property.getSignature());
+                    }
+                    callback.onSuccess();
+                } catch (Exception exception) {
+                    callback.onFailure(exception);
                 }
-                callback.onSuccess();
             }
 
             @Override

@@ -5,7 +5,7 @@ import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
-import com.georgev22.skinoverlay.utilities.SkinOverlays;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
@@ -81,7 +81,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Utils.@NotNull Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
         try {
             Player player = (Player) playerObject.player();
             final Object entityPlayer = getHandleMethod.invoke(player);
@@ -245,7 +245,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
                         dataWatcher.getClass(),
                         "set",
                         dataWatcher,
-                        new Object[]{dataWatcherObject, SkinOverlays.getFlags(skinName)},
+                        new Object[]{dataWatcherObject, skinOptions.getFlags()},
                         new Class[]{dataWatcherObject.getClass(), Object.class});
 
                 try {
@@ -282,8 +282,8 @@ public class SkinHandler_Legacy extends SkinHandler_ {
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull String skinName, Property property, Utils.@NotNull Callback<Boolean> callback) {
-        updateSkin(playerObject, skinName, callback);
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, Utils.@NotNull Callback<Boolean> callback) {
+        updateSkin(playerObject, skinOptions, callback);
     }
 
     @Override
