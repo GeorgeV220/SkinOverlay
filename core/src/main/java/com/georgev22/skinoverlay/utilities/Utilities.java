@@ -37,7 +37,7 @@ public class Utilities {
     private static final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
 
-    public static void setSkin(String skinName, @NotNull PlayerObject playerObject, String @NotNull [] properties) {
+    public static void setSkin(SkinOptions skinOptions, @NotNull PlayerObject playerObject, String @NotNull [] properties) {
         Validate.isTrue((properties.length == 3 ? 1 : 0) != 0, "Properties length must be 3");
         skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
@@ -50,14 +50,14 @@ public class Utilities {
                 skinOverlay.getLogger().log(Level.SEVERE, "User is null");
                 return;
             }
-            user.addCustomData("skinName", skinName);
+            user.addCustomData("skinName", skinOptions.getSkinName());
             user.addCustomData("skinProperty", new Property(properties[0], properties[1], properties[2]));
             updateSkin(playerObject, true);
             skinOverlay.getUserManager().save(user);
         });
     }
 
-    public static void setSkin(ImageSupplier imageSupplier, String skinName, @NotNull PlayerObject playerObject, @Nullable CommandIssuer commandIssuer) {
+    public static void setSkin(ImageSupplier imageSupplier, SkinOptions skinOptions, @NotNull PlayerObject playerObject, @Nullable CommandIssuer commandIssuer) {
         skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
@@ -87,7 +87,7 @@ public class Utilities {
                         Property property = pm.get("textures").stream().filter(gameProfileProperty -> gameProfileProperty.getName().equals("textures")).findFirst().orElseThrow();
                         pm.remove("textures", property);
                         pm.put("textures", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
-                        user.addCustomData("skinName", skinName);
+                        user.addCustomData("skinName", skinOptions.getSkinName());
                         user.addCustomData("skinProperty", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         if (commandIssuer == null) {
                             MessagesUtil.RESET.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
@@ -126,7 +126,7 @@ public class Utilities {
                             JsonObject texture = response.getAsJsonObject().getAsJsonObject("data").getAsJsonObject("texture");
                             String texturesValue = texture.get("value").getAsString();
                             String texturesSignature = texture.get("signature").getAsString();
-                            user.addCustomData("skinName", skinName);
+                            user.addCustomData("skinName", skinOptions.getSkinName());
                             user.addCustomData("skinProperty", new Property("textures", texturesValue, texturesSignature));
                             if (commandIssuer == null) {
                                 MessagesUtil.DONE.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
