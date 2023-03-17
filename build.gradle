@@ -151,6 +151,7 @@ dependencies {
     implementation project(path: ':mc-1-18-2', configuration: 'reobf')
     implementation project(path: ':mc-1-19', configuration: 'reobf')
     implementation project(path: ':mc-1-19-3', configuration: 'reobf')
+    implementation project(path: ':mc-1-19-4', configuration: 'reobf')
 }
 
 shadowJar {
