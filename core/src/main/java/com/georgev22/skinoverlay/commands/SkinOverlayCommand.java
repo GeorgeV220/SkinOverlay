@@ -88,79 +88,80 @@ public class SkinOverlayCommand extends BaseCommand {
     @CommandPermission("skinoverlay.wear.overlay")
     @Syntax("wear <overlay> [player]")
     public void overlay(@NotNull CommandIssuer issuer, String @NotNull [] args) {
-        if (args.length == 0) {
+        if (args.length < 1) {
             MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear <overlay> <player>"), true);
             return;
         }
-        String overlay = args[0];
+
+        var overlay = args[0];
         Optional<PlayerObject> target;
+
         if (args.length > 1) {
-            target = getPlayerObject(issuer, args);
+            target = getPlayerObject(issuer, args[1]);
             if (target.isEmpty()) return;
+        } else if (!(issuer.isPlayer())) {
+            MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
+            return;
         } else {
-            if (!(issuer.isPlayer())) {
-                MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear skin <overlay> <player>"), true);
-                return;
-            }
             target = skinOverlay.getPlayer(issuer.getUniqueId());
         }
+
         Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), new SkinOptions(overlay), target.orElseThrow(), issuer);
+
     }
 
     @Subcommand("url")
     @CommandAlias("wurl|swurl|wearurl")
-    @CommandCompletion("<link> false|true false|true false|true false|true false|true false|true @players")
+    @CommandCompletion("<link> false|true|@players false|true false|true false|true false|true false|true false|true @players")
     @CommandPermission("skinoverlay.wear.url")
     @Syntax("url <url> <options> [player]")
     public void url(@NotNull CommandIssuer issuer, String @NotNull [] args) {
+        if (args.length < 1) {
+            MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "url <url> <options> <player>"), true);
+            return;
+        }
+
         try {
             URL url = new URL(args[0]);
             Optional<PlayerObject> target = skinOverlay.getPlayer(issuer.getUniqueId());
-
-
             ByteArrayOutputStream output = new ByteArrayOutputStream();
 
             try (InputStream stream = url.openStream()) {
                 byte[] buffer = new byte[4096];
-
-                while (true) {
-                    int bytesRead = stream.read(buffer);
-                    if (bytesRead < 0) {
-                        break;
-                    }
+                int bytesRead;
+                while ((bytesRead = stream.read(buffer)) > -1) {
                     output.write(buffer, 0, bytesRead);
                 }
             }
 
-            SkinOptions skinOptions;
-            if (args.length == 8) {
-                skinOptions = new SkinOptions(url.toString(), Boolean.parseBoolean(args[1]), Boolean.parseBoolean(args[2]), Boolean.parseBoolean(args[3]), Boolean.parseBoolean(args[4]), Boolean.parseBoolean(args[5]), Boolean.parseBoolean(args[6]), Boolean.parseBoolean(args[7]));
-            } else {
-                skinOptions = new SkinOptions("custom2");
-                if (args.length > 1 & args.length < 3) {
-                    target = getPlayerObject(issuer, args);
-                    if (target.isEmpty()) return;
-                } else {
-                    if (!(issuer.isPlayer())) {
-                        MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "url <url> <options> <player>"), true);
-                        return;
-                    }
-                    target = skinOverlay.getPlayer(issuer.getUniqueId());
-                }
+            var skinOptions = args.length == 8
+                    ? new SkinOptions(args[0], Boolean.parseBoolean(args[1]), Boolean.parseBoolean(args[2]), Boolean.parseBoolean(args[3]), Boolean.parseBoolean(args[4]), Boolean.parseBoolean(args[5]), Boolean.parseBoolean(args[6]), Boolean.parseBoolean(args[7]))
+                    : new SkinOptions("custom2");
+
+            if (args.length > 1 & args.length < 3) {
+                target = getPlayerObject(issuer, args[1]);
+                if (target.isEmpty()) return;
+            } else if (args.length > 8) {
+                target = getPlayerObject(issuer, args[8]);
+                if (target.isEmpty()) return;
+            } else if (!(issuer.isPlayer())) {
+                MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "url <url> <options> <player>"), true);
+                return;
             }
 
             Utilities.setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), skinOptions, target.orElseThrow(), issuer);
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
-    private Optional<PlayerObject> getPlayerObject(@NotNull CommandIssuer issuer, String @NotNull [] args) {
+    private Optional<PlayerObject> getPlayerObject(@NotNull CommandIssuer issuer, String name) {
         Optional<PlayerObject> target;
         if (issuer.hasPermission("skinoverlay.wear.overlay.others")) {
-            target = skinOverlay.isOnline(args[1]) ? skinOverlay.getPlayer(args[1]) : Optional.empty();
+            target = skinOverlay.isOnline(name) ? skinOverlay.getPlayer(name) : Optional.empty();
             if (target.isEmpty()) {
-                MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", args[1]), true);
+                MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", name), true);
                 return Optional.empty();
             }
         } else {
@@ -179,7 +180,7 @@ public class SkinOverlayCommand extends BaseCommand {
     public void clear(@NotNull CommandIssuer issuer, String[] args) {
         if (!issuer.isPlayer()) {
             if (args.length == 0) {
-                MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "wear clear <player>"), true);
+                MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(issuer, new HashObjectMap<String, String>().append("%command%", "clear <player>"), true);
                 return;
             }
             clear0(issuer, args[0]);

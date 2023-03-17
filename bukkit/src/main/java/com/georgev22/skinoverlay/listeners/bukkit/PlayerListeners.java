@@ -17,7 +17,10 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.UUID;
 
@@ -43,10 +46,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subChannel = in.readUTF();
         UUID uuid = UUID.fromString(in.readUTF());
-        byte[] skinOptionsBytes = in.readUTF().getBytes();
-        ByteArrayInputStream bi = new ByteArrayInputStream(skinOptionsBytes);
-        ObjectInputStream si = new ObjectInputStream(bi);
-        SkinOptions skinOptions = (SkinOptions) si.readObject();
+        SkinOptions skinOptions = Utilities.getSkinOptions(in.readUTF());
         PlayerObject playerObject = skinOverlay.getPlayer(uuid).orElseThrow();
         if (subChannel.equalsIgnoreCase("change")) {
             if (skinOptions.getSkinName().contains("custom")) {
