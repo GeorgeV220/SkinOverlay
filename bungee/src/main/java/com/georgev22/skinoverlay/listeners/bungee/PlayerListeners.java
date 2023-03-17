@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.listeners.bungee;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -18,7 +18,10 @@ public class PlayerListeners implements Listener {
     }
 
     @EventHandler
-    public void onConnect(ServerConnectedEvent serverConnectedEvent) {
+    public void onConnect(ServerSwitchEvent serverConnectedEvent) {
+        if (serverConnectedEvent.getFrom() == null) {
+            return;
+        }
         if (!serverConnectedEvent.getPlayer().isConnected())
             return;
         new PlayerObjectBungee(serverConnectedEvent.getPlayer()).updateSkin();

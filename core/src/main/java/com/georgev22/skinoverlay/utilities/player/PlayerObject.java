@@ -9,7 +9,6 @@ import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.Utilities;
-import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -167,12 +166,8 @@ public abstract class PlayerObject {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
                 return null;
             }
-            if (user != null)
-                if (!(skinOverlay.type().equals(SkinOverlayImpl.Type.VELOCITY) | skinOverlay.type().equals(SkinOverlayImpl.Type.BUNGEE))) {
-                    updateSkin();
-                }
             return user;
-        });
+        }).thenAccept(user -> updateSkin());
     }
 
     public void playerQuit() {

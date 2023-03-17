@@ -17,6 +17,9 @@ public class PlayerListeners {
 
     @Subscribe
     public void onChange(ServerConnectedEvent serverConnectedEvent) {
+        if (serverConnectedEvent.getPreviousServer().isEmpty()) {
+            return;
+        }
         if (!serverConnectedEvent.getPlayer().isActive())
             return;
         new PlayerObjectVelocity(serverConnectedEvent.getPlayer()).updateSkin();
