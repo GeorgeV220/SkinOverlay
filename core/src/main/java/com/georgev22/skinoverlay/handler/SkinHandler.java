@@ -323,7 +323,7 @@ public abstract class SkinHandler {
 
         @Override
         public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, final Utils.@NotNull Callback<Boolean> callback) {
-            throw new UnsupportedOperationException("[SkinHandler]: updateSkin(); Unsupported Minecraft Version");
+            skinOverlay.getLogger().info("Unsupported Minecraft Version");
         }
 
         @Override
