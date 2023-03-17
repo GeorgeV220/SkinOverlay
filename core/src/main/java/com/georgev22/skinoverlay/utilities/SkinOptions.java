@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 
-public class SkinOptions {
+public class SkinOptions implements Serializable {
 
     private final String skinName, url;
 
