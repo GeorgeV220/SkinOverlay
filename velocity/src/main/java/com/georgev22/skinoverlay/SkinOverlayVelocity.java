@@ -14,6 +14,7 @@ import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
+import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.VelocityPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -33,9 +34,7 @@ import org.bstats.velocity.Metrics;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
@@ -118,14 +117,10 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
             @Override
             public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
                 try {
-                    ByteArrayOutputStream bo = new ByteArrayOutputStream();
-                    ObjectOutputStream so = new ObjectOutputStream(bo);
-                    so.writeObject(skinOptions);
-                    so.flush();
                     if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "reset", playerObject.playerUUID().toString(), bo.toString());
+                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "reset", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
                     } else {
-                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "change", playerObject.playerUUID().toString(), bo.toString());
+                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "change", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
                     }
                     callback.onSuccess();
                 } catch (Exception exception) {
@@ -136,14 +131,10 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
             @Override
             public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, Utils.@NotNull Callback<Boolean> callback) {
                 try {
-                    ByteArrayOutputStream bo = new ByteArrayOutputStream();
-                    ObjectOutputStream so = new ObjectOutputStream(bo);
-                    so.writeObject(skinOptions);
-                    so.flush();
                     if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "resetWithProperties", playerObject.playerUUID().toString(), bo.toString(), property.getName(), property.getValue(), property.getSignature());
+                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.getName(), property.getValue(), property.getSignature());
                     } else {
-                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "changeWithProperties", playerObject.playerUUID().toString(), bo.toString(), property.getName(), property.getValue(), property.getSignature());
+                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.getName(), property.getValue(), property.getSignature());
                     }
                     callback.onSuccess();
                 } catch (Exception exception) {
