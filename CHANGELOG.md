@@ -1,3 +1,11 @@
+## [3.12.1](https://github.com/GeorgeV220/SkinOverlay/compare/v3.12.0...v3.12.1) (2023-03-17)
+
+
+### Bug Fixes
+
+* 1_19_R3 getGameProfile0 ([608dd87](https://github.com/GeorgeV220/SkinOverlay/commit/608dd8794ffabcd3e03c5927d9d9fdad28844cb3))
+* proxy updateSkin ([d716fd1](https://github.com/GeorgeV220/SkinOverlay/commit/d716fd1680ccd1625fd9969f51023f5a4452d606))
+
 # [3.12.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.11.0...v3.12.0) (2023-03-17)
 
 
