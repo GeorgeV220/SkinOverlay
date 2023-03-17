@@ -25,8 +25,7 @@ import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Base64;
@@ -50,7 +49,11 @@ public class Utilities {
                 skinOverlay.getLogger().log(Level.SEVERE, "User is null");
                 return;
             }
-            user.addCustomData("skinName", skinOptions.getSkinName());
+            try {
+                user.addCustomData("skinOptions", skinOptionsToBytes(skinOptions));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             user.addCustomData("skinProperty", new Property(properties[0], properties[1], properties[2]));
             updateSkin(playerObject, true);
             skinOverlay.getUserManager().save(user);
@@ -87,7 +90,7 @@ public class Utilities {
                         Property property = pm.get("textures").stream().filter(gameProfileProperty -> gameProfileProperty.getName().equals("textures")).findFirst().orElseThrow();
                         pm.remove("textures", property);
                         pm.put("textures", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
-                        user.addCustomData("skinName", skinOptions.getSkinName());
+                        user.addCustomData("skinOptions", skinOptionsToBytes(skinOptions));
                         user.addCustomData("skinProperty", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         if (commandIssuer == null) {
                             MessagesUtil.RESET.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
@@ -126,7 +129,7 @@ public class Utilities {
                             JsonObject texture = response.getAsJsonObject().getAsJsonObject("data").getAsJsonObject("texture");
                             String texturesValue = texture.get("value").getAsString();
                             String texturesSignature = texture.get("signature").getAsString();
-                            user.addCustomData("skinName", skinOptions.getSkinName());
+                            user.addCustomData("skinOptions", skinOptionsToBytes(skinOptions));
                             user.addCustomData("skinProperty", new Property("textures", texturesValue, texturesSignature));
                             if (commandIssuer == null) {
                                 MessagesUtil.DONE.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
@@ -173,16 +176,34 @@ public class Utilities {
                     org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.player();
                     player.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                     player.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                    skinOverlay.getSkinHandler().updateSkin(playerObject, user.getCustomData("skinName"), new Utils.Callback<>() {
+                    try {
+                        skinOverlay.getSkinHandler().updateSkin(playerObject, getSkinOptions(user.getCustomData("skinOptions")), new Utils.Callback<>() {
+                            @Override
+                            public Boolean onSuccess() {
+                                if (forOthers) {
+                                    skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                                        org.bukkit.entity.Player p = (org.bukkit.entity.Player) playerObjects.player();
+                                        p.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                                        p.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                                    });
+                                }
+                                return true;
+                            }
+
+                            @Override
+                            public Boolean onFailure() {
+                                return false;
+                            }
+                        });
+                    } catch (IOException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                }, 20L);
+            } else {
+                try {
+                    skinOverlay.getSkinHandler().updateSkin(playerObject, getSkinOptions(user.getCustomData("skinOptions")), user.getCustomData("skinProperty"), new Utils.Callback<>() {
                         @Override
                         public Boolean onSuccess() {
-                            if (forOthers) {
-                                skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                                    org.bukkit.entity.Player p = (org.bukkit.entity.Player) playerObjects.player();
-                                    p.hidePlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                                    p.showPlayer((org.bukkit.plugin.Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                                });
-                            }
                             return true;
                         }
 
@@ -191,26 +212,37 @@ public class Utilities {
                             return false;
                         }
                     });
-                }, 20L);
-            } else {
-                skinOverlay.getSkinHandler().updateSkin(playerObject, user.getCustomData("skinName"), user.getCustomData("skinProperty"), new Utils.Callback<>() {
-                    @Override
-                    public Boolean onSuccess() {
-                        return true;
-                    }
-
-                    @Override
-                    public Boolean onFailure() {
-                        return false;
-                    }
-                });
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
             }
+        }).handle((unused, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+                return unused;
+            }
+            return unused;
         });
     }
 
     @Contract("_ -> new")
     public static @NotNull Property propertyFromLinkedTreeMap(@NotNull LinkedTreeMap<String, String> linkedTreeMap) {
         return new Property(linkedTreeMap.get("name"), linkedTreeMap.get("value"), linkedTreeMap.get("signature"));
+    }
+
+    public static String skinOptionsToBytes(SkinOptions skinOptions) throws IOException {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); ObjectOutput out = new ObjectOutputStream(bos)) {
+            out.writeObject(skinOptions);
+            final byte[] byteArray = bos.toByteArray();
+            return Base64.getEncoder().encodeToString(byteArray);
+        }
+    }
+
+    public static SkinOptions getSkinOptions(@NotNull String bytes) throws IOException, ClassNotFoundException {
+        final byte[] skinOptionsBytes = Base64.getDecoder().decode(bytes);
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(skinOptionsBytes); ObjectInput in = new ObjectInputStream(bis)) {
+            return (SkinOptions) in.readObject();
+        }
     }
 
     public static class Request {
