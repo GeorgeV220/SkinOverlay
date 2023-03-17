@@ -1,3 +1,27 @@
+# [3.12.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.11.0...v3.12.0) (2023-03-17)
+
+
+### Bug Fixes
+
+* **SkinOptions:** Improve proxy skin handlers ([b847a9d](https://github.com/GeorgeV220/SkinOverlay/commit/b847a9da70a9da0b8309d3c37883b78466de945b))
+* **SkinOptions:** Serializable ([a116c79](https://github.com/GeorgeV220/SkinOverlay/commit/a116c79ea92682f6c729affd6bec41d70a7be3f8))
+* URL subcommand ([fb26a09](https://github.com/GeorgeV220/SkinOverlay/commit/fb26a098e6d8c6c9c98d46f16ee70fda89d8db29))
+
+
+### Features
+
+* 1.19.4 support ([3856a51](https://github.com/GeorgeV220/SkinOverlay/commit/3856a51829c2f60429bac2b578f9c4517c3addce))
+* Default database type ([d518263](https://github.com/GeorgeV220/SkinOverlay/commit/d518263d4ff16e1c4a284688c03230c537601ccf))
+* **PlayerObject:** change skinName to skinOptions ([13f26fd](https://github.com/GeorgeV220/SkinOverlay/commit/13f26fd321e60ecf6d78cb34d9a028dffca2e76e))
+* **SkinHandler:** SkinsRestorer custom skins hook ([5762022](https://github.com/GeorgeV220/SkinOverlay/commit/57620225b0f89d96504e2e675f3fa866d15a86cf))
+* **SkinOptions:** changed setSkin constructor String skinName to SkinOptions ([1413354](https://github.com/GeorgeV220/SkinOverlay/commit/1413354a369383f6441f8266249b5926595fce35))
+* **SkinOptions:** Changed SkinOverlays to SkinOptions ([5d93797](https://github.com/GeorgeV220/SkinOverlay/commit/5d9379778482f37b60b0b8a473678f619ef16701))
+* **SkinOptions:** changed updateSkin vararg String skinName to SkinOptions ([eb98186](https://github.com/GeorgeV220/SkinOverlay/commit/eb98186aa4dcac627a6f28dfed427f86e57b7e12))
+* **SkinOverlayCommand:** Added url sub command ([00656ad](https://github.com/GeorgeV220/SkinOverlay/commit/00656adbed47adb1dd90b127ccf2a676a379ed1b))
+* Updated onPluginMessageReceived to accept SkinOptions ([136dfb5](https://github.com/GeorgeV220/SkinOverlay/commit/136dfb571b123344269b125c1093a1fef5ea7b51))
+* **Utilities:** proper usage of SkinOptions ([b0b20c9](https://github.com/GeorgeV220/SkinOverlay/commit/b0b20c980dc539ab4f7ea7d5ab017cea689106df))
+* **Velocity:** Update everything to use the new SkinOptions ([d3c1bc8](https://github.com/GeorgeV220/SkinOverlay/commit/d3c1bc8ee3eff490b44b89ce90203a1b6a0294ea))
+
 # [3.11.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.10.0...v3.11.0) (2023-03-10)
 
 
