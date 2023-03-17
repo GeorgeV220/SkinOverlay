@@ -12,5 +12,5 @@ dependencies {
 
     implementation project(path: ':core')
 
-    compileOnly "io.papermc:paperlib:1.0.7"
+    compileOnly "io.papermc:paperlib:1.0.8"
 }
