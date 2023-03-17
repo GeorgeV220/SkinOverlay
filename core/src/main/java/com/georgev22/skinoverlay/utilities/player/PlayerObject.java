@@ -6,6 +6,7 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
@@ -151,7 +152,11 @@ public abstract class PlayerObject {
                 skinOverlay.getLogger().log(Level.SEVERE, "Something went wrong:", e);
                 return null;
             }
-            user.addCustomDataIfNotExists("skinName", "default");
+            try {
+                user.addCustomDataIfNotExists("skinOptions", Utilities.skinOptionsToBytes(new SkinOptions("default")));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             if (user.getCustomData("skinProperty") != null && !(user.getCustomData("skinProperty") instanceof Property)) {
                 user.addCustomData("skinProperty", Utilities.propertyFromLinkedTreeMap(user.getCustomData("skinProperty")));
             }
@@ -192,8 +197,12 @@ public abstract class PlayerObject {
             }
             if (!isOnline())
                 return user;
-            if (user.getCustomData("skinName").equals("default")) {
-                return user;
+            try {
+                if (Utilities.getSkinOptions(user.getCustomData("skinOptions")).getSkinName().equals("default")) {
+                    return user;
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
             Utilities.updateSkin(playerObject(), true);
             return user;
