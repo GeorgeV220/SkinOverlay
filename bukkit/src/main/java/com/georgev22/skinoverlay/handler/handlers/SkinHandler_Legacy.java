@@ -233,7 +233,7 @@ public class SkinHandler_Legacy extends SkinHandler_ {
             if (dataWatcher != null) {
                 Object dataWatcherObject;
                 try {
-                    dataWatcherObject = invokeConstructor(BukkitMinecraftUtils.MinecraftReflection.getNMSClass("DataWatcherObject"), 16, fetchField(getNMSClass("DataWatcherRegistry"), null, "propertyFromLinkedTreeMap"));
+                    dataWatcherObject = invokeConstructor(BukkitMinecraftUtils.MinecraftReflection.getNMSClass("DataWatcherObject"), 16, fetchField(getNMSClass("DataWatcherRegistry"), null, "a"));
                 } catch (ClassNotFoundException e) {
                     callback.onFailure(e);
                     return;
