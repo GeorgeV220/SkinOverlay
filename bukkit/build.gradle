@@ -9,7 +9,7 @@ dependencies {
     compileOnly project(path: ':mc-1-19-3', configuration: 'reobf')
     compileOnly project(path: ':mc-1-19-4', configuration: 'reobf')
 
-    implementation "net.kyori:adventure-platform-bukkit:4.2.0"
+    implementation "net.kyori:adventure-platform-bukkit:4.3.0"
 }
 
 defaultTasks 'build'

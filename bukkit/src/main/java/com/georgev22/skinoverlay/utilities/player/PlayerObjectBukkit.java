@@ -24,7 +24,7 @@ public class PlayerObjectBukkit extends PlayerObject {
 
     @Override
     public Audience audience() {
-        return SkinOverlayBukkit.getInstance().adventure().player(player().getPlayer());
+        return BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(BukkitMinecraftUtils.MinecraftVersion.V1_16_R1) ? SkinOverlayBukkit.getInstance().adventure().player(player().getPlayer()) : player().getPlayer();
     }
 
     @Override

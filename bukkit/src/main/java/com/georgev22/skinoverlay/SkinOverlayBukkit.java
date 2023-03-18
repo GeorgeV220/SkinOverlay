@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.V1_16_R3;
-import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion;
+import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.*;
 
 @MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
 @MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.22")
@@ -65,7 +64,8 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     }
 
     public void onEnable() {
-        this.adventure = BukkitAudiences.create(this);
+        if (BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(V1_16_R1))
+            this.adventure = BukkitAudiences.create(this);
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             tick++;
             SchedulerManager.getScheduler().mainThreadHeartbeat(tick);
