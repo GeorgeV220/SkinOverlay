@@ -1,5 +1,7 @@
 package com.georgev22.skinoverlay.listeners.velocity;
 
+import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -22,7 +24,11 @@ public class PlayerListeners {
         }
         if (!serverConnectedEvent.getPlayer().isActive())
             return;
-        new PlayerObjectVelocity(serverConnectedEvent.getPlayer()).updateSkin();
+
+        //TODO THINK ABOUT A BETTER FIX FOR THIS ISSUE
+        SchedulerManager.getScheduler().runTaskLater(SkinOverlay.getInstance().getClass(), () -> {
+            new PlayerObjectVelocity(serverConnectedEvent.getPlayer()).updateSkin();
+        }, 20L);
     }
 
     @Subscribe
