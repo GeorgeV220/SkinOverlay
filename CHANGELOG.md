@@ -1,3 +1,15 @@
+## [3.12.2](https://github.com/GeorgeV220/SkinOverlay/compare/v3.12.1...v3.12.2) (2023-03-18)
+
+
+### Bug Fixes
+
+* **Adventure:** Fixed adventure ([5f7ac73](https://github.com/GeorgeV220/SkinOverlay/commit/5f7ac73da890a1970e5272084b7b2b811c8573fa))
+* **Proxy:** Update skin on server switch ([593756e](https://github.com/GeorgeV220/SkinOverlay/commit/593756e4eff48718ad1e3ed1d20dd048d7f754e2))
+* **SkinHandler:** Fixed Legacy SkinHandler ([4881d14](https://github.com/GeorgeV220/SkinOverlay/commit/4881d140a5e49672d6b33859d6d6943c7146ef88))
+* **SkinHandler:** Fixed legacy SkinHandler index ([9d1df53](https://github.com/GeorgeV220/SkinOverlay/commit/9d1df533c0df60be4150f1e85c54daa70ffcb9c7))
+* SkinsRestorer hook ([1a184a4](https://github.com/GeorgeV220/SkinOverlay/commit/1a184a41f21fc6851fd83d234f216044de9c026f))
+* **SkinsRestorer:** More fixes for SkinsRestorer hook ([d1d6505](https://github.com/GeorgeV220/SkinOverlay/commit/d1d6505b1783bada0d2d2d26a4b2941faca3cf62))
+
 ## [3.12.1](https://github.com/GeorgeV220/SkinOverlay/compare/v3.12.0...v3.12.1) (2023-03-17)
 
 
