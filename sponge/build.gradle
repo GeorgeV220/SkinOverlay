@@ -44,6 +44,11 @@ sponge {
             loadOrder(PluginDependency.LoadOrder.AFTER)
             optional(true)
         }
+        dependency("skinsrestorer") {
+            loadOrder(PluginDependency.LoadOrder.AFTER)
+            version("")
+            optional(true)
+        }
     }
 }
 

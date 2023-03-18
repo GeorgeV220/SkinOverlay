@@ -3,3 +3,5 @@ version: ${version}
 main: ${bungeeMain}
 author: ${author}
 description: SkinOverlay
+softDepends:
+  - SkinsRestorer

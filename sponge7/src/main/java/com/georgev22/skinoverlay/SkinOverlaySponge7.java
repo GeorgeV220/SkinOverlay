@@ -26,6 +26,7 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
 @MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
-@Plugin(id = "skinoverlay", name = "SkinOverlay", version = "${version}", authors = {"${author}"})
+@Plugin(id = "skinoverlay", name = "SkinOverlay", version = "${version}", authors = {"${author}"}, dependencies = {@Dependency(id = "skinsrestorer", optional = true)})
 public class SkinOverlaySponge7 implements SkinOverlayImpl {
 
     private final File dataFolder;

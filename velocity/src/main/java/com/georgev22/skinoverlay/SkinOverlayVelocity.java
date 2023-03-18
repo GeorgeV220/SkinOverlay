@@ -25,6 +25,7 @@ import com.mojang.authlib.properties.Property;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
@@ -52,7 +53,7 @@ import java.util.stream.Collectors;
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
 @MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
-@Plugin(id = "skinoverlay", name = "${pluginName}", version = "${version}", description = "SkinOverlay", authors = {"${author}"})
+@Plugin(id = "skinoverlay", name = "${pluginName}", version = "${version}", description = "SkinOverlay", authors = {"${author}"}, dependencies = {@Dependency(id = "skinsrestorer", optional = true)})
 public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     private final ProxyServer server;
