@@ -7,9 +7,7 @@ import com.mojang.authlib.properties.Property;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.property.IProperty;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
+import org.jetbrains.annotations.Nullable;
 
 public class SkinsRestorerHook implements SkinHook {
 
@@ -22,11 +20,15 @@ public class SkinsRestorerHook implements SkinHook {
     }
 
     @Override
-    public Property getProperty(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
+    @Nullable
+    public Property getProperty(@NotNull PlayerObject playerObject) {
         String skinName = skinsRestorerAPI.getSkinName(playerObject.playerName());
+        if (skinName == null) {
+            return null;
+        }
         IProperty iProperty = skinsRestorerAPI.getSkinData(skinName);
-        if (skinName == null | iProperty == null) {
-            return playerObject.gameProfile().getProperties().get("textures").stream().filter(property -> property.getName().equalsIgnoreCase("textures")).findFirst().orElse(skinOverlay.getSkinHandler().getSkin(playerObject));
+        if (iProperty == null) {
+            return null;
         }
         return new Property(iProperty.getName(), iProperty.getValue(), iProperty.getSignature());
     }
