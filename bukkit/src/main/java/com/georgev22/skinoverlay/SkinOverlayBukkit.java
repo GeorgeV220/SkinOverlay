@@ -16,6 +16,7 @@ import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
+import io.papermc.lib.PaperLib;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -95,6 +96,8 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
             Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "skinoverlay:bungee", new PlayerListeners());
         if (OptionsUtil.METRICS.getBooleanValue())
             new Metrics(this, 17474);
+        if (!PaperLib.isPaper())
+            PaperLib.suggestPaper(this);
     }
 
     public void onDisable() {
