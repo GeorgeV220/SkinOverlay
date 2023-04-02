@@ -270,15 +270,13 @@ public class SkinOverlay {
 
         //userManager.loadAll();
 
-        onlinePlayers().forEach(player -> {
-            userManager.getUser(player.playerUUID()).handle((user, throwable) -> {
-                if (throwable != null) {
-                    getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
-                    return null;
-                }
-                return user;
-            });
-        });
+        onlinePlayers().forEach(player -> userManager.getUser(player.playerUUID()).handle((user, throwable) -> {
+            if (throwable != null) {
+                getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                return null;
+            }
+            return user;
+        }));
 
     }
 

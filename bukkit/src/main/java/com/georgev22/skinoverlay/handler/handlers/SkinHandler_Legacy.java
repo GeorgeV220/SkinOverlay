@@ -223,7 +223,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
 
             sendPacket(playerConnection, respawn);
 
-            Object dataWatcher = null;
+            Object dataWatcher;
             try {
                 dataWatcher = fetchMethodAndInvoke(entityPlayer.getClass(), "getDataWatcher", entityPlayer, new Object[0], new Class[0]);
             } catch (Exception e) {
