@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay.handler.handlers;
 
+import com.georgev22.library.utilities.UserManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
@@ -66,5 +67,10 @@ public class SkinHandler_BungeeCord extends SkinHandler {
             return sGameProfiles.get(playerObject);
         }
         return sGameProfiles.append(playerObject, this.getGameProfile0(playerObject)).get(playerObject);
+    }
+
+    @Override
+    protected void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
+        updateSkin1(user, playerObject, forOthers);
     }
 }

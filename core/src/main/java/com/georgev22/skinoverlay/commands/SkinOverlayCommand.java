@@ -69,7 +69,7 @@ public class SkinOverlayCommand extends BaseCommand {
                 if (user != null) {
                     Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
                     if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline())
-                        Utilities.updateSkin(optionalPlayerObject.get(), true);
+                        skinOverlay.getSkinHandler().updateSkin(optionalPlayerObject.get(), true);
                 }
             });
         });
@@ -106,7 +106,7 @@ public class SkinOverlayCommand extends BaseCommand {
             target = skinOverlay.getPlayer(issuer.getUniqueId());
         }
 
-        Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), new SkinOptions(overlay), target.orElseThrow(), issuer);
+        skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), new SkinOptions(overlay), target.orElseThrow(), issuer);
 
     }
 
@@ -149,7 +149,7 @@ public class SkinOverlayCommand extends BaseCommand {
                 return;
             }
 
-            Utilities.setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), skinOptions, target.orElseThrow(), issuer);
+            skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), skinOptions, target.orElseThrow(), issuer);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -187,7 +187,7 @@ public class SkinOverlayCommand extends BaseCommand {
             return;
         }
         if (args.length == 0) {
-            Utilities.setSkin(() -> null, new SkinOptions("default"), skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow(), issuer);
+            skinOverlay.getSkinHandler().setSkin(() -> null, new SkinOptions("default"), skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow(), issuer);
         } else {
             clear0(issuer, args[0]);
         }
@@ -200,6 +200,6 @@ public class SkinOverlayCommand extends BaseCommand {
             MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", target), true);
             return;
         }
-        Utilities.setSkin(() -> null, new SkinOptions("default"), optionalPlayerObject.orElseThrow(), issuer);
+        skinOverlay.getSkinHandler().setSkin(() -> null, new SkinOptions("default"), optionalPlayerObject.orElseThrow(), issuer);
     }
 }

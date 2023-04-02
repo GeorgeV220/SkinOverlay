@@ -216,7 +216,7 @@ public abstract class PlayerObject {
             return user;
         }).thenAcceptAsync(user -> {
             if (user != null) {
-                Utilities.updateSkin(playerObject(), true);
+                skinOverlay.getSkinHandler().updateSkin(playerObject(), true);
             }
         });
     }

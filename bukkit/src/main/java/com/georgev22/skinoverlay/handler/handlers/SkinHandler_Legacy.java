@@ -3,10 +3,13 @@ package com.georgev22.skinoverlay.handler.handlers;
 import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.utilities.UserManager;
 import com.georgev22.library.utilities.Utils;
+import com.georgev22.skinoverlay.SkinOverlayBukkit;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
+import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
@@ -277,7 +280,6 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
         } catch (ReflectionException | InvocationTargetException | IllegalAccessException | NoSuchMethodException |
                  NoSuchFieldException e) {
             callback.onFailure(e);
-            //super.updateSkin(playerObject, reset, skinName, callback);
         }
     }
 
@@ -307,5 +309,36 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
 
     private void sendPacket(Object playerConnection, Object packet) throws ReflectionException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         fetchMethodAndInvoke(playerConnection.getClass(), "sendPacket", playerConnection, new Object[]{packet}, new Class<?>[]{this.packet});
+    }
+
+    @Override
+    protected void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
+        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
+            Player player = (Player) playerObject.player();
+            player.hidePlayer(SkinOverlayBukkit.getInstance(), player);
+            player.showPlayer(SkinOverlayBukkit.getInstance(), player);
+            try {
+                skinOverlay.getSkinHandler().updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions")), new Utils.Callback<>() {
+                    @Override
+                    public Boolean onSuccess() {
+                        if (forOthers) {
+                            skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                                Player p = (Player) playerObjects.player();
+                                p.hidePlayer(SkinOverlayBukkit.getInstance(), player);
+                                p.showPlayer(SkinOverlayBukkit.getInstance(), player);
+                            });
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public Boolean onFailure() {
+                        return false;
+                    }
+                });
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }, 20L);
     }
 }

@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.utilities.UserManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SGameProfile;
@@ -103,5 +104,9 @@ public class SkinHandler_Sponge7 extends SkinHandler {
         return new SGameProfile_Sponge7(gameProfile.getName().orElse(null), gameProfile.getUniqueId(), propertyObjectMap);
     }
 
+    @Override
+    protected void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
+        updateSkin1(user, playerObject, forOthers);
+    }
 
 }

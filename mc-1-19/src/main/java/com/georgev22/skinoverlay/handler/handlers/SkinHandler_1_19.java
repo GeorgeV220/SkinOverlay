@@ -1,11 +1,14 @@
 
 package com.georgev22.skinoverlay.handler.handlers;
 
+import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.utilities.UserManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
+import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.mojang.authlib.GameProfile;
@@ -22,8 +25,10 @@ import net.minecraft.world.level.biome.BiomeManager;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -123,6 +128,37 @@ public class SkinHandler_1_19 extends SkinHandler {
 
     private void sendPacket(@NotNull ServerPlayer player, Packet<?> packet) {
         player.connection.send(packet);
+    }
+
+    @Override
+    protected void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
+        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
+            Player player = (Player) playerObject.player();
+            player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+            player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+            try {
+                skinOverlay.getSkinHandler().updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions")), new Utils.Callback<>() {
+                    @Override
+                    public Boolean onSuccess() {
+                        if (forOthers) {
+                            skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                                Player p = (Player) playerObjects.player();
+                                p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                                p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                            });
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public Boolean onFailure() {
+                        return false;
+                    }
+                });
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }, 20L);
     }
 }
 

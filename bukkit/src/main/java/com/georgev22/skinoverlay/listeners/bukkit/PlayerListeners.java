@@ -64,7 +64,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         PlayerObject playerObject = skinOverlay.getPlayer(uuid).orElseThrow();
         if (subChannel.equalsIgnoreCase("change")) {
             if (!skinOptions.getSkinName().contains("custom")) {
-                Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skinOptions.getSkinName() + ".png")), skinOptions, playerObject, null);
+                skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skinOptions.getSkinName() + ".png")), skinOptions, playerObject, null);
             } else {
                 URL url = new URL(skinOptions.getUrl());
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -80,20 +80,20 @@ public class PlayerListeners implements Listener, PluginMessageListener {
                         output.write(buffer, 0, bytesRead);
                     }
                 }
-                Utilities.setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), skinOptions, playerObject, null);
+                skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), skinOptions, playerObject, null);
             }
         } else if (subChannel.equalsIgnoreCase("reset")) {
-            Utilities.setSkin(() -> null, skinOptions, playerObject, null);
+            skinOverlay.getSkinHandler().setSkin(() -> null, skinOptions, playerObject, null);
         } else if (subChannel.equalsIgnoreCase("changeWithProperties")) {
             String name = decrypt(in.readUTF());
             String value = decrypt(in.readUTF());
             String signature = decrypt(in.readUTF());
-            Utilities.setSkin(skinOptions, playerObject, new String[]{name, value, signature});
+            skinOverlay.getSkinHandler().setSkin(skinOptions, playerObject, new String[]{name, value, signature});
         } else if (subChannel.equalsIgnoreCase("resetWithProperties")) {
             String name = decrypt(in.readUTF());
             String value = decrypt(in.readUTF());
             String signature = decrypt(in.readUTF());
-            Utilities.setSkin(skinOptions, playerObject, new String[]{name, value, signature});
+            skinOverlay.getSkinHandler().setSkin(skinOptions, playerObject, new String[]{name, value, signature});
         }
     }
 

@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.utilities.UserManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
@@ -13,6 +14,8 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.util.GameProfile;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 
 public class SkinHandler_Velocity extends SkinHandler {
 
@@ -67,5 +70,10 @@ public class SkinHandler_Velocity extends SkinHandler {
         ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
         gameProfile.getProperties().forEach(property -> propertyObjectMap.append(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature())));
         return new SGameProfile_Velocity(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
+    }
+
+    @Override
+    protected void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
+        updateSkin1(user, playerObject, forOthers);
     }
 }
