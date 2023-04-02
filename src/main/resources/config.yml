@@ -1,6 +1,7 @@
 Options:
   experimental features: false #Turn on experimental features
   proxy: false
+  secret: "SECRET HERE"
   commands: #Disable or enable plugin commands
     skinoverlay: true
   updater:

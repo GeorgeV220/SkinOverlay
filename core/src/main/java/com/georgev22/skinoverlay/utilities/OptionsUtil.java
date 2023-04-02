@@ -5,6 +5,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -12,6 +13,8 @@ import java.util.stream.Collectors;
 public enum OptionsUtil {
 
     PROXY("proxy", false, Optional.of("bungeecord")),
+
+    SECRET("secret", "SECRET HERE", Optional.empty()),
 
     COMMAND_SKINOVERLAY("commands.skinoverlay", true, Optional.empty()),
 

@@ -1,6 +1,12 @@
+repositories {
+    maven {
+        url "https://repo.georgev22.com/Other"
+    }
+}
+
 dependencies {
     compileOnly project(path: ':core')
-    compileOnly 'com.velocitypowered:velocity-api:3.1.1'
+    compileOnly "com.velocitypowered:velocity:3.2.0"
     annotationProcessor 'com.velocitypowered:velocity-api:3.1.1'
 }
 

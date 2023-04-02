@@ -22,7 +22,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 import java.util.UUID;
+
+import static com.georgev22.skinoverlay.utilities.Utilities.decrypt;
 
 public class PlayerListeners implements Listener, PluginMessageListener {
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
@@ -45,11 +48,11 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         }
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subChannel = in.readUTF();
-        UUID uuid = UUID.fromString(in.readUTF());
-        SkinOptions skinOptions = Utilities.getSkinOptions(in.readUTF());
+        UUID uuid = UUID.fromString(Objects.requireNonNull(decrypt(in.readUTF())));
+        SkinOptions skinOptions = Utilities.getSkinOptions(Objects.requireNonNull(decrypt(in.readUTF())));
         PlayerObject playerObject = skinOverlay.getPlayer(uuid).orElseThrow();
         if (subChannel.equalsIgnoreCase("change")) {
-            if (skinOptions.getSkinName().contains("custom")) {
+            if (!skinOptions.getSkinName().contains("custom")) {
                 Utilities.setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skinOptions.getSkinName() + ".png")), skinOptions, playerObject, null);
             } else {
                 URL url = new URL(skinOptions.getUrl());
@@ -71,16 +74,17 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         } else if (subChannel.equalsIgnoreCase("reset")) {
             Utilities.setSkin(() -> null, skinOptions, playerObject, null);
         } else if (subChannel.equalsIgnoreCase("changeWithProperties")) {
-            String name = in.readUTF();
-            String value = in.readUTF();
-            String signature = in.readUTF();
+            String name = decrypt(in.readUTF());
+            String value = decrypt(in.readUTF());
+            String signature = decrypt(in.readUTF());
             Utilities.setSkin(skinOptions, playerObject, new String[]{name, value, signature});
         } else if (subChannel.equalsIgnoreCase("resetWithProperties")) {
-            String name = in.readUTF();
-            String value = in.readUTF();
-            String signature = in.readUTF();
+            String name = decrypt(in.readUTF());
+            String value = decrypt(in.readUTF());
+            String signature = decrypt(in.readUTF());
             Utilities.setSkin(skinOptions, playerObject, new String[]{name, value, signature});
         }
     }
+
 }
 

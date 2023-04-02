@@ -7,6 +7,10 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
+import static com.georgev22.skinoverlay.utilities.Utilities.encrypt;
+
 public final class BungeeCordPluginMessageUtils {
 
     public void sendDataToServer(@NotNull String channel, @NotNull ServerInfo serverInfo, String... dataArray) {
@@ -30,7 +34,8 @@ public final class BungeeCordPluginMessageUtils {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF(channel);
         for (String data : dataArray) {
-            out.writeUTF(data);
+            String encryptedData = encrypt(data);
+            out.writeUTF(Objects.requireNonNull(encryptedData));
         }
         return out;
     }

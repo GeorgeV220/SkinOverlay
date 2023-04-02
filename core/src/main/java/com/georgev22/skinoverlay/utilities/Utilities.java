@@ -5,6 +5,8 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.handler.SGameProfile;
+import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -13,14 +15,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.LinkedTreeMap;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
@@ -28,6 +32,10 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Level;
 
@@ -52,9 +60,9 @@ public class Utilities {
             try {
                 user.addCustomData("skinOptions", skinOptionsToBytes(skinOptions));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
-            user.addCustomData("skinProperty", new Property(properties[0], properties[1], properties[2]));
+            user.addCustomData("skinProperty", new SProperty(properties[0], properties[1], properties[2]));
             updateSkin(playerObject, true);
             skinOverlay.getUserManager().save(user);
         });
@@ -85,13 +93,11 @@ public class Utilities {
                 for (JsonElement object : properties) {
                     if (!object.getAsJsonObject().get("name").getAsString().equals("textures")) continue;
                     if (overlay == null) {
-                        GameProfile gameProfile = skinOverlay.getSkinHandler().getGameProfile(playerObject);
-                        PropertyMap pm = gameProfile.getProperties();
-                        Property property = pm.get("textures").stream().filter(gameProfileProperty -> gameProfileProperty.getName().equals("textures")).findFirst().orElseThrow();
-                        pm.remove("textures", property);
-                        pm.put("textures", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
+                        SGameProfile gameProfile = skinOverlay.getSkinHandler().getGameProfile(playerObject);
+                        gameProfile.removeProperty("textures");
+                        gameProfile.addProperty("textures", new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         user.addCustomData("skinOptions", skinOptionsToBytes(skinOptions));
-                        user.addCustomData("skinProperty", new Property("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
+                        user.addCustomData("skinProperty", new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         if (commandIssuer == null) {
                             MessagesUtil.RESET.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
                         } else {
@@ -130,7 +136,7 @@ public class Utilities {
                             String texturesValue = texture.get("value").getAsString();
                             String texturesSignature = texture.get("signature").getAsString();
                             user.addCustomData("skinOptions", skinOptionsToBytes(skinOptions));
-                            user.addCustomData("skinProperty", new Property("textures", texturesValue, texturesSignature));
+                            user.addCustomData("skinProperty", new SProperty("textures", texturesValue, texturesSignature));
                             if (commandIssuer == null) {
                                 MessagesUtil.DONE.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
                             } else {
@@ -143,7 +149,7 @@ public class Utilities {
                     }
                 }
             } catch (Exception exception) {
-                throw new RuntimeException(exception);
+                exception.printStackTrace();
             }
             return user;
         }).thenAccept(user -> {
@@ -166,11 +172,9 @@ public class Utilities {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error(updateSkin): User is null");
                 return;
             }
-            GameProfile gameProfile = playerObject.gameProfile();
-            PropertyMap pm = gameProfile.getProperties();
-            Property property = pm.get("textures").stream().filter(profileProperty -> profileProperty.getName().equals("textures")).findFirst().orElseThrow();
-            pm.remove("textures", property);
-            pm.put("textures", user.getCustomData("skinProperty"));
+            SGameProfile gameProfile = playerObject.gameProfile();
+            gameProfile.removeProperty("textures");
+            gameProfile.addProperty("textures", user.getCustomData("skinProperty"));
             if (skinOverlay.type().equals(SkinOverlayImpl.Type.PAPER)) {
                 SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
                     org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.player();
@@ -204,11 +208,13 @@ public class Utilities {
                     skinOverlay.getSkinHandler().updateSkin(playerObject, getSkinOptions(user.getCustomData("skinOptions")), user.getCustomData("skinProperty"), new Utils.Callback<>() {
                         @Override
                         public Boolean onSuccess() {
+                            skinOverlay.getLogger().info("Success");
                             return true;
                         }
 
                         @Override
                         public Boolean onFailure() {
+                            skinOverlay.getLogger().info("Error");
                             return false;
                         }
                     });
@@ -218,7 +224,7 @@ public class Utilities {
             }
         }).handle((unused, throwable) -> {
             if (throwable != null) {
-                throwable.printStackTrace();
+                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
                 return unused;
             }
             return unused;
@@ -226,8 +232,8 @@ public class Utilities {
     }
 
     @Contract("_ -> new")
-    public static @NotNull Property propertyFromLinkedTreeMap(@NotNull LinkedTreeMap<String, String> linkedTreeMap) {
-        return new Property(linkedTreeMap.get("name"), linkedTreeMap.get("value"), linkedTreeMap.get("signature"));
+    public static @NotNull SProperty propertyFromLinkedTreeMap(@NotNull LinkedTreeMap<String, String> linkedTreeMap) {
+        return new SProperty(linkedTreeMap.get("name"), linkedTreeMap.get("value"), linkedTreeMap.get("signature"));
     }
 
     public static String skinOptionsToBytes(SkinOptions skinOptions) throws IOException {
@@ -244,6 +250,47 @@ public class Utilities {
             return (SkinOptions) in.readObject();
         }
     }
+
+    public static @Nullable String decrypt(String encryptedText) {
+        try {
+            byte[] salt = Arrays.copyOfRange(Base64.getDecoder().decode(encryptedText), 0, 16);
+            KeySpec spec = new PBEKeySpec(OptionsUtil.SECRET.getStringValue().toCharArray(), salt, 65536, 256);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            byte[] keyBytes = factory.generateSecret(spec).getEncoded();
+            SecretKey key = new SecretKeySpec(keyBytes, "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            byte[] encryptedBytes = Arrays.copyOfRange(Base64.getDecoder().decode(encryptedText), 16, Base64.getDecoder().decode(encryptedText).length);
+            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static @Nullable String encrypt(String plaintext) {
+        try {
+            byte[] salt = new byte[16];
+            SecureRandom random = new SecureRandom();
+            random.nextBytes(salt);
+            KeySpec spec = new PBEKeySpec(OptionsUtil.SECRET.getStringValue().toCharArray(), salt, 65536, 256);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            byte[] keyBytes = factory.generateSecret(spec).getEncoded();
+            SecretKey key = new SecretKeySpec(keyBytes, "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            byte[] encryptedBytes = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
+            byte[] combined = new byte[16 + encryptedBytes.length];
+            System.arraycopy(salt, 0, combined, 0, 16);
+            System.arraycopy(encryptedBytes, 0, combined, 16, encryptedBytes.length);
+            return Base64.getEncoder().encodeToString(combined);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     public static class Request {
         private String address;

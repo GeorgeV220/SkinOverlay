@@ -7,6 +7,10 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
+import static com.georgev22.skinoverlay.utilities.Utilities.encrypt;
+
 public class VelocityPluginMessageUtils {
 
     public void sendDataToServer(@NotNull ProxyServer proxyServer, @NotNull ServerInfo serverInfo, @NotNull String channel, String... dataArray) {
@@ -32,7 +36,8 @@ public class VelocityPluginMessageUtils {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF(channel);
         for (String data : dataArray) {
-            out.writeUTF(data);
+            String encryptedData = encrypt(data);
+            out.writeUTF(Objects.requireNonNull(encryptedData));
         }
         return out;
     }
