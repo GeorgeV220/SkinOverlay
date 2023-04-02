@@ -4,13 +4,13 @@ import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
-import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
+import com.georgev22.skinoverlay.handler.SGameProfile;
+import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftRefl
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftReflection.getOBCClass;
 import static com.georgev22.library.utilities.Utils.Reflection.*;
 
-public class SkinHandler_Legacy extends SkinHandler_ {
+public class SkinHandler_Legacy extends SkinHandler_Unsupported {
     private final Class<?> playOutRespawn;
     private final Class<?> playOutPlayerInfo;
     private final Class<?> playOutPosition;
@@ -282,12 +282,12 @@ public class SkinHandler_Legacy extends SkinHandler_ {
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, Utils.@NotNull Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, Utils.@NotNull Callback<Boolean> callback) {
         updateSkin(playerObject, skinOptions, callback);
     }
 
     @Override
-    protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
+    public GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         try {
             Class<?> craftPlayerClass = getOBCClass("entity.CraftPlayer");
             org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.player();
@@ -295,6 +295,14 @@ public class SkinHandler_Legacy extends SkinHandler_ {
         } catch (Exception e) {
             return super.getGameProfile0(playerObject);
         }
+    }
+
+    @Override
+    public SGameProfile getGameProfile(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
+        if (sGameProfiles.containsKey(playerObject)) {
+            return sGameProfiles.get(playerObject);
+        }
+        return sGameProfiles.append(playerObject, wrapper(this.getGameProfile0(playerObject))).get(playerObject);
     }
 
     private void sendPacket(Object playerConnection, Object packet) throws ReflectionException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {

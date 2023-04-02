@@ -6,13 +6,13 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlaySponge;
-import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
+import com.georgev22.skinoverlay.handler.SGameProfile;
+import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.data.Keys;
@@ -33,7 +33,7 @@ import java.util.logging.Level;
 
 import static com.georgev22.library.utilities.Utils.Reflection.*;
 
-public class SkinHandler_Sponge extends SkinHandler_ {
+public class SkinHandler_Sponge extends SkinHandler_Unsupported {
 
 
     private final ClassLoader classLoader;
@@ -76,17 +76,17 @@ public class SkinHandler_Sponge extends SkinHandler_ {
             return user;
         }).thenAccept(user -> {
             if (user != null)
-                updateSkin(playerObject, skinOptions, user.getCustomData("skinProperty"), callback);
+                updateSkin(playerObject, skinOptions, user.getCustomData("skinSProperty"), callback);
         });
     }
 
     @SneakyThrows
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, @NotNull final Utils.Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, @NotNull final Utils.Callback<Boolean> callback) {
         ServerPlayer receiver = (ServerPlayer) playerObject.player();
 
         receiver.user().offer(Keys.UPDATE_GAME_PROFILE, true);
-        receiver.user().offer(Keys.SKIN_PROFILE_PROPERTY, ProfileProperty.of(ProfileProperty.TEXTURES, property.getValue(), property.getSignature()));
+        receiver.user().offer(Keys.SKIN_PROFILE_PROPERTY, ProfileProperty.of(ProfileProperty.TEXTURES, property.value(), property.signature()));
 
         long seedEncrypted = Hashing.sha256().hashString(String.valueOf(receiver.world().seed()), StandardCharsets.UTF_8).asLong();
 
@@ -294,12 +294,20 @@ public class SkinHandler_Sponge extends SkinHandler_ {
     }
 
     @Override
-    protected GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
+    public GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         try {
             return (GameProfile) fetchMethodAndInvoke(serverPlayerClass, "getGameProfile", playerObject.player(), new Object[]{}, new Class[]{});
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             return super.getGameProfile0(playerObject);
         }
+    }
+
+    @Override
+    public SGameProfile getGameProfile(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
+        if (sGameProfiles.containsKey(playerObject)) {
+            return sGameProfiles.get(playerObject);
+        }
+        return wrapper(getGameProfile0(playerObject));
     }
 
     private void sendPacket(Object playerConnection, Object packet) throws ReflectionException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {

@@ -8,7 +8,10 @@ import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
+import com.georgev22.skinoverlay.handler.SGameProfile;
+import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.handler.profile.SGameProfileBungee;
 import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
@@ -19,13 +22,12 @@ import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.connection.InitialHandler;
+import net.md_5.bungee.protocol.Property;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 
@@ -91,12 +93,12 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
             }
 
             @Override
-            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, Utils.@NotNull Callback<Boolean> callback) {
+            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, Utils.@NotNull Callback<Boolean> callback) {
                 try {
                     if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.getName(), property.getValue(), property.getSignature());
+                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
                     } else {
-                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.getName(), property.getValue(), property.getSignature());
+                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
                     }
                     callback.onSuccess();
                 } catch (Exception exception) {
@@ -105,14 +107,22 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
             }
 
             @Override
-            protected <T> GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
-                GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
+            public SGameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
+                SGameProfile gameProfile = new SGameProfileBungee(playerObject.playerName(), playerObject.playerUUID());
                 if (!gameProfile.getProperties().containsKey("textures")) {
-                    for (net.md_5.bungee.protocol.Property property : ((InitialHandler) ((ProxiedPlayer) playerObject.player()).getPendingConnection()).getLoginProfile().getProperties()) {
-                        gameProfile.getProperties().put(property.getName(), new Property(property.getName(), property.getValue(), property.getSignature()));
+                    for (Property property : ((InitialHandler) ((ProxiedPlayer) playerObject.player()).getPendingConnection()).getLoginProfile().getProperties()) {
+                        gameProfile.addProperty(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature()));
                     }
                 }
                 return gameProfile;
+            }
+
+            @Override
+            public SGameProfile getGameProfile(@NotNull PlayerObject playerObject) {
+                if (sGameProfiles.containsKey(playerObject)) {
+                    return sGameProfiles.get(playerObject);
+                }
+                return sGameProfiles.append(playerObject, this.getGameProfile0(playerObject)).get(playerObject);
             }
         });
         switch (OptionsUtil.SKIN_HOOK.getStringValue()) {

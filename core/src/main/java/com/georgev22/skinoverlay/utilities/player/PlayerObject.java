@@ -5,13 +5,13 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.handler.SGameProfile;
+import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.google.common.collect.Lists;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import net.kyori.adventure.audience.Audience;
 
 import java.io.IOException;
@@ -56,9 +56,17 @@ public abstract class PlayerObject {
 
     public abstract boolean permission(String permission);
 
-    public GameProfile gameProfile() {
+    public SGameProfile gameProfile() {
         try {
             return SkinOverlay.getInstance().getSkinHandler().getGameProfile(playerObject());
+        } catch (IOException | ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Object internalGameProfile() {
+        try {
+            return SkinOverlay.getInstance().getSkinHandler().getGameProfile0(playerObject());
         } catch (IOException | ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -136,7 +144,7 @@ public abstract class PlayerObject {
         if (permission("skinoverlay.updater")) {
             new Updater(this);
         }
-        if (OptionsUtil.PROXY.getBooleanValue() & !skinOverlay.type().isProxy()) {
+        if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
         CompletableFuture<UserManager.User> future = skinOverlay.getUserManager().getUser(playerUUID());
@@ -146,7 +154,7 @@ public abstract class PlayerObject {
                 return null;
             }
             try {
-                user.addCustomData("defaultSkinProperty", gameProfile().getProperties().get("textures").stream().filter(property -> property.getName().equalsIgnoreCase("textures")).findFirst().orElse(skinOverlay.getSkinHandler().getSkin(playerObject())));
+                user.addCustomData("defaultSkinProperty", gameProfile().getProperties().get("textures") != null ? gameProfile().getProperties().get("textures") : skinOverlay.getSkinHandler().getSkin(playerObject()));
             } catch (IOException | ExecutionException | InterruptedException e) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Something went wrong:", e);
                 return null;
@@ -156,22 +164,27 @@ public abstract class PlayerObject {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            if (user.getCustomData("skinProperty") != null && !(user.getCustomData("skinProperty") instanceof Property)) {
+            if (user.getCustomData("skinProperty") != null && !(user.getCustomData("skinProperty") instanceof SProperty)) {
                 user.addCustomData("skinProperty", Utilities.propertyFromLinkedTreeMap(user.getCustomData("skinProperty")));
             }
             skinOverlay.getUserManager().save(user);
             return user;
-        }).handle((user, throwable) -> {
+        }).handleAsync((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
                 return null;
             }
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             return user;
-        }).thenAccept(user -> updateSkin());
+        }).thenAcceptAsync(user -> updateSkin());
     }
 
     public void playerQuit() {
-        if (OptionsUtil.PROXY.getBooleanValue() & !skinOverlay.type().isProxy()) {
+        if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
         skinOverlay.getUserManager().getUser(playerUUID()).handleAsync((user, throwable) -> {
@@ -179,13 +192,16 @@ public abstract class PlayerObject {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
             }
-            skinOverlay.getUserManager().save(user);
             return user;
+        }).thenAcceptAsync(user -> {
+            if (user != null) {
+                skinOverlay.getUserManager().save(user);
+            }
         });
     }
 
     public void updateSkin() {
-        skinOverlay.getUserManager().getUser(playerUUID()).handle((user, throwable) -> {
+        skinOverlay.getUserManager().getUser(playerUUID()).handleAsync((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
@@ -199,8 +215,11 @@ public abstract class PlayerObject {
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            Utilities.updateSkin(playerObject(), true);
             return user;
+        }).thenAcceptAsync(user -> {
+            if (user != null) {
+                Utilities.updateSkin(playerObject(), true);
+            }
         });
     }
 

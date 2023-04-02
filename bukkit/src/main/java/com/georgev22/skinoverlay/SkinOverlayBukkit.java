@@ -7,7 +7,6 @@ import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.skinoverlay.handler.SkinHandler.SkinHandler_;
 import com.georgev22.skinoverlay.handler.handlers.*;
 import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
@@ -77,7 +76,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
             case V1_19_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19());
             case V1_19_R2 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19_R2());
             case V1_19_R3 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19_R3());
-            case UNKNOWN -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_());
+            case UNKNOWN -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Unsupported());
             default -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Legacy());
         }
         switch (OptionsUtil.SKIN_HOOK.getStringValue()) {

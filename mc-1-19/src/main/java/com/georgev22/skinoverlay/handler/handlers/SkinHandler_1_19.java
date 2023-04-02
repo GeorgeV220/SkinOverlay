@@ -2,12 +2,13 @@
 package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.utilities.Utils;
+import com.georgev22.skinoverlay.handler.SGameProfile;
+import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import io.papermc.lib.PaperLib;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
@@ -28,9 +29,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 
+import static com.georgev22.skinoverlay.handler.handlers.SkinHandler_Unsupported.wrapper;
+
 public class SkinHandler_1_19 extends SkinHandler {
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Property property, @NotNull final Utils.Callback<Boolean> callback) {
+    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, @NotNull final Utils.Callback<Boolean> callback) {
         this.updateSkin(playerObject, skinOptions, callback);
     }
 
@@ -108,6 +111,14 @@ public class SkinHandler_1_19 extends SkinHandler {
                 exception.printStackTrace();
             }
         return entityPlayer.getGameProfile();
+    }
+
+    @Override
+    public SGameProfile getGameProfile(@NotNull PlayerObject playerObject) {
+        if (sGameProfiles.containsKey(playerObject)) {
+            return sGameProfiles.get(playerObject);
+        }
+        return sGameProfiles.append(playerObject, wrapper(this.getGameProfile0(playerObject))).get(playerObject);
     }
 
     private void sendPacket(@NotNull ServerPlayer player, Packet<?> packet) {

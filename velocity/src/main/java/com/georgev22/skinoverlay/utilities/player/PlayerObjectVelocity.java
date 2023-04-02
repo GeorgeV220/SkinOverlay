@@ -10,6 +10,7 @@ import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.player.PlayerSettings;
 import com.velocitypowered.api.proxy.player.ResourcePackInfo;
@@ -20,8 +21,8 @@ import com.velocitypowered.api.util.ModInfo;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 import java.util.*;
@@ -32,6 +33,11 @@ public class PlayerObjectVelocity extends PlayerObject {
 
     public PlayerObjectVelocity(final UUID uuid, final String name) {
         this.player = new Player() {
+            @Override
+            public @Nullable IdentifiedKey getIdentifiedKey() {
+                return null;
+            }
+
             @Override
             public String getUsername() {
                 return name;
@@ -60,6 +66,11 @@ public class PlayerObjectVelocity extends PlayerObject {
             @Override
             public PlayerSettings getPlayerSettings() {
                 throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean hasSentPlayerSettings() {
+                return false;
             }
 
             @Override
