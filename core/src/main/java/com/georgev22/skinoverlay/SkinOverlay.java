@@ -284,7 +284,7 @@ public class SkinOverlay {
 
 
     public void setupCommands() {
-        if (OptionsUtil.PROXY.getBooleanValue())
+        if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue())
             return;
         //noinspection deprecation
         commandManager.enableUnstableAPI("help");
@@ -298,12 +298,13 @@ public class SkinOverlay {
     }
 
     private void unregisterCommands() {
-        if (!OptionsUtil.PROXY.getBooleanValue())
-            switch (type()) {
-                case PAPER -> ((PaperCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
-                case BUNGEE -> ((BungeeCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
-                case VELOCITY -> ((VelocityCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
-            }
+        if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue())
+            return;
+        switch (type()) {
+            case PAPER -> ((PaperCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
+            case BUNGEE -> ((BungeeCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
+            case VELOCITY -> ((VelocityCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
+        }
     }
 
     private void loadCommandLocales() {
