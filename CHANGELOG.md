@@ -1,3 +1,12 @@
+# [3.14.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.13.0...v3.14.0) (2023-04-02)
+
+
+### Features
+
+* Added SkinHandler classes for the proxies ([1c30d7f](https://github.com/GeorgeV220/SkinOverlay/commit/1c30d7f0d3b2f54c201789fd1296e01e697c215c))
+* **PluginMessaging:** Use Plugin Messaging API ([c2e016b](https://github.com/GeorgeV220/SkinOverlay/commit/c2e016b1383ae78598fdc86a38e19bf9cbd5aa5d))
+* **SkinHandler:** Moved set/updateSkin to SkinHandler ([020b545](https://github.com/GeorgeV220/SkinOverlay/commit/020b545220587948857c73cbcf1271adc3afa64d))
+
 # [3.13.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.12.2...v3.13.0) (2023-04-02)
 
 
