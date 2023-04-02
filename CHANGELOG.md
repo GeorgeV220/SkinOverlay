@@ -1,3 +1,16 @@
+# [3.13.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.12.2...v3.13.0) (2023-04-02)
+
+
+### Bug Fixes
+
+* Fixed PROXY Option ([0aae418](https://github.com/GeorgeV220/SkinOverlay/commit/0aae4184d3c028f28fc61302da048c328863e224))
+
+
+### Features
+
+* A lot of internal changes ([06d9a67](https://github.com/GeorgeV220/SkinOverlay/commit/06d9a67d9af1a4667f6a29d4f80ad920498fe0d0)), closes [SkinHandler#getGameProfile0](https://github.com/SkinHandler/issues/getGameProfile0)
+* **Proxy:** Encrypt Bungee plugin messaging ([3a68882](https://github.com/GeorgeV220/SkinOverlay/commit/3a68882a7c1b01f0e376f9a294becade18ff7c11))
+
 ## [3.12.2](https://github.com/GeorgeV220/SkinOverlay/compare/v3.12.1...v3.12.2) (2023-03-18)
 
 
