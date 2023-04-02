@@ -26,9 +26,7 @@ public class PlayerListeners {
             return;
 
         //TODO THINK ABOUT A BETTER FIX FOR THIS ISSUE
-        SchedulerManager.getScheduler().runTaskLater(SkinOverlay.getInstance().getClass(), () -> {
-            new PlayerObjectVelocity(serverConnectedEvent.getPlayer()).updateSkin();
-        }, 20L);
+        SchedulerManager.getScheduler().runTaskLater(SkinOverlay.getInstance().getClass(), () -> new PlayerObjectVelocity(serverConnectedEvent.getPlayer()).updateSkin(), 20L);
     }
 
     @Subscribe
