@@ -3,7 +3,6 @@ package com.georgev22.skinoverlay.utilities;
 import com.georgev22.skinoverlay.SkinOverlayVelocity;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import org.jetbrains.annotations.NotNull;
 
