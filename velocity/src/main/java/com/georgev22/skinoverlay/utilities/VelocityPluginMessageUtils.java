@@ -1,48 +1,25 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
+import com.georgev22.skinoverlay.SkinOverlayVelocity;
+import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+public class VelocityPluginMessageUtils extends PluginMessageUtils {
 
-import static com.georgev22.skinoverlay.utilities.Utilities.encrypt;
-
-public class VelocityPluginMessageUtils {
-
-    public void sendDataToServer(@NotNull ProxyServer proxyServer, @NotNull ServerInfo serverInfo, @NotNull String channel, String... dataArray) {
-        if (proxyServer.getServer(serverInfo.getName()).isPresent()) {
-            proxyServer.getServer(serverInfo.getName()).get().sendPluginMessage(() -> "skinoverlay:bungee", this.toByteArray(channel, dataArray));
+    public void sendDataToServer(@NotNull String subChannel, String... dataArray) {
+        if (getObject() == null) {
+            skinOverlay.getLogger().severe("ServerInfo is null!!");
+            return;
+        }
+        if (SkinOverlayVelocity.getInstance().getProxy().getServer(((ServerInfo) getObject()).getName()).isPresent()) {
+            SkinOverlayVelocity.getInstance().getProxy().getServer(((ServerInfo) getObject()).getName()).get().sendPluginMessage(this::getChannel, this.toByteArray(subChannel, dataArray));
         }
     }
 
-    public void sendDataTooAllServers(@NotNull ProxyServer proxyServer, @NotNull String channel, String... dataArray) {
-        proxyServer.getAllServers().forEach(registeredServer -> this.sendDataToServer(proxyServer, registeredServer.getServerInfo(), channel, dataArray));
-    }
-
-    public void sendDataToPlayer(@NotNull String channel, @NotNull Player player, String... dataArray) {
-        player.sendPluginMessage(() -> "skinoverlay:bungee", this.toByteArray(channel, dataArray));
-    }
-
-    public void sendDataToAllPlayers(ProxyServer proxyServer, @NotNull String channel, String... dataArray) {
-        proxyServer.getAllPlayers().forEach(player -> this.sendDataToPlayer(channel, player, dataArray));
-    }
-
-    @NotNull
-    public ByteArrayDataOutput byteArrayDataOutput(@NotNull String channel, String @NotNull ... dataArray) {
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF(channel);
-        for (String data : dataArray) {
-            String encryptedData = encrypt(data);
-            out.writeUTF(Objects.requireNonNull(encryptedData));
-        }
-        return out;
-    }
-
-    public byte @NotNull [] toByteArray(@NotNull String channel, String... dataArray) {
-        return this.byteArrayDataOutput(channel, dataArray).toByteArray();
+    public void sendDataToPlayer(@NotNull String subChannel, @NotNull PlayerObject player, String... dataArray) {
+        ((Player) player.player()).sendPluginMessage(this::getChannel, this.toByteArray(subChannel, dataArray));
     }
 }

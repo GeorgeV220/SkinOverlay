@@ -19,20 +19,19 @@ public class Updater {
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
     private final String localVersion = skinOverlay.getDescription().version();
-    private final String onlineVersion;
+    private String onlineVersion;
 
     {
         try {
             onlineVersion = getOnlineVersion();
         } catch (IOException e) {
-            skinOverlay.getSkinOverlay().print("Failed to check for an update on Git.", "Either Git or you are offline or are slow to respond.");
-
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            skinOverlay.getLogger().warning("Failed to check for an update on GitHub. Either GitHub is offline or has rejected the request due to rate limiting, or you are experiencing slow response times.");
         }
     }
 
     public Updater() {
+        if (onlineVersion == null)
+            return;
         SchedulerManager.getScheduler().runTaskTimerAsynchronously(skinOverlay.getClass(), () -> {
             skinOverlay.getSkinOverlay().print("Checking for Updates ... ");
             if (compareVersions(onlineVersion.replace("v", ""), localVersion.replace("v", "")) == 0) {
@@ -49,6 +48,8 @@ public class Updater {
     }
 
     public Updater(PlayerObject playerObject) {
+        if (onlineVersion == null)
+            return;
         SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
             playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6Checking for Updates ...");
             if (compareVersions(onlineVersion.replace("v", ""), localVersion.replace("v", "")) == 0) {

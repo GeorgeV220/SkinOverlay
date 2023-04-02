@@ -174,13 +174,11 @@ public abstract class PlayerObject {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
                 return null;
             }
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             return user;
-        }).thenAcceptAsync(user -> updateSkin());
+        }).thenAcceptAsync(user -> {
+            if (!OptionsUtil.PROXY.getBooleanValue())
+                updateSkin();
+        });
     }
 
     public void playerQuit() {

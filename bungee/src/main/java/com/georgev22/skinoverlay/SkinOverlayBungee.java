@@ -8,26 +8,18 @@ import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
-import com.georgev22.skinoverlay.handler.SGameProfile;
-import com.georgev22.skinoverlay.handler.SProperty;
-import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.handler.profile.SGameProfileBungee;
+import com.georgev22.skinoverlay.handler.handlers.SkinHandler_BungeeCord;
 import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.connection.InitialHandler;
-import net.md_5.bungee.protocol.Property;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,54 +69,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     public void onEnable() {
         this.adventure = BungeeAudiences.create(this);
         getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
-        SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
-            @Override
-            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
-                try {
-                    if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("reset", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
-                    } else {
-                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("change", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
-                    }
-                    callback.onSuccess();
-                } catch (Exception exception) {
-                    callback.onFailure(exception);
-                }
-            }
-
-            @Override
-            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, Utils.@NotNull Callback<Boolean> callback) {
-                try {
-                    if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
-                    } else {
-                        new BungeeCordPluginMessageUtils().sendDataTooAllServers("changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
-                    }
-                    callback.onSuccess();
-                } catch (Exception exception) {
-                    callback.onFailure(exception);
-                }
-            }
-
-            @Override
-            public SGameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
-                SGameProfile gameProfile = new SGameProfileBungee(playerObject.playerName(), playerObject.playerUUID());
-                if (!gameProfile.getProperties().containsKey("textures")) {
-                    for (Property property : ((InitialHandler) ((ProxiedPlayer) playerObject.player()).getPendingConnection()).getLoginProfile().getProperties()) {
-                        gameProfile.addProperty(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature()));
-                    }
-                }
-                return gameProfile;
-            }
-
-            @Override
-            public SGameProfile getGameProfile(@NotNull PlayerObject playerObject) {
-                if (sGameProfiles.containsKey(playerObject)) {
-                    return sGameProfiles.get(playerObject);
-                }
-                return sGameProfiles.append(playerObject, this.getGameProfile0(playerObject)).get(playerObject);
-            }
-        });
+        SkinOverlay.getInstance().setSkinHandler(new SkinHandler_BungeeCord());
         switch (OptionsUtil.SKIN_HOOK.getStringValue()) {
             case "SkinsRestorer" -> {
                 if (getProxy().getPluginManager().getPlugin("SkinsRestorer") != null) {
@@ -136,8 +81,10 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
+        SkinOverlay.getInstance().setPluginMessageUtils(new BungeeCordPluginMessageUtils());
         BungeeMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         getProxy().registerChannel("skinoverlay:bungee");
+        getProxy().registerChannel("skinoverlay:messagechannel");
         if (OptionsUtil.METRICS.getBooleanValue())
             new Metrics(this, 17475);
         enabled = true;

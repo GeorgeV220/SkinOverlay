@@ -5,21 +5,14 @@ import com.georgev22.api.libraryloader.LibraryLoader;
 import com.georgev22.api.libraryloader.annotations.MavenLibrary;
 import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
-import com.georgev22.library.maps.HashObjectMap;
-import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.VelocityMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
-import com.georgev22.skinoverlay.handler.SGameProfile;
-import com.georgev22.skinoverlay.handler.SProperty;
-import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.handler.profile.SGameProfile_Velocity;
+import com.georgev22.skinoverlay.handler.handlers.SkinHandler_Velocity;
 import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.VelocityPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -31,11 +24,9 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import com.velocitypowered.api.util.GameProfile;
 import org.bstats.velocity.Metrics;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -95,6 +86,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         this.dataFolder = dataDirectory.toFile();
         this.pluginAnnotation = this.getClass().getAnnotation(Plugin.class);
         this.metricsFactory = metricsFactory;
+        this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.create("skinoverlay", "messagechannel"));
     }
 
     @Subscribe
@@ -120,54 +112,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     public void onEnable() {
         this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.create("skinoverlay", "test"));
         this.scheduledTask = getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
-        SkinOverlay.getInstance().setSkinHandler(new SkinHandler() {
-            @Override
-            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
-                try {
-                    if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "reset", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
-                    } else {
-                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "change", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
-                    }
-                    callback.onSuccess();
-                } catch (Exception exception) {
-                    callback.onFailure(exception);
-                }
-            }
-
-            @Override
-            public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, Utils.@NotNull Callback<Boolean> callback) {
-                try {
-                    if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
-                    } else {
-                        new VelocityPluginMessageUtils().sendDataTooAllServers(getProxy(), "changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
-                    }
-                    callback.onSuccess();
-                } catch (Exception exception) {
-                    callback.onFailure(exception);
-                }
-            }
-
-            @Override
-            public GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
-                return ((Player) playerObject.player()).getGameProfile();
-            }
-
-            @Override
-            public SGameProfile getGameProfile(@NotNull PlayerObject playerObject) {
-                if (sGameProfiles.containsKey(playerObject)) {
-                    return sGameProfiles.get(playerObject);
-                }
-                return sGameProfiles.append(playerObject, wrapper(this.getGameProfile0(playerObject))).get(playerObject);
-            }
-
-            public static @NotNull SGameProfile wrapper(@NotNull GameProfile gameProfile) {
-                ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
-                gameProfile.getProperties().forEach(property -> propertyObjectMap.append(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature())));
-                return new SGameProfile_Velocity(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
-            }
-        });
+        SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Velocity());
         switch (OptionsUtil.SKIN_HOOK.getStringValue()) {
             case "SkinsRestorer" -> {
                 if (getProxy().getPluginManager().getPlugin("skinsrestorer").isPresent()) {
@@ -179,6 +124,8 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, dataFolder()));
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
+        SkinOverlay.getInstance().setPluginMessageUtils(new VelocityPluginMessageUtils());
+        this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.from("skinoverlay:messagechannel"));
         VelocityMinecraftUtils.registerListeners(this, new DeveloperInformListener(), new PlayerListeners());
         if (OptionsUtil.METRICS.getBooleanValue())
             metricsFactory.make(this, 17476);

@@ -15,6 +15,7 @@ import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.PluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -46,6 +47,10 @@ public class SkinOverlay {
     @Getter
     @Setter
     private SkinHook skinHook;
+
+    @Getter
+    @Setter
+    private PluginMessageUtils pluginMessageUtils;
 
     @Getter
     private FileManager fileManager;

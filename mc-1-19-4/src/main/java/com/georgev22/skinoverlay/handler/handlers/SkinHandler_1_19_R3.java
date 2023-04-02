@@ -35,7 +35,6 @@ public class SkinHandler_1_19_R3 extends SkinHandler {
 
     @Override
     public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, final Utils.@NotNull Callback<Boolean> callback) {
-        skinOverlay.getLogger().info("????");
         try {
             Player player = (Player) playerObject.player();
             final CraftPlayer craftPlayer = (CraftPlayer) player;

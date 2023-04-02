@@ -1,6 +1,8 @@
 package com.georgev22.skinoverlay.listeners.bukkit;
 
+import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -32,7 +34,16 @@ public class PlayerListeners implements Listener, PluginMessageListener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent playerJoinEvent) {
-        new PlayerObjectBukkit(playerJoinEvent.getPlayer()).playerJoin();
+        PlayerObject playerObject = new PlayerObjectBukkit(playerJoinEvent.getPlayer());
+        playerObject.playerJoin();
+        if (OptionsUtil.PROXY.getBooleanValue())
+            SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
+                skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:messagechannel");
+                if (playerJoinEvent.getPlayer().isOnline())
+                    skinOverlay.getPluginMessageUtils().sendDataToPlayer("playerJoin", playerObject, playerObject.playerUUID().toString());
+                else
+                    skinOverlay.getLogger().warning("Player " + playerObject.playerName() + " is not online");
+            }, 1);
     }
 
     @EventHandler

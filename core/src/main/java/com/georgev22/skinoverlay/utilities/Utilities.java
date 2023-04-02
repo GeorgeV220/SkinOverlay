@@ -208,7 +208,6 @@ public class Utilities {
                     skinOverlay.getSkinHandler().updateSkin(playerObject, getSkinOptions(user.getCustomData("skinOptions")), user.getCustomData("skinProperty"), new Utils.Callback<>() {
                         @Override
                         public Boolean onSuccess() {
-                            skinOverlay.getLogger().info("Success");
                             return true;
                         }
 

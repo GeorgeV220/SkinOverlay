@@ -11,6 +11,7 @@ import com.georgev22.skinoverlay.handler.handlers.*;
 import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
+import com.georgev22.skinoverlay.utilities.BukkitPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -91,8 +92,11 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
         BukkitMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
-        if (OptionsUtil.PROXY.getBooleanValue())
+        if (OptionsUtil.PROXY.getBooleanValue()) {
+            SkinOverlay.getInstance().setPluginMessageUtils(new BukkitPluginMessageUtils());
             Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "skinoverlay:bungee", new PlayerListeners());
+            Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(this, "skinoverlay:messagechannel");
+        }
         if (OptionsUtil.METRICS.getBooleanValue())
             new Metrics(this, 17474);
         if (!PaperLib.isPaper())
@@ -100,6 +104,8 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     }
 
     public void onDisable() {
+        Bukkit.getServer().getMessenger().unregisterIncomingPluginChannel(this);
+        Bukkit.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
         SkinOverlay.getInstance().onDisable();
         Bukkit.getScheduler().cancelTasks(this);
         if (this.adventure != null) {
