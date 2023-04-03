@@ -1,5 +1,7 @@
 package com.georgev22.skinoverlay.handler.handlers;
 
+import com.georgev22.library.maps.HashObjectMap;
+import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
@@ -52,13 +54,11 @@ public class SkinHandler_BungeeCord extends SkinHandler {
 
     @Override
     public SGameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
-        SGameProfile gameProfile = new SGameProfileBungee(playerObject.playerName(), playerObject.playerUUID());
-        if (!gameProfile.getProperties().containsKey("textures")) {
-            for (Property property : ((InitialHandler) ((ProxiedPlayer) playerObject.player()).getPendingConnection()).getLoginProfile().getProperties()) {
-                gameProfile.addProperty(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature()));
-            }
+        ObjectMap<String, SProperty> properties = new HashObjectMap<>();
+        for (Property property : ((InitialHandler) ((ProxiedPlayer) playerObject.player()).getPendingConnection()).getLoginProfile().getProperties()) {
+            properties.append(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature()));
         }
-        return gameProfile;
+        return new SGameProfileBungee(playerObject.playerName(), playerObject.playerUUID(), properties);
     }
 
     @Override
