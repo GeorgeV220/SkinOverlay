@@ -3,31 +3,32 @@ package com.georgev22.skinoverlay.handler.handlers;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.UserManager;
-import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileMojang;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class SkinHandler_Unsupported extends SkinHandler {
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, final Utils.@NotNull Callback<Boolean> callback) {
-        skinOverlay.getLogger().info("Unsupported Minecraft Version");
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions) {
+        return CompletableFuture.supplyAsync(() -> {
+            throw new UnsupportedOperationException("Unsupported Minecraft Version");
+        });
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, final Utils.@NotNull Callback<Boolean> callback) {
-        updateSkin(playerObject, skinOptions, callback);
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property) {
+        return updateSkin(playerObject, skinOptions);
     }
 
     @Override

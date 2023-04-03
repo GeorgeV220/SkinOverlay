@@ -4,7 +4,6 @@ import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.UserManager;
-import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlayBukkit;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
@@ -25,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -84,208 +84,206 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
-        try {
-            Player player = (Player) playerObject.player();
-            final Object entityPlayer = getHandleMethod.invoke(player);
-            Object removePlayer;
-            Object addPlayer;
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
-                removePlayer = invokeConstructor(playOutPlayerInfo, removePlayerEnum, ImmutableList.of(entityPlayer));
-                addPlayer = invokeConstructor(playOutPlayerInfo, addPlayerEnum, ImmutableList.of(entityPlayer));
-            } catch (ReflectionException e) {
-                int ping = (int) fetchField(entityPlayer.getClass(), entityPlayer, "ping");
-                removePlayer = invokeConstructor(playOutPlayerInfo, player.getPlayerListName(), false, 9999);
-                addPlayer = invokeConstructor(playOutPlayerInfo, player.getPlayerListName(), true, ping);
-            }
-
-            Object world;
-            try {
-                world = fetchMethodAndInvoke(entityPlayer.getClass(), "getWorld", entityPlayer, new Object[0], new Class[0]);
-            } catch (Exception ignore) {
-                world = fetchMethodAndInvoke(entityPlayer.getClass(), "getWorldServer", entityPlayer, new Object[0], new Class[0]);
-            }
-            Object difficulty;
-            try {
-                difficulty = fetchMethodAndInvoke(world.getClass(), "getDifficulty", world, new Object[0], new Class[0]);
-            } catch (Exception e) {
+                Player player = (Player) playerObject.player();
+                final Object entityPlayer = getHandleMethod.invoke(player);
+                Object removePlayer;
+                Object addPlayer;
                 try {
-                    difficulty = fetchField(world.getClass(), world, "difficulty");
-                } catch (NoSuchFieldException ignore) {
-                    skinOverlay.getLogger().info(world.getClass().getSimpleName() + " does not have getDifficulty method or difficulty field!!");
-                    difficulty = null;
-                }
-
-            }
-
-            Object worldData = null;
-            try {
-                worldData = fetchMethodAndInvoke(world.getClass(), "getWorldData", world, new Object[0], new Class[0]);
-            } catch (Exception ignored) {
-                try {
-                    worldData = fetchField(world.getClass(), world, "worldData");
-                } catch (Exception ignored2) {
-                    skinOverlay.getLogger().info(world.getClass().getSimpleName() + " does not have getWorldData method or worldData field!!");
-                }
-            }
-
-            Object worldType = null;
-            try {
-                worldType = fetchMethodAndInvoke(Objects.requireNonNull(worldData).getClass(), "getType", worldData, new Object[0], new Class[0]);
-            } catch (Exception ignored) {
-                try {
-                    worldType = fetchMethodAndInvoke(Objects.requireNonNull(worldData).getClass(), "getGameType", worldData, new Object[0], new Class[0]);
-                } catch (Exception ignored2) {
-                }
-            }
-
-            Object playerIntManager = getFieldByType(entityPlayer, "PlayerInteractManager");
-            Enum<?> enumGamemode = (Enum<?>) fetchMethodAndInvoke(playerIntManager.getClass(), "getGameMode", playerIntManager, new Object[0], new Class[0]);
-
-            int gamemodeId = player.getGameMode().getValue();
-            int dimension = player.getWorld().getEnvironment().getId();
-
-            Object respawn;
-            try {
-                respawn = invokeConstructor(playOutRespawn, dimension, difficulty, worldType, enumGamemode);
-            } catch (Exception ignored) {
-                Object worldObject = getFieldByType(entityPlayer, "World");
-                Object dimensionManager = null;
-                try {
-                    dimensionManager = getFieldByType(worldObject, "DimensionManager");
+                    removePlayer = invokeConstructor(playOutPlayerInfo, removePlayerEnum, ImmutableList.of(entityPlayer));
+                    addPlayer = invokeConstructor(playOutPlayerInfo, addPlayerEnum, ImmutableList.of(entityPlayer));
                 } catch (ReflectionException e) {
-                    try {
-                        Class<?> dimensionManagerClass = getNMSClass("DimensionManager", "net.minecraft.world.level.dimension.DimensionManager");
+                    int ping = (int) fetchField(entityPlayer.getClass(), entityPlayer, "ping");
+                    removePlayer = invokeConstructor(playOutPlayerInfo, player.getPlayerListName(), false, 9999);
+                    addPlayer = invokeConstructor(playOutPlayerInfo, player.getPlayerListName(), true, ping);
+                }
 
-                        for (Method m : dimensionManagerClass.getDeclaredMethods()) {
-                            if (m.getReturnType() == dimensionManagerClass && m.getParameterCount() == 1 && m.getParameterTypes()[0] == Integer.TYPE) {
-                                m.setAccessible(true);
-                                dimensionManager = m.invoke(null, dimension);
-                            }
-                        }
-                    } catch (InvocationTargetException | IllegalAccessException | ClassNotFoundException e2) {
-                        callback.onFailure(e2);
+                Object world;
+                try {
+                    world = fetchMethodAndInvoke(entityPlayer.getClass(), "getWorld", entityPlayer, new Object[0], new Class[0]);
+                } catch (Exception ignore) {
+                    world = fetchMethodAndInvoke(entityPlayer.getClass(), "getWorldServer", entityPlayer, new Object[0], new Class[0]);
+                }
+                Object difficulty;
+                try {
+                    difficulty = fetchMethodAndInvoke(world.getClass(), "getDifficulty", world, new Object[0], new Class[0]);
+                } catch (Exception e) {
+                    try {
+                        difficulty = fetchField(world.getClass(), world, "difficulty");
+                    } catch (NoSuchFieldException ignore) {
+                        skinOverlay.getLogger().info(world.getClass().getSimpleName() + " does not have getDifficulty method or difficulty field!!");
+                        difficulty = null;
+                    }
+
+                }
+
+                Object worldData = null;
+                try {
+                    worldData = fetchMethodAndInvoke(world.getClass(), "getWorldData", world, new Object[0], new Class[0]);
+                } catch (Exception ignored) {
+                    try {
+                        worldData = fetchField(world.getClass(), world, "worldData");
+                    } catch (Exception ignored2) {
+                        skinOverlay.getLogger().info(world.getClass().getSimpleName() + " does not have getWorldData method or worldData field!!");
                     }
                 }
 
-                if (dimensionManager == null) {
-                    callback.onFailure(new ReflectionException("Could not get DimensionManager from " + worldObject.getClass().getSimpleName()));
-                    return;
+                Object worldType = null;
+                try {
+                    worldType = fetchMethodAndInvoke(Objects.requireNonNull(worldData).getClass(), "getType", worldData, new Object[0], new Class[0]);
+                } catch (Exception ignored) {
+                    try {
+                        worldType = fetchMethodAndInvoke(Objects.requireNonNull(worldData).getClass(), "getGameType", worldData, new Object[0], new Class[0]);
+                    } catch (Exception ignored2) {
+                    }
                 }
 
+                Object playerIntManager = getFieldByType(entityPlayer, "PlayerInteractManager");
+                Enum<?> enumGamemode = (Enum<?>) fetchMethodAndInvoke(playerIntManager.getClass(), "getGameMode", playerIntManager, new Object[0], new Class[0]);
+
+                int gamemodeId = player.getGameMode().getValue();
+                int dimension = player.getWorld().getEnvironment().getId();
+
+                Object respawn;
                 try {
-                    respawn = invokeConstructor(playOutRespawn, dimensionManager, difficulty, worldType, enumGamemode);
-                } catch (Exception ignored2) {
+                    respawn = invokeConstructor(playOutRespawn, dimension, difficulty, worldType, enumGamemode);
+                } catch (Exception ignored) {
+                    Object worldObject = getFieldByType(entityPlayer, "World");
+                    Object dimensionManager = null;
                     try {
-                        respawn = invokeConstructor(playOutRespawn, dimensionManager, worldType, enumGamemode);
-                    } catch (Exception ignored3) {
-                        long seedEncrypted = Hashing.sha256().hashString(String.valueOf(player.getWorld().getSeed()), StandardCharsets.UTF_8).asLong();
+                        dimensionManager = getFieldByType(worldObject, "DimensionManager");
+                    } catch (ReflectionException e) {
                         try {
-                            respawn = invokeConstructor(playOutRespawn, dimensionManager, seedEncrypted, worldType, enumGamemode);
-                        } catch (Exception ignored5) {
-                            Object dimensionKey = fetchMethodAndInvoke(worldObject.getClass(), "getDimensionKey", worldObject, new Object[0], new Class[0]);
-                            boolean debug = (boolean) fetchMethodAndInvoke(worldObject.getClass(), "isDebugWorld", worldObject, new Object[0], new Class[0]);
-                            boolean flat = (boolean) fetchMethodAndInvoke(worldObject.getClass(), "isFlatWorld", worldObject, new Object[0], new Class[0]);
-                            List<Object> gameModeList = getFieldByTypeList(playerIntManager, "EnumGamemode");
+                            Class<?> dimensionManagerClass = getNMSClass("DimensionManager", "net.minecraft.world.level.dimension.DimensionManager");
 
-                            Enum<?> enumGamemodePrevious = null;
-                            for (Object obj : gameModeList) {
-                                if (obj != enumGamemode)
-                                    enumGamemodePrevious = (Enum<?>) obj;
+                            for (Method m : dimensionManagerClass.getDeclaredMethods()) {
+                                if (m.getReturnType() == dimensionManagerClass && m.getParameterCount() == 1 && m.getParameterTypes()[0] == Integer.TYPE) {
+                                    m.setAccessible(true);
+                                    dimensionManager = m.invoke(null, dimension);
+                                }
                             }
+                        } catch (InvocationTargetException | IllegalAccessException | ClassNotFoundException e2) {
+                            throw new RuntimeException(e2);
+                        }
+                    }
 
+                    if (dimensionManager == null) {
+                        throw new ReflectionException("Could not get DimensionManager from " + worldObject.getClass().getSimpleName());
+                    }
+
+                    try {
+                        respawn = invokeConstructor(playOutRespawn, dimensionManager, difficulty, worldType, enumGamemode);
+                    } catch (Exception ignored2) {
+                        try {
+                            respawn = invokeConstructor(playOutRespawn, dimensionManager, worldType, enumGamemode);
+                        } catch (Exception ignored3) {
+                            long seedEncrypted = Hashing.sha256().hashString(String.valueOf(player.getWorld().getSeed()), StandardCharsets.UTF_8).asLong();
                             try {
-                                Object typeKey = fetchMethodAndInvoke(worldObject.getClass(), "getTypeKey", worldObject, new Object[0], new Class[0]);
+                                respawn = invokeConstructor(playOutRespawn, dimensionManager, seedEncrypted, worldType, enumGamemode);
+                            } catch (Exception ignored5) {
+                                Object dimensionKey = fetchMethodAndInvoke(worldObject.getClass(), "getDimensionKey", worldObject, new Object[0], new Class[0]);
+                                boolean debug = (boolean) fetchMethodAndInvoke(worldObject.getClass(), "isDebugWorld", worldObject, new Object[0], new Class[0]);
+                                boolean flat = (boolean) fetchMethodAndInvoke(worldObject.getClass(), "isFlatWorld", worldObject, new Object[0], new Class[0]);
+                                List<Object> gameModeList = getFieldByTypeList(playerIntManager, "EnumGamemode");
 
-                                respawn = invokeConstructor(playOutRespawn, typeKey, dimensionKey, seedEncrypted, enumGamemode, enumGamemodePrevious, debug, flat, true);
-                            } catch (Exception ignored6) {
-                                respawn = invokeConstructor(playOutRespawn, dimensionManager, dimensionKey, seedEncrypted, enumGamemode, enumGamemodePrevious, debug, flat, true);
+                                Enum<?> enumGamemodePrevious = null;
+                                for (Object obj : gameModeList) {
+                                    if (obj != enumGamemode)
+                                        enumGamemodePrevious = (Enum<?>) obj;
+                                }
+
+                                try {
+                                    Object typeKey = fetchMethodAndInvoke(worldObject.getClass(), "getTypeKey", worldObject, new Object[0], new Class[0]);
+
+                                    respawn = invokeConstructor(playOutRespawn, typeKey, dimensionKey, seedEncrypted, enumGamemode, enumGamemodePrevious, debug, flat, true);
+                                } catch (Exception ignored6) {
+                                    respawn = invokeConstructor(playOutRespawn, dimensionManager, dimensionKey, seedEncrypted, enumGamemode, enumGamemodePrevious, debug, flat, true);
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            Location l = player.getLocation();
-            Object pos;
-            try {
-                pos = invokeConstructor(playOutPosition, l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<Enum<?>>(), 0);
-            } catch (Exception e1) {
+                Location l = player.getLocation();
+                Object pos;
                 try {
-                    pos = invokeConstructor(playOutPosition, l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<Enum<?>>());
-                } catch (Exception e3) {
-                    pos = invokeConstructor(playOutPosition, l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), false);
-                }
-            }
-
-            Object slot = invokeConstructor(playOutHeldItemSlot, player.getInventory().getHeldItemSlot());
-            Object playerConnection = getFieldByType(entityPlayer, "PlayerConnection");
-
-            sendPacket(playerConnection, removePlayer);
-            sendPacket(playerConnection, addPlayer);
-
-            sendPacket(playerConnection, respawn);
-
-            Object dataWatcher;
-            try {
-                dataWatcher = fetchMethodAndInvoke(entityPlayer.getClass(), "getDataWatcher", entityPlayer, new Object[0], new Class[0]);
-            } catch (Exception e) {
-                callback.onFailure(e);
-                return;
-            }
-            if (dataWatcher != null) {
-                Object dataWatcherObject;
-                try {
-                    dataWatcherObject = invokeConstructor(BukkitMinecraftUtils.MinecraftReflection.getNMSClass("DataWatcherObject"), BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(BukkitMinecraftUtils.MinecraftVersion.V1_16_R1) ? 13 : 16, fetchField(getNMSClass("DataWatcherRegistry"), null, "a"));
-                } catch (ClassNotFoundException e) {
-                    callback.onFailure(e);
-                    return;
+                    pos = invokeConstructor(playOutPosition, l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<Enum<?>>(), 0);
+                } catch (Exception e1) {
+                    try {
+                        pos = invokeConstructor(playOutPosition, l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<Enum<?>>());
+                    } catch (Exception e3) {
+                        pos = invokeConstructor(playOutPosition, l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), false);
+                    }
                 }
 
-                //send new metadata
+                Object slot = invokeConstructor(playOutHeldItemSlot, player.getInventory().getHeldItemSlot());
+                Object playerConnection = getFieldByType(entityPlayer, "PlayerConnection");
 
-                fetchMethodAndInvoke(
-                        dataWatcher.getClass(),
-                        "set",
-                        dataWatcher,
-                        new Object[]{dataWatcherObject, skinOptions.getFlags()},
-                        new Class[]{dataWatcherObject.getClass(), Object.class});
+                sendPacket(playerConnection, removePlayer);
+                sendPacket(playerConnection, addPlayer);
 
+                sendPacket(playerConnection, respawn);
+
+                Object dataWatcher;
                 try {
-                    sendPacket(playerConnection, invokeConstructor(getNMSClass("PacketPlayOutEntityMetadata"), player.getEntityId(), dataWatcher, false));
-                } catch (ClassNotFoundException e) {
-                    callback.onFailure(e);
-                    return;
+                    dataWatcher = fetchMethodAndInvoke(entityPlayer.getClass(), "getDataWatcher", entityPlayer, new Object[0], new Class[0]);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-            } else {
-                skinOverlay.getLogger().log(Level.WARNING, "DataWatcher is null!!");
+                if (dataWatcher != null) {
+                    Object dataWatcherObject;
+                    try {
+                        dataWatcherObject = invokeConstructor(BukkitMinecraftUtils.MinecraftReflection.getNMSClass("DataWatcherObject"), BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(BukkitMinecraftUtils.MinecraftVersion.V1_16_R1) ? 13 : 16, fetchField(getNMSClass("DataWatcherRegistry"), null, "a"));
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    //send new metadata
+
+                    fetchMethodAndInvoke(
+                            dataWatcher.getClass(),
+                            "set",
+                            dataWatcher,
+                            new Object[]{dataWatcherObject, skinOptions.getFlags()},
+                            new Class[]{dataWatcherObject.getClass(), Object.class});
+
+                    try {
+                        sendPacket(playerConnection, invokeConstructor(getNMSClass("PacketPlayOutEntityMetadata"), player.getEntityId(), dataWatcher, false));
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    skinOverlay.getLogger().log(Level.WARNING, "DataWatcher is null!!");
+                }
+
+                fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
+
+                sendPacket(playerConnection, pos);
+                sendPacket(playerConnection, slot);
+
+                fetchMethodAndInvoke(player.getClass(), "updateScaledHealth", player, new Object[0], new Class[0]);
+                player.updateInventory();
+                fetchMethodAndInvoke(entityPlayer.getClass(), "triggerHealthUpdate", entityPlayer, new Object[0], new Class[0]);
+
+                if (player.isOp()) {
+                    SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                        player.setOp(false);
+                        player.setOp(true);
+                    });
+                }
+                return true;
+            } catch (ReflectionException | InvocationTargetException | IllegalAccessException | NoSuchMethodException |
+                     NoSuchFieldException e) {
+                throw new RuntimeException(e);
             }
-
-            fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
-
-            sendPacket(playerConnection, pos);
-            sendPacket(playerConnection, slot);
-
-            fetchMethodAndInvoke(player.getClass(), "updateScaledHealth", player, new Object[0], new Class[0]);
-            player.updateInventory();
-            fetchMethodAndInvoke(entityPlayer.getClass(), "triggerHealthUpdate", entityPlayer, new Object[0], new Class[0]);
-
-            if (player.isOp()) {
-                SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
-                    player.setOp(false);
-                    player.setOp(true);
-                });
-            }
-            callback.onSuccess();
-        } catch (ReflectionException | InvocationTargetException | IllegalAccessException | NoSuchMethodException |
-                 NoSuchFieldException e) {
-            callback.onFailure(e);
-        }
+        });
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, Utils.@NotNull Callback<Boolean> callback) {
-        updateSkin(playerObject, skinOptions, callback);
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property) {
+        return updateSkin(playerObject, skinOptions);
     }
 
     @Override
@@ -318,9 +316,14 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
             player.hidePlayer(SkinOverlayBukkit.getInstance(), player);
             player.showPlayer(SkinOverlayBukkit.getInstance(), player);
             try {
-                skinOverlay.getSkinHandler().updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions")), new Utils.Callback<>() {
-                    @Override
-                    public Boolean onSuccess() {
+                skinOverlay.getSkinHandler().updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions"))).handleAsync((aBoolean, throwable) -> {
+                    if (throwable != null) {
+                        throwable.printStackTrace();
+                        return false;
+                    }
+                    return aBoolean;
+                }).thenAccept(aBoolean -> {
+                    if (aBoolean)
                         if (forOthers) {
                             skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
                                 Player p = (Player) playerObjects.player();
@@ -328,13 +331,6 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                                 p.showPlayer(SkinOverlayBukkit.getInstance(), player);
                             });
                         }
-                        return true;
-                    }
-
-                    @Override
-                    public Boolean onFailure() {
-                        return false;
-                    }
                 });
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);

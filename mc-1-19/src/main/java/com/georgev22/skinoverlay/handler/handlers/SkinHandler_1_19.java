@@ -33,71 +33,74 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
 
 import static com.georgev22.skinoverlay.handler.handlers.SkinHandler_Unsupported.wrapper;
 
 public class SkinHandler_1_19 extends SkinHandler {
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, @NotNull final Utils.Callback<Boolean> callback) {
-        this.updateSkin(playerObject, skinOptions, callback);
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property) {
+        return this.updateSkin(playerObject, skinOptions);
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, @NotNull final Utils.Callback<Boolean> callback) {
-        try {
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
 
-            Player player = (Player) playerObject.player();
-            final CraftPlayer craftPlayer = (CraftPlayer) player;
-            final ServerPlayer entityPlayer = craftPlayer.getHandle();
-
-
-            ClientboundPlayerInfoPacket removePlayer = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, ImmutableList.of(entityPlayer));
-            ClientboundPlayerInfoPacket addPlayer = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, ImmutableList.of(entityPlayer));
-
-            ServerLevel world = entityPlayer.getLevel();
-            ServerPlayerGameMode gamemode = entityPlayer.gameMode;
-
-            ClientboundRespawnPacket respawn = new ClientboundRespawnPacket(
-                    world.dimensionTypeId(),
-                    world.dimension(),
-                    BiomeManager.obfuscateSeed(world.getSeed()),
-                    gamemode.getGameModeForPlayer(),
-                    gamemode.getPreviousGameModeForPlayer(),
-                    world.isDebug(),
-                    world.isFlat(),
-                    true,
-                    entityPlayer.getLastDeathLocation()
-            );
-
-            Location l = player.getLocation();
-            ClientboundPlayerPositionPacket pos = new ClientboundPlayerPositionPacket(l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<>(), 0, false);
-            ClientboundSetCarriedItemPacket slot = new ClientboundSetCarriedItemPacket(player.getInventory().getHeldItemSlot());
-
-            sendPacket(entityPlayer, removePlayer);
-            sendPacket(entityPlayer, addPlayer);
-
-            sendPacket(entityPlayer, respawn);
-
-            SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
-
-            synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skinOptions.getFlags());
+                Player player = (Player) playerObject.player();
+                final CraftPlayer craftPlayer = (CraftPlayer) player;
+                final ServerPlayer entityPlayer = craftPlayer.getHandle();
 
 
-            ClientboundSetEntityDataPacket clientboundSetEntityDataPacket = new ClientboundSetEntityDataPacket(entityPlayer.getId(), synchedEntityData, true);
+                ClientboundPlayerInfoPacket removePlayer = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, ImmutableList.of(entityPlayer));
+                ClientboundPlayerInfoPacket addPlayer = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, ImmutableList.of(entityPlayer));
 
-            sendPacket(entityPlayer, clientboundSetEntityDataPacket);
+                ServerLevel world = entityPlayer.getLevel();
+                ServerPlayerGameMode gamemode = entityPlayer.gameMode;
 
-            entityPlayer.onUpdateAbilities();
+                ClientboundRespawnPacket respawn = new ClientboundRespawnPacket(
+                        world.dimensionTypeId(),
+                        world.dimension(),
+                        BiomeManager.obfuscateSeed(world.getSeed()),
+                        gamemode.getGameModeForPlayer(),
+                        gamemode.getPreviousGameModeForPlayer(),
+                        world.isDebug(),
+                        world.isFlat(),
+                        true,
+                        entityPlayer.getLastDeathLocation()
+                );
 
-            sendPacket(entityPlayer, pos);
-            sendPacket(entityPlayer, slot);
-            craftPlayer.updateScaledHealth();
-            player.updateInventory();
-            entityPlayer.resetSentInfo();
-            callback.onSuccess();
-        } catch (Exception exception) {
-            callback.onFailure(exception);
-        }
+                Location l = player.getLocation();
+                ClientboundPlayerPositionPacket pos = new ClientboundPlayerPositionPacket(l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<>(), 0, false);
+                ClientboundSetCarriedItemPacket slot = new ClientboundSetCarriedItemPacket(player.getInventory().getHeldItemSlot());
+
+                sendPacket(entityPlayer, removePlayer);
+                sendPacket(entityPlayer, addPlayer);
+
+                sendPacket(entityPlayer, respawn);
+
+                SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
+
+                synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skinOptions.getFlags());
+
+
+                ClientboundSetEntityDataPacket clientboundSetEntityDataPacket = new ClientboundSetEntityDataPacket(entityPlayer.getId(), synchedEntityData, true);
+
+                sendPacket(entityPlayer, clientboundSetEntityDataPacket);
+
+                entityPlayer.onUpdateAbilities();
+
+                sendPacket(entityPlayer, pos);
+                sendPacket(entityPlayer, slot);
+                craftPlayer.updateScaledHealth();
+                player.updateInventory();
+                entityPlayer.resetSentInfo();
+                return true;
+            } catch (Exception exception) {
+                throw new RuntimeException(exception);
+            }
+        });
     }
 
     @Override
@@ -137,9 +140,14 @@ public class SkinHandler_1_19 extends SkinHandler {
             player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             try {
-                skinOverlay.getSkinHandler().updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions")), new Utils.Callback<>() {
-                    @Override
-                    public Boolean onSuccess() {
+                skinOverlay.getSkinHandler().updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions"))).handleAsync((aBoolean, throwable) -> {
+                    if (throwable != null) {
+                        throwable.printStackTrace();
+                        return false;
+                    }
+                    return aBoolean;
+                }).thenAccept(aBoolean -> {
+                    if (aBoolean)
                         if (forOthers) {
                             skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
                                 Player p = (Player) playerObjects.player();
@@ -147,13 +155,6 @@ public class SkinHandler_1_19 extends SkinHandler {
                                 p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                             });
                         }
-                        return true;
-                    }
-
-                    @Override
-                    public Boolean onFailure() {
-                        return false;
-                    }
                 });
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);

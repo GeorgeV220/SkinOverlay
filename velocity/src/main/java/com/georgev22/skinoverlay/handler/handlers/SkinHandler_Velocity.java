@@ -3,7 +3,6 @@ package com.georgev22.skinoverlay.handler.handlers;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.UserManager;
-import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
@@ -15,40 +14,46 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.util.GameProfile;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.CompletableFuture;
+
 public class SkinHandler_Velocity extends SkinHandler {
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
-        try {
-            Player player = (Player) playerObject.player();
-            skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
-            skinOverlay.getPluginMessageUtils().setObject(player.getCurrentServer().orElseThrow().getServerInfo());
-            if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                skinOverlay.getPluginMessageUtils().sendDataToServer("reset", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
-            } else {
-                skinOverlay.getPluginMessageUtils().sendDataToServer("change", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Player player = (Player) playerObject.player();
+                skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
+                skinOverlay.getPluginMessageUtils().setObject(player.getCurrentServer().orElseThrow().getServerInfo());
+                if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
+                    skinOverlay.getPluginMessageUtils().sendDataToServer("reset", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
+                } else {
+                    skinOverlay.getPluginMessageUtils().sendDataToServer("change", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
+                }
+                return true;
+            } catch (Exception exception) {
+                throw new RuntimeException(exception);
             }
-            callback.onSuccess();
-        } catch (Exception exception) {
-            callback.onFailure(exception);
-        }
+        });
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, Utils.@NotNull Callback<Boolean> callback) {
-        try {
-            Player player = (Player) playerObject.player();
-            skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
-            skinOverlay.getPluginMessageUtils().setObject(player.getCurrentServer().orElseThrow().getServerInfo());
-            if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                skinOverlay.getPluginMessageUtils().sendDataToServer("resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
-            } else {
-                skinOverlay.getPluginMessageUtils().sendDataToServer("changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Player player = (Player) playerObject.player();
+                skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
+                skinOverlay.getPluginMessageUtils().setObject(player.getCurrentServer().orElseThrow().getServerInfo());
+                if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
+                    skinOverlay.getPluginMessageUtils().sendDataToServer("resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
+                } else {
+                    skinOverlay.getPluginMessageUtils().sendDataToServer("changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
+                }
+                return true;
+            } catch (Exception exception) {
+                throw new RuntimeException(exception);
             }
-            callback.onSuccess();
-        } catch (Exception exception) {
-            callback.onFailure(exception);
-        }
+        });
     }
 
     @Override

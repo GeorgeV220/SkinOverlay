@@ -4,7 +4,6 @@ import co.aikar.commands.CommandIssuer;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.UserManager;
-import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
@@ -19,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
+import javax.naming.OperationNotSupportedException;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -40,12 +41,10 @@ public abstract class SkinHandler {
      *
      * @param playerObject Player's {@link PlayerObject} object.
      * @param skinOptions  Skin options
-     * @param callback     Callback
      */
-    public abstract void updateSkin(
+    public abstract CompletableFuture<Boolean> updateSkin(
             @NotNull final PlayerObject playerObject,
-            @NotNull final SkinOptions skinOptions,
-            @NotNull final Utils.Callback<Boolean> callback);
+            @NotNull final SkinOptions skinOptions);
 
     /**
      * Update the skin for the specified {@link PlayerObject} and {@link SProperty}
@@ -53,12 +52,10 @@ public abstract class SkinHandler {
      * @param playerObject Player's {@link PlayerObject} object.
      * @param skinOptions  Skin options)
      * @param property     {@link SProperty} to set
-     * @param callback     Callback
      */
-    public abstract void updateSkin(@NotNull final PlayerObject playerObject,
-                                    @NotNull final SkinOptions skinOptions,
-                                    final SProperty property,
-                                    @NotNull final Utils.Callback<Boolean> callback);
+    public abstract CompletableFuture<Boolean> updateSkin(@NotNull final PlayerObject playerObject,
+                                                          @NotNull final SkinOptions skinOptions,
+                                                          final SProperty property);
 
     /**
      * Retrieves {@link PlayerObject}'s {@link SGameProfile}
@@ -214,7 +211,10 @@ public abstract class SkinHandler {
             updateSkin0(user, playerObject, forOthers);
         }).handle((unused, throwable) -> {
             if (throwable != null) {
-                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
+                if (throwable instanceof OperationNotSupportedException)
+                    skinOverlay.getLogger().info("Unsupported Minecraft Version");
+                else
+                    skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
                 return unused;
             }
             return unused;
@@ -225,17 +225,11 @@ public abstract class SkinHandler {
 
     protected void updateSkin1(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
         try {
-            updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions")), user.getCustomData("skinProperty"), new Utils.Callback<>() {
-                @Override
-                public Boolean onSuccess() {
-                    return true;
+            updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions")), user.getCustomData("skinProperty")).handleAsync((unused, throwable) -> {
+                if (throwable != null) {
+                    skinOverlay.getLogger().log(Level.SEVERE, "Error", throwable);
                 }
-
-                @Override
-                public Boolean onFailure() {
-                    skinOverlay.getLogger().info("Error");
-                    return false;
-                }
+                return unused;
             });
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);

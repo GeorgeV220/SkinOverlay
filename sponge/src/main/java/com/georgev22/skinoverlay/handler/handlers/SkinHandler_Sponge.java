@@ -28,7 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 import static com.georgev22.library.utilities.Utils.Reflection.*;
@@ -67,7 +69,8 @@ public class SkinHandler_Sponge extends SkinHandler_Unsupported {
     }
 
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, Utils.@NotNull Callback<Boolean> callback) {
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions) {
+        AtomicReference<CompletableFuture<Boolean>> atomicReference = new AtomicReference<>();
         skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
@@ -76,221 +79,226 @@ public class SkinHandler_Sponge extends SkinHandler_Unsupported {
             return user;
         }).thenAccept(user -> {
             if (user != null)
-                updateSkin(playerObject, skinOptions, user.getCustomData("skinSProperty"), callback);
+                atomicReference.set(updateSkin(playerObject, skinOptions, user.getCustomData("skinProperty")));
         });
+        return atomicReference.get();
     }
 
     @SneakyThrows
     @Override
-    public void updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property, @NotNull final Utils.Callback<Boolean> callback) {
-        ServerPlayer receiver = (ServerPlayer) playerObject.player();
-
-        receiver.user().offer(Keys.UPDATE_GAME_PROFILE, true);
-        receiver.user().offer(Keys.SKIN_PROFILE_PROPERTY, ProfileProperty.of(ProfileProperty.TEXTURES, property.value(), property.signature()));
-
-        long seedEncrypted = Hashing.sha256().hashString(String.valueOf(receiver.world().seed()), StandardCharsets.UTF_8).asLong();
-
-        Object serverPlayer = serverPlayerClass.cast(receiver);
-
-        Object serverWorld = fetchMethodAndInvoke(serverPlayerClass, "getLevel", serverPlayer, new Object[]{}, new Class[]{});
-
-        Object gameMode = fetchField(serverPlayerClass, serverPlayer, "gameMode");
-
-        Object dimensionType;
-        try {
-            dimensionType = fetchMethodAndInvoke(serverWorldClass, "dimensionTypeId", serverWorld, new Object[]{}, new Class[]{});
-        } catch (Exception ignored) {
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
-                dimensionType = fetchMethodAndInvoke(serverWorldClass, "dimensionTypeRegistration", serverWorld, new Object[]{}, new Class[]{});
-            } catch (Exception ignored2) {
-                dimensionType = fetchMethodAndInvoke(serverWorldClass, "dimensionType", serverWorld, new Object[]{}, new Class[]{});
-            }
-        }
+                ServerPlayer receiver = (ServerPlayer) playerObject.player();
 
-        Object dimension = fetchMethodAndInvoke(serverWorldClass, "dimension", serverWorld, new Object[]{}, new Class[]{});
+                receiver.user().offer(Keys.UPDATE_GAME_PROFILE, true);
+                receiver.user().offer(Keys.SKIN_PROFILE_PROPERTY, ProfileProperty.of(ProfileProperty.TEXTURES, property.value(), property.signature()));
 
-        Object gameModeForPlayer = fetchMethodAndInvoke(gameMode.getClass(), "getGameModeForPlayer", gameMode, new Object[]{}, new Class[]{});
+                long seedEncrypted = Hashing.sha256().hashString(String.valueOf(receiver.world().seed()), StandardCharsets.UTF_8).asLong();
 
-        Object previousGameModeForPlayer = fetchMethodAndInvoke(gameMode.getClass(), "getPreviousGameModeForPlayer", gameMode, new Object[]{}, new Class[]{});
+                Object serverPlayer = serverPlayerClass.cast(receiver);
 
-        if (previousGameModeForPlayer == null) {
-            previousGameModeForPlayer = gameModeForPlayer;
-        }
+                Object serverWorld = fetchMethodAndInvoke(serverPlayerClass, "getLevel", serverPlayer, new Object[]{}, new Class[]{});
 
-        Object addPlayer;
-        Object removePlayer;
-        //Add remove player packet
-        if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().equals(Sponge8MinecraftUtils.MinecraftVersion.V1_19_R2)) {
-            removePlayer = invokeConstructor(removePlayerPacketClass, List.of(receiver.uniqueId()));
-            addPlayer = fetchMethodAndInvoke(addPlayerPacketClass, "createPlayerInitializing", null,
-                    new Object[]{List.of(serverPlayer)},
-                    new Class[]{Collection.class}
-            );
+                Object gameMode = fetchField(serverPlayerClass, serverPlayer, "gameMode");
 
-        } else {
-            removePlayer = invokeConstructor(removePlayerPacketClass,
-                    getEnum(Utils.Reflection.getClass(removePlayerPacketClass.getName() + "$Action", classLoader), "REMOVE_PLAYER"),
-                    ImmutableList.of(serverPlayer));
-            addPlayer = invokeConstructor(addPlayerPacketClass,
-                    getEnum(Utils.Reflection.getClass(addPlayerPacketClass.getName() + "$Action", classLoader), "ADD_PLAYER"),
-                    ImmutableList.of(serverPlayer));
-        }
+                Object dimensionType;
+                try {
+                    dimensionType = fetchMethodAndInvoke(serverWorldClass, "dimensionTypeId", serverWorld, new Object[]{}, new Class[]{});
+                } catch (Exception ignored) {
+                    try {
+                        dimensionType = fetchMethodAndInvoke(serverWorldClass, "dimensionTypeRegistration", serverWorld, new Object[]{}, new Class[]{});
+                    } catch (Exception ignored2) {
+                        dimensionType = fetchMethodAndInvoke(serverWorldClass, "dimensionType", serverWorld, new Object[]{}, new Class[]{});
+                    }
+                }
 
-        Object respawnPacket;
-        //Respawn packet
-        try {
+                Object dimension = fetchMethodAndInvoke(serverWorldClass, "dimension", serverWorld, new Object[]{}, new Class[]{});
 
-            switch (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion()) {
-                case V1_19_R2, UNKNOWN -> respawnPacket = invokeConstructor(
-                        respawnPacketClass,
-                        dimensionType,
-                        dimension,
-                        seedEncrypted,
-                        gameModeForPlayer,
-                        previousGameModeForPlayer,
-                        fetchMethodAndInvoke(serverWorldClass, "isDebug", serverWorld, new Object[]{}, new Class[]{}),
-                        fetchMethodAndInvoke(serverWorldClass, "isFlat", serverWorld, new Object[]{}, new Class[]{}),
-                        (byte) 3,
-                        fetchMethodAndInvoke(serverPlayerClass, "getLastDeathLocation", serverPlayer, new Object[]{}, new Class[]{})
-                );
-                case V1_19_R1 -> respawnPacket = invokeConstructor(
-                        respawnPacketClass,
-                        dimensionType,
-                        dimension,
-                        seedEncrypted,
-                        gameModeForPlayer,
-                        previousGameModeForPlayer,
-                        fetchMethodAndInvoke(serverWorldClass, "isDebug", serverWorld, new Object[]{}, new Class[]{}),
-                        fetchMethodAndInvoke(serverWorldClass, "isFlat", serverWorld, new Object[]{}, new Class[]{}),
-                        true,
-                        fetchMethodAndInvoke(serverPlayerClass, "getLastDeathLocation", serverPlayer, new Object[]{}, new Class[]{})
-                );
-                default -> respawnPacket = invokeConstructor(
-                        respawnPacketClass,
-                        dimensionType,
-                        dimension,
-                        seedEncrypted,
-                        gameModeForPlayer,
-                        previousGameModeForPlayer,
-                        fetchMethodAndInvoke(serverWorldClass, "isDebug", serverWorld, new Object[]{}, new Class[]{}),
-                        fetchMethodAndInvoke(serverWorldClass, "isFlat", serverWorld, new Object[]{}, new Class[]{}),
-                        true);
-            }
-        } catch (Exception exception) {
-            callback.onFailure(exception);
-            return;
-        }
+                Object gameModeForPlayer = fetchMethodAndInvoke(gameMode.getClass(), "getGameModeForPlayer", gameMode, new Object[]{}, new Class[]{});
 
-        //EntityMetaData packet
-        Object entityDataPacket;
-        Object synchedEntityData = fetchMethodAndInvoke(serverPlayerClass, "getEntityData", serverPlayer, new Object[]{}, new Class[]{});
-        Object entityDataAccessor;
+                Object previousGameModeForPlayer = fetchMethodAndInvoke(gameMode.getClass(), "getPreviousGameModeForPlayer", gameMode, new Object[]{}, new Class[]{});
 
-        fetchMethodAndInvoke(synchedEntityData.getClass(), "set", synchedEntityData,
-                new Object[]{
-                        entityDataAccessor = invokeConstructor(
-                                entityDataAccessorClass,
-                                Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
-                                fetchField(entityDataSerializersClass, null, "BYTE")),
-                        skinOptions.getFlags()
-                },
-                new Class[]{
-                        entityDataAccessor.getClass(),
-                        Object.class
-                });
+                if (previousGameModeForPlayer == null) {
+                    previousGameModeForPlayer = gameModeForPlayer;
+                }
 
-        try {
-            fetchMethodAndInvoke(synchedEntityData.getClass(), "markDirty", synchedEntityData, new Object[]{entityDataAccessor}, new Class[]{entityDataAccessorClass});
-        } catch (Exception ignore) {
-            markDirty(synchedEntityData, entityDataAccessor);
-        }
-        if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().equals(Sponge8MinecraftUtils.MinecraftVersion.V1_19_R2)) {
-            entityDataPacket = invokeConstructor(entityDataPacketClass,
-                    fetchMethodAndInvoke(serverPlayerClass, "getId", serverPlayer, new Object[]{}, new Class[]{}),
-                    fetchMethodAndInvoke(synchedEntityData.getClass(), "packDirty", synchedEntityData, new Object[]{}, new Class[]{})
-            );
-        } else {
-            entityDataPacket = invokeConstructor(entityDataPacketClass,
-                    fetchMethodAndInvoke(serverPlayerClass, "getId", serverPlayer, new Object[]{}, new Class[]{}),
-                    synchedEntityData,
-                    true
-            );
-        }
+                Object addPlayer;
+                Object removePlayer;
+                //Add remove player packet
+                if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().equals(Sponge8MinecraftUtils.MinecraftVersion.V1_19_R2)) {
+                    removePlayer = invokeConstructor(removePlayerPacketClass, List.of(receiver.uniqueId()));
+                    addPlayer = fetchMethodAndInvoke(addPlayerPacketClass, "createPlayerInitializing", null,
+                            new Object[]{List.of(serverPlayer)},
+                            new Class[]{Collection.class}
+                    );
 
-        ServerLocation serverLocation = receiver.serverLocation();
-        Vector3d rotation = receiver.rotation();
+                } else {
+                    removePlayer = invokeConstructor(removePlayerPacketClass,
+                            getEnum(Utils.Reflection.getClass(removePlayerPacketClass.getName() + "$Action", classLoader), "REMOVE_PLAYER"),
+                            ImmutableList.of(serverPlayer));
+                    addPlayer = invokeConstructor(addPlayerPacketClass,
+                            getEnum(Utils.Reflection.getClass(addPlayerPacketClass.getName() + "$Action", classLoader), "ADD_PLAYER"),
+                            ImmutableList.of(serverPlayer));
+                }
 
-        Object playerConnection = getFieldByType(serverPlayer, "ServerGamePacketListenerImpl");
+                Object respawnPacket;
+                //Respawn packet
+                try {
 
-        Object playerPositionPacket;
-        Object playerCarriedItemPacket;
-        try {
-            Class<?> playerPositionPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket", classLoader);
-            Class<?> playerCarriedItemPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket", classLoader);
-            switch (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion()) {
-                case V1_19_R2, V1_19_R1, V1_18_R2, V1_18_R1 ->
-                        playerPositionPacket = invokeConstructor(playerPositionPacketClass,
+                    switch (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion()) {
+                        case V1_19_R2, UNKNOWN -> respawnPacket = invokeConstructor(
+                                respawnPacketClass,
+                                dimensionType,
+                                dimension,
+                                seedEncrypted,
+                                gameModeForPlayer,
+                                previousGameModeForPlayer,
+                                fetchMethodAndInvoke(serverWorldClass, "isDebug", serverWorld, new Object[]{}, new Class[]{}),
+                                fetchMethodAndInvoke(serverWorldClass, "isFlat", serverWorld, new Object[]{}, new Class[]{}),
+                                (byte) 3,
+                                fetchMethodAndInvoke(serverPlayerClass, "getLastDeathLocation", serverPlayer, new Object[]{}, new Class[]{})
+                        );
+                        case V1_19_R1 -> respawnPacket = invokeConstructor(
+                                respawnPacketClass,
+                                dimensionType,
+                                dimension,
+                                seedEncrypted,
+                                gameModeForPlayer,
+                                previousGameModeForPlayer,
+                                fetchMethodAndInvoke(serverWorldClass, "isDebug", serverWorld, new Object[]{}, new Class[]{}),
+                                fetchMethodAndInvoke(serverWorldClass, "isFlat", serverWorld, new Object[]{}, new Class[]{}),
+                                true,
+                                fetchMethodAndInvoke(serverPlayerClass, "getLastDeathLocation", serverPlayer, new Object[]{}, new Class[]{})
+                        );
+                        default -> respawnPacket = invokeConstructor(
+                                respawnPacketClass,
+                                dimensionType,
+                                dimension,
+                                seedEncrypted,
+                                gameModeForPlayer,
+                                previousGameModeForPlayer,
+                                fetchMethodAndInvoke(serverWorldClass, "isDebug", serverWorld, new Object[]{}, new Class[]{}),
+                                fetchMethodAndInvoke(serverWorldClass, "isFlat", serverWorld, new Object[]{}, new Class[]{}),
+                                true);
+                    }
+                } catch (Exception exception) {
+                    throw new RuntimeException(exception);
+                }
+
+                //EntityMetaData packet
+                Object entityDataPacket;
+                Object synchedEntityData = fetchMethodAndInvoke(serverPlayerClass, "getEntityData", serverPlayer, new Object[]{}, new Class[]{});
+                Object entityDataAccessor;
+
+                fetchMethodAndInvoke(synchedEntityData.getClass(), "set", synchedEntityData,
+                        new Object[]{
+                                entityDataAccessor = invokeConstructor(
+                                        entityDataAccessorClass,
+                                        Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1) ? 16 : 17,
+                                        fetchField(entityDataSerializersClass, null, "BYTE")),
+                                skinOptions.getFlags()
+                        },
+                        new Class[]{
+                                entityDataAccessor.getClass(),
+                                Object.class
+                        });
+
+                try {
+                    fetchMethodAndInvoke(synchedEntityData.getClass(), "markDirty", synchedEntityData, new Object[]{entityDataAccessor}, new Class[]{entityDataAccessorClass});
+                } catch (Exception ignore) {
+                    markDirty(synchedEntityData, entityDataAccessor);
+                }
+                if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().equals(Sponge8MinecraftUtils.MinecraftVersion.V1_19_R2)) {
+                    entityDataPacket = invokeConstructor(entityDataPacketClass,
+                            fetchMethodAndInvoke(serverPlayerClass, "getId", serverPlayer, new Object[]{}, new Class[]{}),
+                            fetchMethodAndInvoke(synchedEntityData.getClass(), "packDirty", synchedEntityData, new Object[]{}, new Class[]{})
+                    );
+                } else {
+                    entityDataPacket = invokeConstructor(entityDataPacketClass,
+                            fetchMethodAndInvoke(serverPlayerClass, "getId", serverPlayer, new Object[]{}, new Class[]{}),
+                            synchedEntityData,
+                            true
+                    );
+                }
+
+                ServerLocation serverLocation = receiver.serverLocation();
+                Vector3d rotation = receiver.rotation();
+
+                Object playerConnection = getFieldByType(serverPlayer, "ServerGamePacketListenerImpl");
+
+                Object playerPositionPacket;
+                Object playerCarriedItemPacket;
+                try {
+                    Class<?> playerPositionPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket", classLoader);
+                    Class<?> playerCarriedItemPacketClass = Utils.Reflection.getClass("net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket", classLoader);
+                    switch (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion()) {
+                        case V1_19_R2, V1_19_R1, V1_18_R2, V1_18_R1 ->
+                                playerPositionPacket = invokeConstructor(playerPositionPacketClass,
+                                        serverLocation.x(),
+                                        serverLocation.y(),
+                                        serverLocation.z(),
+                                        (float) rotation.y(),
+                                        (float) rotation.x(),
+                                        new HashSet<>(),
+                                        0,
+                                        false);
+                        case V1_17_R1 -> playerPositionPacket = invokeConstructor(playerPositionPacketClass,
+                                serverLocation.x(),
+                                serverLocation.y(),
+                                serverLocation.z(),
+                                (float) rotation.y(),
+                                (float) rotation.x(),
+                                false);
+                        case V1_16_R3, V1_16_R2 -> playerPositionPacket = invokeConstructor(playerPositionPacketClass,
                                 serverLocation.x(),
                                 serverLocation.y(),
                                 serverLocation.z(),
                                 (float) rotation.y(),
                                 (float) rotation.x(),
                                 new HashSet<>(),
-                                0,
-                                false);
-                case V1_17_R1 -> playerPositionPacket = invokeConstructor(playerPositionPacketClass,
-                        serverLocation.x(),
-                        serverLocation.y(),
-                        serverLocation.z(),
-                        (float) rotation.y(),
-                        (float) rotation.x(),
-                        false);
-                case V1_16_R3, V1_16_R2 -> playerPositionPacket = invokeConstructor(playerPositionPacketClass,
-                        serverLocation.x(),
-                        serverLocation.y(),
-                        serverLocation.z(),
-                        (float) rotation.y(),
-                        (float) rotation.x(),
-                        new HashSet<>(),
-                        0);
-                default -> playerPositionPacket = invokeConstructor(playerPositionPacketClass,
-                        serverLocation.x(),
-                        serverLocation.y(),
-                        serverLocation.z(),
-                        (float) rotation.y(),
-                        (float) rotation.x(),
-                        new HashSet<>());
+                                0);
+                        default -> playerPositionPacket = invokeConstructor(playerPositionPacketClass,
+                                serverLocation.x(),
+                                serverLocation.y(),
+                                serverLocation.z(),
+                                (float) rotation.y(),
+                                (float) rotation.x(),
+                                new HashSet<>());
+                    }
+
+                    playerCarriedItemPacket = invokeConstructor(playerCarriedItemPacketClass,
+                            receiver.inventory().hotbar().selectedSlotIndex()
+                    );
+                } catch (Exception exception) {
+                    throw new RuntimeException(exception);
+                }
+
+                sendPacketToAll(removePlayer);
+                sendPacketToAll(addPlayer);
+
+                sendPacket(playerConnection, respawnPacket);
+                sendPacket(playerConnection, entityDataPacket);
+                receiver.offer(Keys.VANISH_STATE, VanishState.vanished());
+                SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> receiver.offer(Keys.VANISH_STATE, VanishState.unvanished()), 1L);
+                fetchMethodAndInvoke(serverPlayerClass, "onUpdateAbilities", serverPlayer, new Object[]{}, new Class[]{});
+                sendPacket(playerConnection, playerPositionPacket);
+                sendPacket(playerConnection, playerCarriedItemPacket);
+
+                if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isAboveOrEqual(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1)) {
+                    Object container = fetchDeclaredField(serverPlayerClass.getSuperclass(), serverPlayer, "containerMenu");
+                    fetchMethodAndInvoke(container.getClass(), "sendAllDataToRemote", container, new Object[]{}, new Class[]{});
+                } else {
+                    Object container = fetchDeclaredField(serverPlayerClass.getSuperclass(), serverPlayer, "activeContainer");
+                    fetchMethodAndInvoke(serverPlayerClass, "updateInventory", serverPlayer, new Object[]{container}, new Class[]{container.getClass()});
+                }
+
+                fetchMethodAndInvoke(serverPlayerClass, "resetSentInfo", serverPlayer, new Object[]{}, new Class[]{});
+                return true;
+            } catch (Exception exception) {
+                throw new RuntimeException(exception);
             }
-
-            playerCarriedItemPacket = invokeConstructor(playerCarriedItemPacketClass,
-                    receiver.inventory().hotbar().selectedSlotIndex()
-            );
-        } catch (Exception exception) {
-            callback.onFailure(exception);
-            return;
-        }
-
-        sendPacketToAll(removePlayer);
-        sendPacketToAll(addPlayer);
-
-        sendPacket(playerConnection, respawnPacket);
-        sendPacket(playerConnection, entityDataPacket);
-        receiver.offer(Keys.VANISH_STATE, VanishState.vanished());
-        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> receiver.offer(Keys.VANISH_STATE, VanishState.unvanished()), 1L);
-        fetchMethodAndInvoke(serverPlayerClass, "onUpdateAbilities", serverPlayer, new Object[]{}, new Class[]{});
-        sendPacket(playerConnection, playerPositionPacket);
-        sendPacket(playerConnection, playerCarriedItemPacket);
-
-        if (Sponge8MinecraftUtils.MinecraftVersion.getCurrentVersion().isAboveOrEqual(Sponge8MinecraftUtils.MinecraftVersion.V1_17_R1)) {
-            Object container = fetchDeclaredField(serverPlayerClass.getSuperclass(), serverPlayer, "containerMenu");
-            fetchMethodAndInvoke(container.getClass(), "sendAllDataToRemote", container, new Object[]{}, new Class[]{});
-        } else {
-            Object container = fetchDeclaredField(serverPlayerClass.getSuperclass(), serverPlayer, "activeContainer");
-            fetchMethodAndInvoke(serverPlayerClass, "updateInventory", serverPlayer, new Object[]{container}, new Class[]{container.getClass()});
-        }
-
-        fetchMethodAndInvoke(serverPlayerClass, "resetSentInfo", serverPlayer, new Object[]{}, new Class[]{});
-        callback.onSuccess();
+        });
     }
 
     @Override
