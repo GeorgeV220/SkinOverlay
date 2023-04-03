@@ -192,7 +192,7 @@ public abstract class SkinHandler {
             return user;
         }).thenAccept(user -> {
             if (user != null)
-                updateSkin0(user, playerObject, true);
+                updateSkin(playerObject, true);
             else
                 skinOverlay.getLogger().log(Level.SEVERE, "User is null");
         });
@@ -210,9 +210,7 @@ public abstract class SkinHandler {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error(updateSkin): User is null");
                 return;
             }
-            SGameProfile gameProfile = playerObject.gameProfile();
-            gameProfile.removeProperty("textures");
-            gameProfile.addProperty("textures", user.getCustomData("skinProperty"));
+            playerObject.gameProfile().removeProperty("textures").addProperty("textures", user.getCustomData("skinProperty"));
             updateSkin0(user, playerObject, forOthers);
         }).handle((unused, throwable) -> {
             if (throwable != null) {
