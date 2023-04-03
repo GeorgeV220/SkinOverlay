@@ -41,7 +41,7 @@ public class SGameProfileBungee extends SGameProfile {
         PlayerObject playerObject = skinOverlay.getPlayer(uuid).orElseThrow();
         LoginResult initialHandler = ((InitialHandler) ((ProxiedPlayer) playerObject.player()).getPendingConnection()).getLoginProfile();
         List<Property> bungeeProperties = new ArrayList<>();
-        this.properties.forEach((s, sProperty) -> bungeeProperties.add(new Property(sProperty.name(), sProperty.value(), sProperty.value())));
+        this.properties.forEach((s, sProperty) -> bungeeProperties.add(new Property(sProperty.name(), sProperty.value(), sProperty.signature())));
         initialHandler.setProperties(bungeeProperties.toArray(Property[]::new));
     }
 }
