@@ -15,8 +15,6 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.util.GameProfile;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
 public class SkinHandler_Velocity extends SkinHandler {
 
     @Override
