@@ -1,3 +1,19 @@
+# [3.15.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.14.0...v3.15.0) (2023-04-06)
+
+
+### Bug Fixes
+
+* **PluginMessaging:** Added a check if the source is Server ([5a7698c](https://github.com/GeorgeV220/SkinOverlay/commit/5a7698cea1d6849f94088e0f743b811814282f48))
+* **SkinHandler:** BungeeCord property signature ([f691876](https://github.com/GeorgeV220/SkinOverlay/commit/f6918761a69284c611264de941699bfa0ebd4404))
+* **SkinHandler:** Fixed SkinHandler_BungeeCord.getGameProfile0 ([9f9c093](https://github.com/GeorgeV220/SkinOverlay/commit/9f9c0931e73a2100b512dfcc429797622ed4f691))
+* **SkinHandler:** Fixed SkinHandler.setSkin method ([9201640](https://github.com/GeorgeV220/SkinOverlay/commit/92016402e5b3a299ba4dd12217ab96946ba8cc4b))
+
+
+### Features
+
+* **SkinHandler:** Removed Callback from updateSkin ([371f16d](https://github.com/GeorgeV220/SkinOverlay/commit/371f16d9417e0e592403826a0ab87c897e7551f2))
+* **Type:** change PAPER to BUKKIT ([fd057db](https://github.com/GeorgeV220/SkinOverlay/commit/fd057db8704fde426c9ae7911df626eaff1e89ec))
+
 # [3.14.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.13.0...v3.14.0) (2023-04-02)
 
 
