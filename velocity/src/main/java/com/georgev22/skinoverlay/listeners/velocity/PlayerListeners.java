@@ -13,6 +13,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -34,6 +35,9 @@ public class PlayerListeners {
 
     @Subscribe
     public void onPluginMessage(PluginMessageEvent pluginMessageEvent) {
+        if (!(pluginMessageEvent.getSource() instanceof ServerConnection)) {
+            return;
+        }
         if (pluginMessageEvent.getIdentifier().getId().equalsIgnoreCase("skinoverlay:messagechannel")) {
             ByteArrayDataInput in = ByteStreams.newDataInput(pluginMessageEvent.dataAsInputStream());
             String subChannel = in.readUTF();
