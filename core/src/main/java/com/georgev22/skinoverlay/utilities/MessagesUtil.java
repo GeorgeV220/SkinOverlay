@@ -104,7 +104,7 @@ public enum MessagesUtil {
     public void msgConsole(Map<String, String> map, boolean ignoreCase) {
         if (this.isMultiLined()) {
             switch (SkinOverlay.getInstance().type()) {
-                case PAPER ->
+                case BUKKIT ->
                         BukkitMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
                 case BUNGEE ->
                         BungeeMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
@@ -117,7 +117,7 @@ public enum MessagesUtil {
             }
         } else {
             switch (SkinOverlay.getInstance().type()) {
-                case PAPER -> BukkitMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
+                case BUKKIT -> BukkitMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
                 case BUNGEE -> BungeeMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
                 case VELOCITY ->
                         VelocityMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));

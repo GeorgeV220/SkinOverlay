@@ -39,7 +39,7 @@ public interface SkinOverlayImpl {
     }
 
     enum Type {
-        PAPER,
+        BUKKIT,
         BUNGEE,
         VELOCITY,
         SPONGE8,

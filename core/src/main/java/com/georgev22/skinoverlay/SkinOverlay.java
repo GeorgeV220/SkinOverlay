@@ -304,7 +304,7 @@ public class SkinOverlay {
         if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue())
             return;
         switch (type()) {
-            case PAPER -> ((PaperCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
+            case BUKKIT -> ((PaperCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
             case BUNGEE -> ((BungeeCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
             case VELOCITY -> ((VelocityCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
         }
@@ -317,7 +317,7 @@ public class SkinOverlay {
             switch (type()) {
                 case BUNGEE ->
                         ((BungeeCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
-                case PAPER ->
+                case BUKKIT ->
                         ((PaperCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
                 case VELOCITY ->
                         ((VelocityCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);

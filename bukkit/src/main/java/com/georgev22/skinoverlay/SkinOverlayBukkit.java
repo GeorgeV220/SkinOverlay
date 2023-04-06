@@ -117,7 +117,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
 
     @Override
     public Type type() {
-        return Type.PAPER;
+        return Type.BUKKIT;
     }
 
     @Override
