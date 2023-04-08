@@ -6,7 +6,6 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SGameProfile;
-import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Updater;
@@ -21,41 +20,127 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
+/**
+ * The PlayerObject class represents a player in the game.
+ */
 public abstract class PlayerObject {
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
+    /**
+     * Returns the PlayerObject instance.
+     *
+     * @return The PlayerObject instance.
+     */
     public PlayerObject playerObject() {
         return this;
     }
 
+    /**
+     * Returns the player object.
+     *
+     * @return The player object.
+     */
     public abstract Object player();
 
+    /**
+     * Returns the audience of the player.
+     *
+     * @return The audience of the player.
+     */
     public abstract Audience audience();
 
+    /**
+     * Returns the UUID of the player.
+     *
+     * @return The UUID of the player.
+     */
     public abstract UUID playerUUID();
 
+    /**
+     * Returns the name of the player.
+     *
+     * @return The name of the player.
+     */
     public abstract String playerName();
 
+    /**
+     * Checks if the player is using Bedrock Edition.
+     *
+     * @return true if the player is using Bedrock Edition, false otherwise.
+     */
     public boolean isBedrock() {
         return this.playerUUID().toString().replace("-", "").startsWith("000000");
     }
 
+    /**
+     * Sends a message to the player.
+     *
+     * @param input The message to be sent.
+     */
     public abstract void sendMessage(String input);
 
+    /**
+     * Sends a list of messages to the player.
+     *
+     * @param input The list of messages to be sent.
+     */
     public abstract void sendMessage(List<String> input);
 
+    /**
+     * Sends an array of messages to the player.
+     *
+     * @param input The array of messages to be sent.
+     */
     public abstract void sendMessage(String... input);
 
+    /**
+     * Sends a message to the player with placeholders.
+     *
+     * @param input        The message to be sent.
+     * @param placeholders The map of placeholders and their values.
+     * @param ignoreCase   Whether to ignore the case of the placeholders.
+     */
     public abstract void sendMessage(String input, ObjectMap<String, String> placeholders, boolean ignoreCase);
 
+    /**
+     * Sends a list of messages to the player with placeholders.
+     *
+     * @param input        The list of messages to be sent.
+     * @param placeholders The map of placeholders and their values.
+     * @param ignoreCase   Whether to ignore the case of the placeholders.
+     */
     public abstract void sendMessage(List<String> input, ObjectMap<String, String> placeholders, boolean ignoreCase);
 
+    /**
+     * Sends an array of messages to the player with placeholders.
+     *
+     * @param input        The array of messages to be sent.
+     * @param placeholders The map of placeholders and their values.
+     * @param ignoreCase   Whether to ignore the case of the placeholders.
+     */
     public abstract void sendMessage(String[] input, ObjectMap<String, String> placeholders, boolean ignoreCase);
 
+    /**
+     * Checks if the player is online.
+     *
+     * @return true if the player is online, false otherwise.
+     */
     public abstract boolean isOnline();
 
+    /**
+     * Checks if the player has a permission.
+     *
+     * @param permission The permission to be checked.
+     * @return true if the player has the permission, false otherwise.
+     */
     public abstract boolean permission(String permission);
 
+    /**
+     * Returns the game profile associated with this player object.
+     *
+     * @return the game profile associated with this player object
+     * @throws RuntimeException if there is an error retrieving the game profile
+     */
     public SGameProfile gameProfile() {
         try {
             return SkinOverlay.getInstance().getSkinHandler().getGameProfile(playerObject());
@@ -64,6 +149,12 @@ public abstract class PlayerObject {
         }
     }
 
+    /**
+     * Returns the internal game profile object associated with this player object.
+     *
+     * @return the internal game profile object associated with this player object
+     * @throws RuntimeException if there is an error retrieving the game profile
+     */
     public Object internalGameProfile() {
         try {
             return SkinOverlay.getInstance().getSkinHandler().getGameProfile0(playerObject());
@@ -76,6 +167,9 @@ public abstract class PlayerObject {
             ObjectMap.Pair.create("GeorgeV22", UUID.fromString("a4f5cd7f-362f-4044-931e-7128b4e6bad9"))
     );
 
+    /**
+     * Checks if a player is registered to receive developer information.
+     */
     public void developerInform() {
 
         final ObjectMap.Pair<String, UUID> pair = ObjectMap.Pair.create(playerName(), playerUUID());
@@ -140,6 +234,13 @@ public abstract class PlayerObject {
         }, 20L * 10L);
     }
 
+    /**
+     * Called when a player joins the server.
+     * If the player has the "skinoverlay.updater" permission, a new Updater instance is created.
+     * If the server is not a proxy server and the "proxy" option is set to true, the method does not continue.
+     * Retrieves the User object associated with the player's UUID from the UserManager and asynchronously handles it.
+     * Adds custom data to the user object, saves it, and updates the player's skin.
+     */
     public void playerJoin() {
         if (permission("skinoverlay.updater")) {
             new Updater(this);
@@ -164,9 +265,6 @@ public abstract class PlayerObject {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            if (user.getCustomData("skinProperty") != null && !(user.getCustomData("skinProperty") instanceof SProperty)) {
-                user.addCustomData("skinProperty", Utilities.propertyFromLinkedTreeMap(user.getCustomData("skinProperty")));
-            }
             skinOverlay.getUserManager().save(user);
             return user;
         }).handleAsync((user, throwable) -> {
@@ -181,6 +279,12 @@ public abstract class PlayerObject {
         });
     }
 
+    /**
+     * Called when a player quits the server.
+     * If the server is not a proxy server and the "proxy" option is set to true, the method does nothing.
+     * Retrieves the User object associated with the player's UUID from the UserManager and asynchronously handles it.
+     * Saves the user object.
+     */
     public void playerQuit() {
         if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
@@ -198,6 +302,12 @@ public abstract class PlayerObject {
         });
     }
 
+    /**
+     * Updates the player's skin.
+     * Retrieves the User object associated with the player's UUID from the UserManager and asynchronously handles it.
+     * If the player is not online or their skin options have the default skin name, no further action is taken.
+     * Updates the player's skin using the SkinHandler.
+     */
     public void updateSkin() {
         skinOverlay.getUserManager().getUser(playerUUID()).handleAsync((user, throwable) -> {
             if (throwable != null) {
