@@ -5,6 +5,7 @@ import com.georgev22.library.database.DatabaseType;
 import com.georgev22.library.database.DatabaseWrapper;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.library.utilities.Utils;
@@ -13,6 +14,7 @@ import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
 import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
+import com.georgev22.skinoverlay.listeners.UserManagerListener;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.PluginMessageUtils;
@@ -268,10 +270,13 @@ public class SkinOverlay {
                 databaseWrapper = null;
                 mongoClient = null;
                 mongoDatabase = null;
-                this.userManager = new UserManager(UserManager.Type.JSON, new File(this.getDataFolder(), "userdata"), null);
+                this.userManager = new UserManager(UserManager.Type.JSON, new File(this.getDataFolder(), "userdata"), null).initializeGsonBuilder();
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: File");
             }
         }
+
+        //TODO TYPE ADAPTERS
+        this.userManager.initializeGsonBuilder();
 
         //userManager.loadAll();
 
@@ -286,7 +291,7 @@ public class SkinOverlay {
     }
 
 
-    public void setupCommands() {
+    protected void setupCommands() {
         if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue())
             return;
         //noinspection deprecation
@@ -299,6 +304,20 @@ public class SkinOverlay {
             commandManager.getCommandCompletions().registerCompletion("overlays", context -> getOverlayList());
         }
     }
+
+    /**
+     * Adds the specified list of {@link UserManagerListener}s to this {@link UserManager} instance. Each listener in the
+     * list will be registered with the {@link ObservableObjectMap} that holds the loaded users in the user manager, and
+     * will be notified whenever a new user is added to the map.
+     *
+     * @param managerListeners the list of listeners to be added
+     */
+    public void registerUserManagerListeners(@NotNull List<UserManagerListener<UUID, UserManager.User>> managerListeners) {
+        for (UserManagerListener<UUID, UserManager.User> managerListener : managerListeners) {
+            ((ObservableObjectMap<UUID, UserManager.User>) this.userManager.getLoadedUsers()).addListener(managerListener);
+        }
+    }
+
 
     private void unregisterCommands() {
         if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue())
