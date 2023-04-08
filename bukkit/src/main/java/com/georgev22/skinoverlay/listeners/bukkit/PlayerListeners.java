@@ -12,6 +12,7 @@ import com.google.common.io.ByteStreams;
 import lombok.SneakyThrows;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -32,7 +33,7 @@ import static com.georgev22.skinoverlay.utilities.Utilities.decrypt;
 public class PlayerListeners implements Listener, PluginMessageListener {
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent playerJoinEvent) {
         PlayerObject playerObject = new PlayerObjectBukkit(playerJoinEvent.getPlayer());
         playerObject.playerJoin();
@@ -46,7 +47,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
             }, 1);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onQuit(PlayerQuitEvent playerQuitEvent) {
         new PlayerObjectBukkit(playerQuitEvent.getPlayer()).playerQuit();
     }

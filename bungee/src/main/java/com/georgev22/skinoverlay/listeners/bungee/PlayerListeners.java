@@ -21,14 +21,14 @@ import java.util.UUID;
 
 public class PlayerListeners implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = 1)
     public void onLogin(PostLoginEvent postLoginEvent) {
         if (!postLoginEvent.getPlayer().isConnected())
             return;
         new PlayerObjectBungee(postLoginEvent.getPlayer()).playerJoin();
     }
 
-    @EventHandler
+    @EventHandler(priority = 1)
     public void onQuit(PlayerDisconnectEvent playerDisconnectEvent) {
         new PlayerObjectBungee(playerDisconnectEvent.getPlayer()).playerQuit();
     }

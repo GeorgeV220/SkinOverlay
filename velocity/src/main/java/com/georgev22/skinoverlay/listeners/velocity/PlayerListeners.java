@@ -1,13 +1,16 @@
 package com.georgev22.skinoverlay.listeners.velocity;
 
 import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlayVelocity;
+import com.georgev22.skinoverlay.listeners.UserManagerListener;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
@@ -19,16 +22,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public class PlayerListeners {
+public class PlayerListeners extends UserManagerListener<UUID, UserManager.User> {
 
-    @Subscribe
+    @Subscribe(order = PostOrder.FIRST)
     public void onLogin(PostLoginEvent loginEvent) {
         if (!loginEvent.getPlayer().isActive())
             return;
         new PlayerObjectVelocity(loginEvent.getPlayer()).playerJoin();
     }
 
-    @Subscribe
+    @Subscribe(order = PostOrder.FIRST)
     public void onQuit(DisconnectEvent playerDisconnectEvent) {
         new PlayerObjectVelocity(playerDisconnectEvent.getPlayer()).playerQuit();
     }
@@ -57,6 +60,11 @@ public class PlayerListeners {
                 });
             }
         }
+    }
+
+    @Override
+    public void entryAdded(UUID key, UserManager.User value) {
+        SkinOverlay.getInstance().getLogger().info("User " + key + " has been added");
     }
 }
 
