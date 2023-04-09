@@ -208,7 +208,12 @@ public abstract class SkinHandler {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error(updateSkin): User is null");
                 return;
             }
-            PlayerObjectUpdateSkinEvent event = new PlayerObjectUpdateSkinEvent(playerObject, user, true, user.getCustomData("skinOptions"));
+            PlayerObjectUpdateSkinEvent event;
+            try {
+                event = new PlayerObjectUpdateSkinEvent(playerObject, user, true, Utilities.getSkinOptions(user.getCustomData("skinOptions")));
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
             skinOverlay.getEventManager().fireEvent(event);
             if (event.isCancelled())
                 return;
