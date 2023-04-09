@@ -319,7 +319,7 @@ public class SkinOverlay {
      */
     public void registerUserManagerListeners(@NotNull List<UserManagerListener<UUID, UserManager.User>> managerListeners) {
         for (UserManagerListener<UUID, UserManager.User> managerListener : managerListeners) {
-            ((ObservableObjectMap<UUID, UserManager.User>) this.userManager.getLoadedUsers()).addListener(managerListener);
+            this.userManager.getLoadedUsers().addListener(managerListener);
         }
     }
 
