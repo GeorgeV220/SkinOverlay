@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public enum OptionsUtil {
+    DEBUG("debug", false, Optional.empty()),
 
     PROXY("proxy", false, Optional.of("bungeecord")),
 

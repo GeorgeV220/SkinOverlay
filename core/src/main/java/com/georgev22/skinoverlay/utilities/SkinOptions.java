@@ -1,12 +1,17 @@
 package com.georgev22.skinoverlay.utilities;
 
+import com.georgev22.skinoverlay.SkinOverlay;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class SkinOptions implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = Long.parseLong(SkinOverlay.getInstance().getSkinOverlay().description().version().replaceAll("\\D", ""));
 
     /**
      * The name of the skin.
@@ -133,6 +138,21 @@ public class SkinOptions implements Serializable {
      */
     public String getUrl() {
         return url;
+    }
+
+    @Override
+    public String toString() {
+        return "SkinOptions{" +
+                "skinName='" + skinName + '\'' +
+                ", url='" + url + '\'' +
+                ", cape=" + cape +
+                ", jacket=" + jacket +
+                ", left_sleeve=" + left_sleeve +
+                ", right_sleeve=" + right_sleeve +
+                ", left_pants=" + left_pants +
+                ", right_pants=" + right_pants +
+                ", hat=" + hat +
+                '}';
     }
 
     @AllArgsConstructor

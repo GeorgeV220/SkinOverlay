@@ -17,6 +17,7 @@ import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.event.EventManager;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
+import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.UserManagerListener;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
@@ -126,6 +127,11 @@ public class SkinOverlay {
         }
         if (OptionsUtil.UPDATER.getBooleanValue()) {
             new Updater();
+        }
+        if (OptionsUtil.DEBUG.getBooleanValue()) {
+            getLogger().warning("Debug mode is enabled!");
+            getLogger().warning("Be prepared for a lot of log messages");
+            eventManager.registerListeners(new DebugListeners());
         }
     }
 
