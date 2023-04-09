@@ -7,9 +7,11 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.config.FileManager;
+import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateSkinEvent;
+import com.georgev22.skinoverlay.event.events.user.UserEvent;
+import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -58,18 +60,29 @@ public class SkinOverlayCommand extends BaseCommand {
                     skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
                     return null;
                 }
+                UserEvent event = new UserEvent(user, false);
+                skinOverlay.getEventManager().fireEvent(event);
                 return user;
             }).thenApply(user -> {
                 if (user == null) {
                     return null;
                 }
+                UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent(user, false);
+                skinOverlay.getEventManager().fireEvent(modifyDataEvent);
+                if (modifyDataEvent.isCancelled())
+                    return user;
                 skinOverlay.getUserManager().save(user);
                 return user;
             }).thenAccept(user -> {
                 if (user != null) {
                     Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
-                    if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline())
-                        skinOverlay.getSkinHandler().updateSkin(optionalPlayerObject.get(), true);
+                    if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline()) {
+                        PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), user, false);
+                        skinOverlay.getEventManager().fireEvent(event);
+                        if (event.isCancelled())
+                            return;
+                        skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);
+                    }
                 }
             });
         });

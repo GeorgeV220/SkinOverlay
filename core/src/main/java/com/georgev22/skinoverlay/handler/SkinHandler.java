@@ -5,6 +5,7 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectUpdateSkinEvent;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
@@ -207,8 +208,12 @@ public abstract class SkinHandler {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error(updateSkin): User is null");
                 return;
             }
-            playerObject.gameProfile().removeProperty("textures").addProperty("textures", user.getCustomData("skinProperty"));
-            updateSkin0(user, playerObject, forOthers);
+            PlayerObjectUpdateSkinEvent event = new PlayerObjectUpdateSkinEvent(playerObject, user, true, user.getCustomData("skinOptions"));
+            skinOverlay.getEventManager().fireEvent(event);
+            if (event.isCancelled())
+                return;
+            event.getPlayerObject().gameProfile().removeProperty("textures").addProperty("textures", event.getUser().getCustomData("skinProperty"));
+            updateSkin0(event.getUser(), event.getPlayerObject(), forOthers);
         }).handle((unused, throwable) -> {
             if (throwable != null) {
                 if (throwable instanceof OperationNotSupportedException)

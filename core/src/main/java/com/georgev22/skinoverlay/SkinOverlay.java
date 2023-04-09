@@ -14,6 +14,7 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
 import com.georgev22.skinoverlay.config.FileManager;
+import com.georgev22.skinoverlay.event.EventManager;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.listeners.UserManagerListener;
@@ -81,6 +82,9 @@ public class SkinOverlay {
     @Getter
     private UserManager userManager;
 
+    @Getter
+    private EventManager eventManager;
+
     public static SkinOverlay getInstance() {
         return instance == null ? (instance = new SkinOverlay()) : instance;
     }
@@ -94,6 +98,7 @@ public class SkinOverlay {
             throw new RuntimeException(e);
         }
         MessagesUtil.repairPaths(fileManager.getMessages());
+        eventManager = new EventManager();
     }
 
 
