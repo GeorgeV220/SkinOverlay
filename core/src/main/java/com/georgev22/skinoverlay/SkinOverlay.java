@@ -5,6 +5,8 @@ import com.georgev22.library.database.DatabaseType;
 import com.georgev22.library.database.DatabaseWrapper;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.maps.ObjectMap.Pair;
+import com.georgev22.library.maps.ObjectMap.PairDocument;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.UserManager;
@@ -19,8 +21,10 @@ import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.PluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.Updater;
+import com.georgev22.skinoverlay.utilities.gson.ObjectMapSPropertyTypeAdapter;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.google.gson.reflect.TypeToken;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
@@ -212,9 +216,9 @@ public class SkinOverlay {
      * @throws ClassNotFoundException When class is not found
      */
     private void setupDatabase() throws Exception {
-        ObjectMap<String, ObjectMap.Pair<String, String>> map = new HashObjectMap<String, ObjectMap.Pair<String, String>>()
-                .append("user_id", ObjectMap.Pair.create("VARCHAR(38)", "NULL"))
-                .append("user_json", ObjectMap.Pair.create("LONGTEXT", "NULL"));
+        ObjectMap<String, Pair<String, String>> map = new HashObjectMap<String, Pair<String, String>>()
+                .append("user_id", Pair.create("VARCHAR(38)", "NULL"))
+                .append("user_json", Pair.create("LONGTEXT", "NULL"));
         switch (OptionsUtil.DATABASE_TYPE.getStringValue()) {
             case "MySQL" -> {
                 if (connection == null || connection.isClosed()) {
@@ -270,13 +274,14 @@ public class SkinOverlay {
                 databaseWrapper = null;
                 mongoClient = null;
                 mongoDatabase = null;
-                this.userManager = new UserManager(UserManager.Type.JSON, new File(this.getDataFolder(), "userdata"), null).initializeGsonBuilder();
+                this.userManager = new UserManager(UserManager.Type.JSON, new File(this.getDataFolder(), "userdata"), null);
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: File");
             }
         }
 
-        //TODO TYPE ADAPTERS
-        this.userManager.initializeGsonBuilder();
+        this.userManager.registerTypeAdaptersByTypeToken(new PairDocument<>(
+                new Pair<>(new TypeToken<ObjectMap<String, Object>>() {
+                }, new ObjectMapSPropertyTypeAdapter())));
 
         //userManager.loadAll();
 
