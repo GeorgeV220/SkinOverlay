@@ -1,10 +1,8 @@
 package com.georgev22.skinoverlay.listeners.velocity;
 
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.SkinOverlayVelocity;
-import com.georgev22.skinoverlay.listeners.UserManagerListener;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
@@ -22,7 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public class PlayerListeners extends UserManagerListener<UUID, UserManager.User> {
+public class PlayerListeners {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onLogin(PostLoginEvent loginEvent) {
@@ -60,11 +58,6 @@ public class PlayerListeners extends UserManagerListener<UUID, UserManager.User>
                 });
             }
         }
-    }
-
-    @Override
-    public void entryAdded(UUID key, UserManager.User value) {
-        SkinOverlay.getInstance().getLogger().info("User " + key + " has been added");
     }
 }
 
