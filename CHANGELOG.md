@@ -1,3 +1,16 @@
+# [3.16.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.15.0...v3.16.0) (2023-04-09)
+
+
+### Bug Fixes
+
+* **Listeners:** Event priority ([e28d5ef](https://github.com/GeorgeV220/SkinOverlay/commit/e28d5efbb3e3bd70f640600a2428195a6d40055b))
+
+
+### Features
+
+* **SkinOverlay:** Fixed (de)serialization ([3ed625a](https://github.com/GeorgeV220/SkinOverlay/commit/3ed625a2fc7a1bbe4d3ea39e4a8d02b4ba84b5a9))
+* UserManagerListener ([0970fa7](https://github.com/GeorgeV220/SkinOverlay/commit/0970fa72fb6880d2f74f0885ed9e83f3dbcc0650))
+
 # [3.15.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.14.0...v3.15.0) (2023-04-06)
 
 
