@@ -54,38 +54,36 @@ public class SkinOverlayCommand extends BaseCommand {
     @CommandAlias("skinoverlayreload|soverlayreload|skinoreload|sreload")
     @CommandPermission("skinoverlay.reload")
     public void reload(final @NotNull CommandIssuer issuer) {
-        skinOverlay.getUserManager().getLoadedUsers().forEach((uuid, loadedUser) -> {
-            skinOverlay.getUserManager().getUser(uuid).handle((user, throwable) -> {
-                if (throwable != null) {
-                    skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
-                    return null;
-                }
-                UserEvent event = new UserEvent(user, false);
-                skinOverlay.getEventManager().fireEvent(event);
+        skinOverlay.getUserManager().getLoadedUsers().forEach((uuid, loadedUser) -> skinOverlay.getUserManager().getUser(uuid).handle((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
+                return null;
+            }
+            UserEvent event = new UserEvent(user, false);
+            skinOverlay.getEventManager().fireEvent(event);
+            return user;
+        }).thenApply(user -> {
+            if (user == null) {
+                return null;
+            }
+            UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent(user, false);
+            skinOverlay.getEventManager().fireEvent(modifyDataEvent);
+            if (modifyDataEvent.isCancelled())
                 return user;
-            }).thenApply(user -> {
-                if (user == null) {
-                    return null;
+            skinOverlay.getUserManager().save(user);
+            return user;
+        }).thenAccept(user -> {
+            if (user != null) {
+                Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
+                if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline()) {
+                    PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), user, false);
+                    skinOverlay.getEventManager().fireEvent(event);
+                    if (event.isCancelled())
+                        return;
+                    skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);
                 }
-                UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent(user, false);
-                skinOverlay.getEventManager().fireEvent(modifyDataEvent);
-                if (modifyDataEvent.isCancelled())
-                    return user;
-                skinOverlay.getUserManager().save(user);
-                return user;
-            }).thenAccept(user -> {
-                if (user != null) {
-                    Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
-                    if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline()) {
-                        PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), user, false);
-                        skinOverlay.getEventManager().fireEvent(event);
-                        if (event.isCancelled())
-                            return;
-                        skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);
-                    }
-                }
-            });
-        });
+            }
+        }));
         skinOverlay.getFileManager().getConfig().reloadFile();
         skinOverlay.getFileManager().getData().reloadFile();
         skinOverlay.getFileManager().getMessages().reloadFile();
