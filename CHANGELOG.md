@@ -1,3 +1,21 @@
+# [3.17.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.16.0...v3.17.0) (2023-04-11)
+
+
+### Bug Fixes
+
+* **Events:** Fixed PlayerObjectUpdateSkinEvent ([da51ce5](https://github.com/GeorgeV220/SkinOverlay/commit/da51ce525158d804f22d1b8b825d99e9aa72d52e))
+* **SGameProfile:** Fixed addProperty method ([803fafe](https://github.com/GeorgeV220/SkinOverlay/commit/803fafe0847c7edfb527f559ba988630cbb5f094))
+
+
+### Features
+
+* **Debug:** Added Debugging listeners ([4d07eb8](https://github.com/GeorgeV220/SkinOverlay/commit/4d07eb8e4e98ca38bb8c6a79d137acd6a4de4105))
+* **Events:** Added Events API ([ecaf5d2](https://github.com/GeorgeV220/SkinOverlay/commit/ecaf5d246a954963cc86fb9b29c53f25c34d3ee8))
+* **Events:** Added new Events ([7a7ff89](https://github.com/GeorgeV220/SkinOverlay/commit/7a7ff89bdd6afdf25887da6d618453ed4dcc9a7d))
+* **Events:** Call the events ([72251f7](https://github.com/GeorgeV220/SkinOverlay/commit/72251f77248531cb8bc14f2c48ab22d9a88b781e))
+* **Exception:** Added UserException ([99bbb34](https://github.com/GeorgeV220/SkinOverlay/commit/99bbb343263e01d23f021b8f02b379be102ca816))
+* **Utilities:** Added Utilities.getMethodsAnnotatedWith ([6342039](https://github.com/GeorgeV220/SkinOverlay/commit/6342039aeb09947075e533f7e86573cb778ac4b5))
+
 # [3.16.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.15.0...v3.16.0) (2023-04-09)
 
 
