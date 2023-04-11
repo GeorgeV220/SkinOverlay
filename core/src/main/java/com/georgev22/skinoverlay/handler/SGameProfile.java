@@ -88,6 +88,9 @@ public abstract class SGameProfile {
      * @return this {@link SGameProfile} object
      */
     public SGameProfile addProperty(String propertyName, SProperty sProperty) {
+        if (sProperty == null) {
+            return this;
+        }
         this.properties.append(propertyName, sProperty);
         this.apply();
         return this;
@@ -100,6 +103,9 @@ public abstract class SGameProfile {
      * @return this {@link SGameProfile} object
      */
     public SGameProfile removeProperty(String propertyName) {
+        if (!this.properties.containsKey(propertyName)) {
+            return this;
+        }
         this.properties.remove(propertyName);
         this.apply();
         return this;
