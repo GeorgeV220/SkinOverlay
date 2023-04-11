@@ -8,6 +8,9 @@ import com.georgev22.skinoverlay.event.events.player.PlayerObjectEvent;
 import com.georgev22.skinoverlay.event.events.player.UserPlayerObjectEvent;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateSkinEvent;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectUpdateSkinEvent;
+import com.georgev22.skinoverlay.event.events.profile.ProfileCreatedEvent;
+import com.georgev22.skinoverlay.event.events.profile.property.SPropertyAddEvent;
+import com.georgev22.skinoverlay.event.events.profile.property.SPropertyRemoveEvent;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
 import com.georgev22.skinoverlay.event.events.user.data.add.UserAddDataEvent;
@@ -90,6 +93,29 @@ public class DebugListeners implements EventListener {
         if (event.isCancelled()) return;
         skinOverlay.getLogger().info("===== Debug =====");
         skinOverlay.getLogger().info("UserModifyDataEvent: " + event.getUser());
+        skinOverlay.getLogger().info("===== Debug =====");
+    }
+
+    @Handler(priority = EventPriority.HIGHEST)
+    public void onProfileCreatedEvent(ProfileCreatedEvent event) {
+        skinOverlay.getLogger().info("===== Debug =====");
+        skinOverlay.getLogger().info("ProfileCreatedEvent: " + event.getProfile());
+        skinOverlay.getLogger().info("===== Debug =====");
+    }
+
+    @Handler(priority = EventPriority.HIGHEST)
+    public void onSPropertyAddEvent(SPropertyAddEvent event) {
+        skinOverlay.getLogger().info("===== Debug =====");
+        skinOverlay.getLogger().info("SPropertyAddEvent: " + event.getPropertyName());
+        skinOverlay.getLogger().info("SPropertyAddEvent: " + event.getProperty());
+        skinOverlay.getLogger().info("===== Debug =====");
+    }
+
+    @Handler(priority = EventPriority.HIGHEST)
+    public void onSPropertyRemoveEvent(SPropertyRemoveEvent event) {
+        skinOverlay.getLogger().info("===== Debug =====");
+        skinOverlay.getLogger().info("SPropertyRemoveEvent: " + event.getPropertyName());
+        skinOverlay.getLogger().info("SPropertyRemoveEvent: " + event.getProperty());
         skinOverlay.getLogger().info("===== Debug =====");
     }
 

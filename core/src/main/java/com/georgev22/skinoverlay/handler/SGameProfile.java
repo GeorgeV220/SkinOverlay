@@ -3,6 +3,10 @@ package com.georgev22.skinoverlay.handler;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.UnmodifiableObjectMap;
+import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.event.events.profile.ProfileCreatedEvent;
+import com.georgev22.skinoverlay.event.events.profile.property.SPropertyAddEvent;
+import com.georgev22.skinoverlay.event.events.profile.property.SPropertyRemoveEvent;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.UUID;
@@ -11,6 +15,8 @@ import java.util.UUID;
  * The SGameProfile class represents a simplified version of a GameProfile, containing a player's name, UUID, and properties.
  */
 public abstract class SGameProfile {
+
+    protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     /**
      * The player's name.
@@ -37,6 +43,7 @@ public abstract class SGameProfile {
         this.name = name;
         this.uuid = uuid;
         this.properties = new HashObjectMap<>();
+        this.skinOverlay.getEventManager().fireEvent(new ProfileCreatedEvent(this, false));
     }
 
     /**
@@ -50,6 +57,7 @@ public abstract class SGameProfile {
         this.name = name;
         this.uuid = uuid;
         this.properties = properties;
+        this.skinOverlay.getEventManager().fireEvent(new ProfileCreatedEvent(this, false));
     }
 
     /**
@@ -91,7 +99,12 @@ public abstract class SGameProfile {
         if (sProperty == null) {
             return this;
         }
-        this.properties.append(propertyName, sProperty);
+        SPropertyAddEvent sPropertyAddEvent = new SPropertyAddEvent(propertyName, sProperty, false);
+        skinOverlay.getEventManager().fireEvent(sPropertyAddEvent);
+        if (sPropertyAddEvent.isCancelled()) {
+            return this;
+        }
+        this.properties.append(sPropertyAddEvent.getPropertyName(), sPropertyAddEvent.getProperty());
         this.apply();
         return this;
     }
@@ -106,7 +119,12 @@ public abstract class SGameProfile {
         if (!this.properties.containsKey(propertyName)) {
             return this;
         }
-        this.properties.remove(propertyName);
+        SPropertyRemoveEvent sPropertyRemoveEvent = new SPropertyRemoveEvent(propertyName, this.properties.get(propertyName), false);
+        skinOverlay.getEventManager().fireEvent(sPropertyRemoveEvent);
+        if (sPropertyRemoveEvent.isCancelled()) {
+            return this;
+        }
+        this.properties.remove(sPropertyRemoveEvent.getPropertyName());
         this.apply();
         return this;
     }
@@ -122,4 +140,13 @@ public abstract class SGameProfile {
     }
 
     public abstract void apply();
+
+    @Override
+    public String toString() {
+        return "SGameProfile{" +
+                "name='" + name + '\'' +
+                ", uuid=" + uuid +
+                ", properties=" + properties +
+                '}';
+    }
 }
