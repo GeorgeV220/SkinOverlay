@@ -38,7 +38,7 @@ public class PlayerListeners implements Listener {
         if (!(pluginMessageEvent.getSender() instanceof Server)) {
             return;
         }
-        if (pluginMessageEvent.getTag().equalsIgnoreCase("skinoverlay:messagechannel")) {
+        if (pluginMessageEvent.getTag().equalsIgnoreCase("skinoverlay:message")) {
             ByteArrayDataInput in = ByteStreams.newDataInput(pluginMessageEvent.getData());
             String subChannel = in.readUTF();
             if (subChannel.equalsIgnoreCase("playerJoin")) {

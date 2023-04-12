@@ -39,7 +39,7 @@ public class PlayerListeners {
         if (!(pluginMessageEvent.getSource() instanceof ServerConnection)) {
             return;
         }
-        if (pluginMessageEvent.getIdentifier().getId().equalsIgnoreCase("skinoverlay:messagechannel")) {
+        if (pluginMessageEvent.getIdentifier().getId().equalsIgnoreCase("skinoverlay:message")) {
             ByteArrayDataInput in = ByteStreams.newDataInput(pluginMessageEvent.dataAsInputStream());
             String subChannel = in.readUTF();
             if (subChannel.equalsIgnoreCase("playerJoin")) {

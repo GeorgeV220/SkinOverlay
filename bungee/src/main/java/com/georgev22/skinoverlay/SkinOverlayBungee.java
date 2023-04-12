@@ -84,7 +84,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         SkinOverlay.getInstance().setPluginMessageUtils(new BungeeCordPluginMessageUtils());
         BungeeMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         getProxy().registerChannel("skinoverlay:bungee");
-        getProxy().registerChannel("skinoverlay:messagechannel");
+        getProxy().registerChannel("skinoverlay:message");
         if (OptionsUtil.METRICS.getBooleanValue())
             new Metrics(this, 17475);
         enabled = true;

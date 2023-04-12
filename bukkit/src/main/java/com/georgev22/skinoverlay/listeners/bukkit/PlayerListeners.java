@@ -39,7 +39,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         playerObject.playerJoin();
         if (OptionsUtil.PROXY.getBooleanValue())
             SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
-                skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:messagechannel");
+                skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:message");
                 if (playerJoinEvent.getPlayer().isOnline())
                     skinOverlay.getPluginMessageUtils().sendDataToPlayer("playerJoin", playerObject, playerObject.playerUUID().toString());
                 else

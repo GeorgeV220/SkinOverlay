@@ -125,7 +125,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
         SkinOverlay.getInstance().setPluginMessageUtils(new VelocityPluginMessageUtils());
-        this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.from("skinoverlay:messagechannel"));
+        this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.from("skinoverlay:message"));
         VelocityMinecraftUtils.registerListeners(this, new DeveloperInformListener(), new PlayerListeners());
         if (OptionsUtil.METRICS.getBooleanValue())
             metricsFactory.make(this, 17476);
