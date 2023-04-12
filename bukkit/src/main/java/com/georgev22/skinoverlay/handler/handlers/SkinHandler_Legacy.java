@@ -258,7 +258,17 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                     skinOverlay.getLogger().log(Level.WARNING, "DataWatcher is null!!");
                 }
 
-                fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
+                if (BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(BukkitMinecraftUtils.MinecraftVersion.V1_16_R1)) {
+                    SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                        try {
+                            fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
+                        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                } else {
+                    fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
+                }
 
                 sendPacket(playerConnection, pos);
                 sendPacket(playerConnection, slot);
