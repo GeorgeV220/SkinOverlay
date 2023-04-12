@@ -85,7 +85,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
 
     @Override
     public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions) {
-        return CompletableFuture.supplyAsync(() -> {
+        return new CompletableFuture<>().thenApply(aBoolean -> {
             try {
                 Player player = (Player) playerObject.player();
                 final Object entityPlayer = getHandleMethod.invoke(player);
@@ -258,17 +258,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                     skinOverlay.getLogger().log(Level.WARNING, "DataWatcher is null!!");
                 }
 
-                if (BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(BukkitMinecraftUtils.MinecraftVersion.V1_16_R1)) {
-                    SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
-                        try {
-                            fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
-                        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                } else {
-                    fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
-                }
+                fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
 
                 sendPacket(playerConnection, pos);
                 sendPacket(playerConnection, slot);
@@ -333,14 +323,16 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                     }
                     return aBoolean;
                 }).thenAccept(aBoolean -> {
-                    if (aBoolean)
-                        if (forOthers) {
-                            skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                                Player p = (Player) playerObjects.player();
-                                p.hidePlayer(SkinOverlayBukkit.getInstance(), player);
-                                p.showPlayer(SkinOverlayBukkit.getInstance(), player);
-                            });
-                        }
+                    SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                        if (aBoolean)
+                            if (forOthers) {
+                                skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                                    Player p = (Player) playerObjects.player();
+                                    p.hidePlayer(SkinOverlayBukkit.getInstance(), player);
+                                    p.showPlayer(SkinOverlayBukkit.getInstance(), player);
+                                });
+                            }
+                    });
                 });
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);

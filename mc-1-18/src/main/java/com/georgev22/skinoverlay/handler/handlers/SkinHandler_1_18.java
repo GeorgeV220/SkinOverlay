@@ -129,14 +129,16 @@ public class SkinHandler_1_18 extends SkinHandler {
                     }
                     return aBoolean;
                 }).thenAccept(aBoolean -> {
-                    if (aBoolean)
-                        if (forOthers) {
-                            skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                                Player p = (Player) playerObjects.player();
-                                p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                                p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                            });
-                        }
+                    SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                        if (aBoolean)
+                            if (forOthers) {
+                                skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                                    Player p = (Player) playerObjects.player();
+                                    p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                                    p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                                });
+                            }
+                    });
                 });
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
