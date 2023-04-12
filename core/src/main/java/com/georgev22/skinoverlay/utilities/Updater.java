@@ -30,6 +30,8 @@ public class Updater {
     }
 
     public Updater() {
+        if (!OptionsUtil.UPDATER.getBooleanValue())
+            return;
         if (onlineVersion == null)
             return;
         SchedulerManager.getScheduler().runTaskTimerAsynchronously(skinOverlay.getClass(), () -> {
@@ -48,6 +50,10 @@ public class Updater {
     }
 
     public Updater(PlayerObject playerObject) {
+        if (!playerObject.permission("skinoverlay.updater"))
+            return;
+        if (!OptionsUtil.UPDATER.getBooleanValue())
+            return;
         if (onlineVersion == null)
             return;
         SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
@@ -93,6 +99,8 @@ public class Updater {
     }
 
     private @NotNull String getOnlineVersion() throws IOException {
+        if (!OptionsUtil.UPDATER.getBooleanValue())
+            return skinOverlay.getSkinOverlay().description().version();
         System.setProperty("http.agent", "Chrome");
         HttpsURLConnection con = (HttpsURLConnection) new URL("https://api.github.com/repos/GeorgeV220/SkinOverlay/tags").openConnection();
 
