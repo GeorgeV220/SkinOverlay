@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.event.events.user.data.load;
 
 import com.georgev22.library.utilities.UserManager;
-import com.georgev22.skinoverlay.event.Event;
+import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +10,9 @@ import java.util.UUID;
 /**
  * An event that is triggered before a user's data is loaded.
  */
-public class UserPreLoadEvent extends UserEvent implements Event {
+public class UserPreLoadEvent extends UserEvent {
+
+    private static final HandlerList handlers = new HandlerList();
 
     private final UUID uuid;
 
@@ -32,5 +34,15 @@ public class UserPreLoadEvent extends UserEvent implements Event {
      */
     public UUID getUUID() {
         return uuid;
+    }
+
+    @NotNull
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 }

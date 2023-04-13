@@ -60,14 +60,14 @@ public class SkinOverlayCommand extends BaseCommand {
                 return null;
             }
             UserEvent event = new UserEvent(user, false);
-            skinOverlay.getEventManager().fireEvent(event);
+            skinOverlay.getEventManager().callEvent(event);
             return user;
         }).thenApply(user -> {
             if (user == null) {
                 return null;
             }
             UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent(user, false);
-            skinOverlay.getEventManager().fireEvent(modifyDataEvent);
+            skinOverlay.getEventManager().callEvent(modifyDataEvent);
             if (modifyDataEvent.isCancelled())
                 return user;
             skinOverlay.getUserManager().save(user);
@@ -77,7 +77,7 @@ public class SkinOverlayCommand extends BaseCommand {
                 Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
                 if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline()) {
                     PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), user, false);
-                    skinOverlay.getEventManager().fireEvent(event);
+                    skinOverlay.getEventManager().callEvent(event);
                     if (event.isCancelled())
                         return;
                     skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);

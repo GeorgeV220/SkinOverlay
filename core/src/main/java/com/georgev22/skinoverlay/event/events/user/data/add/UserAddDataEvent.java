@@ -3,14 +3,16 @@ package com.georgev22.skinoverlay.event.events.user.data.add;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.Cancellable;
-import com.georgev22.skinoverlay.event.Event;
+import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * An event that represents the addition of data to a user.
  */
-public class UserAddDataEvent extends UserModifyDataEvent implements Event, Cancellable {
+public class UserAddDataEvent extends UserModifyDataEvent implements Cancellable {
+
+    private static final HandlerList handlers = new HandlerList();
 
     private ObjectMap.Pair<String, ?> objectPair;
 
@@ -21,7 +23,7 @@ public class UserAddDataEvent extends UserModifyDataEvent implements Event, Canc
      * @param async      whether this event should be run asynchronously
      * @param objectPair the data being added to the user
      */
-    public UserAddDataEvent(UserManager.@NotNull User user, boolean async, ObjectMap.@NotNull Pair<String, ?> objectPair) {
+    public UserAddDataEvent(UserManager.@NotNull User user, ObjectMap.@NotNull Pair<String, ?> objectPair, boolean async) {
         super(user, async);
         this.objectPair = objectPair;
     }
@@ -42,5 +44,15 @@ public class UserAddDataEvent extends UserModifyDataEvent implements Event, Canc
      */
     public void setData(ObjectMap.Pair<String, ?> objectPair) {
         this.objectPair = objectPair;
+    }
+
+    @NotNull
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 }

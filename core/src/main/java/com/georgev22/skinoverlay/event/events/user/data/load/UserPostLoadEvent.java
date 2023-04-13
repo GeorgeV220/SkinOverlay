@@ -1,14 +1,16 @@
 package com.georgev22.skinoverlay.event.events.user.data.load;
 
 import com.georgev22.library.utilities.UserManager;
-import com.georgev22.skinoverlay.event.Event;
+import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * An event that is triggered after a user's data is loaded.
  */
-public class UserPostLoadEvent extends UserEvent implements Event {
+public class UserPostLoadEvent extends UserEvent {
+
+    private static final HandlerList handlers = new HandlerList();
 
     /**
      * Constructs a {@code UserPostLoadEvent} with the specified user and asynchronous status.
@@ -18,5 +20,15 @@ public class UserPostLoadEvent extends UserEvent implements Event {
      */
     public UserPostLoadEvent(@NotNull UserManager.User user, boolean async) {
         super(user, async);
+    }
+
+    @NotNull
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 }

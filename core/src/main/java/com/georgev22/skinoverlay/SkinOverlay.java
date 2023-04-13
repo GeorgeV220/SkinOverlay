@@ -15,6 +15,7 @@ import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
 import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.event.EventManager;
+import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
@@ -99,7 +100,7 @@ public class SkinOverlay {
             throw new RuntimeException(e);
         }
         MessagesUtil.repairPaths(fileManager.getMessages());
-        eventManager = new EventManager();
+        eventManager = new EventManager(getLogger(), this.getClass());
     }
 
 
@@ -125,13 +126,13 @@ public class SkinOverlay {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (OptionsUtil.UPDATER.getBooleanValue()) {
-            new Updater();
-        }
+
+        new Updater();
+        HandlerList.bakeAll();
         if (OptionsUtil.DEBUG.getBooleanValue()) {
             getLogger().warning("Debug mode is enabled!");
             getLogger().warning("Be prepared for a lot of log messages");
-            eventManager.registerListeners(new DebugListeners());
+            eventManager.register(new DebugListeners());
         }
     }
 
@@ -158,6 +159,7 @@ public class SkinOverlay {
         }
         unregisterCommands();
         SchedulerManager.getScheduler().cancelTasks(this.getClass());
+        HandlerList.unregisterAll();
     }
 
     public SkinOverlayImpl.Type type() {

@@ -276,13 +276,13 @@ public abstract class PlayerObject {
             try {
                 UserAddDataEvent event = new UserAddDataEvent(
                         user,
-                        true,
                         Pair.create(
                                 "defaultSkinProperty",
                                 gameProfile().getProperties().get("textures") != null
                                         ? gameProfile().getProperties().get("textures")
                                         : skinOverlay.getSkinHandler().getSkin(playerObject())
-                        ));
+                        ),
+                        true);
                 skinOverlay.getEventManager().callEvent(event);
                 if (!event.isCancelled()) {
                     user.addCustomData(event.getData().key(), event.getData().value());
@@ -291,7 +291,7 @@ public abstract class PlayerObject {
                 throw new RuntimeException(e);
             }
             try {
-                UserAddDataEvent event = new UserAddDataEvent(user, true, Pair.create("skinOptions", Utilities.skinOptionsToBytes(new SkinOptions("default"))));
+                UserAddDataEvent event = new UserAddDataEvent(user, Pair.create("skinOptions", Utilities.skinOptionsToBytes(new SkinOptions("default"))), true);
                 skinOverlay.getEventManager().callEvent(event);
                 if (!event.isCancelled()) {
                     user.addCustomDataIfNotExists(event.getData().key(), event.getData().value());

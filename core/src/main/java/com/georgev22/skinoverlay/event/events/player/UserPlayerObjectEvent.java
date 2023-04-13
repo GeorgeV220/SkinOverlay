@@ -2,7 +2,7 @@ package com.georgev22.skinoverlay.event.events.player;
 
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.Cancellable;
-import com.georgev22.skinoverlay.event.Event;
+import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +10,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * An event that represents a user player object event.
  */
-public class UserPlayerObjectEvent extends UserEvent implements Event, Cancellable {
+public class UserPlayerObjectEvent extends UserEvent implements Cancellable {
+
+    private final static HandlerList handlers = new HandlerList();
 
     /**
      * The player object associated with this event.
@@ -36,5 +38,15 @@ public class UserPlayerObjectEvent extends UserEvent implements Event, Cancellab
      */
     public PlayerObject getPlayerObject() {
         return playerObject;
+    }
+
+    @NotNull
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 }

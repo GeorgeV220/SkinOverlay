@@ -210,11 +210,11 @@ public abstract class SkinHandler {
             }
             PlayerObjectUpdateSkinEvent event;
             try {
-                event = new PlayerObjectUpdateSkinEvent(playerObject, user, true, Utilities.getSkinOptions(user.getCustomData("skinOptions")));
+                event = new PlayerObjectUpdateSkinEvent(playerObject, user, Utilities.getSkinOptions(user.getCustomData("skinOptions")), true);
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            skinOverlay.getEventManager().fireEvent(event);
+            skinOverlay.getEventManager().callEvent(event);
             if (event.isCancelled())
                 return;
             event.getPlayerObject().gameProfile().removeProperty("textures").addProperty("textures", event.getUser().getCustomData("skinProperty"));

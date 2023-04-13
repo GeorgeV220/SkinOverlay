@@ -2,16 +2,19 @@ package com.georgev22.skinoverlay.event.events.profile.property;
 
 import com.georgev22.skinoverlay.event.Cancellable;
 import com.georgev22.skinoverlay.event.Event;
+import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.handler.SProperty;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An event that is fired when a SProperty is removed.
  */
-public class SPropertyRemoveEvent implements Event, Cancellable {
+public class SPropertyRemoveEvent extends Event implements Cancellable {
+
+    private static final HandlerList handlers = new HandlerList();
 
     private final String propertyName;
     private final SProperty property;
-    private final boolean async;
     private boolean cancelled;
 
     /**
@@ -22,9 +25,9 @@ public class SPropertyRemoveEvent implements Event, Cancellable {
      * @param async        whether the event should be run asynchronously
      */
     public SPropertyRemoveEvent(String propertyName, SProperty property, boolean async) {
+        super(async);
         this.propertyName = propertyName;
         this.property = property;
-        this.async = async;
     }
 
     /**
@@ -65,13 +68,13 @@ public class SPropertyRemoveEvent implements Event, Cancellable {
         return cancelled;
     }
 
-    /**
-     * Returns whether this event should be run asynchronously.
-     *
-     * @return {@code true} if this event should be run asynchronously, {@code false} otherwise
-     */
+    @NotNull
     @Override
-    public boolean runAsync() {
-        return async;
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 }

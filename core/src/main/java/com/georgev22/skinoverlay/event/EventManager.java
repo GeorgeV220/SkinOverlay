@@ -1,115 +1,168 @@
 package com.georgev22.skinoverlay.event;
 
+import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
- * The EventManager class is responsible for managing listeners and events.
+ * A class that manages events and listeners.
  */
 public class EventManager {
 
     /**
-     * A map that stores the event listeners by their class name.
+     * The logger used for this event manager.
      */
-    private final ObservableObjectMap<String, EventListener> eventListenerObservableObjectMap = new ObservableObjectMap<>();
+    private final Logger logger;
 
     /**
-     * A map that stores the event listener methods along with their priority.
+     * The class that owns this event manager.
      */
-    private final ObservableObjectMap<ObjectMap.Pair<EventListener, Method>, EventPriority> priorityObservableObjectMap = new ObservableObjectMap<>();
+    private final Class<?> clazz;
 
     /**
-     * Registers one or more event listeners.
+     * Constructs a new EventManager with the given logger and class.
      *
-     * @param listeners The event listeners to register.
+     * @param logger the logger to use
+     * @param clazz  the class that owns this event manager
      */
-    public void registerListeners(EventListener @NotNull ... listeners) {
+    public EventManager(Logger logger, Class<?> clazz) {
+        this.logger = logger;
+        this.clazz = clazz;
+    }
+
+    /**
+     * Registers one or more listeners to this event manager.
+     *
+     * @param listeners the listeners to register
+     */
+    public void register(EventListener @NotNull ... listeners) {
         for (EventListener listener : listeners) {
-            eventListenerObservableObjectMap.append(listener.getClass().getSimpleName(), listener);
+            for (Map.Entry<Class<? extends Event>, Set<ListenerWrapper>> entry : createRegisteredListeners(listener).entrySet()) {
+                getEventListeners(getRegistrationClass(entry.getKey())).registerAll(entry.getValue());
+            }
         }
     }
 
     /**
-     * Fires an event to all registered listeners.
+     * Unregisters one or more listeners from this event manager.
      *
-     * @param event The event to be fired.
+     * @param listeners the listeners to unregister
      */
-    public void fireEvent(@NotNull Event event) {
-        if (event.runAsync()) {
-            SchedulerManager.getScheduler().runTaskAsynchronously(SkinOverlay.getInstance().getClass(), () -> fireEvent0(event));
+    public void unregister(EventListener @NotNull ... listeners) {
+        for (EventListener listener : listeners) {
+            HandlerList.unregisterAll(listener.getClass());
+        }
+    }
+
+    /**
+     * Calls the given event either synchronously or asynchronously,
+     * depending on the event's {@link Event#isAsynchronous()}
+     * value.
+     * Asynchronous event handling is recommended for long-running or potentially blocking tasks, as it allows the
+     * main thread to continue processing other tasks while the event is being handled.
+     * Synchronous event handling is recommended
+     * for quick, lightweight tasks that can be handled quickly without blocking the main thread.
+     *
+     * @param event the event to call
+     */
+    public void callEvent(Event event) {
+        if (event == null) return;
+        if (event.isAsynchronous()) {
+            SchedulerManager.getScheduler().runTaskAsynchronously(clazz, () -> callEvent0(event));
         } else {
-            fireEvent0(event);
+            callEvent0(event);
+        }
+    }
+
+    private void callEvent0(@NotNull Event event) {
+        for (ListenerWrapper listenerWrapper : event.getHandlers().getListenerWrappers()) {
+            try {
+                listenerWrapper.callEvent(event);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
     /**
-     * Helper method that is called by the fireEvent method to actually fire the event.
+     * Creates a map of event classes to listener wrappers for the given listener.
      *
-     * @param event The event to be fired.
+     * @param listener the listener to create the map for
+     * @return the map of event classes to listener wrappers
      */
-    private void fireEvent0(Event event) {
-        eventListenerObservableObjectMap.forEach((s, listener) -> {
-            Class<?> listenerClass = listener.getClass();
-            Utilities.getMethodsAnnotatedWith(listenerClass, Handler.class)
-                    .stream()
-                    .filter(method -> method.getParameterTypes()[0] == event.getClass())
-                    .forEach(method -> {
-                        Handler handler = method.getAnnotation(Handler.class);
-                        int priority = handler.priority().ordinal();
-
-                        priorityObservableObjectMap.append(ObjectMap.Pair.create(listener, method), EventPriority.getPriority(priority));
-                    });
-        });
-
-        priorityObservableObjectMap.entrySet().stream()
-                .filter(entry -> entry.getValue().ordinal() == EventPriority.LOW.ordinal())
-                .filter(entry -> entry.getKey().value().getParameterTypes()[0] == event.getClass())
-                .forEach(entry -> invoke(entry.getKey().value(), entry.getKey().key(), event));
-
-        priorityObservableObjectMap.entrySet().stream()
-                .filter(entry -> entry.getValue().ordinal() == EventPriority.NORMAL.ordinal())
-                .filter(entry -> entry.getKey().value().getParameterTypes()[0] == event.getClass())
-                .forEach(entry -> invoke(entry.getKey().value(), entry.getKey().key(), event));
-
-        priorityObservableObjectMap.entrySet().stream()
-                .filter(entry -> entry.getValue().ordinal() == EventPriority.HIGH.ordinal())
-                .filter(entry -> entry.getKey().value().getParameterTypes()[0] == event.getClass())
-                .forEach(entry -> invoke(entry.getKey().value(), entry.getKey().key(), event));
-
-        priorityObservableObjectMap.entrySet().stream()
-                .filter(entry -> entry.getValue().ordinal() == EventPriority.HIGHEST.ordinal())
-                .filter(entry -> entry.getKey().value().getParameterTypes()[0] == event.getClass())
-                .forEach(entry -> invoke(entry.getKey().value(), entry.getKey().key(), event));
-    }
-
-    /**
-     * Invokes the given listener method with the given event.
-     *
-     * @param method   The method to be invoked.
-     * @param listener The listener instance on which the method will be invoked.
-     * @param event    The event to be passed as an argument to the method.
-     */
-    private void invoke(@NotNull Method method, EventListener listener, Event event) {
+    @NotNull
+    public ObjectMap<Class<? extends Event>, Set<ListenerWrapper>> createRegisteredListeners(@NotNull EventListener listener) {
+        ObjectMap<Class<? extends Event>, Set<ListenerWrapper>> ret = new HashObjectMap<>();
+        List<Method> methods;
         try {
-            method.invoke(listener, event);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            methods = new ArrayList<>(Arrays.asList(listener.getClass().getDeclaredMethods()));
+        } catch (NoClassDefFoundError e) {
+            logger.severe("Failed to register events for " + listener.getClass() + " in EventManager of " + clazz.getName() + ". The required class or resource (" + e.getMessage() + ") could not be found.");
+            return ret;
+        }
+
+        for (final Method method : methods) {
+            final EventHandler eh = method.getAnnotation(EventHandler.class);
+            if (eh == null) continue;
+            if (method.isBridge() || method.isSynthetic()) {
+                continue;
+            }
+            final Class<?> checkClass;
+            if (method.getParameterTypes().length != 1 || !Event.class.isAssignableFrom(checkClass = method.getParameterTypes()[0])) {
+                logger.severe("Failed to register events for " + listener + " in EventManager of " + clazz.getName() + ". The method " + method.getName() + " must have a single parameter of type Event.");
+                continue;
+            }
+            final Class<? extends Event> eventClass = checkClass.asSubclass(Event.class);
+            method.setAccessible(true);
+            Set<ListenerWrapper> eventSet = ret.computeIfAbsent(eventClass, k -> new HashSet<>());
+
+            eventSet.add(new ListenerWrapper(clazz, listener, method, eh.priority(), eh.ignoreCancelled()));
+
+        }
+        return ret;
+    }
+
+    /**
+     * Gets the handler list for the given event class.
+     *
+     * @param type the event class to get the handler list for
+     * @return the handler list for the given event class
+     */
+    @NotNull
+    public HandlerList getEventListeners(@NotNull Class<? extends Event> type) {
+        try {
+            Method method = getRegistrationClass(type).getDeclaredMethod("getHandlerList");
+            method.setAccessible(true);
+            return (HandlerList) method.invoke(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     /**
-     * Returns the map of registered event listeners.
+     * Gets the registration class for the given event class.
      *
-     * @return The map of registered event listeners.
+     * @param clazz the event class to get the registration class for
+     * @return the registration class for the given event class
      */
-    public ObservableObjectMap<String, EventListener> getEventListeners() {
-        return eventListenerObservableObjectMap;
+    @NotNull
+    public Class<? extends Event> getRegistrationClass(@NotNull Class<? extends Event> clazz) {
+        try {
+            clazz.getDeclaredMethod("getHandlerList");
+            return clazz;
+        } catch (NoSuchMethodException e) {
+            if (clazz.getSuperclass() != null
+                    && !clazz.getSuperclass().equals(Event.class)
+                    && Event.class.isAssignableFrom(clazz.getSuperclass())) {
+                return getRegistrationClass(clazz.getSuperclass().asSubclass(Event.class));
+            } else {
+                throw new RuntimeException("Unable to locate the handler list for event " + clazz.getName() + ". Please ensure that a static getHandlerList method is defined.");
+            }
+        }
     }
 }

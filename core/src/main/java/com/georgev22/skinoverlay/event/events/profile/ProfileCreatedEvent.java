@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.event.events.profile;
 
 import com.georgev22.library.maps.UnmodifiableObjectMap;
 import com.georgev22.skinoverlay.event.Event;
+import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import org.jetbrains.annotations.NotNull;
@@ -12,13 +13,14 @@ import java.util.UUID;
 /**
  * An event that is fired when a new SGameProfile is created.
  */
-public class ProfileCreatedEvent implements Event {
+public class ProfileCreatedEvent extends Event {
+
+    private static final HandlerList handlers = new HandlerList();
 
     private final String name;
     private final UUID uuid;
     private final UnmodifiableObjectMap<String, SProperty> properties;
     private final SGameProfile profile;
-    private final boolean async;
 
     /**
      * Constructs a new ProfileCreatedEvent with the given SGameProfile and whether the event should be run asynchronously.
@@ -27,11 +29,11 @@ public class ProfileCreatedEvent implements Event {
      * @param async        whether the event should be run asynchronously
      */
     public ProfileCreatedEvent(@NotNull SGameProfile sGameProfile, boolean async) {
+        super(async);
         this.name = sGameProfile.getName();
         this.uuid = sGameProfile.getUUID();
         this.properties = sGameProfile.getProperties();
         this.profile = sGameProfile;
-        this.async = async;
     }
 
     /**
@@ -71,13 +73,14 @@ public class ProfileCreatedEvent implements Event {
         return profile;
     }
 
-    /**
-     * Returns whether this event should be run asynchronously.
-     *
-     * @return {@code true} if this event should be run asynchronously, {@code false} otherwise
-     */
+    @NotNull
     @Override
-    public boolean runAsync() {
-        return async;
+    public HandlerList getHandlers() {
+        return handlers;
     }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
 }

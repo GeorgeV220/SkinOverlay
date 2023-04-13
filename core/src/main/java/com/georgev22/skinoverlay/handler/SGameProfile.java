@@ -43,7 +43,7 @@ public abstract class SGameProfile {
         this.name = name;
         this.uuid = uuid;
         this.properties = new HashObjectMap<>();
-        this.skinOverlay.getEventManager().fireEvent(new ProfileCreatedEvent(this, false));
+        this.skinOverlay.getEventManager().callEvent(new ProfileCreatedEvent(this, false));
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class SGameProfile {
         this.name = name;
         this.uuid = uuid;
         this.properties = properties;
-        this.skinOverlay.getEventManager().fireEvent(new ProfileCreatedEvent(this, false));
+        this.skinOverlay.getEventManager().callEvent(new ProfileCreatedEvent(this, false));
     }
 
     /**
@@ -100,7 +100,7 @@ public abstract class SGameProfile {
             return this;
         }
         SPropertyAddEvent sPropertyAddEvent = new SPropertyAddEvent(propertyName, sProperty, false);
-        skinOverlay.getEventManager().fireEvent(sPropertyAddEvent);
+        skinOverlay.getEventManager().callEvent(sPropertyAddEvent);
         if (sPropertyAddEvent.isCancelled()) {
             return this;
         }
@@ -120,7 +120,7 @@ public abstract class SGameProfile {
             return this;
         }
         SPropertyRemoveEvent sPropertyRemoveEvent = new SPropertyRemoveEvent(propertyName, this.properties.get(propertyName), false);
-        skinOverlay.getEventManager().fireEvent(sPropertyRemoveEvent);
+        skinOverlay.getEventManager().callEvent(sPropertyRemoveEvent);
         if (sPropertyRemoveEvent.isCancelled()) {
             return this;
         }
