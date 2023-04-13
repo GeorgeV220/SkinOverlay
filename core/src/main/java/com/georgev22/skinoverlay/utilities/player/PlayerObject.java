@@ -250,14 +250,12 @@ public abstract class PlayerObject {
      * Adds custom data to the user object, saves it, and updates the player's skin.
      */
     public void playerJoin() {
-        if (permission("skinoverlay.updater")) {
-            new Updater(this);
-        }
+        new Updater(this);
         if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
         UserPreLoadEvent userPreLoadEvent = new UserPreLoadEvent(this.playerUUID(), true);
-        skinOverlay.getEventManager().fireEvent(userPreLoadEvent);
+        skinOverlay.getEventManager().callEvent(userPreLoadEvent);
         if (userPreLoadEvent.isCancelled()) {
             return;
         }
@@ -271,7 +269,7 @@ public abstract class PlayerObject {
                 throw new UserException("User not found!");
             }
             UserModifyDataEvent userModifyDataEvent = new UserModifyDataEvent(user, true);
-            skinOverlay.getEventManager().fireEvent(userModifyDataEvent);
+            skinOverlay.getEventManager().callEvent(userModifyDataEvent);
             if (userModifyDataEvent.isCancelled()) {
                 return user;
             }
@@ -285,7 +283,7 @@ public abstract class PlayerObject {
                                         ? gameProfile().getProperties().get("textures")
                                         : skinOverlay.getSkinHandler().getSkin(playerObject())
                         ));
-                skinOverlay.getEventManager().fireEvent(event);
+                skinOverlay.getEventManager().callEvent(event);
                 if (!event.isCancelled()) {
                     user.addCustomData(event.getData().key(), event.getData().value());
                 }
@@ -294,7 +292,7 @@ public abstract class PlayerObject {
             }
             try {
                 UserAddDataEvent event = new UserAddDataEvent(user, true, Pair.create("skinOptions", Utilities.skinOptionsToBytes(new SkinOptions("default"))));
-                skinOverlay.getEventManager().fireEvent(event);
+                skinOverlay.getEventManager().callEvent(event);
                 if (!event.isCancelled()) {
                     user.addCustomDataIfNotExists(event.getData().key(), event.getData().value());
                 }
@@ -302,7 +300,7 @@ public abstract class PlayerObject {
                 throw new RuntimeException(e);
             }
             userModifyDataEvent = new UserModifyDataEvent(user, true);
-            skinOverlay.getEventManager().fireEvent(userModifyDataEvent);
+            skinOverlay.getEventManager().callEvent(userModifyDataEvent);
             if (!userModifyDataEvent.isCancelled()) {
                 skinOverlay.getUserManager().save(user);
             }
@@ -316,11 +314,11 @@ public abstract class PlayerObject {
         }).thenAcceptAsync(user -> {
             if (user != null) {
                 UserPlayerObjectEvent userPlayerObjectEvent = new UserPlayerObjectEvent(user, playerObject(), true);
-                skinOverlay.getEventManager().fireEvent(userPlayerObjectEvent);
+                skinOverlay.getEventManager().callEvent(userPlayerObjectEvent);
                 if (userPlayerObjectEvent.isCancelled())
                     return;
                 UserPostLoadEvent userPostLoadEvent = new UserPostLoadEvent(user, true);
-                skinOverlay.getEventManager().fireEvent(userPostLoadEvent);
+                skinOverlay.getEventManager().callEvent(userPostLoadEvent);
                 if (userPostLoadEvent.isCancelled()) {
                     return;
                 }
@@ -349,7 +347,7 @@ public abstract class PlayerObject {
         }).thenAcceptAsync(user -> {
             if (user != null) {
                 UserModifyDataEvent userModifyDataEvent = new UserModifyDataEvent(user, true);
-                skinOverlay.getEventManager().fireEvent(userModifyDataEvent);
+                skinOverlay.getEventManager().callEvent(userModifyDataEvent);
                 if (!userModifyDataEvent.isCancelled()) {
                     skinOverlay.getUserManager().save(user);
                 }
@@ -382,7 +380,7 @@ public abstract class PlayerObject {
         }).thenAcceptAsync(user -> {
             if (user != null) {
                 PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(this, user, true);
-                skinOverlay.getEventManager().fireEvent(event);
+                skinOverlay.getEventManager().callEvent(event);
                 if (event.isCancelled())
                     return;
                 skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);

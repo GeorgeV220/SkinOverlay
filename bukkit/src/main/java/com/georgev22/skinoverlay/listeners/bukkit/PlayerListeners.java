@@ -35,16 +35,16 @@ public class PlayerListeners implements Listener, PluginMessageListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent playerJoinEvent) {
-        PlayerObject playerObject = new PlayerObjectBukkit(playerJoinEvent.getPlayer());
+        PlayerObject playerObject = skinOverlay.getPlayer(playerJoinEvent.getPlayer().getUniqueId()).orElseThrow();
         playerObject.playerJoin();
         if (OptionsUtil.PROXY.getBooleanValue())
-            SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
+            SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
                 skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:message");
                 if (playerJoinEvent.getPlayer().isOnline())
                     skinOverlay.getPluginMessageUtils().sendDataToPlayer("playerJoin", playerObject, playerObject.playerUUID().toString());
                 else
                     skinOverlay.getLogger().warning("Player " + playerObject.playerName() + " is not online");
-            }, 1);
+            });
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
