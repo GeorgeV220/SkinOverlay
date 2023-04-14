@@ -18,6 +18,7 @@ import com.georgev22.skinoverlay.event.EventManager;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
+import com.georgev22.skinoverlay.hook.hooks.SkinHookImpl;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.UserManagerListener;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
@@ -56,6 +57,9 @@ public class SkinOverlay {
     @Getter
     @Setter
     private SkinHook skinHook;
+
+    @Getter
+    private final SkinHook defaultSkinHook = new SkinHookImpl();
 
     @Getter
     @Setter

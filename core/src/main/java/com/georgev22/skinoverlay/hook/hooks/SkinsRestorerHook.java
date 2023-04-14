@@ -60,7 +60,7 @@ public class SkinsRestorerHook implements SkinHook {
             }
             return new SProperty(iProperty.getName(), iProperty.getValue(), iProperty.getSignature());
         } catch (Exception exception) {
-            return skinOverlay.getSkinHandler().getSkin(playerObject);
+            return skinOverlay.getDefaultSkinHook().getProperty(playerObject);
         }
     }
 
