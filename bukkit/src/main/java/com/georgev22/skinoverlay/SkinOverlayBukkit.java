@@ -10,6 +10,7 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.handlers.*;
 import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
+import com.georgev22.skinoverlay.listeners.bukkit.PaperPlayerListeners;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BukkitPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
@@ -92,6 +93,8 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
         BukkitMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
+        if (PaperLib.isPaper() & getCurrentVersion().isAboveOrEqual(V1_15_R1))
+            BukkitMinecraftUtils.registerListeners(this, new PaperPlayerListeners());
         if (OptionsUtil.PROXY.getBooleanValue()) {
             SkinOverlay.getInstance().setPluginMessageUtils(new BukkitPluginMessageUtils());
             Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "skinoverlay:bungee", new PlayerListeners());
