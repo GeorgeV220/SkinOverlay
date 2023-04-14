@@ -335,6 +335,7 @@ public abstract class PlayerObject {
      * Saves the user object.
      */
     public void playerQuit() {
+        skinOverlay.getSkinOverlay().onlinePlayers().remove(playerUUID());
         if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
@@ -353,7 +354,6 @@ public abstract class PlayerObject {
                 }
             }
         });
-        skinOverlay.getSkinOverlay().onlinePlayers().remove(playerUUID());
     }
 
     /**
@@ -378,14 +378,22 @@ public abstract class PlayerObject {
                 if (event.isCancelled())
                     return;
                 try {
-                    if (Utilities.getSkinOptions(user.getCustomData("skinOptions")).getSkinName().equals("default")) {
+                    SkinOptions skinOptions = Utilities.getSkinOptions(user.getCustomData("skinOptions"));
+                    if (skinOptions == null)
                         return;
-                    }
+                    if (skinOptions.getSkinName().equals("default"))
+                        return;
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
                 skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);
             }
+        }).handleAsync((unused, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
+                return null;
+            }
+            return unused;
         });
     }
 
