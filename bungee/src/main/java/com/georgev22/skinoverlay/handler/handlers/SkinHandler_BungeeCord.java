@@ -43,14 +43,18 @@ public class SkinHandler_BungeeCord extends SkinHandler {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ProxiedPlayer proxiedPlayer = (ProxiedPlayer) playerObject.player();
-                skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
-                skinOverlay.getPluginMessageUtils().setObject(proxiedPlayer.getServer().getInfo());
-                if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                    skinOverlay.getPluginMessageUtils().sendDataToServer("resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
+                if (proxiedPlayer.getServer() != null) {
+                    skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
+                    skinOverlay.getPluginMessageUtils().setObject(proxiedPlayer.getServer().getInfo());
+                    if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
+                        skinOverlay.getPluginMessageUtils().sendDataToServer("resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
+                    } else {
+                        skinOverlay.getPluginMessageUtils().sendDataToServer("changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
+                    }
+                    return true;
                 } else {
-                    skinOverlay.getPluginMessageUtils().sendDataToServer("changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
+                    return false;
                 }
-                return true;
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
             }
