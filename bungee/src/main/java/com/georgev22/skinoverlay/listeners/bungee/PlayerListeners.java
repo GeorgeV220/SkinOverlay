@@ -3,8 +3,6 @@ package com.georgev22.skinoverlay.listeners.bungee;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.Utilities;
-import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.ProxyServer;
@@ -21,16 +19,18 @@ import java.util.UUID;
 
 public class PlayerListeners implements Listener {
 
+    private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
+
     @EventHandler(priority = 1)
     public void onLogin(PostLoginEvent postLoginEvent) {
         if (!postLoginEvent.getPlayer().isConnected())
             return;
-        new PlayerObjectBungee(postLoginEvent.getPlayer()).playerJoin();
+        skinOverlay.getPlayer(postLoginEvent.getPlayer().getUniqueId()).orElseThrow().playerJoin();
     }
 
     @EventHandler(priority = 1)
     public void onQuit(PlayerDisconnectEvent playerDisconnectEvent) {
-        new PlayerObjectBungee(playerDisconnectEvent.getPlayer()).playerQuit();
+        skinOverlay.getPlayer(playerDisconnectEvent.getPlayer().getUniqueId()).orElseThrow().playerQuit();
     }
 
     @EventHandler
@@ -50,8 +50,7 @@ public class PlayerListeners implements Listener {
                     SkinOverlay.getInstance().getUserManager().getUser(playerUUID).thenAccept(user -> {
                         ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(playerUUID);
                         if (proxiedPlayer != null && proxiedPlayer.isConnected()) {
-                            PlayerObject playerObject = new PlayerObjectBungee(proxiedPlayer);
-                            playerObject.updateSkin();
+                            skinOverlay.getPlayer(proxiedPlayer.getUniqueId()).orElseThrow().updateSkin();
                         }
                     });
                 });

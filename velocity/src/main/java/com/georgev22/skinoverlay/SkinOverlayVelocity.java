@@ -5,6 +5,7 @@ import com.georgev22.api.libraryloader.LibraryLoader;
 import com.georgev22.api.libraryloader.annotations.MavenLibrary;
 import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
+import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.minecraft.VelocityMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
@@ -24,6 +25,7 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.scheduler.ScheduledTask;
@@ -35,9 +37,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
 @MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.22")
@@ -185,9 +186,17 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         return server.getConfiguration().isOnlineMode();
     }
 
+    private final ObservableObjectMap<UUID, PlayerObject> players = new ObservableObjectMap<>();
+
     @Override
-    public List<PlayerObject> onlinePlayers() {
-        return server.getAllPlayers().stream().map(PlayerObjectVelocity::new).collect(Collectors.toList());
+    public ObservableObjectMap<UUID, PlayerObject> onlinePlayers() {
+        for (Player player : server.getAllPlayers()) {
+            if (players.containsKey(player.getUniqueId())) {
+                continue;
+            }
+            players.append(player.getUniqueId(), new PlayerObjectVelocity(player));
+        }
+        return players;
     }
 
     public Path getDataDirectory() {

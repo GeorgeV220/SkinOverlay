@@ -199,7 +199,7 @@ public class SkinOverlay {
     }
 
     public List<PlayerObject> onlinePlayers() {
-        return skinOverlay.onlinePlayers();
+        return new ArrayList<>(skinOverlay.onlinePlayers().values());
     }
 
     public boolean isOnline(String playerName) {

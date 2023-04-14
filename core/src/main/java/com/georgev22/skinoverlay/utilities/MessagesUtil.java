@@ -131,17 +131,17 @@ public enum MessagesUtil {
 
     public void msgAll() {
         if (this.isMultiLined()) {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()));
+            SkinOverlay.getInstance().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()));
         } else {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()[0]));
+            SkinOverlay.getInstance().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()[0]));
         }
     }
 
     public void msgAll(Map<String, String> map, boolean ignoreCase) {
         if (this.isMultiLined()) {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages(), map, ignoreCase)));
+            SkinOverlay.getInstance().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages(), map, ignoreCase)));
         } else {
-            SkinOverlay.getInstance().getSkinOverlay().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages()[0], map, ignoreCase)));
+            SkinOverlay.getInstance().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages()[0], map, ignoreCase)));
         }
     }
 

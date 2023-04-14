@@ -1,11 +1,13 @@
 package com.georgev22.skinoverlay.utilities.interfaces;
 
+import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -72,11 +74,11 @@ public interface SkinOverlayImpl {
     boolean onlineMode();
 
     /**
-     * Returns a list of PlayerObject instances representing all online players on the server.
+     * Returns an ObservableObjectMap of PlayerObject instances representing all online players on the server.
      *
-     * @return A list of PlayerObject instances representing all online players on the server.
+     * @return An ObservableObjectMap of PlayerObject instances representing all online players on the server.
      */
-    List<PlayerObject> onlinePlayers();
+    ObservableObjectMap<UUID, PlayerObject> onlinePlayers();
 
     /**
      * Returns the plugin instance.

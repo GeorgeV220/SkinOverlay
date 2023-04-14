@@ -5,6 +5,7 @@ import com.georgev22.api.libraryloader.LibraryLoader;
 import com.georgev22.api.libraryloader.annotations.MavenLibrary;
 import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
+import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.handlers.*;
@@ -21,13 +22,13 @@ import io.papermc.lib.PaperLib;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.*;
 
@@ -154,9 +155,17 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         return Bukkit.getOnlineMode();
     }
 
+    private final ObservableObjectMap<UUID, PlayerObject> players = new ObservableObjectMap<>();
+
     @Override
-    public List<PlayerObject> onlinePlayers() {
-        return Bukkit.getOnlinePlayers().stream().map(PlayerObjectBukkit::new).collect(Collectors.toList());
+    public ObservableObjectMap<UUID, PlayerObject> onlinePlayers() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (players.containsKey(player.getUniqueId())) {
+                continue;
+            }
+            players.append(player.getUniqueId(), new PlayerObjectBukkit(player));
+        }
+        return players;
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.georgev22.api.libraryloader.LibraryLoader;
 import com.georgev22.api.libraryloader.annotations.MavenLibrary;
 import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
+import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
@@ -19,16 +20,16 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bstats.bungeecord.Metrics;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
 @MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.22")
@@ -150,9 +151,17 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         return getProxy().getConfig().isOnlineMode();
     }
 
+    private final ObservableObjectMap<UUID, PlayerObject> players = new ObservableObjectMap<>();
+
     @Override
-    public List<PlayerObject> onlinePlayers() {
-        return getProxy().getPlayers().stream().map(PlayerObjectBungee::new).collect(Collectors.toList());
+    public ObservableObjectMap<UUID, PlayerObject> onlinePlayers() {
+        for (ProxiedPlayer player : getProxy().getPlayers()) {
+            if (players.containsKey(player.getUniqueId())) {
+                continue;
+            }
+            players.append(player.getUniqueId(), new PlayerObjectBungee(player));
+        }
+        return players;
     }
 
     @Override

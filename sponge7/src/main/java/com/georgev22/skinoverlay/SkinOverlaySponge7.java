@@ -5,6 +5,7 @@ import com.georgev22.api.libraryloader.LibraryLoader;
 import com.georgev22.api.libraryloader.annotations.MavenLibrary;
 import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
+import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.minecraft.Sponge7MinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.LoggerWrapper;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -33,10 +35,9 @@ import org.spongepowered.api.plugin.PluginManager;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
 @MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.22")
@@ -165,9 +166,17 @@ public class SkinOverlaySponge7 implements SkinOverlayImpl {
         return server.getOnlineMode();
     }
 
+    private final ObservableObjectMap<UUID, PlayerObject> players = new ObservableObjectMap<>();
+
     @Override
-    public List<PlayerObject> onlinePlayers() {
-        return server.getOnlinePlayers().stream().map(PlayerObjectSponge7::new).collect(Collectors.toList());
+    public ObservableObjectMap<UUID, PlayerObject> onlinePlayers() {
+        for (Player player : server.getOnlinePlayers()) {
+            if (players.containsKey(player.getUniqueId())) {
+                continue;
+            }
+            players.append(player.getUniqueId(), new PlayerObjectSponge7(player));
+        }
+        return players;
     }
 
     @Override

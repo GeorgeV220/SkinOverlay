@@ -353,6 +353,7 @@ public abstract class PlayerObject {
                 }
             }
         });
+        skinOverlay.getSkinOverlay().onlinePlayers().remove(playerUUID());
     }
 
     /**
