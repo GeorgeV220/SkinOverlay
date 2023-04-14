@@ -174,11 +174,6 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         return Bukkit.getBukkitVersion();
     }
 
-    @Override
-    public void print(String... msg) {
-        BukkitMinecraftUtils.printMsg(msg);
-    }
-
     public @NotNull BukkitAudiences adventure() {
         if (this.adventure == null) {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");

@@ -212,9 +212,4 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     public String serverVersion() {
         return SkinOverlayVelocity.getInstance().getProxy().getVersion().getName() + "-" + SkinOverlayVelocity.getInstance().getProxy().getVersion().getVersion();
     }
-
-    @Override
-    public void print(String... msg) {
-        VelocityMinecraftUtils.printMsg(msg);
-    }
 }

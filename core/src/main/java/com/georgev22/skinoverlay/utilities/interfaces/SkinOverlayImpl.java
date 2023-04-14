@@ -4,6 +4,7 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -103,7 +104,9 @@ public interface SkinOverlayImpl {
      *
      * @param msg The message(s) to print.
      */
-    void print(String... msg);
+    default void print(String... msg) {
+        Arrays.stream(msg).forEach(s -> logger().info(s));
+    }
 
     /**
      * A record representing the plugin's description.

@@ -170,11 +170,6 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         return getProxy().getVersion();
     }
 
-    @Override
-    public void print(String... msg) {
-        BungeeMinecraftUtils.printMsg(msg);
-    }
-
     public @NotNull BungeeAudiences adventure() {
         if (this.adventure == null) {
             throw new IllegalStateException("Cannot retrieve audience provider while plugin is not enabled");

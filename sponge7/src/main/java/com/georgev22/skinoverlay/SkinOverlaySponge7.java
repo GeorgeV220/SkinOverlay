@@ -33,7 +33,6 @@ import org.spongepowered.api.plugin.PluginManager;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -184,11 +183,6 @@ public class SkinOverlaySponge7 implements SkinOverlayImpl {
     @Override
     public String serverVersion() {
         return Sponge.getPlatform().getMinecraftVersion().getName();
-    }
-
-    @Override
-    public void print(String... msg) {
-        Sponge7MinecraftUtils.printMsg(logger(), Arrays.stream(msg).toList());
     }
 
     public PluginContainer getPluginContainer() {
