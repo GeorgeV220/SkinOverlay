@@ -369,13 +369,6 @@ public abstract class PlayerObject {
             }
             if (!isOnline())
                 return user;
-            try {
-                if (Utilities.getSkinOptions(user.getCustomData("skinOptions")).getSkinName().equals("default")) {
-                    return user;
-                }
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
             return user;
         }).thenAcceptAsync(user -> {
             if (user != null) {
@@ -383,6 +376,13 @@ public abstract class PlayerObject {
                 skinOverlay.getEventManager().callEvent(event);
                 if (event.isCancelled())
                     return;
+                try {
+                    if (Utilities.getSkinOptions(user.getCustomData("skinOptions")).getSkinName().equals("default")) {
+                        return;
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
                 skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);
             }
         });

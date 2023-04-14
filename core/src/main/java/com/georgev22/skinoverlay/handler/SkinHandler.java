@@ -218,7 +218,8 @@ public abstract class SkinHandler {
             if (event.isCancelled())
                 return;
             event.getPlayerObject().gameProfile().removeProperty("textures").addProperty("textures", event.getUser().getCustomData("skinProperty"));
-            updateSkin0(event.getUser(), event.getPlayerObject(), forOthers);
+            if (event.getUser().getCustomData("skinProperty") != null)
+                updateSkin0(event.getUser(), event.getPlayerObject(), forOthers);
         }).handle((unused, throwable) -> {
             if (throwable != null) {
                 if (throwable instanceof OperationNotSupportedException)
@@ -424,15 +425,7 @@ public abstract class SkinHandler {
         if (skinOverlay.getSkinHook() != null && skinOverlay.getSkinHook().getProperty(playerObject) != null) {
             return skinOverlay.getSkinHook().getProperty(playerObject);
         }
-        final JsonElement json = JsonParser.parseString(new String(this.getProfileBytes(playerObject, null)));
-        final JsonArray properties = json.getAsJsonObject().get("properties").getAsJsonArray();
-        SProperty property = null;
-        for (final JsonElement object : properties) {
-            if (object.getAsJsonObject().get("name").getAsString().equals("textures")) {
-                property = new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString());
-            }
-        }
-        return property;
+        return skinOverlay.getDefaultSkinHook().getProperty(playerObject);
     }
 
     /**
