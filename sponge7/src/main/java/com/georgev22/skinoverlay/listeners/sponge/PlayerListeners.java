@@ -1,21 +1,23 @@
 package com.georgev22.skinoverlay.listeners.sponge;
 
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectSponge7;
+import com.georgev22.skinoverlay.SkinOverlay;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 public class PlayerListeners {
 
+    private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
+
     @Listener
-    public void onLogin(ClientConnectionEvent.Join joinEvent) {
+    public void onJoin(ClientConnectionEvent.Join joinEvent) {
         if (!joinEvent.getTargetEntity().isOnline())
             return;
-        new PlayerObjectSponge7(joinEvent.getTargetEntity()).playerJoin();
+        skinOverlay.getPlayer(joinEvent.getTargetEntity().getUniqueId()).orElseThrow().playerJoin();
     }
 
     @Listener
-    public void onLogin(ClientConnectionEvent.Disconnect disconnectEvent) {
-        new PlayerObjectSponge7(disconnectEvent.getTargetEntity()).playerQuit();
+    public void onDisconnect(ClientConnectionEvent.Disconnect disconnectEvent) {
+        skinOverlay.getPlayer(disconnectEvent.getTargetEntity().getUniqueId()).orElseThrow().playerQuit();
     }
 }
 

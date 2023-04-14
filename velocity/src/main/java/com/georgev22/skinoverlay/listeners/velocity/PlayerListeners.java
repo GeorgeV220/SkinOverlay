@@ -11,6 +11,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.proxy.ServerConnection;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -33,17 +34,15 @@ public class PlayerListeners {
 
     @Subscribe
     public void onPluginMessage(PluginMessageEvent pluginMessageEvent) {
+        if (!(pluginMessageEvent.getSource() instanceof ServerConnection)) {
+            return;
+        }
         if (pluginMessageEvent.getIdentifier().getId().equalsIgnoreCase("skinoverlay:message")) {
             ByteArrayDataInput in = ByteStreams.newDataInput(pluginMessageEvent.dataAsInputStream());
             String subChannel = in.readUTF();
             if (subChannel.equalsIgnoreCase("playerJoin")) {
                 UUID playerUUID = UUID.fromString(Objects.requireNonNull(Utilities.decrypt(in.readUTF())));
-                SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
-                    while (!skinOverlay.getUserManager().getLoadedUsers().containsKey(playerUUID)) {
-                        //IGNORE
-                    }
-                    SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> skinOverlay.getPlayer(playerUUID).ifPresent(PlayerObject::updateSkin));
-                });
+                SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> skinOverlay.getPlayer(playerUUID).ifPresent(PlayerObject::updateSkin));
             }
         }
     }

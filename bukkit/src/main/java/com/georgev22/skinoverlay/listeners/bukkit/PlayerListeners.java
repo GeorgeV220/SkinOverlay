@@ -6,7 +6,6 @@ import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import lombok.SneakyThrows;
@@ -49,7 +48,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onQuit(PlayerQuitEvent playerQuitEvent) {
-        new PlayerObjectBukkit(playerQuitEvent.getPlayer()).playerQuit();
+        skinOverlay.getPlayer(playerQuitEvent.getPlayer().getUniqueId()).orElseThrow().playerQuit();
     }
 
     @SneakyThrows

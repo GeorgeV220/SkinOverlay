@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay.listeners.bukkit;
 
-import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
+import com.georgev22.skinoverlay.SkinOverlay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -8,8 +8,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class DeveloperInformListener implements Listener {
 
+    private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
+
     @EventHandler
     private void onJoin(final PlayerJoinEvent e) {
-        new PlayerObjectBukkit(e.getPlayer()).developerInform();
+        skinOverlay.getPlayer(e.getPlayer().getUniqueId()).orElseThrow().developerInform();
     }
 }

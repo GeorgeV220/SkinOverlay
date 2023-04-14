@@ -3,10 +3,9 @@ package com.georgev22.skinoverlay.listeners.bungee;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.Utilities;
+import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -43,17 +42,7 @@ public class PlayerListeners implements Listener {
             String subChannel = in.readUTF();
             if (subChannel.equalsIgnoreCase("playerJoin")) {
                 UUID playerUUID = UUID.fromString(Objects.requireNonNull(Utilities.decrypt(in.readUTF())));
-                SchedulerManager.getScheduler().runTaskAsynchronously(SkinOverlay.getInstance().getClass(), () -> {
-                    while (!SkinOverlay.getInstance().getUserManager().getLoadedUsers().containsKey(playerUUID)) {
-                        //IGNORE
-                    }
-                    SkinOverlay.getInstance().getUserManager().getUser(playerUUID).thenAccept(user -> {
-                        ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(playerUUID);
-                        if (proxiedPlayer != null && proxiedPlayer.isConnected()) {
-                            skinOverlay.getPlayer(proxiedPlayer.getUniqueId()).orElseThrow().updateSkin();
-                        }
-                    });
-                });
+                SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> skinOverlay.getPlayer(playerUUID).ifPresent(PlayerObject::updateSkin));
             }
         }
     }
