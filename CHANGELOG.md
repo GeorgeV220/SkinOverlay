@@ -1,3 +1,27 @@
+# [3.18.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.17.0...v3.18.0) (2023-04-15)
+
+
+### Bug Fixes
+
+* Bukkit Async Skin Update ([ac14a77](https://github.com/GeorgeV220/SkinOverlay/commit/ac14a77d7fd14ee661f168b7f6c1ce9c83496a91))
+* Fixed ChannelNameTooLongException ([b478004](https://github.com/GeorgeV220/SkinOverlay/commit/b4780044387fb7a96aa311cf2ca49037efdac68f))
+* IllegalStateException Asynchronous player tracker update on thread ([92e9b2d](https://github.com/GeorgeV220/SkinOverlay/commit/92e9b2d4b4dabae0ce9d39dc3ab9896fe9635bdc))
+* **Listeners:** Fixed all proxy and bukkit listeners ([34ec157](https://github.com/GeorgeV220/SkinOverlay/commit/34ec1571ce1861fa5934dc5254adb581fccd1815))
+* **PlayerObject:** Remove player from onlinePlayers and error handling ([a6355da](https://github.com/GeorgeV220/SkinOverlay/commit/a6355da8d0bde7ba7e9b7eb84da74923927fc96c))
+* **Proxy:** Fixed Bungee updateSkin getServer() null exception ([0d929ad](https://github.com/GeorgeV220/SkinOverlay/commit/0d929ad63859ea65c5d41fafbb3d898bd56dd83c))
+* **Proxy:** Fixed Plugin Messaging ([2541202](https://github.com/GeorgeV220/SkinOverlay/commit/25412026ed142816c4c88212305e1be67c0d61d7))
+* **SkinOverlayImpl:** Made print a default ([e4fe0f6](https://github.com/GeorgeV220/SkinOverlay/commit/e4fe0f6f62f9caf3e14db9263a8e89b042f85cf0))
+* **SProperty:** Fixed SProperty null pointer exception ([c2329a4](https://github.com/GeorgeV220/SkinOverlay/commit/c2329a4f39ce93802bf007e53910b14cc826705c))
+* Updater spamming in the console ([2cf4dd0](https://github.com/GeorgeV220/SkinOverlay/commit/2cf4dd0cb0cd12f622c4c1ed06a35c10e36d0c52))
+
+
+### Features
+
+* **Events:** Changed how the Events work ([2d32528](https://github.com/GeorgeV220/SkinOverlay/commit/2d32528d98496479c9565e66cb6bf123b2e11149))
+* **Paper:** Added Paper listener ([38f4953](https://github.com/GeorgeV220/SkinOverlay/commit/38f4953ad83f76343952e6f6938cdfdababa0e58))
+* **SkinHookImpl:** Added SkinHookImpl ([20cc18c](https://github.com/GeorgeV220/SkinOverlay/commit/20cc18c57b5da20027cd6fc317159b1aabdd6de0))
+* **SkinOverlayImpl:** Changed onlinePlayers to ObservableObjectMap ([bc43b5b](https://github.com/GeorgeV220/SkinOverlay/commit/bc43b5b7635e05130d670317a74a28687625d849))
+
 # [3.17.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.16.0...v3.17.0) (2023-04-11)
 
 
