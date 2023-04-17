@@ -1,3 +1,16 @@
+# [4.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.18.0...v4.0.0) (2023-04-17)
+
+
+### Features
+
+* **GlowStone:** Added GlowStone support ([082aa4d](https://github.com/GeorgeV220/SkinOverlay/commit/082aa4d7c467805a9a43e6d5c11d24bd05e5a6b5))
+* **ObservableListener:** Changed UserManagerListener to ObservableListener ([845cf67](https://github.com/GeorgeV220/SkinOverlay/commit/845cf673fe295fda95abadba158e4ce9502997a6))
+
+
+### BREAKING CHANGES
+
+* **ObservableListener:** Bumped major version due to extensive internal API changes
+
 # [3.18.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.17.0...v3.18.0) (2023-04-15)
 
 
