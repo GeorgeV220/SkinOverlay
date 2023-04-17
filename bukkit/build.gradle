@@ -1,6 +1,11 @@
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT'
     compileOnly "io.papermc:paperlib:1.0.8"
+    compileOnly 'com.github.GeorgeV220:Glowstone:2023.4.1'
     compileOnly project(path: ':core')
     compileOnly project(path: ':mc-1-17', configuration: 'reobf')
     compileOnly project(path: ':mc-1-18', configuration: 'reobf')

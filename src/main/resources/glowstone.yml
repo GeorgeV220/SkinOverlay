@@ -1,0 +1,10 @@
+main: com.georgev22.skinoverlay.SkinOverlayGlowStone
+name: ${pluginName}
+version: ${version}
+authors:
+  - GeorgeV22
+api-version: 1.13
+load: POSTWORLD
+softdepend:
+  - PlaceholderAPI
+  - SkinsRestorer

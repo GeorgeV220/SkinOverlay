@@ -2,7 +2,7 @@ package com.georgev22.skinoverlay.utilities.player;
 
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
-import com.georgev22.skinoverlay.SkinOverlayBukkit;
+import com.georgev22.skinoverlay.SkinOverlay;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.OfflinePlayer;
 
@@ -24,7 +24,7 @@ public class PlayerObjectBukkit extends PlayerObject {
 
     @Override
     public Audience audience() {
-        return BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(BukkitMinecraftUtils.MinecraftVersion.V1_16_R1) ? SkinOverlayBukkit.getInstance().adventure().player(player().getPlayer()) : player().getPlayer();
+        return BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(BukkitMinecraftUtils.MinecraftVersion.V1_16_R1) ? SkinOverlay.getInstance().getSkinOverlay().adventure().player(player().getUniqueId()) : player().getPlayer();
     }
 
     @Override

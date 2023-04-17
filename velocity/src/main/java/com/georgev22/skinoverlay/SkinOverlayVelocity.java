@@ -29,6 +29,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.scheduler.ScheduledTask;
+import net.kyori.adventure.platform.AudienceProvider;
 import org.bstats.velocity.Metrics;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -220,5 +221,10 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     @Override
     public String serverVersion() {
         return SkinOverlayVelocity.getInstance().getProxy().getVersion().getName() + "-" + SkinOverlayVelocity.getInstance().getProxy().getVersion().getVersion();
+    }
+
+    @Override
+    public AudienceProvider adventure() {
+        return null;
     }
 }

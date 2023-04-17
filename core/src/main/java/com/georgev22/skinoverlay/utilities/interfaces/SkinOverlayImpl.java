@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.utilities.interfaces;
 
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import net.kyori.adventure.platform.AudienceProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -109,6 +110,8 @@ public interface SkinOverlayImpl {
     default void print(String... msg) {
         Arrays.stream(msg).forEach(s -> logger().info(s));
     }
+
+    AudienceProvider adventure();
 
     /**
      * A record representing the plugin's description.

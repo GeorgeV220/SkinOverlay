@@ -202,6 +202,7 @@ public class SkinOverlaySponge7 implements SkinOverlayImpl {
         return pluginManager;
     }
 
+    @Override
     public SpongeAudiences adventure() {
         return adventure;
     }

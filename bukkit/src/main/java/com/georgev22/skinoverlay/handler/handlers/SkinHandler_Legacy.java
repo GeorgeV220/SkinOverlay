@@ -4,7 +4,6 @@ import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.UserManager;
-import com.georgev22.skinoverlay.SkinOverlayBukkit;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
@@ -15,6 +14,7 @@ import com.google.common.hash.Hashing;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -313,8 +313,8 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
     protected void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
         SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
             Player player = (Player) playerObject.player();
-            player.hidePlayer(SkinOverlayBukkit.getInstance(), player);
-            player.showPlayer(SkinOverlayBukkit.getInstance(), player);
+            player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+            player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             try {
                 skinOverlay.getSkinHandler().updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions"))).handleAsync((aBoolean, throwable) -> {
                     if (throwable != null) {
@@ -328,8 +328,8 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                             if (forOthers) {
                                 skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
                                     Player p = (Player) playerObjects.player();
-                                    p.hidePlayer(SkinOverlayBukkit.getInstance(), player);
-                                    p.showPlayer(SkinOverlayBukkit.getInstance(), player);
+                                    p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                                    p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                                 });
                             }
                     });

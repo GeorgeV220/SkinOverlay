@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BungeeMinecraftUtils;
-import com.georgev22.skinoverlay.SkinOverlayBungee;
+import com.georgev22.skinoverlay.SkinOverlay;
 import net.kyori.adventure.audience.Audience;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -23,7 +23,7 @@ public class PlayerObjectBungee extends PlayerObject {
 
     @Override
     public Audience audience() {
-        return SkinOverlayBungee.getInstance().adventure().player(this.proxiedPlayer);
+        return SkinOverlay.getInstance().getSkinOverlay().adventure().player(this.proxiedPlayer.getUniqueId());
     }
 
     @Override

@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
 @MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
 @Plugin("${pluginName}")
-public class SkinOverlaySponge implements SkinOverlayImpl {
+public abstract class SkinOverlaySponge implements SkinOverlayImpl {
     private final File dataFolder;
     private final Logger logger;
     private final PluginManager pluginManager;
