@@ -20,7 +20,7 @@ import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.hook.hooks.SkinHookImpl;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
-import com.georgev22.skinoverlay.listeners.UserManagerListener;
+import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.PluginMessageUtils;
@@ -328,15 +328,34 @@ public class SkinOverlay {
     }
 
     /**
-     * Adds the specified list of {@link UserManagerListener}s to this {@link UserManager} instance. Each listener in the
-     * list will be registered with the {@link ObservableObjectMap} that holds the loaded users in the user manager, and
-     * will be notified whenever a new user is added to the map.
+     * Adds the specified list of {@link ObservableListener}s to this {@link UserManager} instance.
+     * Each listener in the
+     * list will be registered with the {@link ObservableObjectMap}
+     * that holds the loaded users in the user manager,
+     * and
+     * will be notified whenever a new user is added or removed to the map.
      *
      * @param managerListeners the list of listeners to be added
      */
-    public void registerUserManagerListeners(@NotNull List<UserManagerListener<UUID, UserManager.User>> managerListeners) {
-        for (UserManagerListener<UUID, UserManager.User> managerListener : managerListeners) {
+    public void registerUserManagerListeners(@NotNull List<ObservableListener<UUID, UserManager.User>> managerListeners) {
+        for (ObservableListener<UUID, UserManager.User> managerListener : managerListeners) {
             this.userManager.getLoadedUsers().addListener(managerListener);
+        }
+    }
+
+    /**
+     * Adds the specified list of {@link ObservableListener}s to this {@link SkinOverlayImpl} instance.
+     * Each listener in the
+     * list will be registered with the {@link ObservableObjectMap}
+     * that holds the online players in the server,
+     * and
+     * will be notified whenever a new player is added or removed to the map.
+     *
+     * @param pListeners the list of listeners to be added
+     */
+    public void registerOnlinePlayersListeners(@NotNull List<ObservableListener<UUID, PlayerObject>> pListeners) {
+        for (ObservableListener<UUID, PlayerObject> pListener : pListeners) {
+            this.skinOverlay.onlinePlayers().addListener(pListener);
         }
     }
 
