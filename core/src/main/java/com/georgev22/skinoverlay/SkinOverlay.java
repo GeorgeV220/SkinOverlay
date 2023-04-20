@@ -381,9 +381,6 @@ public class SkinOverlay {
                         ((PaperCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
                 case VELOCITY ->
                         ((VelocityCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
-                case SPONGE8 ->
-                        ((SpongeCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
-                case SPONGE7 -> ((Sponge7CommandManager) commandManager).getLocales().loadLanguages();
             }
             commandManager.usePerIssuerLocale(true);
         } catch (Exception e) {

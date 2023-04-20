@@ -110,10 +110,6 @@ public enum MessagesUtil {
                         BungeeMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
                 case VELOCITY ->
                         VelocityMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
-                case SPONGE7 ->
-                        Sponge7MinecraftUtils.printMsg(SkinOverlay.getInstance().getLogger(), Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
-                case SPONGE8 ->
-                        Sponge8MinecraftUtils.printMsg(SkinOverlay.getInstance().getLogger(), Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
             }
         } else {
             switch (SkinOverlay.getInstance().type()) {
@@ -121,10 +117,6 @@ public enum MessagesUtil {
                 case BUNGEE -> BungeeMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
                 case VELOCITY ->
                         VelocityMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
-                case SPONGE7 ->
-                        Sponge7MinecraftUtils.printMsg(SkinOverlay.getInstance().getLogger(), Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
-                case SPONGE8 ->
-                        Sponge8MinecraftUtils.printMsg(SkinOverlay.getInstance().getLogger(), Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
             }
         }
     }

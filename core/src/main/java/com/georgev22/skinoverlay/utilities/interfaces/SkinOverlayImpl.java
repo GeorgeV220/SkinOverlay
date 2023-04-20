@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public interface SkinOverlayImpl {
 
     /**
-     * Returns the type of server implementation (Bukkit, Bungee, Velocity, Sponge 8 or Sponge 7).
+     * Returns the type of server implementation (Bukkit, Bungee or Velocity).
      *
      * @return The type of server implementation.
      */
@@ -125,9 +125,7 @@ public interface SkinOverlayImpl {
     enum Type {
         BUKKIT,
         BUNGEE,
-        VELOCITY,
-        SPONGE8,
-        SPONGE7;
+        VELOCITY;
 
         /**
          * Returns whether the server implementation is a proxy server.
