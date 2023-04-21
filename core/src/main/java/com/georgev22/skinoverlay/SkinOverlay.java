@@ -8,6 +8,7 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObjectMap.Pair;
 import com.georgev22.library.maps.ObjectMap.PairDocument;
 import com.georgev22.library.maps.ObservableObjectMap;
+import com.georgev22.library.maps.UnmodifiableObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.library.utilities.Utils;
@@ -166,73 +167,194 @@ public class SkinOverlay {
         HandlerList.unregisterAll();
     }
 
+    /**
+     * Returns the type of server implementation (Bukkit, Bungee or Velocity).
+     *
+     * @return The type of server implementation.
+     */
     public SkinOverlayImpl.Type type() {
         return skinOverlay.type();
     }
 
+    /**
+     * Returns the plugin's data folder.
+     *
+     * @return The plugin's data folder.
+     */
     public File getDataFolder() {
         return skinOverlay.dataFolder();
     }
 
+    /**
+     * Returns the plugin's logger.
+     *
+     * @return The plugin's logger.
+     */
     public Logger getLogger() {
         return skinOverlay.logger();
     }
 
+    /**
+     * Returns the plugin's description.
+     *
+     * @return The plugin's description.
+     */
     public SkinOverlayImpl.Description getDescription() {
         return skinOverlay.description();
     }
 
+    /**
+     * Enables or disables the plugin.
+     *
+     * @param enable true to enable, false to disable.
+     * @return True if the plugin was successfully enabled or disabled, false otherwise.
+     */
     public boolean setEnable(boolean enable) {
         return skinOverlay.enable(enable);
     }
 
+    /**
+     * Returns whether the plugin is currently enabled.
+     *
+     * @return True if the plugin is enabled, false otherwise.
+     */
     public boolean isEnabled() {
         return skinOverlay.enabled();
     }
 
+    /**
+     * Saves a resource from the plugin's JAR file to the plugin's data folder.
+     *
+     * @param resource The path of the resource to save.
+     * @param replace  True to replace the file if it already exists, false otherwise.
+     */
     public void saveResource(@NotNull String resource, boolean replace) {
         skinOverlay.saveResource(resource, replace);
     }
 
+    /**
+     * Returns whether the server is running in online mode.
+     *
+     * @return True if the server is running in online mode, false otherwise.
+     */
     public boolean isOnlineMode() {
         return skinOverlay.onlineMode();
     }
 
+    /**
+     * Returns the plugin instance.
+     *
+     * @return The plugin instance.
+     */
+    public Object getPlugin() {
+        return skinOverlay.plugin();
+    }
+
+    /**
+     * Returns the server implementation instance.
+     *
+     * @return The server implementation instance.
+     */
+    public Object getServerImplementation() {
+        return skinOverlay.serverImpl();
+    }
+
+    /**
+     * Returns the version of the server implementation.
+     *
+     * @return The version of the server implementation.
+     */
+    public String getServerVersion() {
+        return skinOverlay.serverVersion();
+    }
+
+    /**
+     * Prints a message to the console.
+     *
+     * @param msg The message(s) to print.
+     */
+    public void print(String... msg) {
+        skinOverlay.print(msg);
+    }
+
+    /**
+     * Returns a list of PlayerObjects for all online players.
+     */
     public List<PlayerObject> onlinePlayers() {
         return new ArrayList<>(skinOverlay.onlinePlayers().values());
     }
 
+    /**
+     * Returns an UnmodifiableObjectMap of PlayerObject instances representing all online players on the server.
+     *
+     * @return An UnmodifiableObjectMap of PlayerObject instances representing all online players on the server.
+     */
+    public UnmodifiableObjectMap<UUID, PlayerObject> onlinePlayersMap() {
+        return new UnmodifiableObjectMap<>(skinOverlay.onlinePlayers());
+    }
+
+    /**
+     * Returns true if the player with the given name is currently online, and false otherwise.
+     *
+     * @param playerName the name of the player to check
+     */
     public boolean isOnline(String playerName) {
         return onlinePlayers().stream().anyMatch(playerObject -> playerObject.playerName().equalsIgnoreCase(playerName));
     }
 
+    /**
+     * Returns true if the player with the given UUID is currently online, and false otherwise.
+     *
+     * @param uuid the UUID of the player to check
+     */
     public boolean isOnline(UUID uuid) {
         return onlinePlayers().stream().anyMatch(playerObject -> playerObject.playerUUID().equals(uuid));
     }
 
+    /**
+     * Returns an Optional containing the PlayerObject for the player with the given name,
+     * or an empty Optional if the player is not online.
+     *
+     * @param playerName the name of the player to get the PlayerObject for
+     */
     public Optional<PlayerObject> getPlayer(String playerName) {
         return onlinePlayers().stream().filter(playerObject -> playerObject.playerName().equalsIgnoreCase(playerName)).findFirst();
     }
 
+    /**
+     * Returns an Optional containing the PlayerObject for the player with the given UUID,
+     * or an empty Optional if the player is not online.
+     *
+     * @param uuid the UUID of the player to get the PlayerObject for
+     */
     public Optional<PlayerObject> getPlayer(UUID uuid) {
         return onlinePlayers().stream().filter(playerObject -> playerObject.playerUUID().equals(uuid)).findFirst();
     }
 
+    /**
+     * Returns the configuration for this SkinOverlay.
+     */
     public FileConfiguration getConfig() {
         return fileManager.getConfig().getFileConfiguration();
     }
 
+    /**
+     * Returns a list of all available overlay names.
+     */
     public List<String> getOverlayList() {
         return Arrays.stream(Objects.requireNonNull(getSkinsDataFolder().listFiles())).map(File::getName).filter(file -> file.endsWith(".png")).map(file -> file.substring(0, file.length() - 4)).collect(Collectors.toList());
     }
 
     /**
-     * Setup database Values: File, MySQL, SQLite
+     * Sets up a connection to the specified database type, which can be File, MySQL, SQLite, PostgreSQL or MongoDB.
+     * This method throws a SQLException if there's an issue with the connection or configuration,
+     * and a ClassNotFoundException
+     * if the specified database driver can't be found.
      *
-     * @throws java.sql.SQLException  When something goes wrong
-     * @throws ClassNotFoundException When class is not found
+     * @throws SQLException           If there's an issue with the connection or configuration.
+     * @throws ClassNotFoundException If the specified database driver can't be found.
      */
-    private void setupDatabase() throws Exception {
+    public void setupDatabase() throws Exception {
         ObjectMap<String, Pair<String, String>> map = new HashObjectMap<String, Pair<String, String>>()
                 .append("user_id", Pair.create("VARCHAR(38)", "NULL"))
                 .append("user_json", Pair.create("LONGTEXT", "NULL"));
@@ -313,14 +435,20 @@ public class SkinOverlay {
     }
 
 
-    protected void setupCommands() {
-        if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue())
+    /**
+     * Registers and sets up the commands for this SkinOverlay.
+     * If the SkinOverlay is not a proxy and the 'PROXY' option is enabled, no commands will be registered.
+     */
+    public void setupCommands() {
+        if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
+        }
+        // Enable unstable API for deprecated 'help' command
         //noinspection deprecation
         commandManager.enableUnstableAPI("help");
-
+        // Load command locales
         loadCommandLocales();
-
+        // Register SkinOverlayCommand and command completions if 'COMMAND_SKINOVERLAY' option is enabled
         if (OptionsUtil.COMMAND_SKINOVERLAY.getBooleanValue()) {
             commandManager.registerCommand(new SkinOverlayCommand());
             commandManager.getCommandCompletions().registerCompletion("overlays", context -> getOverlayList());
@@ -359,8 +487,11 @@ public class SkinOverlay {
         }
     }
 
-
-    private void unregisterCommands() {
+    /**
+     * Unregisters the commands for this SkinOverlay.
+     * If the SkinOverlay is not a proxy and the 'PROXY' option is enabled, no commands will be unregistered.
+     */
+    public void unregisterCommands() {
         if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue())
             return;
         switch (type()) {
@@ -370,18 +501,27 @@ public class SkinOverlay {
         }
     }
 
-    private void loadCommandLocales() {
+    /**
+     * Loads the command locales for this SkinOverlay.
+     * If a 'lang_en.yml' language file exists in the data folder, it will be used as the default language file.
+     * Otherwise, the default English language file provided by the command manager will be used.
+     */
+    public void loadCommandLocales() {
         try {
+            // Save the default English language file if it doesn't exist
             saveResource("lang_en.yml", true);
+            // Set the default locale to English
             commandManager.getLocales().setDefaultLocale(Locale.ENGLISH);
+            // Load the language file based on the server platform
             switch (type()) {
-                case BUNGEE ->
-                        ((BungeeCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
-                case BUKKIT ->
-                        ((PaperCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
-                case VELOCITY ->
-                        ((VelocityCommandManager) commandManager).getLocales().loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
+                case BUNGEE -> ((BungeeCommandManager) commandManager).getLocales()
+                        .loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
+                case BUKKIT -> ((PaperCommandManager) commandManager).getLocales()
+                        .loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
+                case VELOCITY -> ((VelocityCommandManager) commandManager).getLocales()
+                        .loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
             }
+            // Enable per-issuer locale support
             commandManager.usePerIssuerLocale(true);
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Failed to load language config 'lang_en.yaml': ", e);
