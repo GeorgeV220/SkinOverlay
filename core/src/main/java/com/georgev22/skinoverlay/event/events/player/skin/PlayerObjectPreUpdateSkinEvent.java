@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.event.events.player.skin;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.Cancellable;
 import com.georgev22.skinoverlay.event.HandlerList;
-import com.georgev22.skinoverlay.event.events.player.PlayerObjectEvent;
+import com.georgev22.skinoverlay.event.events.player.PlayerObjectUserEvent;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Represents an event that is called before the player's skin is updated.
  */
-public class PlayerObjectPreUpdateSkinEvent extends PlayerObjectEvent implements Cancellable {
+public class PlayerObjectPreUpdateSkinEvent extends PlayerObjectUserEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * An event that represents a user player object event.
  */
-public class UserPlayerObjectEvent extends UserEvent implements Cancellable {
+public class PlayerObjectUserEvent extends UserEvent implements Cancellable {
 
     private final static HandlerList handlers = new HandlerList();
 
@@ -20,13 +20,14 @@ public class UserPlayerObjectEvent extends UserEvent implements Cancellable {
     private final PlayerObject playerObject;
 
     /**
-     * Constructs a {@code UserPlayerObjectEvent} with the specified user, player object, and asynchronous status.
+     * Constructs a {@code PlayerObjectUserEvent} with the specified user, player object, and asynchronous status.
+     * <p>
      *
-     * @param user         the user associated with this event
      * @param playerObject the player object associated with this event
+     * @param user         the user associated with this event
      * @param async        whether this event should be run asynchronously
      */
-    public UserPlayerObjectEvent(@NotNull UserManager.User user, @NotNull PlayerObject playerObject, boolean async) {
+    public PlayerObjectUserEvent(@NotNull PlayerObject playerObject, @NotNull UserManager.User user, boolean async) {
         super(user, async);
         this.playerObject = playerObject;
     }

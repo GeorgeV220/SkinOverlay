@@ -5,7 +5,7 @@ import com.georgev22.skinoverlay.event.EventHandler;
 import com.georgev22.skinoverlay.event.EventListener;
 import com.georgev22.skinoverlay.event.EventPriority;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectEvent;
-import com.georgev22.skinoverlay.event.events.player.UserPlayerObjectEvent;
+import com.georgev22.skinoverlay.event.events.player.PlayerObjectUserEvent;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateSkinEvent;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectUpdateSkinEvent;
 import com.georgev22.skinoverlay.event.events.profile.ProfileCreatedEvent;
@@ -47,11 +47,11 @@ public class DebugListeners implements EventListener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onUserPlayerObjectEvent(UserPlayerObjectEvent event) {
+    public void onUserPlayerObjectEvent(PlayerObjectUserEvent event) {
         if (event.isCancelled()) return;
         skinOverlay.getLogger().info("===== Debug =====");
-        skinOverlay.getLogger().info("UserPlayerObjectEvent: " + event.getPlayerObject().playerName());
-        skinOverlay.getLogger().info("UserPlayerObjectEvent: " + event.getUser());
+        skinOverlay.getLogger().info("PlayerObjectUserEvent: " + event.getPlayerObject().playerName());
+        skinOverlay.getLogger().info("PlayerObjectUserEvent: " + event.getUser());
         skinOverlay.getLogger().info("===== Debug =====");
     }
 

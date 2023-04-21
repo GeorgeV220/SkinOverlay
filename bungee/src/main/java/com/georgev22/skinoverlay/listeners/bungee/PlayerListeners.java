@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.listeners.bungee;
 
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.event.events.player.PlayerObjectConnectionEvent;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.io.ByteArrayDataInput;
@@ -24,12 +25,24 @@ public class PlayerListeners implements Listener {
     public void onLogin(PostLoginEvent postLoginEvent) {
         if (!postLoginEvent.getPlayer().isConnected())
             return;
-        skinOverlay.getPlayer(postLoginEvent.getPlayer().getUniqueId()).orElseThrow().playerJoin();
+        skinOverlay.getEventManager().callEvent(
+                new PlayerObjectConnectionEvent(
+                        skinOverlay.getPlayer(postLoginEvent.getPlayer().getUniqueId()).orElseThrow(),
+                        PlayerObjectConnectionEvent.ConnectionType.CONNECT,
+                        true
+                )
+        );
     }
 
     @EventHandler(priority = 1)
     public void onQuit(PlayerDisconnectEvent playerDisconnectEvent) {
-        skinOverlay.getPlayer(playerDisconnectEvent.getPlayer().getUniqueId()).orElseThrow().playerQuit();
+        skinOverlay.getEventManager().callEvent(
+                new PlayerObjectConnectionEvent(
+                        skinOverlay.getPlayer(playerDisconnectEvent.getPlayer().getUniqueId()).orElseThrow(),
+                        PlayerObjectConnectionEvent.ConnectionType.DISCONNECT,
+                        true
+                )
+        );
     }
 
     @EventHandler

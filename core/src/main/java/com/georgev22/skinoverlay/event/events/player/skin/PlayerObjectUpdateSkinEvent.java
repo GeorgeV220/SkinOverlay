@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.event.events.player.skin;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.Cancellable;
 import com.georgev22.skinoverlay.event.HandlerList;
-import com.georgev22.skinoverlay.event.events.player.PlayerObjectEvent;
+import com.georgev22.skinoverlay.event.events.player.PlayerObjectUserEvent;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -17,7 +17,7 @@ import java.io.IOException;
  * This event is cancellable, which allows you to prevent the player's skin from being updated.
  * If you want to modify the skin options of a player, use {@link PlayerObjectPreUpdateSkinEvent}.
  */
-public class PlayerObjectUpdateSkinEvent extends PlayerObjectEvent implements Cancellable {
+public class PlayerObjectUpdateSkinEvent extends PlayerObjectUserEvent implements Cancellable {
 
     /**
      * A list of all registered handlers for this event.
@@ -39,7 +39,7 @@ public class PlayerObjectUpdateSkinEvent extends PlayerObjectEvent implements Ca
      *                     If true, the event will be handled on a separate thread.
      *                     If false, the event will be handled on the main thread.
      */
-    public PlayerObjectUpdateSkinEvent(PlayerObject playerObject, UserManager.@Nullable User user, @Nullable SkinOptions skinOptions, boolean async) {
+    public PlayerObjectUpdateSkinEvent(PlayerObject playerObject, UserManager.User user, @Nullable SkinOptions skinOptions, boolean async) {
         super(playerObject, user, async);
         this.skinOptions = skinOptions;
     }

@@ -70,13 +70,13 @@ public class EventManager {
      *
      * @param event the event to call
      */
-    public void callEvent(Event event) {
-        if (event == null) return;
+    public Event callEvent(@NotNull Event event) {
         if (event.isAsynchronous()) {
             SchedulerManager.getScheduler().runTaskAsynchronously(clazz, () -> callEvent0(event));
         } else {
             callEvent0(event);
         }
+        return event;
     }
 
     private void callEvent0(@NotNull Event event) {

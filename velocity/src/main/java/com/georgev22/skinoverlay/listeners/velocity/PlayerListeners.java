@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.listeners.velocity;
 
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.event.events.player.PlayerObjectConnectionEvent;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.io.ByteArrayDataInput;
@@ -24,12 +25,24 @@ public class PlayerListeners {
     public void onPostLogin(PostLoginEvent loginEvent) {
         if (!loginEvent.getPlayer().isActive())
             return;
-        skinOverlay.getPlayer(loginEvent.getPlayer().getUniqueId()).ifPresent(PlayerObject::playerJoin);
+        skinOverlay.getEventManager().callEvent(
+                new PlayerObjectConnectionEvent(
+                        skinOverlay.getPlayer(loginEvent.getPlayer().getUniqueId()).orElseThrow(),
+                        PlayerObjectConnectionEvent.ConnectionType.CONNECT,
+                        true
+                )
+        );
     }
 
     @Subscribe(order = PostOrder.FIRST)
     public void onQuit(DisconnectEvent playerDisconnectEvent) {
-        skinOverlay.getPlayer(playerDisconnectEvent.getPlayer().getUniqueId()).ifPresent(PlayerObject::playerQuit);
+        skinOverlay.getEventManager().callEvent(
+                new PlayerObjectConnectionEvent(
+                        skinOverlay.getPlayer(playerDisconnectEvent.getPlayer().getUniqueId()).orElseThrow(),
+                        PlayerObjectConnectionEvent.ConnectionType.DISCONNECT,
+                        true
+                )
+        );
     }
 
     @Subscribe

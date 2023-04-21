@@ -1,8 +1,7 @@
 package com.georgev22.skinoverlay.listeners.bukkit;
 
-import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.event.events.player.PlayerObjectConnectionEvent;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -32,23 +31,26 @@ import static com.georgev22.skinoverlay.utilities.Utilities.decrypt;
 public class PlayerListeners implements Listener, PluginMessageListener {
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent playerJoinEvent) {
-        PlayerObject playerObject = skinOverlay.getPlayer(playerJoinEvent.getPlayer().getUniqueId()).orElseThrow();
-        playerObject.playerJoin();
-        if (OptionsUtil.PROXY.getBooleanValue())
-            SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
-                skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:message");
-                if (playerJoinEvent.getPlayer().isOnline())
-                    skinOverlay.getPluginMessageUtils().sendDataToPlayer("playerJoin", playerObject, playerObject.playerUUID().toString());
-                else
-                    skinOverlay.getLogger().warning("Player " + playerObject.playerName() + " is not online");
-            });
+        skinOverlay.getEventManager().callEvent(
+                new PlayerObjectConnectionEvent(
+                        skinOverlay.getPlayer(playerJoinEvent.getPlayer().getUniqueId()).orElseThrow(),
+                        PlayerObjectConnectionEvent.ConnectionType.CONNECT,
+                        true
+                )
+        );
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent playerQuitEvent) {
-        skinOverlay.getPlayer(playerQuitEvent.getPlayer().getUniqueId()).orElseThrow().playerQuit();
+        skinOverlay.getEventManager().callEvent(
+                new PlayerObjectConnectionEvent(
+                        skinOverlay.getPlayer(playerQuitEvent.getPlayer().getUniqueId()).orElseThrow(),
+                        PlayerObjectConnectionEvent.ConnectionType.DISCONNECT,
+                        true
+                )
+        );
     }
 
     @SneakyThrows
