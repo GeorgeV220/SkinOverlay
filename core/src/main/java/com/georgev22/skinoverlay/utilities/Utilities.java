@@ -13,34 +13,15 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 
 public class Utilities {
-
-    public static @NotNull List<Method> getMethodsAnnotatedWith(final Class<?> clazz, final Class<? extends Annotation> annotation) {
-        final List<Method> methods = new ArrayList<>();
-        Class<?> clazz1 = clazz;
-        while (clazz1 != Object.class) {
-            for (final Method method : clazz1.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(annotation)) {
-                    Annotation annotInstance = method.getAnnotation(annotation);
-                    methods.add(method);
-                }
-            }
-            clazz1 = clazz1.getSuperclass();
-        }
-        return methods;
-    }
 
     /**
      * Creates an {@link SProperty} object from a {@link LinkedTreeMap} of strings.
