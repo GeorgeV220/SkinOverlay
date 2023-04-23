@@ -1,3 +1,21 @@
+# [4.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v4.0.0...v4.1.0) (2023-04-23)
+
+
+### Bug Fixes
+
+* **Event:** Override isCancel and cancel methods ([650df6b](https://github.com/GeorgeV220/SkinOverlay/commit/650df6bbfc068895ae1ac92be6754e078ed475b8))
+* **Listener:** Register PlayerListeners ([d0a5d25](https://github.com/GeorgeV220/SkinOverlay/commit/d0a5d2570c445497f40ed6ff6fbef7c2724cc764))
+* **User:** Save user data only to the proxy if it is running in proxy mode. ([2f5a920](https://github.com/GeorgeV220/SkinOverlay/commit/2f5a92093bf171ea9a6bdc32f2c921694c0fa83f))
+
+
+### Features
+
+* **Event:** Refactored package structure and event invocation method. ([3861de3](https://github.com/GeorgeV220/SkinOverlay/commit/3861de3a9f9b9dc9ccc69520d2b0e933524aac7e))
+* **Events:** Improve management of Player connections and skin parts with new events. ([1768d28](https://github.com/GeorgeV220/SkinOverlay/commit/1768d2879a4090c8fd303eb7fcd784f1717475ff))
+* **Exception:** Added EventException ([86b6d63](https://github.com/GeorgeV220/SkinOverlay/commit/86b6d63a950b3a6860a5b90c6a313cfa4393f8df))
+* **SkinOverlay:** Added JavaDocs, new methods and changed old ones to public ([3f674a6](https://github.com/GeorgeV220/SkinOverlay/commit/3f674a67216baf601a22eed2661c674dcea784d8))
+* **Sponge:** Dropped Sponge support ([8d46a21](https://github.com/GeorgeV220/SkinOverlay/commit/8d46a210fd74af622b6d77aca551791b0abd59fd))
+
 # [4.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v3.18.0...v4.0.0) (2023-04-17)
 
 
