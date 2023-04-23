@@ -1,6 +1,5 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.georgev22.skinoverlay.SkinOverlayBukkit;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

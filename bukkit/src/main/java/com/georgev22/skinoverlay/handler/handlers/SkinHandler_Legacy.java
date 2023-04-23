@@ -322,18 +322,16 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                         return false;
                     }
                     return aBoolean;
-                }).thenAccept(aBoolean -> {
-                    SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
-                        if (aBoolean)
-                            if (forOthers) {
-                                skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                                    Player p = (Player) playerObjects.player();
-                                    p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                                    p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                                });
-                            }
-                    });
-                });
+                }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                    if (aBoolean)
+                        if (forOthers) {
+                            skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                                Player p = (Player) playerObjects.player();
+                                p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                                p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                            });
+                        }
+                }));
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }

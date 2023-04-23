@@ -154,18 +154,16 @@ public class SkinHandler_GlowStone extends SkinHandler {
                         return false;
                     }
                     return aBoolean;
-                }).thenAccept(aBoolean -> {
-                    SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
-                        if (aBoolean)
-                            if (forOthers) {
-                                skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                                    GlowPlayer p = (GlowPlayer) playerObjects.player();
-                                    p.hidePlayer(player);
-                                    p.showPlayer(player);
-                                });
-                            }
-                    });
-                });
+                }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                    if (aBoolean)
+                        if (forOthers) {
+                            skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                                GlowPlayer p = (GlowPlayer) playerObjects.player();
+                                p.hidePlayer(player);
+                                p.showPlayer(player);
+                            });
+                        }
+                }));
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }

@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
-import java.util.EventListener;
 
 /**
  * This class represents a list of event handlers, sorted by priority.
@@ -178,6 +177,7 @@ public class HandlerList {
      *
      * @param listener the EventListener that represents the event type
      */
+    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     public synchronized void unregister(@NotNull EventListener listener) {
         boolean changed = false;
         for (List<ListenerWrapper> list : handlerSlots.values()) {

@@ -31,7 +31,7 @@ import java.util.logging.Level;
 public class SkinOverlayCommand extends BaseCommand {
     protected final ObjectMap<String, String> placeholders = new HashObjectMap<>();
     protected final FileManager fm = SkinOverlay.getInstance().getFileManager();
-    protected SkinOverlay skinOverlay = SkinOverlay.getInstance();
+    protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     @Default
     @HelpCommand
