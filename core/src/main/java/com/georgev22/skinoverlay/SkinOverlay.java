@@ -22,6 +22,7 @@ import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.hook.hooks.SkinHookImpl;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
+import com.georgev22.skinoverlay.listeners.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.PluginMessageUtils;
@@ -134,6 +135,7 @@ public class SkinOverlay {
 
         new Updater();
         HandlerList.bakeAll();
+        eventManager.register(new PlayerListeners());
         if (OptionsUtil.DEBUG.getBooleanValue()) {
             getLogger().warning("Debug mode is enabled!");
             getLogger().warning("Be prepared for a lot of log messages");
@@ -149,8 +151,12 @@ public class SkinOverlay {
             }
             return user;
         }).thenAccept(user -> {
-            if (user != null)
+            if (user != null) {
+                if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                    return;
+                }
                 userManager.save(user);
+            }
         }));
         if (connection != null) {
             try {
