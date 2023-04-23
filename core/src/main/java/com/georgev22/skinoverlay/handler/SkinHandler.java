@@ -100,6 +100,9 @@ public abstract class SkinHandler {
             }
             user.addCustomData("skinProperty", new SProperty(properties[0], properties[1], properties[2]));
             updateSkin(playerObject, true);
+            if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                return;
+            }
             skinOverlay.getUserManager().save(user);
         });
     }
@@ -186,6 +189,14 @@ public abstract class SkinHandler {
                 }
             } catch (Exception exception) {
                 exception.printStackTrace();
+            }
+            return user;
+        }).thenApplyAsync(user -> {
+            if (user != null) {
+                if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                    return user;
+                }
+                skinOverlay.getUserManager().save(user);
             }
             return user;
         }).thenAccept(user -> {

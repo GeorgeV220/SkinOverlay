@@ -11,6 +11,7 @@ import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateS
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
+import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -70,6 +71,9 @@ public class SkinOverlayCommand extends BaseCommand {
             skinOverlay.getEventManager().callEvent(modifyDataEvent);
             if (modifyDataEvent.isCancelled())
                 return user;
+            if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                return user;
+            }
             skinOverlay.getUserManager().save(user);
             return user;
         }).thenAccept(user -> {

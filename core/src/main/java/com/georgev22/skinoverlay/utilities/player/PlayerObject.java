@@ -18,6 +18,7 @@ import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.Utilities;
+import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl.Type;
 import com.google.common.collect.Lists;
 import net.kyori.adventure.audience.Audience;
 
@@ -251,9 +252,6 @@ public abstract class PlayerObject {
      */
     public void playerJoin() {
         new Updater(this);
-        if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
-            return;
-        }
         UserPreLoadEvent userPreLoadEvent = (UserPreLoadEvent) skinOverlay.getEventManager()
                 .callEvent(new UserPreLoadEvent(this.playerUUID(), true));
         if (userPreLoadEvent.isCancelled()) {
@@ -309,6 +307,9 @@ public abstract class PlayerObject {
             userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
                     .callEvent(new UserModifyDataEvent(user, true));
             if (!userModifyDataEvent.isCancelled()) {
+                if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                    return user;
+                }
                 skinOverlay.getUserManager().save(user);
             }
             return user;
@@ -331,6 +332,14 @@ public abstract class PlayerObject {
                 }
                 if (!OptionsUtil.PROXY.getBooleanValue())
                     updateSkin();
+                if (skinOverlay.type().equals(Type.BUKKIT) & OptionsUtil.PROXY.getBooleanValue())
+                    SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
+                        skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:message");
+                        if (isOnline())
+                            skinOverlay.getPluginMessageUtils().sendDataToPlayer("playerJoin", this, playerUUID().toString());
+                        else
+                            skinOverlay.getLogger().warning("Player " + playerName() + " is not online");
+                    });
             }
         });
     }
@@ -357,6 +366,9 @@ public abstract class PlayerObject {
                 UserModifyDataEvent userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
                         .callEvent(new UserModifyDataEvent(user, true));
                 if (!userModifyDataEvent.isCancelled()) {
+                    if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                        return;
+                    }
                     skinOverlay.getUserManager().save(user);
                 }
             }
