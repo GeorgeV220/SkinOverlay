@@ -15,6 +15,7 @@ public class UserAddDataEvent extends UserModifyDataEvent implements Cancellable
     private static final HandlerList handlers = new HandlerList();
 
     private ObjectMap.Pair<String, ?> objectPair;
+    private boolean cancelled = false;
 
     /**
      * Constructs a {@code UserAddDataEvent} with the specified user, asynchronous status, and data.
@@ -44,6 +45,26 @@ public class UserAddDataEvent extends UserModifyDataEvent implements Cancellable
      */
     public void setData(ObjectMap.Pair<String, ?> objectPair) {
         this.objectPair = objectPair;
+    }
+
+    /**
+     * Cancels the event.
+     *
+     * @return {@code true} if the event was successfully cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean cancel() {
+        return cancelled = true;
+    }
+
+    /**
+     * Returns whether the event has been cancelled.
+     *
+     * @return {@code true} if the event has been cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     @NotNull

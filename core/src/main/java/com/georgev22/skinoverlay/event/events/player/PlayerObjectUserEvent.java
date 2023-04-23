@@ -18,6 +18,7 @@ public class PlayerObjectUserEvent extends UserEvent implements Cancellable {
      * The player object associated with this event.
      */
     private final PlayerObject playerObject;
+    private boolean cancelled = false;
 
     /**
      * Constructs a {@code PlayerObjectUserEvent} with the specified user, player object, and asynchronous status.
@@ -39,6 +40,26 @@ public class PlayerObjectUserEvent extends UserEvent implements Cancellable {
      */
     public PlayerObject getPlayerObject() {
         return playerObject;
+    }
+
+    /**
+     * Cancels the event.
+     *
+     * @return {@code true} if the event was successfully cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean cancel() {
+        return cancelled = true;
+    }
+
+    /**
+     * Returns whether the event has been cancelled.
+     *
+     * @return {@code true} if the event has been cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     @NotNull

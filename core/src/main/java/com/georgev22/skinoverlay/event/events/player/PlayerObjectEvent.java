@@ -13,7 +13,7 @@ public class PlayerObjectEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private boolean cancelled;
+    private boolean cancelled = false;
 
     /**
      * The player object associated with this event.

@@ -6,7 +6,6 @@ import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectUserEvent;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents an event that is called before the player's skin is updated.
@@ -14,6 +13,8 @@ import org.jetbrains.annotations.Nullable;
 public class PlayerObjectPreUpdateSkinEvent extends PlayerObjectUserEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
+
+    private boolean cancelled = false;
 
     /**
      * This event is called when a player's skin is about to be updated.
@@ -26,11 +27,31 @@ public class PlayerObjectPreUpdateSkinEvent extends PlayerObjectUserEvent implem
      * <p>The event is fired asynchronously by default.</p>
      *
      * @param playerObject The player object being updated.
-     * @param user         The user associated with the player object, or null if the player is not a valid user.
+     * @param user         The user associated with the player object.
      * @param async        Whether the event is asynchronous.
      */
-    public PlayerObjectPreUpdateSkinEvent(PlayerObject playerObject, UserManager.@Nullable User user, boolean async) {
+    public PlayerObjectPreUpdateSkinEvent(PlayerObject playerObject, UserManager.User user, boolean async) {
         super(playerObject, user, async);
+    }
+
+    /**
+     * Cancels the event.
+     *
+     * @return {@code true} if the event was successfully cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean cancel() {
+        return cancelled = true;
+    }
+
+    /**
+     * Returns whether the event has been cancelled.
+     *
+     * @return {@code true} if the event has been cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
 
 

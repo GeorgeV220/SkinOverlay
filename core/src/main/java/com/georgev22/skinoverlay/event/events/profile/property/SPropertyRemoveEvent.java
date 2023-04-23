@@ -15,7 +15,7 @@ public class SPropertyRemoveEvent extends Event implements Cancellable {
 
     private final String propertyName;
     private final SProperty property;
-    private boolean cancelled;
+    private boolean cancelled = false;
 
     /**
      * Constructs a new SPropertyRemoveEvent with the given property name, SProperty, and whether the event should be run asynchronously.

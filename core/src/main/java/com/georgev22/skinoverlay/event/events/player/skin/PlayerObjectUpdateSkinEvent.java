@@ -28,6 +28,7 @@ public class PlayerObjectUpdateSkinEvent extends PlayerObjectUserEvent implement
      * The skin options of the player.
      */
     private SkinOptions skinOptions;
+    private boolean cancelled = false;
 
     /**
      * Constructs a new PlayerObjectUpdateSkinEvent.
@@ -63,6 +64,26 @@ public class PlayerObjectUpdateSkinEvent extends PlayerObjectUserEvent implement
      */
     public void setSkinOptions(SkinOptions skinOptions) {
         getUser().addCustomData("skinOptions", this.skinOptions = skinOptions);
+    }
+
+    /**
+     * Cancels the event.
+     *
+     * @return {@code true} if the event was successfully cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean cancel() {
+        return cancelled = true;
+    }
+
+    /**
+     * Returns whether the event has been cancelled.
+     *
+     * @return {@code true} if the event has been cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     /**

@@ -21,7 +21,7 @@ public class UserEvent extends Event implements Cancellable {
     /**
      * Whether this event has been cancelled.
      */
-    private boolean cancelled;
+    private boolean cancelled = false;
 
     /**
      * Constructs a {@code UserEvent} with the specified user and asynchronous status.

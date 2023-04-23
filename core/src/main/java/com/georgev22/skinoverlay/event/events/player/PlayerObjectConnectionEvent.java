@@ -10,6 +10,7 @@ public class PlayerObjectConnectionEvent extends PlayerObjectEvent implements Ca
     private static final HandlerList handlers = new HandlerList();
 
     private final ConnectionType connectionType;
+    private boolean cancelled = false;
 
     /**
      * Constructs a {@code PlayerObjectConnectionEvent} with the specified player object, connection type and asynchronous status.
@@ -25,6 +26,26 @@ public class PlayerObjectConnectionEvent extends PlayerObjectEvent implements Ca
 
     public ConnectionType getConnectionType() {
         return connectionType;
+    }
+
+    /**
+     * Cancels the event.
+     *
+     * @return {@code true} if the event was successfully cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean cancel() {
+        return cancelled = true;
+    }
+
+    /**
+     * Returns whether the event has been cancelled.
+     *
+     * @return {@code true} if the event has been cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     @NotNull

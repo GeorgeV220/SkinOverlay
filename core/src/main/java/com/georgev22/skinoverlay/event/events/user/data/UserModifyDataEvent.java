@@ -13,6 +13,8 @@ public class UserModifyDataEvent extends UserEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
+    private boolean cancelled = false;
+
     /**
      * Constructs a {@code UserModifyDataEvent} with the specified user and asynchronous status.
      *
@@ -21,6 +23,26 @@ public class UserModifyDataEvent extends UserEvent implements Cancellable {
      */
     public UserModifyDataEvent(@NotNull UserManager.User user, boolean async) {
         super(user, async);
+    }
+
+    /**
+     * Cancels the event.
+     *
+     * @return {@code true} if the event was successfully cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean cancel() {
+        return cancelled = true;
+    }
+
+    /**
+     * Returns whether the event has been cancelled.
+     *
+     * @return {@code true} if the event has been cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     @NotNull

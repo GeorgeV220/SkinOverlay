@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay.event.events.user.data.load;
 import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
+import com.georgev22.skinoverlay.event.interfaces.Cancellable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -10,11 +11,12 @@ import java.util.UUID;
 /**
  * An event that is triggered before a user's data is loaded.
  */
-public class UserPreLoadEvent extends UserEvent {
+public class UserPreLoadEvent extends UserEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
     private final UUID uuid;
+    private boolean cancelled = false;
 
     /**
      * Constructs a {@code UserPreLoadEvent} with the specified UUID and asynchronous status.
@@ -34,6 +36,26 @@ public class UserPreLoadEvent extends UserEvent {
      */
     public UUID getUUID() {
         return uuid;
+    }
+
+    /**
+     * Cancels the event.
+     *
+     * @return {@code true} if the event was successfully cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean cancel() {
+        return cancelled = true;
+    }
+
+    /**
+     * Returns whether the event has been cancelled.
+     *
+     * @return {@code true} if the event has been cancelled, {@code false} otherwise
+     */
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     @NotNull
