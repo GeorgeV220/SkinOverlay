@@ -1,4 +1,7 @@
-package com.georgev22.skinoverlay.event;
+package com.georgev22.skinoverlay.event.annotations;
+
+import com.georgev22.skinoverlay.event.Event;
+import com.georgev22.skinoverlay.event.EventPriority;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

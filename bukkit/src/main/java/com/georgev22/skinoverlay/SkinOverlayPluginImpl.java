@@ -181,7 +181,7 @@ public class SkinOverlayPluginImpl implements SkinOverlayImpl {
 
     @Override
     public Object plugin() {
-        return this;
+        return plugin;
     }
 
     @Override

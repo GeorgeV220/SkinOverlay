@@ -2,7 +2,8 @@ package com.georgev22.skinoverlay.event;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.skinoverlay.event.annotations.EventHandler;
+import com.georgev22.skinoverlay.event.interfaces.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
@@ -71,22 +72,10 @@ public class EventManager {
      * @param event the event to call
      */
     public Event callEvent(@NotNull Event event) {
-        if (event.isAsynchronous()) {
-            SchedulerManager.getScheduler().runTaskAsynchronously(clazz, () -> callEvent0(event));
-        } else {
-            callEvent0(event);
+        for (ListenerWrapper listenerWrapper : event.getHandlers().getListenerWrappers()) {
+            listenerWrapper.callEvent(event);
         }
         return event;
-    }
-
-    private void callEvent0(@NotNull Event event) {
-        for (ListenerWrapper listenerWrapper : event.getHandlers().getListenerWrappers()) {
-            try {
-                listenerWrapper.callEvent(event);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
     }
 
     /**
