@@ -82,7 +82,7 @@ allprojects {
 
         compileOnly 'org.apache.logging.log4j:log4j-api:2.20.0'
         compileOnly 'net.kyori:adventure-api:4.13.0'
-        compileOnly 'net.kyori:adventure-text-serializer-legacy:4.13.0'
+        compileOnly 'net.kyori:adventure-text-serializer-legacy:4.13.1'
         compileOnly 'com.google.code.gson:gson:2.10.1'
         compileOnly 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
