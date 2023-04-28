@@ -4,13 +4,12 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObjectMap.Pair;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectUserEvent;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateSkinEvent;
 import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
-import com.georgev22.skinoverlay.event.events.user.data.load.UserPostLoadEvent;
 import com.georgev22.skinoverlay.event.events.user.data.add.UserAddDataEvent;
+import com.georgev22.skinoverlay.event.events.user.data.load.UserPostLoadEvent;
 import com.georgev22.skinoverlay.event.events.user.data.load.UserPreLoadEvent;
 import com.georgev22.skinoverlay.exceptions.UserException;
 import com.georgev22.skinoverlay.handler.SGameProfile;
@@ -25,7 +24,6 @@ import net.kyori.adventure.audience.Audience;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -257,91 +255,96 @@ public abstract class PlayerObject {
         if (userPreLoadEvent.isCancelled()) {
             return;
         }
-        CompletableFuture<UserManager.User> future = skinOverlay.getUserManager().getUser(playerUUID());
-        future.handleAsync((user, throwable) -> {
-            if (throwable != null) {
-                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
-                return null;
-            }
-            if (user == null) {
-                throw new UserException("User not found!");
-            }
-            UserModifyDataEvent userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
-                    .callEvent(new UserModifyDataEvent(user, true));
-            if (userModifyDataEvent.isCancelled()) {
-                return user;
-            }
-            try {
-                UserAddDataEvent event = (UserAddDataEvent) skinOverlay.getEventManager()
-                        .callEvent(new UserAddDataEvent(
-                                user,
-                                Pair.create(
-                                        "defaultSkinProperty",
-                                        gameProfile().getProperties().get("textures") != null
-                                                ? gameProfile().getProperties().get("textures")
-                                                : skinOverlay.getSkinHandler().getSkin(playerObject())
-                                ),
-                                true));
-                if (!event.isCancelled()) {
-                    user.addCustomData(event.getData().key(), event.getData().value());
-                }
-            } catch (IOException | ExecutionException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                UserAddDataEvent event = (UserAddDataEvent) skinOverlay.getEventManager()
-                        .callEvent(new UserAddDataEvent(
-                                user,
-                                Pair.create(
-                                        "skinOptions",
-                                        Utilities.skinOptionsToBytes(new SkinOptions("default"))
-                                ),
-                                true)
-                        );
-                if (!event.isCancelled()) {
-                    user.addCustomDataIfNotExists(event.getData().key(), event.getData().value());
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
-                    .callEvent(new UserModifyDataEvent(user, true));
-            if (!userModifyDataEvent.isCancelled()) {
-                if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+        skinOverlay.getUserCompletableFutureManager().add(skinOverlay.getCompletableFutureConsumer(), skinOverlay.getUserManager().getUser(playerUUID())
+                .handleAsync((user, throwable) -> {
+                    if (throwable != null) {
+                        skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                        return null;
+                    }
+                    if (user == null) {
+                        throw new UserException("User not found!");
+                    }
+                    UserModifyDataEvent userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
+                            .callEvent(new UserModifyDataEvent(user, true));
+                    if (userModifyDataEvent.isCancelled()) {
+                        return user;
+                    }
+                    try {
+                        UserAddDataEvent event = (UserAddDataEvent) skinOverlay.getEventManager()
+                                .callEvent(new UserAddDataEvent(
+                                        user,
+                                        Pair.create(
+                                                "defaultSkinProperty",
+                                                gameProfile().getProperties().get("textures") != null
+                                                        ? gameProfile().getProperties().get("textures")
+                                                        : skinOverlay.getSkinHandler().getSkin(playerObject())
+                                        ),
+                                        true));
+                        if (!event.isCancelled()) {
+                            user.addCustomData(event.getData().key(), event.getData().value());
+                        }
+                    } catch (IOException | ExecutionException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        UserAddDataEvent event = (UserAddDataEvent) skinOverlay.getEventManager()
+                                .callEvent(new UserAddDataEvent(
+                                        user,
+                                        Pair.create(
+                                                "skinOptions",
+                                                Utilities.skinOptionsToBytes(new SkinOptions("default"))
+                                        ),
+                                        true)
+                                );
+                        if (!event.isCancelled()) {
+                            user.addCustomDataIfNotExists(event.getData().key(), event.getData().value());
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
+                            .callEvent(new UserModifyDataEvent(user, true));
+                    if (!userModifyDataEvent.isCancelled()) {
+                        if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                            return user;
+                        }
+                        skinOverlay.getUserManager().save(userModifyDataEvent.getUser());
+                    }
+                    return userModifyDataEvent.getUser();
+                }).handleAsync((user, throwable) -> {
+                    if (throwable != null) {
+                        skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
+                        return null;
+                    }
                     return user;
-                }
-                skinOverlay.getUserManager().save(user);
-            }
-            return user;
-        }).handleAsync((user, throwable) -> {
-            if (throwable != null) {
-                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
-                return null;
-            }
-            return user;
-        }).thenAcceptAsync(user -> {
-            if (user != null) {
-                PlayerObjectUserEvent playerObjectUserEvent = (PlayerObjectUserEvent) skinOverlay.getEventManager()
-                        .callEvent(new PlayerObjectUserEvent(playerObject(), user, true));
-                if (playerObjectUserEvent.isCancelled())
-                    return;
-                UserPostLoadEvent userPostLoadEvent = (UserPostLoadEvent) skinOverlay.getEventManager()
-                        .callEvent(new UserPostLoadEvent(user, true));
-                if (userPostLoadEvent.isCancelled()) {
-                    return;
-                }
-                if (!OptionsUtil.PROXY.getBooleanValue())
-                    updateSkin();
-                if (skinOverlay.type().equals(Type.BUKKIT) & OptionsUtil.PROXY.getBooleanValue())
-                    SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
-                        skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:message");
-                        if (isOnline())
-                            skinOverlay.getPluginMessageUtils().sendDataToPlayer("playerJoin", this, playerUUID().toString());
-                        else
-                            skinOverlay.getLogger().warning("Player " + playerName() + " is not online");
-                    });
-            }
-        });
+                }).thenApplyAsync(user -> {
+                    if (user != null) {
+                        PlayerObjectUserEvent playerObjectUserEvent = (PlayerObjectUserEvent) skinOverlay.getEventManager()
+                                .callEvent(new PlayerObjectUserEvent(playerObject(), user, true));
+
+                        if (playerObjectUserEvent.isCancelled())
+                            return playerObjectUserEvent.getUser();
+
+                        UserPostLoadEvent userPostLoadEvent = (UserPostLoadEvent) skinOverlay.getEventManager()
+                                .callEvent(new UserPostLoadEvent(user, true));
+                        if (userPostLoadEvent.isCancelled())
+                            return userPostLoadEvent.getUser();
+
+                        if (!OptionsUtil.PROXY.getBooleanValue())
+                            updateSkin();
+
+                        if (skinOverlay.type().equals(Type.BUKKIT) & OptionsUtil.PROXY.getBooleanValue())
+                            SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
+                                skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:message");
+                                if (isOnline())
+                                    skinOverlay.getPluginMessageUtils().sendDataToPlayer("playerJoin", this, playerUUID().toString());
+                                else
+                                    skinOverlay.getLogger().warning("Player " + playerName() + " is not online");
+                            });
+                        return userPostLoadEvent.getUser();
+                    }
+                    return null;
+                }));
     }
 
     /**
@@ -352,6 +355,7 @@ public abstract class PlayerObject {
      */
     public void playerQuit() {
         skinOverlay.getSkinOverlay().onlinePlayers().remove(playerUUID());
+        skinOverlay.getLoadedUsers().remove(playerUUID());
         if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
@@ -369,7 +373,7 @@ public abstract class PlayerObject {
                     if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                         return;
                     }
-                    skinOverlay.getUserManager().save(user);
+                    skinOverlay.getUserManager().save(userModifyDataEvent.getUser());
                 }
             }
         });
@@ -397,7 +401,7 @@ public abstract class PlayerObject {
                 if (event.isCancelled())
                     return;
                 try {
-                    SkinOptions skinOptions = Utilities.getSkinOptions(user.getCustomData("skinOptions"));
+                    SkinOptions skinOptions = Utilities.getSkinOptions(event.getUser().getCustomData("skinOptions"));
                     if (skinOptions == null)
                         return;
                     if (skinOptions.getSkinName().equals("default"))
