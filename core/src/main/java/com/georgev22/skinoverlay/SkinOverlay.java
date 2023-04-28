@@ -23,10 +23,7 @@ import com.georgev22.skinoverlay.hook.hooks.SkinHookImpl;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
-import com.georgev22.skinoverlay.utilities.MessagesUtil;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
-import com.georgev22.skinoverlay.utilities.PluginMessageUtils;
-import com.georgev22.skinoverlay.utilities.Updater;
+import com.georgev22.skinoverlay.utilities.*;
 import com.georgev22.skinoverlay.utilities.gson.ObjectMapSPropertyTypeAdapter;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -41,6 +38,8 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -93,6 +92,24 @@ public class SkinOverlay {
     @Getter
     private EventManager eventManager;
 
+    @Getter
+    private CompletableFutureManager<UserManager.User> userCompletableFutureManager;
+
+    @Getter
+    private final ObservableObjectMap<UUID, UserManager.User> loadedUsers = new ObservableObjectMap<>();
+
+    @Getter
+    private final Consumer<CompletableFuture<UserManager.User>> completableFutureConsumer = userCompletableFuture -> userCompletableFuture.handle((user, throwable) -> {
+        if (throwable != null) {
+            getLogger().log(Level.SEVERE, "Error: ", throwable);
+            return null;
+        }
+        return user;
+    }).thenAccept(user -> {
+        if (user != null)
+            loadedUsers.append(user.getId(), user);
+    });
+
     public static SkinOverlay getInstance() {
         return instance == null ? (instance = new SkinOverlay()) : instance;
     }
@@ -107,6 +124,7 @@ public class SkinOverlay {
         }
         MessagesUtil.repairPaths(fileManager.getMessages());
         eventManager = new EventManager(getLogger(), this.getClass());
+        userCompletableFutureManager = new CompletableFutureManager<>();
     }
 
 
