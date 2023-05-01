@@ -9,7 +9,6 @@ import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectUpdateSkin
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.Utilities.Request;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -93,11 +92,7 @@ public abstract class SkinHandler {
                 skinOverlay.getLogger().log(Level.SEVERE, "User is null");
                 return;
             }
-            try {
-                user.addCustomData("skinOptions", Utilities.skinOptionsToBytes(skinOptions));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            user.addCustomData("skinOptions", SkinOptions.skinOptionsToBytes(skinOptions));
             user.addCustomData("skinProperty", new SProperty(properties[0], properties[1], properties[2]));
             updateSkin(playerObject, true);
             if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
@@ -135,7 +130,7 @@ public abstract class SkinHandler {
                         SGameProfile gameProfile = getGameProfile(playerObject);
                         gameProfile.removeProperty("textures");
                         gameProfile.addProperty("textures", new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
-                        user.addCustomData("skinOptions", Utilities.skinOptionsToBytes(skinOptions));
+                        user.addCustomData("skinOptions", SkinOptions.skinOptionsToBytes(skinOptions));
                         user.addCustomData("skinProperty", new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         if (commandIssuer == null) {
                             MessagesUtil.RESET.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
@@ -174,7 +169,7 @@ public abstract class SkinHandler {
                             JsonObject texture = response.getAsJsonObject().getAsJsonObject("data").getAsJsonObject("texture");
                             String texturesValue = texture.get("value").getAsString();
                             String texturesSignature = texture.get("signature").getAsString();
-                            user.addCustomData("skinOptions", Utilities.skinOptionsToBytes(skinOptions));
+                            user.addCustomData("skinOptions", SkinOptions.skinOptionsToBytes(skinOptions));
                             user.addCustomData("skinProperty", new SProperty("textures", texturesValue, texturesSignature));
                             if (commandIssuer == null) {
                                 MessagesUtil.DONE.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
@@ -220,11 +215,7 @@ public abstract class SkinHandler {
                 return;
             }
             PlayerObjectUpdateSkinEvent event;
-            try {
-                event = new PlayerObjectUpdateSkinEvent(playerObject, user, Utilities.getSkinOptions(user.getCustomData("skinOptions")), true);
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            event = new PlayerObjectUpdateSkinEvent(playerObject, user, SkinOptions.getSkinOptions(user.getCustomData("skinOptions")), true);
             skinOverlay.getEventManager().callEvent(event);
             if (event.isCancelled())
                 return;
@@ -246,16 +237,12 @@ public abstract class SkinHandler {
     protected abstract void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers);
 
     protected void updateSkin1(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
-        try {
-            updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions")), user.getCustomData("skinProperty")).handleAsync((unused, throwable) -> {
-                if (throwable != null) {
-                    skinOverlay.getLogger().log(Level.SEVERE, "Error", throwable);
-                }
-                return unused;
-            });
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        updateSkin(playerObject, SkinOptions.getSkinOptions(user.getCustomData("skinOptions")), user.getCustomData("skinProperty")).handleAsync((unused, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error", throwable);
+            }
+            return unused;
+        });
     }
 
     /**

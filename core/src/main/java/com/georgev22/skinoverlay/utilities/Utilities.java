@@ -1,9 +1,5 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.georgev22.skinoverlay.handler.SProperty;
-import com.georgev22.skinoverlay.handler.Skin;
-import com.google.gson.internal.LinkedTreeMap;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,19 +19,6 @@ import java.util.Arrays;
 import java.util.Base64;
 
 public class Utilities {
-
-    /**
-     * Creates an {@link SProperty} object from a {@link LinkedTreeMap} of strings.
-     *
-     * @param linkedTreeMap the linked tree map to create the SProperty object from
-     * @return the created SProperty object
-     * @deprecated This method is deprecated.
-     */
-    @Deprecated
-    @Contract("_ -> new")
-    public static @NotNull SProperty propertyFromLinkedTreeMap(@NotNull LinkedTreeMap<String, String> linkedTreeMap) {
-        return new SProperty(linkedTreeMap.get("name"), linkedTreeMap.get("value"), linkedTreeMap.get("signature"));
-    }
 
     /**
      * Decodes the specified Base64-encoded string into an object.

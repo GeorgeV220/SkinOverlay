@@ -8,7 +8,6 @@ import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileBungee;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.connection.InitialHandler;
@@ -27,9 +26,9 @@ public class SkinHandler_BungeeCord extends SkinHandler {
                 skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
                 skinOverlay.getPluginMessageUtils().setObject(proxiedPlayer.getServer().getInfo());
                 if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                    skinOverlay.getPluginMessageUtils().sendDataToServer("reset", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
+                    skinOverlay.getPluginMessageUtils().sendDataToServer("reset", playerObject.playerUUID().toString(), SkinOptions.skinOptionsToBytes(skinOptions));
                 } else {
-                    skinOverlay.getPluginMessageUtils().sendDataToServer("change", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions));
+                    skinOverlay.getPluginMessageUtils().sendDataToServer("change", playerObject.playerUUID().toString(), SkinOptions.skinOptionsToBytes(skinOptions));
                 }
                 return true;
             } catch (Exception exception) {
@@ -47,9 +46,9 @@ public class SkinHandler_BungeeCord extends SkinHandler {
                     skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
                     skinOverlay.getPluginMessageUtils().setObject(proxiedPlayer.getServer().getInfo());
                     if (skinOptions.getSkinName().equalsIgnoreCase("default")) {
-                        skinOverlay.getPluginMessageUtils().sendDataToServer("resetWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
+                        skinOverlay.getPluginMessageUtils().sendDataToServer("resetWithProperties", playerObject.playerUUID().toString(), SkinOptions.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
                     } else {
-                        skinOverlay.getPluginMessageUtils().sendDataToServer("changeWithProperties", playerObject.playerUUID().toString(), Utilities.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
+                        skinOverlay.getPluginMessageUtils().sendDataToServer("changeWithProperties", playerObject.playerUUID().toString(), SkinOptions.skinOptionsToBytes(skinOptions), property.name(), property.value(), property.signature());
                     }
                     return true;
                 } else {

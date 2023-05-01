@@ -3,7 +3,6 @@ package com.georgev22.skinoverlay.listeners.bukkit;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectConnectionEvent;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
@@ -62,7 +61,7 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subChannel = in.readUTF();
         UUID uuid = UUID.fromString(Objects.requireNonNull(decrypt(in.readUTF())));
-        SkinOptions skinOptions = Utilities.getSkinOptions(Objects.requireNonNull(decrypt(in.readUTF())));
+        SkinOptions skinOptions = SkinOptions.getSkinOptions(Objects.requireNonNull(decrypt(in.readUTF())));
         PlayerObject playerObject = skinOverlay.getPlayer(uuid).orElseThrow();
         if (subChannel.equalsIgnoreCase("change")) {
             if (!skinOptions.getSkinName().contains("custom")) {

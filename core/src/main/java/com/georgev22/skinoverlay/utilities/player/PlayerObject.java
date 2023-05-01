@@ -16,7 +16,6 @@ import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Updater;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl.Type;
 import com.google.common.collect.Lists;
 import net.kyori.adventure.audience.Audience;
@@ -286,21 +285,17 @@ public abstract class PlayerObject {
                     } catch (IOException | ExecutionException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    try {
-                        UserAddDataEvent event = (UserAddDataEvent) skinOverlay.getEventManager()
-                                .callEvent(new UserAddDataEvent(
-                                        user,
-                                        Pair.create(
-                                                "skinOptions",
-                                                Utilities.skinOptionsToBytes(new SkinOptions("default"))
-                                        ),
-                                        true)
-                                );
-                        if (!event.isCancelled()) {
-                            user.addCustomDataIfNotExists(event.getData().key(), event.getData().value());
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    UserAddDataEvent event = (UserAddDataEvent) skinOverlay.getEventManager()
+                            .callEvent(new UserAddDataEvent(
+                                    user,
+                                    Pair.create(
+                                            "skinOptions",
+                                            SkinOptions.skinOptionsToBytes(new SkinOptions("default"))
+                                    ),
+                                    true)
+                            );
+                    if (!event.isCancelled()) {
+                        user.addCustomDataIfNotExists(event.getData().key(), event.getData().value());
                     }
                     userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
                             .callEvent(new UserModifyDataEvent(user, true));
@@ -400,15 +395,11 @@ public abstract class PlayerObject {
                         .callEvent(new PlayerObjectPreUpdateSkinEvent(this, user, true));
                 if (event.isCancelled())
                     return;
-                try {
-                    SkinOptions skinOptions = Utilities.getSkinOptions(event.getUser().getCustomData("skinOptions"));
-                    if (skinOptions == null)
-                        return;
-                    if (skinOptions.getSkinName().equals("default"))
-                        return;
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
+                SkinOptions skinOptions = SkinOptions.getSkinOptions(event.getUser().getCustomData("skinOptions"));
+                if (skinOptions == null)
+                    return;
+                if (skinOptions.getSkinName().equals("default"))
+                    return;
                 skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);
             }
         }).handleAsync((unused, throwable) -> {
