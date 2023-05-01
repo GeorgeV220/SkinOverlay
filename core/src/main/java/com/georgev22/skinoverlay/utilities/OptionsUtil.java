@@ -28,7 +28,9 @@ public enum OptionsUtil {
 
     DATABASE_DATABASE("database.SQL.database", "SkinOverlay", Optional.empty()),
 
-    DATABASE_TABLE_NAME("database.SQL.table name", "skinoverlay_users", Optional.empty()),
+    DATABASE_USERS_TABLE_NAME("database.SQL.users table name", "skinoverlay_users", Optional.of("database.SQL.table name")),
+
+    DATABASE_SKINS_TABLE_NAME("database.SQL.skins table name", "skinoverlay_users", Optional.empty()),
 
     DATABASE_SQLITE("database.SQLite.file name", "skinoverlay", Optional.empty()),
 
@@ -42,7 +44,9 @@ public enum OptionsUtil {
 
     DATABASE_MONGO_DATABASE("database.MongoDB.database", "skinoverlay", Optional.empty()),
 
-    DATABASE_MONGO_COLLECTION("database.MongoDB.collection", "skinoverlay_users", Optional.empty()),
+    DATABASE_MONGO_USERS_COLLECTION("database.MongoDB.users collection", "skinoverlay_users", Optional.of("database.MongoDB.collection")),
+
+    DATABASE_MONGO_SKINS_COLLECTION("database.MongoDB.users collection", "skinoverlay_users", Optional.empty()),
 
     DATABASE_TYPE("database.type", "SQLite", Optional.empty()),
 

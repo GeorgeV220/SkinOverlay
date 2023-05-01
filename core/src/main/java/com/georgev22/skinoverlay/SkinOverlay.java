@@ -404,6 +404,9 @@ public class SkinOverlay {
         ObjectMap<String, Pair<String, String>> map = new HashObjectMap<String, Pair<String, String>>()
                 .append("user_id", Pair.create("VARCHAR(38)", "NULL"))
                 .append("user_json", Pair.create("LONGTEXT", "NULL"));
+        ObjectMap<String, Pair<String, String>> skinMap = new HashObjectMap<String, Pair<String, String>>()
+                .append("id", Pair.create("VARCHAR(38)", "NULL"))
+                .append("skin", Pair.create("LONGTEXT", "NULL"));
         switch (OptionsUtil.DATABASE_TYPE.getStringValue()) {
             case "MySQL" -> {
                 if (connection == null || connection.isClosed()) {
@@ -414,8 +417,9 @@ public class SkinOverlay {
                             OptionsUtil.DATABASE_PASSWORD.getStringValue(),
                             OptionsUtil.DATABASE_DATABASE.getStringValue());
                     connection = databaseWrapper.connect().getSQLConnection();
-                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_TABLE_NAME.getStringValue(), map);
-                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_TABLE_NAME.getStringValue());
+                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
+                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
+                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MySQL");
                 }
             }
@@ -428,8 +432,9 @@ public class SkinOverlay {
                             OptionsUtil.DATABASE_PASSWORD.getStringValue(),
                             OptionsUtil.DATABASE_DATABASE.getStringValue());
                     connection = databaseWrapper.connect().getSQLConnection();
-                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_TABLE_NAME.getStringValue(), map);
-                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_TABLE_NAME.getStringValue());
+                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
+                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
+                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: PostgreSQL");
                 }
             }
@@ -437,8 +442,9 @@ public class SkinOverlay {
                 if (connection == null || connection.isClosed()) {
                     databaseWrapper = new DatabaseWrapper(DatabaseType.SQLITE, getDataFolder().getAbsolutePath(), OptionsUtil.DATABASE_SQLITE.getStringValue());
                     connection = databaseWrapper.connect().getSQLConnection();
-                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_TABLE_NAME.getStringValue(), map);
-                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_TABLE_NAME.getStringValue());
+                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
+                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
+                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: SQLite");
                 }
             }
@@ -452,14 +458,17 @@ public class SkinOverlay {
                         .connect();
                 mongoClient = databaseWrapper.getMongoClient();
                 mongoDatabase = databaseWrapper.getMongoDatabase();
-                this.userManager = new UserManager(UserManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_COLLECTION.getStringValue());
+                this.userManager = new UserManager(UserManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue());
+                this.userManager = new UserManager(UserManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_SKINS_COLLECTION.getStringValue());
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MongoDB");
             }
             default -> {
+                connection = null;
                 databaseWrapper = null;
                 mongoClient = null;
                 mongoDatabase = null;
                 this.userManager = new UserManager(UserManager.Type.JSON, new File(this.getDataFolder(), "userdata"), null);
+                //TODO SKINS STORAGE
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: File");
             }
         }
