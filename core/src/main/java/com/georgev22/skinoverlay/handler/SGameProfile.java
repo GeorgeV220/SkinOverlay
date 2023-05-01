@@ -7,6 +7,9 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.profile.ProfileCreatedEvent;
 import com.georgev22.skinoverlay.event.events.profile.property.SPropertyAddEvent;
 import com.georgev22.skinoverlay.event.events.profile.property.SPropertyRemoveEvent;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.UUID;
@@ -28,13 +31,16 @@ public abstract class SGameProfile {
      */
     private final UUID uuid;
 
+    @Nullable
+    private final Skin skin;
+
     /**
      * The player's properties.
      */
     private final ObjectMap<String, SProperty> properties;
 
     /**
-     * Constructs an {@link SGameProfile} object with the specified name and UUID, and an empty properties map.
+     * Constructs an {@link SGameProfile} object with the specified name and UUID, and an empty skin and properties map.
      *
      * @param name the player's name
      * @param uuid the player's UUID
@@ -43,22 +49,40 @@ public abstract class SGameProfile {
         this.name = name;
         this.uuid = uuid;
         this.properties = new HashObjectMap<>();
+        this.skin = null;
         this.skinOverlay.getEventManager().callEvent(new ProfileCreatedEvent(this, false));
     }
 
     /**
-     * Constructs an {@link SGameProfile} object with the specified name, UUID, and properties map.
+     * Constructs an {@link SGameProfile} object with the specified name, UUID, and skin from the property map.
      *
      * @param name       the player's name
      * @param uuid       the player's UUID
      * @param properties the player's properties map
      */
-    public SGameProfile(String name, UUID uuid, ObjectMap<String, SProperty> properties) {
+    public SGameProfile(String name, UUID uuid, @NotNull ObjectMap<String, SProperty> properties) {
         this.name = name;
         this.uuid = uuid;
         this.properties = properties;
+        this.skin = new Skin(properties.get("textures"));
         this.skinOverlay.getEventManager().callEvent(new ProfileCreatedEvent(this, false));
     }
+
+    /**
+     * Constructs an {@link SGameProfile} object with the specified name, UUID, and skin.
+     *
+     * @param name the player's name
+     * @param uuid the player's UUID
+     * @param skin the player's skin
+     */
+    public SGameProfile(String name, UUID uuid, @NotNull Skin skin) {
+        this.name = name;
+        this.uuid = uuid;
+        this.skin = skin;
+        this.properties = new HashObjectMap<String, SProperty>().append("textures", skin.getProperty());
+        this.skinOverlay.getEventManager().callEvent(new ProfileCreatedEvent(this, false));
+    }
+
 
     /**
      * Returns the player's name.
@@ -76,6 +100,15 @@ public abstract class SGameProfile {
      */
     public UUID getUUID() {
         return uuid;
+    }
+
+    /**
+     * Returns the player's Skin object
+     *
+     * @return the player's Skin object
+     */
+    public @Nullable Skin getSkin() {
+        return skin;
     }
 
     /**
