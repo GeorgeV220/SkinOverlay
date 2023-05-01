@@ -1,6 +1,7 @@
 package com.georgev22.skinoverlay.utilities;
 
 import com.georgev22.skinoverlay.handler.SProperty;
+import com.georgev22.skinoverlay.handler.Skin;
 import com.google.gson.internal.LinkedTreeMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -37,32 +38,43 @@ public class Utilities {
     }
 
     /**
-     * Converts a {@link SkinOptions} object to a Base64-encoded string.
+     * Decodes the specified Base64-encoded string into an object.
      *
-     * @param skinOptions the SkinOptions object to convert
-     * @return the Base64-encoded string
-     * @throws IOException if an I/O error occurs
+     * @param bytesString the Base64-encoded string
+     * @return the decoded object
+     * @throws RuntimeException if the decoding fails for any reason
      */
-    public static String skinOptionsToBytes(SkinOptions skinOptions) throws IOException {
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); ObjectOutput out = new ObjectOutputStream(bos)) {
-            out.writeObject(skinOptions);
-            final byte[] byteArray = bos.toByteArray();
-            return Base64.getEncoder().encodeToString(byteArray);
+    public static Object getObject(@NotNull String bytesString) {
+        // Decode the Base64 string into bytes
+        final byte[] bytes = Base64.getDecoder().decode(bytesString);
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+             ObjectInput in = new ObjectInputStream(bis)) {
+            // Read the object from the input stream
+            return in.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            // Throw a runtime exception if the decoding fails
+            throw new RuntimeException(e);
         }
     }
 
     /**
-     * Converts a Base64-encoded string to a {@link SkinOptions} object.
+     * Encodes the specified object into a Base64-encoded string.
      *
-     * @param bytes the Base64-encoded string to convert
-     * @return the SkinOptions object
-     * @throws IOException            if an I/O error occurs
-     * @throws ClassNotFoundException if the class of a serialized object cannot be found
+     * @param object the object to encode
+     * @return the Base64-encoded string
+     * @throws RuntimeException if the encoding fails for any reason
      */
-    public static SkinOptions getSkinOptions(@NotNull String bytes) throws IOException, ClassNotFoundException {
-        final byte[] skinOptionsBytes = Base64.getDecoder().decode(bytes);
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(skinOptionsBytes); ObjectInput in = new ObjectInputStream(bis)) {
-            return (SkinOptions) in.readObject();
+    public static String objectToString(Object object) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             ObjectOutput out = new ObjectOutputStream(bos)) {
+            // Write the object to the output stream
+            out.writeObject(object);
+            final byte[] byteArray = bos.toByteArray();
+            // Encode the byte array into a Base64 string
+            return Base64.getEncoder().encodeToString(byteArray);
+        } catch (IOException e) {
+            // Throw a runtime exception if the encoding fails
+            throw new RuntimeException(e);
         }
     }
 
