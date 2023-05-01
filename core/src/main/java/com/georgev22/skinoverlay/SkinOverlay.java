@@ -20,6 +20,7 @@ import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.hook.hooks.SkinHookImpl;
+import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
@@ -129,6 +130,17 @@ public class SkinOverlay {
 
 
     public void onEnable() {
+        switch (OptionsUtil.SKIN_HOOK.getStringValue().toLowerCase(Locale.US)) {
+            case "skinsrestorer" -> {
+                if (skinOverlay.isPluginEnabled(type().equals(SkinOverlayImpl.Type.VELOCITY) ? "skinsrestorer" : "SkinsRestorer")) {
+                    setSkinHook(new SkinsRestorerHook());
+                }
+            }
+            case "skinoverlay" -> {
+                setSkinHook(new SkinHookImpl());
+            }
+            default -> setSkinHook(null);
+        }
         this.skinsDataFolder = new File(this.getDataFolder(), "skins");
         if (!this.skinsDataFolder.exists()) {
             if (this.skinsDataFolder.mkdirs()) {
@@ -263,6 +275,16 @@ public class SkinOverlay {
      */
     public boolean isOnlineMode() {
         return skinOverlay.onlineMode();
+    }
+
+    /**
+     * Returns a boolean value indicating whether a specified plugin is enabled.
+     *
+     * @param pluginName the name of the plugin to check
+     * @return {@code true} if the plugin is enabled, {@code false} otherwise.
+     */
+    public boolean isPluginEnabled(String pluginName) {
+        return skinOverlay.isPluginEnabled(pluginName);
     }
 
     /**

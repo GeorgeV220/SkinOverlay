@@ -6,7 +6,6 @@ import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.handlers.*;
-import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bukkit.GlowStonePlayerListeners;
 import com.georgev22.skinoverlay.listeners.bukkit.PaperPlayerListeners;
@@ -85,14 +84,6 @@ public class SkinOverlayPluginImpl implements SkinOverlayImpl {
                 }
             }
             default -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Legacy());
-        }
-        switch (OptionsUtil.SKIN_HOOK.getStringValue()) {
-            case "SkinsRestorer" -> {
-                if (plugin.getServer().getPluginManager().isPluginEnabled("SkinsRestorer")) {
-                    SkinOverlay.getInstance().setSkinHook(new SkinsRestorerHook());
-                }
-            }
-            default -> SkinOverlay.getInstance().setSkinHook(null);
         }
         SkinOverlay.getInstance().setCommandManager(new PaperCommandManager(plugin));
         SkinOverlay.getInstance().onEnable();
@@ -177,6 +168,11 @@ public class SkinOverlayPluginImpl implements SkinOverlayImpl {
             players.append(player.getUniqueId(), new PlayerObjectBukkit(player));
         }
         return players;
+    }
+
+    @Override
+    public boolean isPluginEnabled(String pluginName) {
+        return plugin.getServer().getPluginManager().isPluginEnabled(pluginName);
     }
 
     @Override

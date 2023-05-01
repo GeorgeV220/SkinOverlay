@@ -82,6 +82,14 @@ public interface SkinOverlayImpl {
     ObservableObjectMap<UUID, PlayerObject> onlinePlayers();
 
     /**
+     * Returns a boolean value indicating whether a specified plugin is enabled.
+     *
+     * @param pluginName the name of the plugin to check
+     * @return {@code true} if the plugin is enabled, {@code false} otherwise.
+     */
+    boolean isPluginEnabled(String pluginName);
+
+    /**
      * Returns the plugin instance.
      *
      * @return The plugin instance.

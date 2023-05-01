@@ -10,7 +10,6 @@ import com.georgev22.library.minecraft.VelocityMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.handlers.SkinHandler_Velocity;
-import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
@@ -115,14 +114,6 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.create("skinoverlay", "test"));
         this.scheduledTask = getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Velocity());
-        switch (OptionsUtil.SKIN_HOOK.getStringValue()) {
-            case "SkinsRestorer" -> {
-                if (getProxy().getPluginManager().getPlugin("skinsrestorer").isPresent()) {
-                    SkinOverlay.getInstance().setSkinHook(new SkinsRestorerHook());
-                }
-            }
-            default -> SkinOverlay.getInstance().setSkinHook(null);
-        }
         SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, dataFolder()));
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
@@ -198,6 +189,11 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
             players.append(player.getUniqueId(), new PlayerObjectVelocity(player));
         }
         return players;
+    }
+
+    @Override
+    public boolean isPluginEnabled(String pluginName) {
+        return getProxy().getPluginManager().getPlugin(pluginName).isPresent();
     }
 
     public Path getDataDirectory() {

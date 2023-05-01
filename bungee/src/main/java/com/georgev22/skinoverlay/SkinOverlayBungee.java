@@ -10,7 +10,6 @@ import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.handlers.SkinHandler_BungeeCord;
-import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
@@ -71,14 +70,6 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         this.adventure = BungeeAudiences.create(this);
         getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
         SkinOverlay.getInstance().setSkinHandler(new SkinHandler_BungeeCord());
-        switch (OptionsUtil.SKIN_HOOK.getStringValue()) {
-            case "SkinsRestorer" -> {
-                if (getProxy().getPluginManager().getPlugin("SkinsRestorer") != null) {
-                    SkinOverlay.getInstance().setSkinHook(new SkinsRestorerHook());
-                }
-            }
-            default -> SkinOverlay.getInstance().setSkinHook(null);
-        }
         SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
         SkinOverlay.getInstance().onEnable();
         SkinOverlay.getInstance().setupCommands();
@@ -162,6 +153,11 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
             players.append(player.getUniqueId(), new PlayerObjectBungee(player));
         }
         return players;
+    }
+
+    @Override
+    public boolean isPluginEnabled(String pluginName) {
+        return getProxy().getPluginManager().getPlugin(pluginName) != null;
     }
 
     @Override
