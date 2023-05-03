@@ -30,11 +30,11 @@ public class DebugListeners implements EventListener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerObjectUpdateSkinEvent(PlayerObjectUpdateSkinEvent event) throws Exception {
+    public void onPlayerObjectUpdateSkinEvent(PlayerObjectUpdateSkinEvent event) {
         if (event.isCancelled()) return;
         skinOverlay.getLogger().info("===== Debug =====");
         skinOverlay.getLogger().info("PlayerObjectUpdateSkinEvent: " + event.getPlayerObject().playerName());
-        skinOverlay.getLogger().info("PlayerObjectUpdateSkinEvent: " + event.getSkinOptions().toString());
+        skinOverlay.getLogger().info("PlayerObjectUpdateSkinEvent: " + event.getSkin().toString());
         skinOverlay.getLogger().info("===== Debug =====");
     }
 

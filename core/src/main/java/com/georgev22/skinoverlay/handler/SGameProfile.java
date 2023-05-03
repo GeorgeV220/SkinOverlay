@@ -7,7 +7,6 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.profile.ProfileCreatedEvent;
 import com.georgev22.skinoverlay.event.events.profile.property.SPropertyAddEvent;
 import com.georgev22.skinoverlay.event.events.profile.property.SPropertyRemoveEvent;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -79,7 +78,7 @@ public abstract class SGameProfile {
         this.name = name;
         this.uuid = uuid;
         this.skin = skin;
-        this.properties = new HashObjectMap<String, SProperty>().append("textures", skin.getProperty());
+        this.properties = new HashObjectMap<String, SProperty>().append("textures", skin.skinProperty());
         this.skinOverlay.getEventManager().callEvent(new ProfileCreatedEvent(this, false));
     }
 

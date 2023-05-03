@@ -1,9 +1,15 @@
 package com.georgev22.skinoverlay.handler;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * Represents a property with a name, value, and signature.
  */
-public record SProperty(String name, String value, String signature) {
+public record SProperty(String name, String value, String signature) implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new {@code SProperty} with the given name, value, and signature.

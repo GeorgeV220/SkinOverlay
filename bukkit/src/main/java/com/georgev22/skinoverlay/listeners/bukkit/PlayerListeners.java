@@ -1,8 +1,9 @@
 package com.georgev22.skinoverlay.listeners.bukkit;
 
+import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectConnectionEvent;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
+import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
@@ -61,40 +62,35 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subChannel = in.readUTF();
         UUID uuid = UUID.fromString(Objects.requireNonNull(decrypt(in.readUTF())));
-        SkinOptions skinOptions = SkinOptions.getSkinOptions(Objects.requireNonNull(decrypt(in.readUTF())));
+        Skin skin = (Skin) Utils.deserializeObjectFromString(Objects.requireNonNull(decrypt(in.readUTF())));
+        boolean b = Boolean.parseBoolean(decrypt(in.readUTF()));
         PlayerObject playerObject = skinOverlay.getPlayer(uuid).orElseThrow();
-        if (subChannel.equalsIgnoreCase("change")) {
-            if (!skinOptions.getSkinName().contains("custom")) {
-                skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skinOptions.getSkinName() + ".png")), skinOptions, playerObject, null);
-            } else {
-                URL url = new URL(skinOptions.getUrl());
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
+        if (b) {
+            skinOverlay.getSkinHandler().setSkin(skin, playerObject);
+        } else {
+            if (subChannel.equalsIgnoreCase("change")) {
+                if (!skin.skinOptions().getSkinName().contains("custom")) {
+                    skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skin.skinOptions().getSkinName() + ".png")), skin, playerObject);
+                } else {
+                    URL url = new URL(skin.skinOptions().getUrl());
+                    ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-                try (InputStream stream = url.openStream()) {
-                    byte[] buffer = new byte[4096];
+                    try (InputStream stream = url.openStream()) {
+                        byte[] buffer = new byte[4096];
 
-                    while (true) {
-                        int bytesRead = stream.read(buffer);
-                        if (bytesRead < 0) {
-                            break;
+                        while (true) {
+                            int bytesRead = stream.read(buffer);
+                            if (bytesRead < 0) {
+                                break;
+                            }
+                            output.write(buffer, 0, bytesRead);
                         }
-                        output.write(buffer, 0, bytesRead);
                     }
+                    skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), skin, playerObject);
                 }
-                skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), skinOptions, playerObject, null);
+            } else if (subChannel.equalsIgnoreCase("reset")) {
+                skinOverlay.getSkinHandler().setSkin(() -> null, skin, playerObject);
             }
-        } else if (subChannel.equalsIgnoreCase("reset")) {
-            skinOverlay.getSkinHandler().setSkin(() -> null, skinOptions, playerObject, null);
-        } else if (subChannel.equalsIgnoreCase("changeWithProperties")) {
-            String name = decrypt(in.readUTF());
-            String value = decrypt(in.readUTF());
-            String signature = decrypt(in.readUTF());
-            skinOverlay.getSkinHandler().setSkin(skinOptions, playerObject, new String[]{name, value, signature});
-        } else if (subChannel.equalsIgnoreCase("resetWithProperties")) {
-            String name = decrypt(in.readUTF());
-            String value = decrypt(in.readUTF());
-            String signature = decrypt(in.readUTF());
-            skinOverlay.getSkinHandler().setSkin(skinOptions, playerObject, new String[]{name, value, signature});
         }
     }
 

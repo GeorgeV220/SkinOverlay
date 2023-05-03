@@ -4,9 +4,8 @@ import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
-import com.georgev22.skinoverlay.handler.SProperty;
+import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.storage.User;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
@@ -83,7 +82,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions) {
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         return new CompletableFuture<>().thenApply(aBoolean -> {
             try {
                 Player player = (Player) playerObject.player();
@@ -245,7 +244,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                             dataWatcher.getClass(),
                             "set",
                             dataWatcher,
-                            new Object[]{dataWatcherObject, skinOptions.getFlags()},
+                            new Object[]{dataWatcherObject, skin.skinOptions().getFlags()},
                             new Class[]{dataWatcherObject.getClass(), Object.class});
 
                     try {
@@ -281,11 +280,6 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property) {
-        return updateSkin(playerObject, skinOptions);
-    }
-
-    @Override
     public GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         try {
             Class<?> craftPlayerClass = getOBCClass("entity.CraftPlayer");
@@ -314,7 +308,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
             Player player = (Player) playerObject.player();
             player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-            skinOverlay.getSkinHandler().updateSkin(playerObject, SkinOptions.getSkinOptions(user.getCustomData("skinOptions"))).handleAsync((aBoolean, throwable) -> {
+            skinOverlay.getSkinHandler().updateSkin(playerObject, user.skin()).handleAsync((aBoolean, throwable) -> {
                 if (throwable != null) {
                     throwable.printStackTrace();
                     return false;

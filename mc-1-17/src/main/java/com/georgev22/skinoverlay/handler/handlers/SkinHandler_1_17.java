@@ -3,10 +3,9 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
-import com.georgev22.skinoverlay.handler.SProperty;
+import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.storage.User;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.mojang.authlib.GameProfile;
@@ -31,13 +30,9 @@ import java.util.concurrent.CompletableFuture;
 import static com.georgev22.skinoverlay.handler.handlers.SkinHandler_Unsupported.wrapper;
 
 public class SkinHandler_1_17 extends SkinHandler {
-    @Override
-    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property) {
-        return this.updateSkin(playerObject, skinOptions);
-    }
 
     @Override
-    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions) {
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Player player = (Player) playerObject.player();
@@ -72,7 +67,7 @@ public class SkinHandler_1_17 extends SkinHandler {
 
                 SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
 
-                synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skinOptions.getFlags());
+                synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skin.skinOptions().getFlags());
 
 
                 ClientboundSetEntityDataPacket clientboundSetEntityDataPacket = new ClientboundSetEntityDataPacket(entityPlayer.getId(), synchedEntityData, true);
@@ -119,7 +114,7 @@ public class SkinHandler_1_17 extends SkinHandler {
             Player player = (Player) playerObject.player();
             player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-            skinOverlay.getSkinHandler().updateSkin(playerObject, SkinOptions.getSkinOptions(user.getCustomData("skinOptions"))).handleAsync((aBoolean, throwable) -> {
+            skinOverlay.getSkinHandler().updateSkin(playerObject, user.skin()).handleAsync((aBoolean, throwable) -> {
                 if (throwable != null) {
                     throwable.printStackTrace();
                     return false;

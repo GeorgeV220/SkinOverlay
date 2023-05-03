@@ -10,26 +10,6 @@ import java.io.Serializable;
 
 public class SkinOptions implements Serializable {
 
-    /**
-     * Converts a Base64-encoded string to a {@link SkinOptions} object.
-     *
-     * @param bytes the Base64-encoded string to convert
-     * @return the SkinOptions object
-     */
-    public static SkinOptions getSkinOptions(@NotNull String bytes) {
-        return (SkinOptions) Utilities.getObject(bytes);
-    }
-
-    /**
-     * Converts a {@link SkinOptions} object to a Base64-encoded string.
-     *
-     * @param skinOptions the SkinOptions object to convert
-     * @return the Base64-encoded string
-     */
-    public static String skinOptionsToBytes(SkinOptions skinOptions) {
-        return Utilities.objectToString(skinOptions);
-    }
-
     @Serial
     private static final long serialVersionUID = Long.parseLong(SkinOverlay.getInstance().getSkinOverlay().description().version().replaceAll("\\D", ""));
 

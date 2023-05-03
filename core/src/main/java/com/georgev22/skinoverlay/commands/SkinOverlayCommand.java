@@ -10,7 +10,7 @@ import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateSkinEvent;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
-import com.georgev22.skinoverlay.storage.User;
+import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
@@ -61,14 +61,14 @@ public class SkinOverlayCommand extends BaseCommand {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
                 return null;
             }
-            UserEvent event = new UserEvent((User) user, false);
+            UserEvent event = new UserEvent(user, false);
             skinOverlay.getEventManager().callEvent(event);
             return user;
         }).thenApply(user -> {
             if (user == null) {
                 return null;
             }
-            UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent((User) user, false);
+            UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent(user, false);
             skinOverlay.getEventManager().callEvent(modifyDataEvent);
             if (modifyDataEvent.isCancelled())
                 return user;
@@ -81,7 +81,7 @@ public class SkinOverlayCommand extends BaseCommand {
             if (user != null) {
                 Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
                 if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline()) {
-                    PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), (User) user, false);
+                    PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), user, false);
                     skinOverlay.getEventManager().callEvent(event);
                     if (event.isCancelled())
                         return;
@@ -122,7 +122,7 @@ public class SkinOverlayCommand extends BaseCommand {
             target = skinOverlay.getPlayer(issuer.getUniqueId());
         }
 
-        skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), new SkinOptions(overlay), target.orElseThrow(), issuer);
+        skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), new Skin(null, new SkinOptions(overlay)), target.orElseThrow());
 
     }
 
@@ -165,7 +165,7 @@ public class SkinOverlayCommand extends BaseCommand {
                 return;
             }
 
-            skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), skinOptions, target.orElseThrow(), issuer);
+            skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), new Skin(null, skinOptions), target.orElseThrow());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -203,7 +203,7 @@ public class SkinOverlayCommand extends BaseCommand {
             return;
         }
         if (args.length == 0) {
-            skinOverlay.getSkinHandler().setSkin(() -> null, new SkinOptions("default"), skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow(), issuer);
+            skinOverlay.getSkinHandler().setSkin(() -> null, new Skin(null, new SkinOptions("default")), skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow());
         } else {
             clear0(issuer, args[0]);
         }
@@ -216,6 +216,6 @@ public class SkinOverlayCommand extends BaseCommand {
             MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", target), true);
             return;
         }
-        skinOverlay.getSkinHandler().setSkin(() -> null, new SkinOptions("default"), optionalPlayerObject.orElseThrow(), issuer);
+        skinOverlay.getSkinHandler().setSkin(() -> null, new Skin(null, new SkinOptions("default")), optionalPlayerObject.orElseThrow());
     }
 }

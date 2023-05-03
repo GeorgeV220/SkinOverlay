@@ -1,17 +1,18 @@
 package com.georgev22.skinoverlay;
 
-import co.aikar.commands.*;
+import co.aikar.commands.BungeeCommandManager;
+import co.aikar.commands.CommandManager;
+import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.VelocityCommandManager;
 import com.georgev22.library.database.DatabaseType;
 import com.georgev22.library.database.DatabaseWrapper;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObjectMap.Pair;
-import com.georgev22.library.maps.ObjectMap.PairDocument;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.maps.UnmodifiableObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.EntityManager;
-import com.georgev22.library.utilities.EntityManager.Entity;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
@@ -27,10 +28,8 @@ import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
 import com.georgev22.skinoverlay.storage.User;
 import com.georgev22.skinoverlay.utilities.*;
-import com.georgev22.skinoverlay.utilities.gson.ObjectMapSPropertyTypeAdapter;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.google.gson.reflect.TypeToken;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
@@ -90,7 +89,7 @@ public class SkinOverlay {
     private CommandManager<?, ?, ?, ?, ?, ?> commandManager;
 
     @Getter
-    private EntityManager userManager;
+    private EntityManager<User> userManager;
 
     @Getter
     private EventManager eventManager;
@@ -415,10 +414,7 @@ public class SkinOverlay {
                             OptionsUtil.DATABASE_USER.getStringValue(),
                             OptionsUtil.DATABASE_PASSWORD.getStringValue(),
                             OptionsUtil.DATABASE_DATABASE.getStringValue());
-                    connection = databaseWrapper.connect().getSQLConnection();
-                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
-                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
-                    this.userManager = new EntityManager(EntityManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+                    sql(map, skinMap);
                     //TODO SKINS STORAGE
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MySQL");
                 }
@@ -431,10 +427,7 @@ public class SkinOverlay {
                             OptionsUtil.DATABASE_USER.getStringValue(),
                             OptionsUtil.DATABASE_PASSWORD.getStringValue(),
                             OptionsUtil.DATABASE_DATABASE.getStringValue());
-                    connection = databaseWrapper.connect().getSQLConnection();
-                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
-                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
-                    this.userManager = new EntityManager(EntityManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+                    sql(map, skinMap);
                     //TODO SKINS STORAGE
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: PostgreSQL");
                 }
@@ -442,10 +435,7 @@ public class SkinOverlay {
             case "SQLite" -> {
                 if (connection == null || connection.isClosed()) {
                     databaseWrapper = new DatabaseWrapper(DatabaseType.SQLITE, getDataFolder().getAbsolutePath(), OptionsUtil.DATABASE_SQLITE.getStringValue());
-                    connection = databaseWrapper.connect().getSQLConnection();
-                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
-                    databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
-                    this.userManager = new EntityManager(EntityManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+                    sql(map, skinMap);
                     //TODO SKINS STORAGE
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: SQLite");
                 }
@@ -460,7 +450,7 @@ public class SkinOverlay {
                         .connect();
                 mongoClient = databaseWrapper.getMongoClient();
                 mongoDatabase = databaseWrapper.getMongoDatabase();
-                this.userManager = new EntityManager(EntityManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue());
+                this.userManager = new EntityManager<>(EntityManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue(), User.class);
                 //TODO SKINS STORAGE
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MongoDB");
             }
@@ -469,15 +459,11 @@ public class SkinOverlay {
                 databaseWrapper = null;
                 mongoClient = null;
                 mongoDatabase = null;
-                this.userManager = new EntityManager(EntityManager.Type.JSON, new File(this.getDataFolder(), "userdata"), null);
+                this.userManager = new EntityManager<>(EntityManager.Type.FILE, new File(this.getDataFolder(), "userdata"), null, User.class);
                 //TODO SKINS STORAGE
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: File");
             }
         }
-
-        this.userManager.registerTypeAdaptersByTypeToken(new PairDocument<>(
-                new Pair<>(new TypeToken<ObjectMap<String, Object>>() {
-                }, new ObjectMapSPropertyTypeAdapter())));
 
         userManager.loadAll();
 
@@ -489,6 +475,13 @@ public class SkinOverlay {
             return user;
         }));
 
+    }
+
+    private void sql(ObjectMap<String, Pair<String, String>> map, ObjectMap<String, Pair<String, String>> skinMap) throws SQLException, ClassNotFoundException {
+        connection = databaseWrapper.connect().getSQLConnection();
+        databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
+        databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
+        this.userManager = new EntityManager<>(EntityManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), User.class);
     }
 
 
@@ -522,8 +515,8 @@ public class SkinOverlay {
      *
      * @param managerListeners the list of listeners to be added
      */
-    public void registerUserManagerListeners(@NotNull List<ObservableListener<UUID, Entity>> managerListeners) {
-        for (ObservableListener<UUID, Entity> managerListener : managerListeners) {
+    public void registerUserManagerListeners(@NotNull List<ObservableListener<UUID, User>> managerListeners) {
+        for (ObservableListener<UUID, User> managerListener : managerListeners) {
             this.userManager.getLoadedEntities().addListener(managerListener);
         }
     }

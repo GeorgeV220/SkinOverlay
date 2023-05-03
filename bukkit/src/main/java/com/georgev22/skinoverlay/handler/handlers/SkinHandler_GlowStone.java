@@ -5,10 +5,10 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
+import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileGlowStone;
 import com.georgev22.skinoverlay.storage.User;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.glowstone.GlowServer;
 import net.glowstone.GlowWorld;
@@ -36,10 +36,10 @@ public class SkinHandler_GlowStone extends SkinHandler {
      * Update the skin for the specified {@link PlayerObject}
      *
      * @param playerObject Player's {@link PlayerObject} object.
-     * @param skinOptions  Skin options
+     * @param skin         Skin
      */
     @Override
-    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions) {
+    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 GlowPlayer glowPlayer = (GlowPlayer) playerObject.player();
@@ -73,7 +73,7 @@ public class SkinHandler_GlowStone extends SkinHandler {
                 glowSession.send(userListItemMessage);
                 glowSession.send(respawnMessage);
 
-                glowPlayer.getMetadata().set(MetadataIndex.PLAYER_SKIN_PARTS, skinOptions.getFlags());
+                glowPlayer.getMetadata().set(MetadataIndex.PLAYER_SKIN_PARTS, skin.skinOptions().getFlags());
 
                 ClientSettings clientSettings = glowPlayer.getSettings();
 
@@ -82,7 +82,7 @@ public class SkinHandler_GlowStone extends SkinHandler {
                         clientSettings.getViewDistance(),
                         clientSettings.getChatFlags(),
                         clientSettings.isChatColors(),
-                        skinOptions.getFlags(),
+                        skin.skinOptions().getFlags(),
                         clientSettings.getMainHand()
                 ));
 
@@ -101,18 +101,6 @@ public class SkinHandler_GlowStone extends SkinHandler {
                 throw new RuntimeException(exception);
             }
         });
-    }
-
-    /**
-     * Update the skin for the specified {@link PlayerObject} and {@link SProperty}
-     *
-     * @param playerObject Player's {@link PlayerObject} object.
-     * @param skinOptions  Skin options)
-     * @param property     {@link SProperty} to set
-     */
-    @Override
-    public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull SkinOptions skinOptions, SProperty property) {
-        return this.updateSkin(playerObject, skinOptions);
     }
 
     /**
@@ -145,7 +133,7 @@ public class SkinHandler_GlowStone extends SkinHandler {
             GlowPlayer player = (GlowPlayer) playerObject.player();
             player.hidePlayer(player);
             player.showPlayer(player);
-            skinOverlay.getSkinHandler().updateSkin(playerObject, SkinOptions.getSkinOptions(user.getCustomData("skinOptions"))).handleAsync((aBoolean, throwable) -> {
+            skinOverlay.getSkinHandler().updateSkin(playerObject, user.skin()).handleAsync((aBoolean, throwable) -> {
                 if (throwable != null) {
                     throwable.printStackTrace();
                     return false;

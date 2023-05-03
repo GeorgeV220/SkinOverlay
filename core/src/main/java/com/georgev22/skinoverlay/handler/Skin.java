@@ -1,9 +1,7 @@
 package com.georgev22.skinoverlay.handler;
 
 import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.google.gson.JsonParser;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serial;
@@ -12,30 +10,10 @@ import java.util.Base64;
 
 public class Skin implements Serializable {
 
-    /**
-     * Converts a Base64-encoded string to a {@link Skin} object.
-     *
-     * @param bytes the Base64-encoded string to convert
-     * @return the Skin object
-     */
-    public static Skin getSkin(@NotNull String bytes) {
-        return (Skin) Utilities.getObject(bytes);
-    }
-
-    /**
-     * Converts a {@link Skin} object to a Base64-encoded string.
-     *
-     * @param skin the Skin object to convert
-     * @return the Base64-encoded string
-     */
-    public static String skinToBytes(Skin skin) {
-        return Utilities.objectToString(skin);
-    }
-
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final SProperty property;
+    private SProperty property;
     private SkinOptions skinOptions = new SkinOptions("default");
 
     public Skin(SProperty sProperty) {
@@ -52,11 +30,11 @@ public class Skin implements Serializable {
         this.skinOptions = skinOptions;
     }
 
-    public SProperty getProperty() {
+    public SProperty skinProperty() {
         return property;
     }
 
-    public SkinOptions getSkinOptions() {
+    public SkinOptions skinOptions() {
         return skinOptions;
     }
 
@@ -64,12 +42,24 @@ public class Skin implements Serializable {
         this.skinOptions = skinOptions;
     }
 
-    public @Nullable String getSkinURL() {
+    public void setProperty(SProperty property) {
+        this.property = property;
+    }
+
+    public @Nullable String skinURL() {
         return new JsonParser().parse(new String(Base64.getDecoder().decode(property.value())))
                 .getAsJsonObject()
                 .getAsJsonObject("textures")
                 .getAsJsonObject("SKIN")
                 .get("url")
                 .getAsString();
+    }
+
+    @Override
+    public String toString() {
+        return "Skin{" +
+                "property=" + property +
+                ", skinOptions=" + skinOptions +
+                '}';
     }
 }

@@ -1,14 +1,11 @@
 package com.georgev22.skinoverlay.handler;
 
-import co.aikar.commands.CommandIssuer;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectUpdateSkinEvent;
 import com.georgev22.skinoverlay.storage.User;
-import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Utilities.Request;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -40,22 +37,11 @@ public abstract class SkinHandler {
      * Update the skin for the specified {@link PlayerObject}
      *
      * @param playerObject Player's {@link PlayerObject} object.
-     * @param skinOptions  Skin options
+     * @param skin         Skin
      */
     public abstract CompletableFuture<Boolean> updateSkin(
             @NotNull final PlayerObject playerObject,
-            @NotNull final SkinOptions skinOptions);
-
-    /**
-     * Update the skin for the specified {@link PlayerObject} and {@link SProperty}
-     *
-     * @param playerObject Player's {@link PlayerObject} object.
-     * @param skinOptions  Skin options)
-     * @param property     {@link SProperty} to set
-     */
-    public abstract CompletableFuture<Boolean> updateSkin(@NotNull final PlayerObject playerObject,
-                                                          @NotNull final SkinOptions skinOptions,
-                                                          final SProperty property);
+            @NotNull final Skin skin);
 
     /**
      * Retrieves {@link PlayerObject}'s {@link SGameProfile}
@@ -79,8 +65,9 @@ public abstract class SkinHandler {
      */
     public abstract SGameProfile getGameProfile(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException;
 
-    public void setSkin(SkinOptions skinOptions, @NotNull PlayerObject playerObject, String @NotNull [] properties) {
-        Validate.isTrue((properties.length == 3 ? 1 : 0) != 0, "Properties length must be 3");
+    public void setSkin(Skin skin, @NotNull PlayerObject playerObject) {
+        Validate.notNull(skin);
+        Validate.notNull(playerObject);
         skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
@@ -92,8 +79,7 @@ public abstract class SkinHandler {
                 skinOverlay.getLogger().log(Level.SEVERE, "User is null");
                 return;
             }
-            user.addCustomData("skinOptions", SkinOptions.skinOptionsToBytes(skinOptions));
-            user.addCustomData("skinProperty", new SProperty(properties[0], properties[1], properties[2]));
+            user.addCustomData("skin", skin);
             updateSkin(playerObject, true);
             if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                 return;
@@ -102,7 +88,8 @@ public abstract class SkinHandler {
         });
     }
 
-    public void setSkin(ImageSupplier imageSupplier, SkinOptions skinOptions, @NotNull PlayerObject playerObject, @Nullable CommandIssuer commandIssuer) {
+    public void setSkin(ImageSupplier imageSupplier, Skin skin, @NotNull PlayerObject playerObject) {
+        skinOverlay.getLogger().info("B");
         skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
@@ -121,7 +108,7 @@ public abstract class SkinHandler {
                 overlay = null;
             }
             try {
-                byte[] profileBytes = getProfileBytes(playerObject, user.getCustomData("defaultSkinProperty"));
+                byte[] profileBytes = getProfileBytes(playerObject, user.defaultSkin().skinProperty());
                 JsonElement json = JsonParser.parseString(new String(profileBytes));
                 JsonArray properties = json.getAsJsonObject().get("properties").getAsJsonArray();
                 for (JsonElement object : properties) {
@@ -130,23 +117,23 @@ public abstract class SkinHandler {
                         SGameProfile gameProfile = getGameProfile(playerObject);
                         gameProfile.removeProperty("textures");
                         gameProfile.addProperty("textures", new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
-                        user.addCustomData("skinOptions", SkinOptions.skinOptionsToBytes(skinOptions));
-                        user.addCustomData("skinProperty", new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
-                        if (commandIssuer == null) {
+                        skin.setProperty(new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
+                        user.addCustomData("skin", skin);
+                        /*if (commandIssuer == null) {
                             MessagesUtil.RESET.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
                         } else {
                             MessagesUtil.RESET.msg(commandIssuer, new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
-                        }
+                        }*/
                         break;
                     }
                     String base64 = object.getAsJsonObject().get("value").getAsString();
                     String value = new String(Base64.getDecoder().decode(base64));
                     JsonElement textureJson = JsonParser.parseString(value);
                     String skinUrl = textureJson.getAsJsonObject().getAsJsonObject("textures").getAsJsonObject("SKIN").get("url").getAsString();
-                    BufferedImage skin = ImageIO.read(new URL(skinUrl));
-                    BufferedImage image = new BufferedImage(skin.getWidth(), skin.getHeight(), 2);
+                    BufferedImage bufferedImage = ImageIO.read(new URL(skinUrl));
+                    BufferedImage image = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), 2);
                     Graphics2D canvas = image.createGraphics();
-                    canvas.drawImage(skin, 0, 0, null);
+                    canvas.drawImage(bufferedImage, 0, 0, null);
                     canvas.drawImage(overlay, 0, 0, null);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     ImageIO.write(image, "PNG", stream);
@@ -169,13 +156,13 @@ public abstract class SkinHandler {
                             JsonObject texture = response.getAsJsonObject().getAsJsonObject("data").getAsJsonObject("texture");
                             String texturesValue = texture.get("value").getAsString();
                             String texturesSignature = texture.get("signature").getAsString();
-                            user.addCustomData("skinOptions", SkinOptions.skinOptionsToBytes(skinOptions));
-                            user.addCustomData("skinProperty", new SProperty("textures", texturesValue, texturesSignature));
-                            if (commandIssuer == null) {
+                            skin.setProperty(new SProperty("textures", texturesValue, texturesSignature));
+                            user.addCustomData("skin", skin);
+                            /*if (commandIssuer == null) {
                                 MessagesUtil.DONE.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
                             } else {
                                 MessagesUtil.DONE.msg(commandIssuer, new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
-                            }
+                            }*/
 
                         }
                         default ->
@@ -215,12 +202,12 @@ public abstract class SkinHandler {
                 return;
             }
             PlayerObjectUpdateSkinEvent event;
-            event = new PlayerObjectUpdateSkinEvent(playerObject, (User) user, SkinOptions.getSkinOptions(user.getCustomData("skinOptions")), true);
+            event = new PlayerObjectUpdateSkinEvent(playerObject, user, user.skin(), true);
             skinOverlay.getEventManager().callEvent(event);
             if (event.isCancelled())
                 return;
-            event.getPlayerObject().gameProfile().removeProperty("textures").addProperty("textures", event.getUser().getCustomData("skinProperty"));
-            if (event.getUser().getCustomData("skinProperty") != null)
+            event.getPlayerObject().gameProfile().removeProperty("textures").addProperty("textures", event.getUser().skin().skinProperty());
+            if (event.getUser().skin().skinProperty() != null)
                 updateSkin0(event.getUser(), event.getPlayerObject(), forOthers);
         }).handle((unused, throwable) -> {
             if (throwable != null) {
@@ -236,8 +223,8 @@ public abstract class SkinHandler {
 
     protected abstract void updateSkin0(User user, PlayerObject playerObject, boolean forOthers);
 
-    protected void updateSkin1(User user, PlayerObject playerObject, boolean forOthers) {
-        updateSkin(playerObject, SkinOptions.getSkinOptions(user.getCustomData("skinOptions")), user.getCustomData("skinProperty")).handleAsync((unused, throwable) -> {
+    protected void updateSkin1(@NotNull User user, PlayerObject playerObject, boolean forOthers) {
+        updateSkin(playerObject, user.skin()).handleAsync((unused, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error", throwable);
             }
