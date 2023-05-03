@@ -2,11 +2,11 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileBungee;
+import com.georgev22.skinoverlay.storage.User;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -78,7 +78,7 @@ public class SkinHandler_BungeeCord extends SkinHandler {
     }
 
     @Override
-    protected void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
+    protected void updateSkin0(User user, PlayerObject playerObject, boolean forOthers) {
         updateSkin1(user, playerObject, forOthers);
     }
 }

@@ -10,6 +10,7 @@ import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateSkinEvent;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
+import com.georgev22.skinoverlay.storage.User;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
@@ -55,19 +56,19 @@ public class SkinOverlayCommand extends BaseCommand {
     @CommandAlias("skinoverlayreload|soverlayreload|skinoreload|sreload")
     @CommandPermission("skinoverlay.reload")
     public void reload(final @NotNull CommandIssuer issuer) {
-        skinOverlay.getUserManager().getLoadedUsers().forEach((uuid, loadedUser) -> skinOverlay.getUserManager().getUser(uuid).handle((user, throwable) -> {
+        skinOverlay.getUserManager().getLoadedEntities().forEach((uuid, loadedUser) -> skinOverlay.getUserManager().getEntity(uuid).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
                 return null;
             }
-            UserEvent event = new UserEvent(user, false);
+            UserEvent event = new UserEvent((User) user, false);
             skinOverlay.getEventManager().callEvent(event);
             return user;
         }).thenApply(user -> {
             if (user == null) {
                 return null;
             }
-            UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent(user, false);
+            UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent((User) user, false);
             skinOverlay.getEventManager().callEvent(modifyDataEvent);
             if (modifyDataEvent.isCancelled())
                 return user;
@@ -80,7 +81,7 @@ public class SkinOverlayCommand extends BaseCommand {
             if (user != null) {
                 Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
                 if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline()) {
-                    PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), user, false);
+                    PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), (User) user, false);
                     skinOverlay.getEventManager().callEvent(event);
                     if (event.isCancelled())
                         return;

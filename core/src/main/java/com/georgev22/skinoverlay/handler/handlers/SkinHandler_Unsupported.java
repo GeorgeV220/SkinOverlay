@@ -2,11 +2,11 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileMojang;
+import com.georgev22.skinoverlay.storage.User;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
@@ -56,7 +56,7 @@ public class SkinHandler_Unsupported extends SkinHandler {
     }
 
     @Override
-    protected void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
+    protected void updateSkin0(User user, PlayerObject playerObject, boolean forOthers) {
         updateSkin1(user, playerObject, forOthers);
     }
 }

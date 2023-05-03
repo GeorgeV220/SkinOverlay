@@ -3,9 +3,9 @@ package com.georgev22.skinoverlay.handler;
 import co.aikar.commands.CommandIssuer;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectUpdateSkinEvent;
+import com.georgev22.skinoverlay.storage.User;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
@@ -81,7 +81,7 @@ public abstract class SkinHandler {
 
     public void setSkin(SkinOptions skinOptions, @NotNull PlayerObject playerObject, String @NotNull [] properties) {
         Validate.isTrue((properties.length == 3 ? 1 : 0) != 0, "Properties length must be 3");
-        skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
+        skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
@@ -103,7 +103,7 @@ public abstract class SkinHandler {
     }
 
     public void setSkin(ImageSupplier imageSupplier, SkinOptions skinOptions, @NotNull PlayerObject playerObject, @Nullable CommandIssuer commandIssuer) {
-        skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
+        skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
@@ -203,7 +203,7 @@ public abstract class SkinHandler {
     }
 
     public void updateSkin(@NotNull PlayerObject playerObject, boolean forOthers) {
-        skinOverlay.getUserManager().getUser(playerObject.playerUUID()).handle((user, throwable) -> {
+        skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
@@ -215,7 +215,7 @@ public abstract class SkinHandler {
                 return;
             }
             PlayerObjectUpdateSkinEvent event;
-            event = new PlayerObjectUpdateSkinEvent(playerObject, user, SkinOptions.getSkinOptions(user.getCustomData("skinOptions")), true);
+            event = new PlayerObjectUpdateSkinEvent(playerObject, (User) user, SkinOptions.getSkinOptions(user.getCustomData("skinOptions")), true);
             skinOverlay.getEventManager().callEvent(event);
             if (event.isCancelled())
                 return;
@@ -234,9 +234,9 @@ public abstract class SkinHandler {
         });
     }
 
-    protected abstract void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers);
+    protected abstract void updateSkin0(User user, PlayerObject playerObject, boolean forOthers);
 
-    protected void updateSkin1(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
+    protected void updateSkin1(User user, PlayerObject playerObject, boolean forOthers) {
         updateSkin(playerObject, SkinOptions.getSkinOptions(user.getCustomData("skinOptions")), user.getCustomData("skinProperty")).handleAsync((unused, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error", throwable);

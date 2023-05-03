@@ -1,9 +1,9 @@
 package com.georgev22.skinoverlay.event.events.user.data.load;
 
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import com.georgev22.skinoverlay.event.interfaces.Cancellable;
+import com.georgev22.skinoverlay.storage.User;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,7 +21,7 @@ public class UserPostLoadEvent extends UserEvent implements Cancellable {
      * @param user  the user associated with this event
      * @param async whether this event should be run asynchronously
      */
-    public UserPostLoadEvent(@NotNull UserManager.User user, boolean async) {
+    public UserPostLoadEvent(@NotNull User user, boolean async) {
         super(user, async);
     }
 

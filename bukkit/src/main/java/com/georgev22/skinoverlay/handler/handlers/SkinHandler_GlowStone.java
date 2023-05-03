@@ -3,13 +3,12 @@ package com.georgev22.skinoverlay.handler.handlers;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileGlowStone;
+import com.georgev22.skinoverlay.storage.User;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.glowstone.GlowServer;
 import net.glowstone.GlowWorld;
@@ -28,7 +27,6 @@ import org.bukkit.GameMode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
@@ -142,31 +140,27 @@ public class SkinHandler_GlowStone extends SkinHandler {
         return sGameProfiles.append(playerObject, wrapper(getGameProfile0(playerObject))).get(playerObject);
     }
 
-    protected void updateSkin0(UserManager.User user, PlayerObject playerObject, boolean forOthers) {
+    protected void updateSkin0(User user, PlayerObject playerObject, boolean forOthers) {
         SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
             GlowPlayer player = (GlowPlayer) playerObject.player();
             player.hidePlayer(player);
             player.showPlayer(player);
-            try {
-                skinOverlay.getSkinHandler().updateSkin(playerObject, Utilities.getSkinOptions(user.getCustomData("skinOptions"))).handleAsync((aBoolean, throwable) -> {
-                    if (throwable != null) {
-                        throwable.printStackTrace();
-                        return false;
+            skinOverlay.getSkinHandler().updateSkin(playerObject, SkinOptions.getSkinOptions(user.getCustomData("skinOptions"))).handleAsync((aBoolean, throwable) -> {
+                if (throwable != null) {
+                    throwable.printStackTrace();
+                    return false;
+                }
+                return aBoolean;
+            }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                if (aBoolean)
+                    if (forOthers) {
+                        skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                            GlowPlayer p = (GlowPlayer) playerObjects.player();
+                            p.hidePlayer(player);
+                            p.showPlayer(player);
+                        });
                     }
-                    return aBoolean;
-                }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
-                    if (aBoolean)
-                        if (forOthers) {
-                            skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                                GlowPlayer p = (GlowPlayer) playerObjects.player();
-                                p.hidePlayer(player);
-                                p.showPlayer(player);
-                            });
-                        }
-                }));
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            }));
         }, 20L);
     }
 

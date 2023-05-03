@@ -1,10 +1,10 @@
 package com.georgev22.skinoverlay.event.events.user.data.add;
 
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.interfaces.Cancellable;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
+import com.georgev22.skinoverlay.storage.User;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,7 +24,7 @@ public class UserAddDataEvent extends UserModifyDataEvent implements Cancellable
      * @param async      whether this event should be run asynchronously
      * @param objectPair the data being added to the user
      */
-    public UserAddDataEvent(UserManager.@NotNull User user, ObjectMap.@NotNull Pair<String, ?> objectPair, boolean async) {
+    public UserAddDataEvent(@NotNull User user, ObjectMap.@NotNull Pair<String, ?> objectPair, boolean async) {
         super(user, async);
         this.objectPair = objectPair;
     }

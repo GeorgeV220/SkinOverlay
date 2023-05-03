@@ -1,9 +1,9 @@
 package com.georgev22.skinoverlay.event.events.user.data.load;
 
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import com.georgev22.skinoverlay.event.interfaces.Cancellable;
+import com.georgev22.skinoverlay.storage.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -25,7 +25,7 @@ public class UserPreLoadEvent extends UserEvent implements Cancellable {
      * @param async whether this event should be run asynchronously
      */
     public UserPreLoadEvent(@NotNull UUID uuid, boolean async) {
-        super(new UserManager.User(uuid), async);
+        super(new User(uuid), async);
         this.uuid = uuid;
     }
 

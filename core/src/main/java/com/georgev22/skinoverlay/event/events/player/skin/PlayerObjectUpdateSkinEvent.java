@@ -1,11 +1,10 @@
 package com.georgev22.skinoverlay.event.events.player.skin;
 
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.interfaces.Cancellable;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectUserEvent;
+import com.georgev22.skinoverlay.storage.User;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +39,7 @@ public class PlayerObjectUpdateSkinEvent extends PlayerObjectUserEvent implement
      *                     If true, the event will be handled on a separate thread.
      *                     If false, the event will be handled on the main thread.
      */
-    public PlayerObjectUpdateSkinEvent(PlayerObject playerObject, UserManager.User user, @Nullable SkinOptions skinOptions, boolean async) {
+    public PlayerObjectUpdateSkinEvent(PlayerObject playerObject, User user, @Nullable SkinOptions skinOptions, boolean async) {
         super(playerObject, user, async);
         this.skinOptions = skinOptions;
     }
@@ -54,7 +53,7 @@ public class PlayerObjectUpdateSkinEvent extends PlayerObjectUserEvent implement
      * @throws ClassNotFoundException if the class of the serialized object cannot be found.
      */
     public SkinOptions getSkinOptions() throws IOException, ClassNotFoundException {
-        return skinOptions == null ? Utilities.getSkinOptions(getUser().getCustomData("skinOptions")) : skinOptions;
+        return skinOptions == null ? SkinOptions.getSkinOptions(getUser().getCustomData("skinOptions")) : skinOptions;
     }
 
     /**

@@ -1,9 +1,9 @@
 package com.georgev22.skinoverlay.event.events.player;
 
-import com.georgev22.library.utilities.UserManager;
 import com.georgev22.skinoverlay.event.interfaces.Cancellable;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
+import com.georgev22.skinoverlay.storage.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ public class PlayerObjectUserEvent extends UserEvent implements Cancellable {
      * @param user         the user associated with this event
      * @param async        whether this event should be run asynchronously
      */
-    public PlayerObjectUserEvent(@NotNull PlayerObject playerObject, @NotNull UserManager.User user, boolean async) {
+    public PlayerObjectUserEvent(@NotNull PlayerObject playerObject, @NotNull User user, boolean async) {
         super(user, async);
         this.playerObject = playerObject;
     }

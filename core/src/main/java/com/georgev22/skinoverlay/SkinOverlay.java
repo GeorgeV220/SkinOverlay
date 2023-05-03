@@ -10,7 +10,8 @@ import com.georgev22.library.maps.ObjectMap.PairDocument;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.maps.UnmodifiableObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
-import com.georgev22.library.utilities.UserManager;
+import com.georgev22.library.utilities.EntityManager;
+import com.georgev22.library.utilities.EntityManager.Entity;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
@@ -24,6 +25,7 @@ import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
+import com.georgev22.skinoverlay.storage.User;
 import com.georgev22.skinoverlay.utilities.*;
 import com.georgev22.skinoverlay.utilities.gson.ObjectMapSPropertyTypeAdapter;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
@@ -88,19 +90,19 @@ public class SkinOverlay {
     private CommandManager<?, ?, ?, ?, ?, ?> commandManager;
 
     @Getter
-    private UserManager userManager;
+    private EntityManager userManager;
 
     @Getter
     private EventManager eventManager;
 
     @Getter
-    private CompletableFutureManager<UserManager.User> userCompletableFutureManager;
+    private CompletableFutureManager<User> userCompletableFutureManager;
 
     @Getter
-    private final ObservableObjectMap<UUID, UserManager.User> loadedUsers = new ObservableObjectMap<>();
+    private final ObservableObjectMap<UUID, User> loadedUsers = new ObservableObjectMap<>();
 
     @Getter
-    private final Consumer<CompletableFuture<UserManager.User>> completableFutureConsumer = userCompletableFuture -> userCompletableFuture.handle((user, throwable) -> {
+    private final Consumer<CompletableFuture<User>> completableFutureConsumer = userCompletableFuture -> userCompletableFuture.handle((user, throwable) -> {
         if (throwable != null) {
             getLogger().log(Level.SEVERE, "Error: ", throwable);
             return null;
@@ -128,7 +130,6 @@ public class SkinOverlay {
         userCompletableFutureManager = new CompletableFutureManager<>();
     }
 
-
     public void onEnable() {
         switch (OptionsUtil.SKIN_HOOK.getStringValue().toLowerCase(Locale.US)) {
             case "skinsrestorer" -> {
@@ -136,9 +137,7 @@ public class SkinOverlay {
                     setSkinHook(new SkinsRestorerHook());
                 }
             }
-            case "skinoverlay" -> {
-                setSkinHook(new SkinHookImpl());
-            }
+            case "skinoverlay" -> setSkinHook(new SkinHookImpl());
             default -> setSkinHook(null);
         }
         this.skinsDataFolder = new File(this.getDataFolder(), "skins");
@@ -174,7 +173,7 @@ public class SkinOverlay {
     }
 
     public void onDisable() {
-        userManager.getLoadedUsers().forEach((uuid, loadedUser) -> userManager.getUser(uuid).handle((user, throwable) -> {
+        userManager.getLoadedEntities().forEach((uuid, loadedUser) -> userManager.getEntity(uuid).handle((user, throwable) -> {
             if (throwable != null) {
                 getLogger().log(Level.SEVERE, "Error: ", throwable);
                 return null;
@@ -419,7 +418,8 @@ public class SkinOverlay {
                     connection = databaseWrapper.connect().getSQLConnection();
                     databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
                     databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
-                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+                    this.userManager = new EntityManager(EntityManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+                    //TODO SKINS STORAGE
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MySQL");
                 }
             }
@@ -434,7 +434,8 @@ public class SkinOverlay {
                     connection = databaseWrapper.connect().getSQLConnection();
                     databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
                     databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
-                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+                    this.userManager = new EntityManager(EntityManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+                    //TODO SKINS STORAGE
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: PostgreSQL");
                 }
             }
@@ -444,7 +445,8 @@ public class SkinOverlay {
                     connection = databaseWrapper.connect().getSQLConnection();
                     databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
                     databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
-                    this.userManager = new UserManager(UserManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+                    this.userManager = new EntityManager(EntityManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+                    //TODO SKINS STORAGE
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: SQLite");
                 }
             }
@@ -458,8 +460,8 @@ public class SkinOverlay {
                         .connect();
                 mongoClient = databaseWrapper.getMongoClient();
                 mongoDatabase = databaseWrapper.getMongoDatabase();
-                this.userManager = new UserManager(UserManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue());
-                this.userManager = new UserManager(UserManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_SKINS_COLLECTION.getStringValue());
+                this.userManager = new EntityManager(EntityManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue());
+                //TODO SKINS STORAGE
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MongoDB");
             }
             default -> {
@@ -467,7 +469,7 @@ public class SkinOverlay {
                 databaseWrapper = null;
                 mongoClient = null;
                 mongoDatabase = null;
-                this.userManager = new UserManager(UserManager.Type.JSON, new File(this.getDataFolder(), "userdata"), null);
+                this.userManager = new EntityManager(EntityManager.Type.JSON, new File(this.getDataFolder(), "userdata"), null);
                 //TODO SKINS STORAGE
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: File");
             }
@@ -477,9 +479,9 @@ public class SkinOverlay {
                 new Pair<>(new TypeToken<ObjectMap<String, Object>>() {
                 }, new ObjectMapSPropertyTypeAdapter())));
 
-        //userManager.loadAll();
+        userManager.loadAll();
 
-        onlinePlayers().forEach(player -> userManager.getUser(player.playerUUID()).handle((user, throwable) -> {
+        onlinePlayers().forEach(player -> userManager.getEntity(player.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
@@ -511,7 +513,7 @@ public class SkinOverlay {
     }
 
     /**
-     * Adds the specified list of {@link ObservableListener}s to this {@link UserManager} instance.
+     * Adds the specified list of {@link ObservableListener}s to this {@link EntityManager} instance.
      * Each listener in the
      * list will be registered with the {@link ObservableObjectMap}
      * that holds the loaded users in the user manager,
@@ -520,9 +522,9 @@ public class SkinOverlay {
      *
      * @param managerListeners the list of listeners to be added
      */
-    public void registerUserManagerListeners(@NotNull List<ObservableListener<UUID, UserManager.User>> managerListeners) {
-        for (ObservableListener<UUID, UserManager.User> managerListener : managerListeners) {
-            this.userManager.getLoadedUsers().addListener(managerListener);
+    public void registerUserManagerListeners(@NotNull List<ObservableListener<UUID, Entity>> managerListeners) {
+        for (ObservableListener<UUID, Entity> managerListener : managerListeners) {
+            this.userManager.getLoadedEntities().addListener(managerListener);
         }
     }
 
