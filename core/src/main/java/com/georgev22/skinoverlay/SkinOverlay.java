@@ -26,7 +26,7 @@ import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
-import com.georgev22.skinoverlay.storage.User;
+import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.*;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;

@@ -8,7 +8,7 @@ import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileBungee;
-import com.georgev22.skinoverlay.storage.User;
+import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.connection.InitialHandler;

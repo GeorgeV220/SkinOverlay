@@ -5,7 +5,7 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.storage.User;
+import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.protocol.Packet;

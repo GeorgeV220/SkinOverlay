@@ -8,7 +8,7 @@ import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfile_Velocity;
-import com.georgev22.skinoverlay.storage.User;
+import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.util.GameProfile;

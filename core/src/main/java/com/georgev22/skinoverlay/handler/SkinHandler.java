@@ -4,7 +4,7 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectUpdateSkinEvent;
-import com.georgev22.skinoverlay.storage.User;
+import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.Utilities.Request;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;

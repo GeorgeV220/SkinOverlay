@@ -1,4 +1,4 @@
-package com.georgev22.skinoverlay.storage;
+package com.georgev22.skinoverlay.utilities.player;
 
 import com.georgev22.library.utilities.EntityManager;
 import com.georgev22.skinoverlay.handler.Skin;

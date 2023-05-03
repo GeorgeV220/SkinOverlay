@@ -6,7 +6,7 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.storage.User;
+import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import io.papermc.lib.PaperLib;
