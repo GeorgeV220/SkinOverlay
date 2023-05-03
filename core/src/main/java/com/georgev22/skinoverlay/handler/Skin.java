@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay.handler;
 
+import com.georgev22.library.utilities.EntityManager.Entity;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.Nullable;
@@ -8,7 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Base64;
 
-public class Skin implements Serializable {
+public class Skin extends Entity {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -30,20 +31,20 @@ public class Skin implements Serializable {
         this.skinOptions = skinOptions;
     }
 
-    public SProperty skinProperty() {
-        return property;
+    public @Nullable SProperty skinProperty() {
+        return getCustomData("property") != null ? getCustomData("property") : property;
     }
 
     public SkinOptions skinOptions() {
-        return skinOptions;
+        return getCustomData("skinOptions") != null ? getCustomData("skinOptions") : skinOptions;
     }
 
     public void setSkinOptions(SkinOptions skinOptions) {
-        this.skinOptions = skinOptions;
+        addCustomData("skinOptions", this.skinOptions = skinOptions);
     }
 
     public void setProperty(SProperty property) {
-        this.property = property;
+        addCustomData("property", this.property = property);
     }
 
     public @Nullable String skinURL() {
