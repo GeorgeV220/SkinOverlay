@@ -122,7 +122,19 @@ public class SkinOverlayCommand extends BaseCommand {
             target = skinOverlay.getPlayer(issuer.getUniqueId());
         }
 
-        skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")), new Skin(null, new SkinOptions(overlay)), target.orElseThrow());
+        skinOverlay.getSkinHandler().setSkin(
+                () -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")),
+                new Skin(null, new SkinOptions(overlay)),
+                target.orElseThrow()
+        ).thenAccept(
+                entity -> MessagesUtil.DONE.msg(
+                        issuer,
+                        new HashObjectMap<String, String>()
+                                .append("%player%", target.orElseThrow().playerName())
+                                .append("%url%", entity.skin().skinURL()),
+                        true
+                )
+        );
 
     }
 
@@ -165,7 +177,20 @@ public class SkinOverlayCommand extends BaseCommand {
                 return;
             }
 
-            skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), new Skin(null, skinOptions), target.orElseThrow());
+            Optional<PlayerObject> finalTarget = target;
+            skinOverlay.getSkinHandler().setSkin(
+                    () -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())),
+                    new Skin(null, skinOptions),
+                    finalTarget.orElseThrow()
+            ).thenAccept(
+                    entity -> MessagesUtil.DONE.msg(
+                            issuer,
+                            new HashObjectMap<String, String>()
+                                    .append("%player%", finalTarget.orElseThrow().playerName())
+                                    .append("%url%", entity.skin().skinURL()),
+                            true
+                    )
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -203,7 +228,16 @@ public class SkinOverlayCommand extends BaseCommand {
             return;
         }
         if (args.length == 0) {
-            skinOverlay.getSkinHandler().setSkin(() -> null, new Skin(null, new SkinOptions("default")), skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow());
+            skinOverlay.getSkinHandler().setSkin(
+                            () -> null,
+                            new Skin(null, new SkinOptions("default")),
+                            skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow())
+                    .thenAccept(user -> MessagesUtil.RESET.msg(
+                                    issuer,
+                                    new HashObjectMap<String, String>().append("%player%", skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow().playerName()),
+                                    true
+                            )
+                    );
         } else {
             clear0(issuer, args[0]);
         }
@@ -216,6 +250,15 @@ public class SkinOverlayCommand extends BaseCommand {
             MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", target), true);
             return;
         }
-        skinOverlay.getSkinHandler().setSkin(() -> null, new Skin(null, new SkinOptions("default")), optionalPlayerObject.orElseThrow());
+        skinOverlay.getSkinHandler().setSkin(
+                        () -> null,
+                        new Skin(null, new SkinOptions("default")),
+                        optionalPlayerObject.orElseThrow())
+                .thenAccept(user -> MessagesUtil.RESET.msg(
+                                issuer,
+                                new HashObjectMap<String, String>().append("%player%", optionalPlayerObject.orElseThrow().playerName()),
+                                true
+                        )
+                );
     }
 }

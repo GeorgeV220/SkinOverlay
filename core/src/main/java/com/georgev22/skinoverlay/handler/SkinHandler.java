@@ -4,11 +4,11 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectUpdateSkinEvent;
-import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.Utilities.Request;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.georgev22.skinoverlay.utilities.player.User;
 import com.google.gson.*;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
@@ -88,9 +88,9 @@ public abstract class SkinHandler {
         });
     }
 
-    public void setSkin(ImageSupplier imageSupplier, Skin skin, @NotNull PlayerObject playerObject) {
+    public CompletableFuture<User> setSkin(ImageSupplier imageSupplier, Skin skin, @NotNull PlayerObject playerObject) {
         skinOverlay.getLogger().info("B");
-        skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
+        return skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
@@ -119,11 +119,6 @@ public abstract class SkinHandler {
                         gameProfile.addProperty("textures", new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         skin.setProperty(new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
                         user.addCustomData("skin", skin);
-                        /*if (commandIssuer == null) {
-                            MessagesUtil.RESET.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
-                        } else {
-                            MessagesUtil.RESET.msg(commandIssuer, new HashObjectMap<String, String>().append("%player%", playerObject.playerName()), true);
-                        }*/
                         break;
                     }
                     String base64 = object.getAsJsonObject().get("value").getAsString();
@@ -158,12 +153,6 @@ public abstract class SkinHandler {
                             String texturesSignature = texture.get("signature").getAsString();
                             skin.setProperty(new SProperty("textures", texturesValue, texturesSignature));
                             user.addCustomData("skin", skin);
-                            /*if (commandIssuer == null) {
-                                MessagesUtil.DONE.msgConsole(new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
-                            } else {
-                                MessagesUtil.DONE.msg(commandIssuer, new HashObjectMap<String, String>().append("%player%", playerObject.playerName()).append("%url%", texture.get("url").getAsString()), true);
-                            }*/
-
                         }
                         default ->
                                 skinOverlay.getLogger().log(Level.SEVERE, "Unknown error code: " + request.getHttpCode());
@@ -181,11 +170,12 @@ public abstract class SkinHandler {
                 skinOverlay.getUserManager().save(user);
             }
             return user;
-        }).thenAccept(user -> {
+        }).thenApply(user -> {
             if (user != null)
                 updateSkin(playerObject, true);
             else
                 skinOverlay.getLogger().log(Level.SEVERE, "User is null");
+            return user;
         });
     }
 
