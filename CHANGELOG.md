@@ -1,3 +1,35 @@
+# [5.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v4.1.0...v5.0.0) (2023-05-04)
+
+
+### Bug Fixes
+
+* **User:** Added serial version ([afe2613](https://github.com/GeorgeV220/SkinOverlay/commit/afe2613e729abed53df0e8f7468265d5b94d5e20))
+* **User:** Changed the class package ([0bb98d5](https://github.com/GeorgeV220/SkinOverlay/commit/0bb98d5283208adb33f5517553aa3ca654afae99))
+
+
+### Features
+
+* Add CompletableFutureManager and getLoadedUsers() ([7c47b19](https://github.com/GeorgeV220/SkinOverlay/commit/7c47b197d6d4d7e61e98890eed02d39a832f6097))
+* **Command:** Reintroduce command message ([40a9745](https://github.com/GeorgeV220/SkinOverlay/commit/40a974516bcfffe76558d8114b1ccd732751d432))
+* Enhance PlayerObject methods with the UserEvent#getUser() ([58c07b0](https://github.com/GeorgeV220/SkinOverlay/commit/58c07b06dce719d9c072e8cfb88c31369efc9e06))
+* **SGameProfile:** Add extra constructor with name, UUID, and skin parameters ([db13424](https://github.com/GeorgeV220/SkinOverlay/commit/db134244e2ebfd4bface1e1922526b8e81e9a476))
+* **Skin:** Added Skin class to manage the player skins ([d4ed272](https://github.com/GeorgeV220/SkinOverlay/commit/d4ed2726f5ec532fbb4d2b9658b2ff300e76596b))
+* **Skin:** extends Skin to Entity ([7eb5d14](https://github.com/GeorgeV220/SkinOverlay/commit/7eb5d14bf8c13ee15b63d007d2c66195ca6e37bf))
+* **SkinHandler:** Full usage of the Skin class ([042e1de](https://github.com/GeorgeV220/SkinOverlay/commit/042e1deef2ce184e80765fd7291c88e76f218210))
+* **SkinOptions:** Added static methods to de/serialize SkinOptions ([c4fef62](https://github.com/GeorgeV220/SkinOverlay/commit/c4fef624783ac4dcee762a773c62be3e71f9c209))
+* **SkinOverlay:** Added isPluginEnabled ([4bd5663](https://github.com/GeorgeV220/SkinOverlay/commit/4bd566373a038fc53477ca887419eea63b37b776))
+* **SkinOverlay:** Implement overlay storage caching to optimize performance and avoid repeated requests. ([6bebf7c](https://github.com/GeorgeV220/SkinOverlay/commit/6bebf7c26afe2b72bb48f7937ef5353f7843f13e))
+* **SkinOverlay:** Skins storage ([bf4f39e](https://github.com/GeorgeV220/SkinOverlay/commit/bf4f39e687f7605f02df7f6535574ce763f70db9))
+* Skins SQL table and Mongo collection ([266aa50](https://github.com/GeorgeV220/SkinOverlay/commit/266aa5093c1b779a1d234488f33c0f7d251b1770))
+* **User:** Added User class ([c59a047](https://github.com/GeorgeV220/SkinOverlay/commit/c59a0470cf50a45e6cfc6ee3dcef4bde0ebd38e1))
+* **Utilities:** Generate UUID from String seed ([fec41e1](https://github.com/GeorgeV220/SkinOverlay/commit/fec41e126d4b95380cd69985bbe18b71cf144847))
+* **Utilities:** Removed deprecated method ([33e24b8](https://github.com/GeorgeV220/SkinOverlay/commit/33e24b8ad1ded36ed26bd12c971a25a26ec20b14))
+
+
+### BREAKING CHANGES
+
+* **SkinHandler:** The way internal user saves work has been changed. You should remove the old user data for File, SQL, and Mongo. Additionally, if you are using SQL tables or Mongo collection, delete them. The plugin is going through a lot of changes, and the version 5.x will not be backwards compatible.
+
 # [4.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v4.0.0...v4.1.0) (2023-04-23)
 
 
