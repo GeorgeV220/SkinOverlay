@@ -63,7 +63,7 @@ public abstract class SGameProfile {
         this.name = name;
         this.uuid = uuid;
         this.properties = properties;
-        this.skin = new Skin(properties.get("textures"));
+        this.skin = null;
         this.skinOverlay.getEventManager().callEvent(new ProfileCreatedEvent(this, false));
     }
 

@@ -17,12 +17,14 @@ import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Updater;
+import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl.Type;
 import com.google.common.collect.Lists;
 import net.kyori.adventure.audience.Audience;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -269,19 +271,24 @@ public abstract class PlayerObject {
                     if (userModifyDataEvent.isCancelled()) {
                         return user;
                     }
+                    UUID skinUUID = Utilities.generateUUID("default" + playerUUID().toString());
                     try {
                         UserAddDataEvent event = (UserAddDataEvent) skinOverlay.getEventManager()
                                 .callEvent(new UserAddDataEvent(
                                         user,
                                         Pair.create(
                                                 "defaultSkin",
-                                                new Skin(gameProfile().getProperties().get("textures") != null
+                                                new Skin(skinUUID, gameProfile().getProperties().get("textures") != null
                                                         ? gameProfile().getProperties().get("textures")
                                                         : skinOverlay.getSkinHandler().getSkin(playerObject()))
                                         ),
                                         true));
                         if (!event.isCancelled()) {
-                            user.addCustomData(event.getData().key(), event.getData().value());
+                            if (user.getCustomData(event.getData().key()) == null && !Objects.equals(user.getCustomData(event.getData().key()), event.getData().value())) {
+                                user.addCustomData(event.getData().key(), event.getData().value());
+                                skinOverlay.getSkinManager().save(user.defaultSkin());
+                                skinOverlay.getLogger().info(user.defaultSkin().toString());
+                            }
                         }
                     } catch (IOException | ExecutionException | InterruptedException e) {
                         throw new RuntimeException(e);
@@ -293,7 +300,7 @@ public abstract class PlayerObject {
                                         user,
                                         Pair.create(
                                                 "skin",
-                                                new Skin(gameProfile().getProperties().get("textures") != null
+                                                new Skin(skinUUID, gameProfile().getProperties().get("textures") != null
                                                         ? gameProfile().getProperties().get("textures")
                                                         : skinOverlay.getSkinHandler().getSkin(playerObject()))
                                         ),

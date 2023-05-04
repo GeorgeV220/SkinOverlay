@@ -22,6 +22,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -89,8 +90,7 @@ public abstract class SkinHandler {
     }
 
     public CompletableFuture<User> setSkin(ImageSupplier imageSupplier, Skin skin, @NotNull PlayerObject playerObject) {
-        skinOverlay.getLogger().info("B");
-        return skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
+        return skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handleAsync((user, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
@@ -116,8 +116,19 @@ public abstract class SkinHandler {
                     if (overlay == null) {
                         SGameProfile gameProfile = getGameProfile(playerObject);
                         gameProfile.removeProperty("textures");
-                        gameProfile.addProperty("textures", new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
-                        skin.setProperty(new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString()));
+                        SProperty property = new SProperty("textures", object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString());
+                        gameProfile.addProperty("textures", property);
+                        if (skin.skinProperty() == null && !Objects.equals(skin.skinProperty(), property)) {
+                            skin.setProperty(property);
+                            skin.setBase(user.defaultSkin());
+                            skinOverlay.getSkinManager().save(skin);
+                        }
+                        user.addCustomData("skin", skin);
+                        break;
+                    }
+                    if (((skin.base() != null & user.defaultSkin() != null) & skin.skinProperty() != null) && Objects.equals(Objects.requireNonNull(skin.base()).skinURL(), user.defaultSkin().skinURL())) {
+                        skin.setBase(user.defaultSkin());
+                        skinOverlay.getSkinManager().save(skin);
                         user.addCustomData("skin", skin);
                         break;
                     }
@@ -151,7 +162,12 @@ public abstract class SkinHandler {
                             JsonObject texture = response.getAsJsonObject().getAsJsonObject("data").getAsJsonObject("texture");
                             String texturesValue = texture.get("value").getAsString();
                             String texturesSignature = texture.get("signature").getAsString();
-                            skin.setProperty(new SProperty("textures", texturesValue, texturesSignature));
+                            SProperty property = new SProperty("textures", texturesValue, texturesSignature);
+                            if (skin.skinProperty() == null && !Objects.equals(skin.skinProperty(), property)) {
+                                skin.setProperty(property);
+                                skin.setBase(user.defaultSkin());
+                                skinOverlay.getSkinManager().save(skin);
+                            }
                             user.addCustomData("skin", skin);
                         }
                         default ->
@@ -159,7 +175,12 @@ public abstract class SkinHandler {
                     }
                 }
             } catch (Exception exception) {
-                exception.printStackTrace();
+                throw new RuntimeException("Exception " + exception.getClass().getSimpleName() + ":", exception);
+            }
+            return user;
+        }).handleAsync((user, throwable) -> {
+            if (throwable != null) {
+                skinOverlay.getLogger().log(Level.SEVERE, "Error:", throwable);
             }
             return user;
         }).thenApplyAsync(user -> {
@@ -171,10 +192,11 @@ public abstract class SkinHandler {
             }
             return user;
         }).thenApply(user -> {
-            if (user != null)
+            if (user != null) {
                 updateSkin(playerObject, true);
-            else
+            } else {
                 skinOverlay.getLogger().log(Level.SEVERE, "User is null");
+            }
             return user;
         });
     }

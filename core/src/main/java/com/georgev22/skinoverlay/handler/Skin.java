@@ -6,8 +6,8 @@ import com.google.gson.JsonParser;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Base64;
+import java.util.UUID;
 
 public class Skin extends Entity {
 
@@ -17,16 +17,23 @@ public class Skin extends Entity {
     private SProperty property;
     private SkinOptions skinOptions = new SkinOptions("default");
 
-    public Skin(SProperty sProperty) {
+    public Skin(UUID uuid) {
+        super(uuid);
+    }
+
+    public Skin(UUID uuid, SProperty sProperty) {
+        super(uuid);
         this.property = sProperty;
     }
 
-    public Skin(SProperty sProperty, String skinName) {
+    public Skin(UUID uuid, SProperty sProperty, String skinName) {
+        super(uuid);
         this.property = sProperty;
         this.skinOptions = new SkinOptions(skinName);
     }
 
-    public Skin(SProperty sProperty, SkinOptions skinOptions) {
+    public Skin(UUID uuid, SProperty sProperty, SkinOptions skinOptions) {
+        super(uuid);
         this.property = sProperty;
         this.skinOptions = skinOptions;
     }
@@ -56,11 +63,20 @@ public class Skin extends Entity {
                 .getAsString();
     }
 
+    public @Nullable Skin base() {
+        return getCustomData("base");
+    }
+
+    public void setBase(Skin skin) {
+        addCustomData("base", skin);
+    }
+
     @Override
     public String toString() {
         return "Skin{" +
                 "property=" + property +
                 ", skinOptions=" + skinOptions +
+                ", skinURL=" + skinURL() +
                 '}';
     }
 }

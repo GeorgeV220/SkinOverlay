@@ -14,6 +14,7 @@ import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.utilities.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
+import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Level;
 
 @CommandAlias("skinoverlay|soverlay|skino")
@@ -121,20 +123,36 @@ public class SkinOverlayCommand extends BaseCommand {
         } else {
             target = skinOverlay.getPlayer(issuer.getUniqueId());
         }
-
-        skinOverlay.getSkinHandler().setSkin(
-                () -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")),
-                new Skin(null, new SkinOptions(overlay)),
-                target.orElseThrow()
-        ).thenAccept(
-                entity -> MessagesUtil.DONE.msg(
-                        issuer,
-                        new HashObjectMap<String, String>()
-                                .append("%player%", target.orElseThrow().playerName())
-                                .append("%url%", entity.skin().skinURL()),
-                        true
-                )
-        );
+        UUID skinUUID = Utilities.generateUUID(overlay + target.orElseThrow().playerUUID().toString());
+        skinOverlay.getSkinManager().getEntity(skinUUID)
+                .handleAsync((skin, throwable) -> {
+                    if (throwable != null) {
+                        skinOverlay.getLogger().log(Level.SEVERE, "Error SkinCommand 130:", throwable);
+                    }
+                    return skin;
+                })
+                .handleAsync((skin, throwable) -> {
+                    if (skin == null) {
+                        skin = new Skin(skinUUID, null, new SkinOptions(overlay));
+                    }
+                    if (!skin.skinOptions().equals(new SkinOptions(overlay))) {
+                        skin.setSkinOptions(new SkinOptions(overlay));
+                    }
+                    return skin;
+                })
+                .thenAccept(skin -> skinOverlay.getSkinHandler().setSkin(
+                        () -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")),
+                        skin,
+                        target.orElseThrow()
+                ).thenAccept(
+                        entity -> MessagesUtil.DONE.msg(
+                                issuer,
+                                new HashObjectMap<String, String>()
+                                        .append("%player%", target.orElseThrow().playerName())
+                                        .append("%url%", entity.skin().skinURL()),
+                                true
+                        )
+                ));
 
     }
 
@@ -178,19 +196,37 @@ public class SkinOverlayCommand extends BaseCommand {
             }
 
             Optional<PlayerObject> finalTarget = target;
-            skinOverlay.getSkinHandler().setSkin(
-                    () -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())),
-                    new Skin(null, skinOptions),
-                    finalTarget.orElseThrow()
-            ).thenAccept(
-                    entity -> MessagesUtil.DONE.msg(
-                            issuer,
-                            new HashObjectMap<String, String>()
-                                    .append("%player%", finalTarget.orElseThrow().playerName())
-                                    .append("%url%", entity.skin().skinURL()),
-                            true
-                    )
-            );
+            UUID skinUUID = Utilities.generateUUID(url + target.orElseThrow().playerUUID().toString());
+            skinOverlay.getSkinManager().getEntity(skinUUID)
+                    .handleAsync((skin, throwable) -> {
+                        if (throwable != null) {
+                            skinOverlay.getLogger().log(Level.SEVERE, "Error SkinCommand 197:", throwable);
+                        }
+                        return skin;
+                    })
+                    .handleAsync((skin, throwable) -> {
+                        if (skin == null) {
+                            skin = new Skin(skinUUID, null, skinOptions);
+                        }
+                        if (!skin.skinOptions().equals(skinOptions)) {
+                            skin.setSkinOptions(skinOptions);
+                        }
+                        return skin;
+                    })
+                    .thenAccept(skin -> skinOverlay.getSkinHandler().setSkin(
+                            () -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())),
+                            skin,
+                            finalTarget.orElseThrow()
+                    ).thenAccept(
+                            entity -> MessagesUtil.DONE.msg(
+                                    issuer,
+                                    new HashObjectMap<String, String>()
+                                            .append("%player%", finalTarget.orElseThrow().playerName())
+                                            .append("%url%", entity.skin().skinURL()),
+                                    true
+                            )
+                    ));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -228,16 +264,26 @@ public class SkinOverlayCommand extends BaseCommand {
             return;
         }
         if (args.length == 0) {
-            skinOverlay.getSkinHandler().setSkin(
-                            () -> null,
-                            new Skin(null, new SkinOptions("default")),
-                            skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow())
-                    .thenAccept(user -> MessagesUtil.RESET.msg(
-                                    issuer,
-                                    new HashObjectMap<String, String>().append("%player%", skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow().playerName()),
-                                    true
-                            )
-                    );
+            PlayerObject playerObject = skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow();
+            UUID skinUUID = Utilities.generateUUID("default" + playerObject.playerUUID().toString());
+            skinOverlay.getSkinManager().getEntity(skinUUID)
+                    .handle((skin, throwable) -> {
+                        if (throwable != null) {
+                            skinOverlay.getLogger().log(Level.SEVERE, "Error:", throwable);
+                        }
+                        return skin;
+                    })
+                    .handle((skin, throwable) -> skin == null ? new Skin(skinUUID, null, "default") : skin)
+                    .thenAccept(skin -> skinOverlay.getSkinHandler().setSkin(
+                                    () -> null,
+                                    skin,
+                                    playerObject)
+                            .thenAccept(user -> MessagesUtil.RESET.msg(
+                                            issuer,
+                                            new HashObjectMap<String, String>().append("%player%", playerObject.playerName()),
+                                            true
+                                    )
+                            ));
         } else {
             clear0(issuer, args[0]);
         }
@@ -250,15 +296,24 @@ public class SkinOverlayCommand extends BaseCommand {
             MessagesUtil.OFFLINE_PLAYER.msg(issuer, new HashObjectMap<String, String>().append("%player%", target), true);
             return;
         }
-        skinOverlay.getSkinHandler().setSkin(
-                        () -> null,
-                        new Skin(null, new SkinOptions("default")),
-                        optionalPlayerObject.orElseThrow())
-                .thenAccept(user -> MessagesUtil.RESET.msg(
-                                issuer,
-                                new HashObjectMap<String, String>().append("%player%", optionalPlayerObject.orElseThrow().playerName()),
-                                true
-                        )
-                );
+        UUID skinUUID = Utilities.generateUUID("default" + optionalPlayerObject.orElseThrow().playerUUID().toString());
+        skinOverlay.getSkinManager().getEntity(skinUUID)
+                .handle((skin, throwable) -> {
+                    if (throwable != null) {
+                        skinOverlay.getLogger().log(Level.SEVERE, "Error:", throwable);
+                    }
+                    return skin;
+                })
+                .handle((skin, throwable) -> skin == null ? new Skin(skinUUID, null, "default") : skin)
+                .thenAccept(skin -> skinOverlay.getSkinHandler().setSkin(
+                                () -> null,
+                                skin,
+                                optionalPlayerObject.orElseThrow())
+                        .thenAccept(user -> MessagesUtil.RESET.msg(
+                                        issuer,
+                                        new HashObjectMap<String, String>().append("%player%", optionalPlayerObject.orElseThrow().playerName()),
+                                        true
+                                )
+                        ));
     }
 }
