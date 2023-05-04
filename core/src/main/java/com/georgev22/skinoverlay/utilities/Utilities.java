@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay.utilities;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,12 +14,36 @@ import java.io.*;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.UUID;
 
 public class Utilities {
+
+    /**
+     * Generates a deterministic UUID from a given seed using the SHA-256 hash function.
+     *
+     * @param seed the input seed used to generate the UUID
+     * @return a UUID generated from the seed
+     * @throws NoSuchAlgorithmException if SHA-256 is not a supported message digest algorithm
+     */
+    @Contract("_ -> new")
+    public static @NotNull UUID generateUUID(@NotNull String seed) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(seed.getBytes(StandardCharsets.UTF_8));
+        byte[] hash = md.digest();
+        long msb = 0;
+        long lsb = 0;
+        for (int i = 0; i < 8; i++)
+            msb = (msb << 8) | (hash[i] & 0xff);
+        for (int i = 8; i < 16; i++)
+            lsb = (lsb << 8) | (hash[i] & 0xff);
+        return new UUID(msb, lsb);
+    }
 
     /**
      * Decodes the specified Base64-encoded string into an object.
