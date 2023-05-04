@@ -19,6 +19,7 @@ import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
 import com.georgev22.skinoverlay.config.FileManager;
 import com.georgev22.skinoverlay.event.EventManager;
 import com.georgev22.skinoverlay.event.HandlerList;
+import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.hook.hooks.SkinHookImpl;
@@ -90,6 +91,9 @@ public class SkinOverlay {
 
     @Getter
     private EntityManager<User> userManager;
+
+    @Getter
+    private EntityManager<Skin> skinManager;
 
     @Getter
     private EventManager eventManager;
@@ -415,7 +419,6 @@ public class SkinOverlay {
                             OptionsUtil.DATABASE_PASSWORD.getStringValue(),
                             OptionsUtil.DATABASE_DATABASE.getStringValue());
                     sql(map, skinMap);
-                    //TODO SKINS STORAGE
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MySQL");
                 }
             }
@@ -428,7 +431,6 @@ public class SkinOverlay {
                             OptionsUtil.DATABASE_PASSWORD.getStringValue(),
                             OptionsUtil.DATABASE_DATABASE.getStringValue());
                     sql(map, skinMap);
-                    //TODO SKINS STORAGE
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: PostgreSQL");
                 }
             }
@@ -436,7 +438,6 @@ public class SkinOverlay {
                 if (connection == null || connection.isClosed()) {
                     databaseWrapper = new DatabaseWrapper(DatabaseType.SQLITE, getDataFolder().getAbsolutePath(), OptionsUtil.DATABASE_SQLITE.getStringValue());
                     sql(map, skinMap);
-                    //TODO SKINS STORAGE
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: SQLite");
                 }
             }
@@ -450,8 +451,8 @@ public class SkinOverlay {
                         .connect();
                 mongoClient = databaseWrapper.getMongoClient();
                 mongoDatabase = databaseWrapper.getMongoDatabase();
-                this.userManager = new EntityManager<>(EntityManager.Type.SQL, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue(), User.class);
-                //TODO SKINS STORAGE
+                this.userManager = new EntityManager<>(EntityManager.Type.MONGODB, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue(), User.class);
+                this.skinManager = new EntityManager<>(EntityManager.Type.MONGODB, databaseWrapper.getMongoDB(), OptionsUtil.DATABASE_MONGO_SKINS_COLLECTION.getStringValue(), Skin.class);
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MongoDB");
             }
             default -> {
@@ -460,12 +461,13 @@ public class SkinOverlay {
                 mongoClient = null;
                 mongoDatabase = null;
                 this.userManager = new EntityManager<>(EntityManager.Type.FILE, new File(this.getDataFolder(), "userdata"), null, User.class);
-                //TODO SKINS STORAGE
+                this.skinManager = new EntityManager<>(EntityManager.Type.FILE, new File(this.getDataFolder(), "skindata"), null, Skin.class);
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: File");
             }
         }
 
         userManager.loadAll();
+        skinManager.loadAll();
 
         onlinePlayers().forEach(player -> userManager.getEntity(player.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
@@ -482,6 +484,7 @@ public class SkinOverlay {
         databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
         databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
         this.userManager = new EntityManager<>(EntityManager.Type.SQL, connection, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), User.class);
+        this.skinManager = new EntityManager<>(EntityManager.Type.SQL, connection, OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), Skin.class);
     }
 
 
