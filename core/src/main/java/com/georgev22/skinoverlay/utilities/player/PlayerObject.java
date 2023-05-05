@@ -287,7 +287,6 @@ public abstract class PlayerObject {
                             if (user.getCustomData(event.getData().key()) == null && !Objects.equals(user.getCustomData(event.getData().key()), event.getData().value())) {
                                 user.addCustomData(event.getData().key(), event.getData().value());
                                 skinOverlay.getSkinManager().save(user.defaultSkin());
-                                skinOverlay.getLogger().info(user.defaultSkin().toString());
                             }
                         }
                     } catch (IOException | ExecutionException | InterruptedException e) {
