@@ -1,7 +1,6 @@
 package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.exceptions.ReflectionException;
-import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.Skin;
@@ -12,7 +11,6 @@ import com.google.common.hash.Hashing;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -28,6 +26,7 @@ import java.util.logging.Level;
 
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftReflection.getNMSClass;
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftReflection.getOBCClass;
+import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.*;
 import static com.georgev22.library.utilities.Utils.Reflection.*;
 
 public class SkinHandler_Legacy extends SkinHandler_Unsupported {
@@ -83,9 +82,10 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
 
     @Override
     public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
-        return new CompletableFuture<>().thenApply(aBoolean -> {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 Player player = (Player) playerObject.player();
+
                 final Object entityPlayer = getHandleMethod.invoke(player);
                 Object removePlayer;
                 Object addPlayer;
@@ -231,22 +231,27 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                     throw new RuntimeException(e);
                 }
                 if (dataWatcher != null) {
-                    Object dataWatcherObject;
+                    Object dataWatcherObject = null;
                     try {
-                        dataWatcherObject = invokeConstructor(BukkitMinecraftUtils.MinecraftReflection.getNMSClass("DataWatcherObject"), BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(BukkitMinecraftUtils.MinecraftVersion.V1_16_R1) ? 13 : 16, fetchField(getNMSClass("DataWatcherRegistry"), null, "a"));
-                    } catch (ClassNotFoundException e) {
-                        throw new RuntimeException(e);
+                        dataWatcherObject = invokeConstructor(
+                                getNMSClass("DataWatcherObject"),
+                                getCurrentVersion().isBelow(V1_16_R1) ? 13 : 16,
+                                fetchField(getNMSClass("DataWatcherRegistry"), null, "a"));
+                    } catch (ClassNotFoundException ignore) {
                     }
 
                     //send new metadata
-
-                    fetchMethodAndInvoke(
-                            dataWatcher.getClass(),
-                            "set",
-                            dataWatcher,
-                            new Object[]{dataWatcherObject, skin.skinOptions().getFlags()},
-                            new Class[]{dataWatcherObject.getClass(), Object.class});
-
+                    if (dataWatcherObject != null) {
+                        fetchMethodAndInvoke(
+                                dataWatcher.getClass(),
+                                "set",
+                                dataWatcher,
+                                new Object[]{dataWatcherObject, skin.skinOptions().getFlags()},
+                                new Class[]{dataWatcherObject.getClass(), Object.class});
+                    } else {
+                        //1.8.8 data watcher (Spigot and Spigot forks like FlamePaper Titanium and PandaSpigot)
+                        fetchMethodAndInvoke(dataWatcher.getClass(), "watch", dataWatcher, new Object[]{10, skin.skinOptions().getFlags()}, new Class[]{int.class, Object.class});
+                    }
                     try {
                         sendPacket(playerConnection, invokeConstructor(getNMSClass("PacketPlayOutEntityMetadata"), player.getEntityId(), dataWatcher, false));
                     } catch (ClassNotFoundException e) {
@@ -276,7 +281,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                      NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, runnable -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), runnable));
     }
 
     @Override
@@ -298,7 +303,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
         return sGameProfiles.append(playerObject, wrapper(this.getGameProfile0(playerObject))).get(playerObject);
     }
 
-    private void sendPacket(Object playerConnection, Object packet) throws ReflectionException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    private void sendPacket(Object playerConnection, Object packet) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         fetchMethodAndInvoke(playerConnection.getClass(), "sendPacket", playerConnection, new Object[]{packet}, new Class<?>[]{this.packet});
     }
 
@@ -306,8 +311,8 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
     protected void updateSkin0(User user, PlayerObject playerObject, boolean forOthers) {
         SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
             Player player = (Player) playerObject.player();
-            player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-            player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+            player.hidePlayer(player);
+            player.showPlayer(player);
             skinOverlay.getSkinHandler().updateSkin(playerObject, user.skin()).handleAsync((aBoolean, throwable) -> {
                 if (throwable != null) {
                     throwable.printStackTrace();
@@ -319,8 +324,8 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                     if (forOthers) {
                         skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
                             Player p = (Player) playerObjects.player();
-                            p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                            p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                            p.hidePlayer(player);
+                            p.showPlayer(player);
                         });
                     }
             }));
