@@ -30,12 +30,13 @@ public @interface EventHandler {
     EventPriority priority() default EventPriority.NORMAL;
 
     /**
-     * Whether cancellation of the event should be ignored.
-     * If set to true, the event will be called even if it has been
-     * cancelled.
-     * By default, cancellation of the event is not ignored.
+     * Define if the handler ignores a cancelled event.
+     * <p>
+     * If ignoreCancelled is true and the event is cancelled, the method is
+     * not called.
+     * Otherwise, the method is always called.
      *
-     * @return true if cancellation of the event should be ignored, false otherwise.
+     * @return whether cancelled events should be ignored
      */
     boolean ignoreCancelled() default false;
 }

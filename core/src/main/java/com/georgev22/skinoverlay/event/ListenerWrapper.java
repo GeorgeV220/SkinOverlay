@@ -52,7 +52,7 @@ public record ListenerWrapper(
      */
     public void callEvent(@NotNull final Event event) {
         if (event instanceof Cancellable) {
-            if (((Cancellable) event).isCancelled() && !ignoreCancelled()) {
+            if (((Cancellable) event).isCancelled() && ignoreCancelled()) {
                 return;
             }
         }
