@@ -12,7 +12,7 @@ public class PlayerListeners implements EventListener {
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onConnection(@NotNull PlayerObjectConnectionEvent event) {
         switch (event.getConnectionType()) {
             case CONNECT -> event.getPlayerObject().playerJoin();
