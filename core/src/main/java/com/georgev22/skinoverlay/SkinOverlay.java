@@ -561,23 +561,21 @@ public class SkinOverlay {
      */
     public void loadCommandLocales() {
         try {
-            // Save the default English language file if it doesn't exist
-            saveResource("lang_en.yml", true);
             // Set the default locale to English
             commandManager.getLocales().setDefaultLocale(Locale.ENGLISH);
             // Load the language file based on the server platform
             switch (type()) {
                 case BUNGEE -> ((BungeeCommandManager) commandManager).getLocales()
-                        .loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
+                        .loadYamlLanguageFile(new File(getDataFolder(), "messages.yml"), Locale.ENGLISH);
                 case BUKKIT -> ((PaperCommandManager) commandManager).getLocales()
-                        .loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
+                        .loadYamlLanguageFile(new File(getDataFolder(), "messages.yml"), Locale.ENGLISH);
                 case VELOCITY -> ((VelocityCommandManager) commandManager).getLocales()
-                        .loadYamlLanguageFile(new File(getDataFolder(), "lang_en.yml"), Locale.ENGLISH);
+                        .loadYamlLanguageFile(new File(getDataFolder(), "messages.yml"), Locale.ENGLISH);
             }
             // Enable per-issuer locale support
             commandManager.usePerIssuerLocale(true);
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Failed to load language config 'lang_en.yaml': ", e);
+            getLogger().log(Level.SEVERE, "Failed to load language config 'messages.yaml': ", e);
         }
     }
 }

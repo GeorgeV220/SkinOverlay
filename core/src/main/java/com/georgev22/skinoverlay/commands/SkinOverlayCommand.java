@@ -40,7 +40,7 @@ public class SkinOverlayCommand extends BaseCommand {
     @HelpCommand
     @Subcommand("help")
     @CommandAlias("shelp")
-    @Description("{@@commands.descriptions.skinoverlay.help}")
+    @Description("{@@Commands.Descriptions.SkinOverlay.help}")
     @CommandPermission("skinoverlay.default")
     public void onHelp(final @NotNull CommandIssuer issuer) {
         for (String input : Arrays.asList(
@@ -56,6 +56,7 @@ public class SkinOverlayCommand extends BaseCommand {
 
     @Subcommand("reload")
     @CommandAlias("skinoverlayreload|soverlayreload|skinoreload|sreload")
+    @Description("{@@Commands.Descriptions.SkinOverlay.reload}")
     @CommandPermission("skinoverlay.reload")
     public void reload(final @NotNull CommandIssuer issuer) {
         skinOverlay.getUserManager().getLoadedEntities().forEach((uuid, loadedUser) -> skinOverlay.getUserManager().getEntity(uuid).handle((user, throwable) -> {
@@ -92,8 +93,8 @@ public class SkinOverlayCommand extends BaseCommand {
             }
         }));
         skinOverlay.getFileManager().getConfig().reloadFile();
-        skinOverlay.getFileManager().getData().reloadFile();
         skinOverlay.getFileManager().getMessages().reloadFile();
+        skinOverlay.loadCommandLocales();
         MessagesUtil.repairPaths(fm.getMessages());
         issuer.sendMessage(LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacy('&').deserialize("&a&l(!)&a Plugin reloaded!")));
 
@@ -102,7 +103,7 @@ public class SkinOverlayCommand extends BaseCommand {
     @Subcommand("overlay")
     @CommandAlias("wear|swear")
     @CommandCompletion("@overlays @players ")
-    @Description("{@@commands.descriptions.skinoverlay.overlay}")
+    @Description("{@@Commands.Descriptions.SkinOverlay.overlay}")
     @CommandPermission("skinoverlay.wear.overlay")
     @Syntax("wear <overlay> [player]")
     public void overlay(@NotNull CommandIssuer issuer, String @NotNull [] args) {
@@ -159,6 +160,7 @@ public class SkinOverlayCommand extends BaseCommand {
     @Subcommand("url")
     @CommandAlias("wurl|swurl|wearurl")
     @CommandCompletion("<link> false|true|@players false|true false|true false|true false|true false|true false|true @players")
+    @Description("{@@Commands.Descriptions.SkinOverlay.url}")
     @CommandPermission("skinoverlay.wear.url")
     @Syntax("url <url> <options> [player]")
     public void url(@NotNull CommandIssuer issuer, String @NotNull [] args) {
@@ -251,7 +253,7 @@ public class SkinOverlayCommand extends BaseCommand {
     @Subcommand("clear")
     @CommandAlias("sclear")
     @CommandCompletion("@players ")
-    @Description("{@@commands.descriptions.skinoverlay.clear}")
+    @Description("{@@Commands.Descriptions.SkinOverlay.clear}")
     @CommandPermission("skinoverlay.wear.clear")
     @Syntax("clear [player]")
     public void clear(@NotNull CommandIssuer issuer, String[] args) {
