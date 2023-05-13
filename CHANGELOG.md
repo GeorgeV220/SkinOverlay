@@ -1,3 +1,18 @@
+# [5.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v5.0.0...v5.1.0) (2023-05-13)
+
+
+### Bug Fixes
+
+* **Event:** Ignore the handler if the event is cancelled. ([3eff65b](https://github.com/GeorgeV220/SkinOverlay/commit/3eff65b7593c2f09538eab74c85a90faa0fd4ef8))
+* **PlayerListeners:** Change the event priority to HIGHEST ([79d60fe](https://github.com/GeorgeV220/SkinOverlay/commit/79d60fe8650f728077908e200bfa2216570cfc95))
+* **PlayerObject:** Removed debug message ([4502a32](https://github.com/GeorgeV220/SkinOverlay/commit/4502a3296fba4740f1f69449f29260161af54c70))
+* **SkinHandler_Legacy:** Fixed for Minecraft 1.8.8 ([03c26de](https://github.com/GeorgeV220/SkinOverlay/commit/03c26de3871eab3f27e218a2196487fd774e3cc0))
+
+
+### Features
+
+* **lang:** Removed lang_en.yml and moved the messages to messages.yml ([3c5107f](https://github.com/GeorgeV220/SkinOverlay/commit/3c5107ff3fdc021b5aa59d591cad7536bbce7187))
+
 # [5.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v4.1.0...v5.0.0) (2023-05-04)
 
 
