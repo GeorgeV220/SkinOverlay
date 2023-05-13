@@ -1,8 +1,0 @@
-commands:
-  descriptions:
-    skinoverlay:
-      default: 'The basic skinoverlay command'
-      help: 'Shows the help page'
-      overlay: 'Wear a specific overlay from the plugin files'
-      clear: 'Removes the skin overlay'
-      url: 'Wear a specific overlay from a URL'

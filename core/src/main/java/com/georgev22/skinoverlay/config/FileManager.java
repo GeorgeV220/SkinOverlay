@@ -7,7 +7,6 @@ public final class FileManager {
     private static FileManager instance;
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
     private CFG config;
-    private CFG data;
     private CFG messages;
 
     public static FileManager getInstance() {
@@ -20,7 +19,6 @@ public final class FileManager {
     public void loadFiles() throws Exception {
         this.messages = new CFG("messages", this.skinOverlay.getDataFolder(), false, false, skinOverlay.getLogger(), skinOverlay.getClass());
         this.config = new CFG("config", this.skinOverlay.getDataFolder(), true, true, skinOverlay.getLogger(), skinOverlay.getClass());
-        this.data = new CFG("data", this.skinOverlay.getDataFolder(), true, true, skinOverlay.getLogger(), skinOverlay.getClass());
     }
 
     public CFG getMessages() {
@@ -31,8 +29,5 @@ public final class FileManager {
         return this.config;
     }
 
-    public CFG getData() {
-        return this.data;
-    }
 }
 
