@@ -1,0 +1,15 @@
+Messages:
+  No Permission: '&c&l(!)&c You do not have the correct permissions to do this!'
+  Only Player Command: '&c&l(!)&c Only players can run this command!'
+  Offline Player: '&c&l(!)&c Player %player% is offline!'
+  Overlay Applied: '&a&l(!)&a Overlay %url% applied!'
+  Overlay Reset: '&a&l(!)&a Default skin applied(%player%)!!'
+  Insufficient arguments: '&c&l(!)&c Insufficient arguments (%command%)'
+Commands:
+  Descriptions:
+    SkinOverlay:
+      help: 'Shows the help page'
+      overlay: 'Wear a specific overlay from the plugin files'
+      clear: 'Removes the skin overlay'
+      url: 'Wear a specific overlay from a URL'
+      reload: 'Reload the plugin configuration files (some settings need server restart)'

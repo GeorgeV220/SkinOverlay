@@ -1,6 +1,5 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.georgev22.skinoverlay.SkinOverlay;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +10,7 @@ import java.io.Serializable;
 public class SkinOptions implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = Long.parseLong(SkinOverlay.getInstance().getSkinOverlay().description().version().replaceAll("\\D", ""));
+    private static final long serialVersionUID = 1L;
 
     /**
      * The name of the skin.

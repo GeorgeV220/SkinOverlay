@@ -11,10 +11,7 @@ import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateS
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
 import com.georgev22.skinoverlay.handler.Skin;
-import com.georgev22.skinoverlay.utilities.MessagesUtil;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
-import com.georgev22.skinoverlay.utilities.Utilities;
+import com.georgev22.skinoverlay.utilities.*;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -93,9 +90,13 @@ public class SkinOverlayCommand extends BaseCommand {
             }
         }));
         skinOverlay.getFileManager().getConfig().reloadFile();
-        skinOverlay.getFileManager().getMessages().reloadFile();
-        skinOverlay.loadCommandLocales();
-        MessagesUtil.repairPaths(fm.getMessages());
+        try {
+            MessagesUtil.repairPaths(Locale.fromString(OptionsUtil.LOCALE.getStringValue()));
+            MessagesUtil.getMessagesCFG().reloadFile();
+            skinOverlay.loadCommandLocales();
+        } catch (Exception e) {
+            skinOverlay.getLogger().log(Level.SEVERE, "Error loading the language file: ", e);
+        }
         issuer.sendMessage(LegacyComponentSerializer.legacySection().serialize(LegacyComponentSerializer.legacy('&').deserialize("&a&l(!)&a Plugin reloaded!")));
 
     }

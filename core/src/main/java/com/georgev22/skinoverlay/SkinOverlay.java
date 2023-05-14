@@ -27,6 +27,7 @@ import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
+import com.georgev22.skinoverlay.utilities.Locale;
 import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.*;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
@@ -128,13 +129,17 @@ public class SkinOverlay {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        MessagesUtil.repairPaths(fileManager.getMessages());
+        try {
+            MessagesUtil.repairPaths(Locale.fromString(OptionsUtil.LOCALE.getStringValue()));
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Error loading the language file: ", e);
+        }
         eventManager = new EventManager(getLogger(), this.getClass());
         userCompletableFutureManager = new CompletableFutureManager<>();
     }
 
     public void onEnable() {
-        switch (OptionsUtil.SKIN_HOOK.getStringValue().toLowerCase(Locale.US)) {
+        switch (OptionsUtil.SKIN_HOOK.getStringValue().toLowerCase(java.util.Locale.US)) {
             case "skinsrestorer" -> {
                 if (skinOverlay.isPluginEnabled(type().equals(SkinOverlayImpl.Type.VELOCITY) ? "skinsrestorer" : "SkinsRestorer")) {
                     setSkinHook(new SkinsRestorerHook());
@@ -562,20 +567,20 @@ public class SkinOverlay {
     public void loadCommandLocales() {
         try {
             // Set the default locale to English
-            commandManager.getLocales().setDefaultLocale(Locale.ENGLISH);
+            commandManager.getLocales().setDefaultLocale(java.util.Locale.ENGLISH);
             // Load the language file based on the server platform
             switch (type()) {
                 case BUNGEE -> ((BungeeCommandManager) commandManager).getLocales()
-                        .loadYamlLanguageFile(new File(getDataFolder(), "messages.yml"), Locale.ENGLISH);
+                        .loadYamlLanguageFile(MessagesUtil.getMessagesCFG().getFile(), java.util.Locale.ENGLISH);
                 case BUKKIT -> ((PaperCommandManager) commandManager).getLocales()
-                        .loadYamlLanguageFile(new File(getDataFolder(), "messages.yml"), Locale.ENGLISH);
+                        .loadYamlLanguageFile(MessagesUtil.getMessagesCFG().getFile(), java.util.Locale.ENGLISH);
                 case VELOCITY -> ((VelocityCommandManager) commandManager).getLocales()
-                        .loadYamlLanguageFile(new File(getDataFolder(), "messages.yml"), Locale.ENGLISH);
+                        .loadYamlLanguageFile(MessagesUtil.getMessagesCFG().getFile(), java.util.Locale.ENGLISH);
             }
             // Enable per-issuer locale support
             commandManager.usePerIssuerLocale(true);
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Failed to load language config 'messages.yaml': ", e);
+            getLogger().log(Level.SEVERE, "Failed to load language config messages_" + OptionsUtil.LOCALE.getStringValue() + "': ", e);
         }
     }
 }
