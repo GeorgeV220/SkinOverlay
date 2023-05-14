@@ -16,7 +16,7 @@ import com.georgev22.library.utilities.EntityManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
-import com.georgev22.skinoverlay.config.FileManager;
+import com.georgev22.skinoverlay.utilities.config.FileManager;
 import com.georgev22.skinoverlay.event.EventManager;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.handler.Skin;
@@ -28,6 +28,8 @@ import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.Locale;
+import com.georgev22.skinoverlay.utilities.config.MessagesUtil;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.*;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
@@ -139,7 +141,7 @@ public class SkinOverlay {
     }
 
     public void onEnable() {
-        switch (OptionsUtil.SKIN_HOOK.getStringValue().toLowerCase(java.util.Locale.US)) {
+        switch (OptionsUtil.SKIN_HOOK.getStringValue().toLowerCase(Locale.ENGLISH_US.getLocale())) {
             case "skinsrestorer" -> {
                 if (skinOverlay.isPluginEnabled(type().equals(SkinOverlayImpl.Type.VELOCITY) ? "skinsrestorer" : "SkinsRestorer")) {
                     setSkinHook(new SkinsRestorerHook());
@@ -567,15 +569,15 @@ public class SkinOverlay {
     public void loadCommandLocales() {
         try {
             // Set the default locale to English
-            commandManager.getLocales().setDefaultLocale(java.util.Locale.ENGLISH);
+            commandManager.getLocales().setDefaultLocale(MessagesUtil.getLocale().getLocale());
             // Load the language file based on the server platform
             switch (type()) {
                 case BUNGEE -> ((BungeeCommandManager) commandManager).getLocales()
-                        .loadYamlLanguageFile(MessagesUtil.getMessagesCFG().getFile(), java.util.Locale.ENGLISH);
+                        .loadYamlLanguageFile(MessagesUtil.getMessagesCFG().getFile(), MessagesUtil.getLocale().getLocale());
                 case BUKKIT -> ((PaperCommandManager) commandManager).getLocales()
-                        .loadYamlLanguageFile(MessagesUtil.getMessagesCFG().getFile(), java.util.Locale.ENGLISH);
+                        .loadYamlLanguageFile(MessagesUtil.getMessagesCFG().getFile(), MessagesUtil.getLocale().getLocale());
                 case VELOCITY -> ((VelocityCommandManager) commandManager).getLocales()
-                        .loadYamlLanguageFile(MessagesUtil.getMessagesCFG().getFile(), java.util.Locale.ENGLISH);
+                        .loadYamlLanguageFile(MessagesUtil.getMessagesCFG().getFile(), MessagesUtil.getLocale().getLocale());
             }
             // Enable per-issuer locale support
             commandManager.usePerIssuerLocale(true);

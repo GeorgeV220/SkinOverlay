@@ -13,7 +13,7 @@ import com.georgev22.skinoverlay.handler.handlers.SkinHandler_BungeeCord;
 import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bungee.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BungeeCordPluginMessageUtils;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBungee;

@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.listeners.bukkit;
 import com.destroystokyo.paper.event.player.PlayerClientOptionsChangeEvent;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerSkinPartOptionsChangedEvent;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;

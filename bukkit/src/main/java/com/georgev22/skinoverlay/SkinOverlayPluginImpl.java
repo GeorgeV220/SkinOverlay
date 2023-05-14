@@ -11,7 +11,7 @@ import com.georgev22.skinoverlay.listeners.bukkit.GlowStonePlayerListeners;
 import com.georgev22.skinoverlay.listeners.bukkit.PaperPlayerListeners;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BukkitPluginMessageUtils;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;

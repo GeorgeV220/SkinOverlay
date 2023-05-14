@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.utilities;
 
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

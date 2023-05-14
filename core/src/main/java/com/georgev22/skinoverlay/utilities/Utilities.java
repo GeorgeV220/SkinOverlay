@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay.utilities;
 
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

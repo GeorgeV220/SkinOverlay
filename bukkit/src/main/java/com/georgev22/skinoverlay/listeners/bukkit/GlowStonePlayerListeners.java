@@ -2,7 +2,7 @@ package com.georgev22.skinoverlay.listeners.bukkit;
 
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerSkinPartOptionsChangedEvent;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import net.glowstone.events.player.PlayerClientOptionsChangeEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

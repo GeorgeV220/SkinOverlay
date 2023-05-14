@@ -1,4 +1,4 @@
-package com.georgev22.skinoverlay.utilities;
+package com.georgev22.skinoverlay.utilities.config;
 
 import com.georgev22.library.utilities.Color;
 import com.georgev22.skinoverlay.SkinOverlay;

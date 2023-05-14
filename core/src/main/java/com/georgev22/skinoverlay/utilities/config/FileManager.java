@@ -1,4 +1,4 @@
-package com.georgev22.skinoverlay.config;
+package com.georgev22.skinoverlay.utilities.config;
 
 import com.georgev22.library.yaml.configmanager.CFG;
 import com.georgev22.skinoverlay.SkinOverlay;

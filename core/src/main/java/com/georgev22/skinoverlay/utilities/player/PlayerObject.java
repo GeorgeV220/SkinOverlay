@@ -14,7 +14,7 @@ import com.georgev22.skinoverlay.event.events.user.data.load.UserPreLoadEvent;
 import com.georgev22.skinoverlay.exceptions.UserException;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.Skin;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.Utilities;

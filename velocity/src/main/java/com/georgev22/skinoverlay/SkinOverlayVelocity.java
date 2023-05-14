@@ -12,7 +12,7 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.handlers.SkinHandler_Velocity;
 import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
-import com.georgev22.skinoverlay.utilities.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.VelocityPluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;

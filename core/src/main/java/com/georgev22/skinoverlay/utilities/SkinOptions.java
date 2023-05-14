@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay.utilities;
 
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
