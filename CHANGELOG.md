@@ -1,3 +1,10 @@
+# [5.2.0](https://github.com/GeorgeV220/SkinOverlay/compare/v5.1.0...v5.2.0) (2023-05-14)
+
+
+### Features
+
+* **Locale:** Added proper locale support. ([656c65f](https://github.com/GeorgeV220/SkinOverlay/commit/656c65f1d460284add78d6f9746ab55e8ccc9d05))
+
 # [5.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v5.0.0...v5.1.0) (2023-05-13)
 
 
