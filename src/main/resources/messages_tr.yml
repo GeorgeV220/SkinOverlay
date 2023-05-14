@@ -1,0 +1,15 @@
+Messages:
+  No Permission: '&c&l(!)&c Bunu yapmak için gerekli yetkilere sahip değilsin!'
+  Only Player Command: '&c&l(!)&c Bu komutu sadece oyuncular kullanabilir!'
+  Offline Player: '&c&l(!)&c %player% adlı oyuncu çevrimdışı!'
+  Overlay Applied: '&a&l(!)&a %url% kaplaması uygulandı!'
+  Overlay Reset: '&a&l(!)&a Varsayılan cilt uygulandı (%player%)!'
+  Insufficient arguments: '&c&l(!)&c Yetersiz argüman(lar)! (%command%)'
+Commands:
+  Descriptions:
+    SkinOverlay:
+      help: 'Yardım sayfasını gösterir'
+      overlay: 'Eklentinin dosyalarından belli bir kaplama kuşan'
+      clear: 'Cilt kaplamasını kaldırır'
+      url: 'Bir URL''den belli bir kaplama kuşan'
+      reload: 'Eklentinin yapılandırma dosyalarını yenile (bazı ayarların yenilenmesi için sunucunun yeniden başlatılması gerekir)'
