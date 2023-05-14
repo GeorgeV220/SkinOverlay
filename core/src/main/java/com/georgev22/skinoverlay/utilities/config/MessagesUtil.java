@@ -1,22 +1,21 @@
-package com.georgev22.skinoverlay.utilities;
+package com.georgev22.skinoverlay.utilities.config;
 
 import co.aikar.commands.CommandIssuer;
 import com.georgev22.library.maps.HashObjectMap;
-import com.georgev22.library.minecraft.BukkitMinecraftUtils;
-import com.georgev22.library.minecraft.BungeeMinecraftUtils;
-import com.georgev22.library.minecraft.VelocityMinecraftUtils;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.configmanager.CFG;
+import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.utilities.Locale;
+import lombok.Getter;
+import lombok.Setter;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import static com.georgev22.library.utilities.Utils.placeHolder;
-import static com.georgev22.skinoverlay.SkinOverlay.getInstance;
 
 public enum MessagesUtil {
     NO_PERMISSION("Messages.No Permission", "&c&l(!)&c You do not have the correct permissions to do this!"),
@@ -33,8 +32,13 @@ public enum MessagesUtil {
     ;
     private String[] messages;
     private final String path;
+    private static final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
+    @Getter
+    @Setter
     private static CFG messagesCFG;
+    @Getter
+    @Setter
     private static Locale locale;
 
     MessagesUtil(String path, String... messages) {
@@ -48,16 +52,16 @@ public enum MessagesUtil {
 
     public static void repairPaths(Locale locale) throws Exception {
         if (messagesCFG == null | !Objects.equals(MessagesUtil.locale, locale)) {
-            MessagesUtil.locale = locale;
-            messagesCFG = new CFG("messages_" + locale.getStringLocale(), getInstance().getDataFolder(), true, true, getInstance().getLogger(), getInstance().getClass());
+            setLocale(locale);
+            setMessagesCFG(new CFG("messages_" + locale.getStringLocale(), skinOverlay.getDataFolder(), true, true, skinOverlay.getLogger(), skinOverlay.getClass()));
         }
         boolean changed = false;
         for (MessagesUtil enumMessage : MessagesUtil.values()) {
             if (messagesCFG.getFileConfiguration().contains(enumMessage.getPath())) {
-                MessagesUtil.setPathToMessage(messagesCFG, enumMessage);
+                setPathToMessage(messagesCFG, enumMessage);
                 continue;
             }
-            MessagesUtil.setMessageToPath(messagesCFG, enumMessage);
+            setMessageToPath(messagesCFG, enumMessage);
             if (changed) continue;
             changed = true;
         }
@@ -118,42 +122,26 @@ public enum MessagesUtil {
 
     public void msgConsole(Map<String, String> map, boolean ignoreCase) {
         if (this.isMultiLined()) {
-            switch (getInstance().type()) {
-                case BUKKIT ->
-                        BukkitMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
-                case BUNGEE ->
-                        BungeeMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
-                case VELOCITY ->
-                        VelocityMinecraftUtils.printMsg(Utils.placeHolder(Arrays.stream(this.getMessages()).toList(), map, ignoreCase));
-            }
+            skinOverlay.print(Utils.placeHolder(this.getMessages(), map, ignoreCase));
         } else {
-            switch (getInstance().type()) {
-                case BUKKIT -> BukkitMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
-                case BUNGEE -> BungeeMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
-                case VELOCITY ->
-                        VelocityMinecraftUtils.printMsg(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
-            }
+            skinOverlay.print(Utils.placeHolder(this.getMessages()[0], map, ignoreCase));
         }
     }
 
     public void msgAll() {
         if (this.isMultiLined()) {
-            getInstance().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()));
+            skinOverlay.onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()));
         } else {
-            getInstance().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()[0]));
+            skinOverlay.onlinePlayers().forEach(playerObject -> playerObject.sendMessage(this.getMessages()[0]));
         }
     }
 
     public void msgAll(Map<String, String> map, boolean ignoreCase) {
         if (this.isMultiLined()) {
-            getInstance().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages(), map, ignoreCase)));
+            skinOverlay.onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages(), map, ignoreCase)));
         } else {
-            getInstance().onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages()[0], map, ignoreCase)));
+            skinOverlay.onlinePlayers().forEach(playerObject -> playerObject.sendMessage(placeHolder(this.getMessages()[0], map, ignoreCase)));
         }
-    }
-
-    public static CFG getMessagesCFG() {
-        return MessagesUtil.messagesCFG;
     }
 
 }
