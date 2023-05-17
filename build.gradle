@@ -38,7 +38,7 @@ spigot {
                  "org.xerial:sqlite-jdbc:3.41.2.1",
                  "com.google.guava:guava:31.1-jre",
                  "org.postgresql:postgresql:42.6.0",
-                 "commons-io:commons-io:2.11.0",
+                 "commons-io:commons-io:2.12.0",
                  "commons-lang:commons-lang:2.6",
                  "commons-codec:commons-codec:1.15"]
     softDepends = ['PlaceholderAPI', 'SkinsRestorer']
@@ -90,7 +90,7 @@ allprojects {
         compileOnly 'com.georgev22.api:libraryloader:1.4.0'
         compileOnly 'org.jetbrains:annotations:24.0.1'
         compileOnly 'commons-codec:commons-codec:1.15'
-        compileOnly 'commons-io:commons-io:2.11.0'
+        compileOnly 'commons-io:commons-io:2.12.0'
         compileOnly 'commons-lang:commons-lang:2.6'
         compileOnly 'org.mongodb:mongodb-driver:3.12.13'
         compileOnly 'com.mojang:authlib:3.11.50'
