@@ -1,3 +1,11 @@
+# [5.3.0](https://github.com/GeorgeV220/SkinOverlay/compare/v5.2.0...v5.3.0) (2023-05-18)
+
+
+### Features
+
+* **API:** Make some classes final or annotate them with APIStatus ([41f106c](https://github.com/GeorgeV220/SkinOverlay/commit/41f106ca99bee675d4e5957601c07ee3f8538cca))
+* **Locales:** Added Turkish translation [skip ci] ([4bd46ac](https://github.com/GeorgeV220/SkinOverlay/commit/4bd46ac667dc1573bb1fe0235df1e7da8853cbf3)), closes [#57](https://github.com/GeorgeV220/SkinOverlay/issues/57)
+
 # [5.2.0](https://github.com/GeorgeV220/SkinOverlay/compare/v5.1.0...v5.2.0) (2023-05-14)
 
 
