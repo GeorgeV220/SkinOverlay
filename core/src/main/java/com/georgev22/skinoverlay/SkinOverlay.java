@@ -161,7 +161,6 @@ public final class SkinOverlay {
                     Utils.saveResource("skins/" + resource + ".png", false, this.getDataFolder(), this.getClass());
                 } catch (Exception e) {
                     this.getLogger().log(Level.WARNING, "Cannot save default skins: ", e.getCause());
-                    e.printStackTrace();
                 }
             }
         }
@@ -169,7 +168,7 @@ public final class SkinOverlay {
         try {
             setupDatabase();
         } catch (Exception e) {
-            e.printStackTrace();
+            this.getLogger().log(Level.SEVERE, "Cannot initialize the database: ", e.getCause());
         }
 
         new Updater();
@@ -202,7 +201,7 @@ public final class SkinOverlay {
             try {
                 connection.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                this.getLogger().log(Level.SEVERE, "Cannot close the SQL connection: ", e.getCause());
             }
         }
         if (mongoClient != null) {
