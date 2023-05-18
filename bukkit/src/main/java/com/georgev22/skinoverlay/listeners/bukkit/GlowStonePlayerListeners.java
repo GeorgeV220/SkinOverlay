@@ -7,7 +7,10 @@ import net.glowstone.events.player.PlayerClientOptionsChangeEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class GlowStonePlayerListeners implements Listener {
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();

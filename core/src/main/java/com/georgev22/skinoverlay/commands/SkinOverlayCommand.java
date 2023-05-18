@@ -30,10 +30,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 @CommandAlias("skinoverlay|soverlay|skino")
-public class SkinOverlayCommand extends BaseCommand {
-    protected final ObjectMap<String, String> placeholders = new HashObjectMap<>();
-    protected final FileManager fm = SkinOverlay.getInstance().getFileManager();
-    protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();
+public final class SkinOverlayCommand extends BaseCommand {
+    private final ObjectMap<String, String> placeholders = new HashObjectMap<>();
+    private final FileManager fm = SkinOverlay.getInstance().getFileManager();
+    private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     @Default
     @HelpCommand

@@ -24,12 +24,15 @@ import net.glowstone.net.message.play.game.RespawnMessage;
 import net.glowstone.net.message.play.game.UserListItemMessage;
 import net.glowstone.net.message.play.inv.HeldItemMessage;
 import org.bukkit.GameMode;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinHandler_GlowStone extends SkinHandler {
 
     /**

@@ -3,12 +3,14 @@ package com.georgev22.skinoverlay.handler;
 import com.georgev22.library.utilities.EntityManager.Entity;
 import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.google.gson.JsonParser;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serial;
 import java.util.Base64;
 import java.util.UUID;
 
+@ApiStatus.NonExtendable
 public class Skin extends Entity {
 
     @Serial

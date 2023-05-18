@@ -6,9 +6,12 @@ import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.glowstone.entity.meta.profile.GlowPlayerProfile;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.UUID;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SGameProfileGlowStone extends SGameProfile {
 
     public SGameProfileGlowStone(String name, UUID uuid) {

@@ -7,12 +7,15 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinHookImpl implements SkinHook {
 
 

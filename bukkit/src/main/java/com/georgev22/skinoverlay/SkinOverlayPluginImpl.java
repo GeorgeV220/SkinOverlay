@@ -21,6 +21,7 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -38,6 +39,8 @@ import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVers
 @MavenLibrary(groupId = "commons-codec", artifactId = "commons-codec", version = "1.15")
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
 @MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinOverlayPluginImpl implements SkinOverlayImpl {
 
     private int tick = 0;
@@ -46,6 +49,7 @@ public class SkinOverlayPluginImpl implements SkinOverlayImpl {
 
     private final JavaPlugin plugin;
     private final boolean glowStone;
+    private final SkinOverlay skinOverlay;
     private static SkinOverlayPluginImpl instance;
 
     public static SkinOverlayPluginImpl getInstance() {
@@ -53,13 +57,14 @@ public class SkinOverlayPluginImpl implements SkinOverlayImpl {
     }
 
     public SkinOverlayPluginImpl(JavaPlugin javaPlugin, boolean glowStone) {
+        this.skinOverlay = new SkinOverlay(this);
         instance = this;
         this.plugin = javaPlugin;
         this.glowStone = glowStone;
     }
 
     public void onLoad() {
-        SkinOverlay.getInstance().onLoad(this);
+        skinOverlay.onLoad();
     }
 
     public void onEnable() {
@@ -70,31 +75,30 @@ public class SkinOverlayPluginImpl implements SkinOverlayImpl {
             SchedulerManager.getScheduler().mainThreadHeartbeat(tick);
         }, 0, 1L);
         switch (getCurrentVersion()) {
-            case V1_17_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_17());
-            case V1_18_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_18());
-            case V1_18_R2 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_18_R2());
-            case V1_19_R1 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19());
-            case V1_19_R2 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19_R2());
-            case V1_19_R3 -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_1_19_R3());
+            case V1_17_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_17());
+            case V1_18_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_18());
+            case V1_18_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_18_R2());
+            case V1_19_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_19());
+            case V1_19_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_19_R2());
+            case V1_19_R3 -> skinOverlay.setSkinHandler(new SkinHandler_1_19_R3());
             case UNKNOWN -> {
                 if (glowStone) {
-                    SkinOverlay.getInstance().setSkinHandler(new SkinHandler_GlowStone());
+                    skinOverlay.setSkinHandler(new SkinHandler_GlowStone());
                 } else {
-                    SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Unsupported());
+                    skinOverlay.setSkinHandler(new SkinHandler_Unsupported());
                 }
             }
-            default -> SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Legacy());
+            default -> skinOverlay.setSkinHandler(new SkinHandler_Legacy());
         }
-        SkinOverlay.getInstance().setCommandManager(new PaperCommandManager(plugin));
-        SkinOverlay.getInstance().onEnable();
-        SkinOverlay.getInstance().setupCommands();
+        skinOverlay.setCommandManager(new PaperCommandManager(plugin));
+        skinOverlay.onEnable();
         BukkitMinecraftUtils.registerListeners(plugin, new PlayerListeners(), new DeveloperInformListener());
         if (glowStone)
             BukkitMinecraftUtils.registerListeners(plugin, new GlowStonePlayerListeners());
         if (PaperLib.isPaper() & getCurrentVersion().isAboveOrEqual(V1_15_R1))
             BukkitMinecraftUtils.registerListeners(plugin, new PaperPlayerListeners());
         if (OptionsUtil.PROXY.getBooleanValue()) {
-            SkinOverlay.getInstance().setPluginMessageUtils(new BukkitPluginMessageUtils());
+            skinOverlay.setPluginMessageUtils(new BukkitPluginMessageUtils());
             Bukkit.getServer().getMessenger().registerIncomingPluginChannel(plugin, "skinoverlay:bungee", new PlayerListeners());
             Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(plugin, "skinoverlay:message");
         }
@@ -107,7 +111,7 @@ public class SkinOverlayPluginImpl implements SkinOverlayImpl {
     public void onDisable() {
         Bukkit.getServer().getMessenger().unregisterIncomingPluginChannel(plugin);
         Bukkit.getServer().getMessenger().unregisterOutgoingPluginChannel(plugin);
-        SkinOverlay.getInstance().onDisable();
+        skinOverlay.onDisable();
         Bukkit.getScheduler().cancelTasks(plugin);
         if (this.adventure != null) {
             this.adventure.close();

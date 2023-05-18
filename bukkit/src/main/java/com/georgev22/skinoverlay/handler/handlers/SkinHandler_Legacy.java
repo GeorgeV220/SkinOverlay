@@ -11,6 +11,7 @@ import com.google.common.hash.Hashing;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -29,6 +30,8 @@ import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftRefl
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.*;
 import static com.georgev22.library.utilities.Utils.Reflection.*;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinHandler_Legacy extends SkinHandler_Unsupported {
     private final Class<?> playOutRespawn;
     private final Class<?> playOutPlayerInfo;

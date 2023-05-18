@@ -13,10 +13,13 @@ import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
 import java.util.UUID;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class PlayerListeners implements Listener {
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();

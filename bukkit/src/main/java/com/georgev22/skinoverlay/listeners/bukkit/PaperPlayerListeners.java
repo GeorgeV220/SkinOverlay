@@ -7,7 +7,10 @@ import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class PaperPlayerListeners implements Listener {
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();

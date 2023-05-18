@@ -34,7 +34,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.georgev22.skinoverlay.handler.handlers.SkinHandler_Unsupported.wrapper;
 
-public class SkinHandler_1_19 extends SkinHandler {
+public final class SkinHandler_1_19 extends SkinHandler {
 
     @Override
     public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {

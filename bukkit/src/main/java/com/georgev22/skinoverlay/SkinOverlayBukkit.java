@@ -4,10 +4,13 @@ import com.georgev22.api.libraryloader.LibraryLoader;
 import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.V1_16_R3;
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinOverlayBukkit extends JavaPlugin {
 
     private SkinOverlayPluginImpl skinOverlayPluginImpl;

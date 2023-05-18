@@ -13,10 +13,13 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.ServerConnection;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
 import java.util.UUID;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class PlayerListeners {
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();

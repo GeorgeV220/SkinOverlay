@@ -30,6 +30,7 @@ import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import net.kyori.adventure.platform.AudienceProvider;
 import org.bstats.velocity.Metrics;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,6 +52,8 @@ import java.util.logging.Logger;
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
 @MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
 @Plugin(id = "skinoverlay", name = "${pluginName}", version = "${version}", description = "SkinOverlay", authors = {"${author}"}, dependencies = {@Dependency(id = "skinsrestorer", optional = true)})
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     private final ProxyServer server;
@@ -64,6 +67,8 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     private final Metrics.Factory metricsFactory;
 
+    private final SkinOverlay skinOverlay;
+
     private ScheduledTask scheduledTask;
 
     private int tick = 0;
@@ -72,6 +77,8 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     private static SkinOverlayVelocity instance;
 
+    @ApiStatus.Internal
+    @ApiStatus.NonExtendable
     public static SkinOverlayVelocity getInstance() {
         return instance;
     }
@@ -80,6 +87,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     @Inject
     public SkinOverlayVelocity(@NotNull ProxyServer server, @NotNull Logger logger, @DataDirectory @NotNull Path dataDirectory, Metrics.Factory metricsFactory) {
         VelocityMinecraftUtils.setServer(server);
+        this.skinOverlay = new SkinOverlay(this);
         instance = this;
         this.server = server;
         this.logger = logger;
@@ -106,18 +114,17 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
-        SkinOverlay.getInstance().onLoad(this);
+        skinOverlay.onLoad();
         onEnable();
     }
 
     public void onEnable() {
         this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.create("skinoverlay", "test"));
         this.scheduledTask = getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
-        SkinOverlay.getInstance().setSkinHandler(new SkinHandler_Velocity());
-        SkinOverlay.getInstance().setCommandManager(new VelocityCommandManager(getProxy(), this, dataFolder()));
-        SkinOverlay.getInstance().onEnable();
-        SkinOverlay.getInstance().setupCommands();
-        SkinOverlay.getInstance().setPluginMessageUtils(new VelocityPluginMessageUtils());
+        skinOverlay.setSkinHandler(new SkinHandler_Velocity());
+        skinOverlay.setCommandManager(new VelocityCommandManager(getProxy(), this, dataFolder()));
+        skinOverlay.onEnable();
+        skinOverlay.setPluginMessageUtils(new VelocityPluginMessageUtils());
         this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.from("skinoverlay:message"));
         VelocityMinecraftUtils.registerListeners(this, new DeveloperInformListener(), new PlayerListeners());
         if (OptionsUtil.METRICS.getBooleanValue())
@@ -126,7 +133,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
     }
 
     public void onDisable() {
-        SkinOverlay.getInstance().onDisable();
+        skinOverlay.onDisable();
         scheduledTask.cancel();
         enabled = false;
     }

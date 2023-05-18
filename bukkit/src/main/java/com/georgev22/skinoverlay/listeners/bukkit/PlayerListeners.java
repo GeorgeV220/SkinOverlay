@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -28,6 +29,8 @@ import java.util.UUID;
 
 import static com.georgev22.skinoverlay.utilities.Utilities.decrypt;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class PlayerListeners implements Listener, PluginMessageListener {
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 

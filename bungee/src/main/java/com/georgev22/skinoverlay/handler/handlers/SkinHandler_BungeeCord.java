@@ -13,10 +13,13 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.protocol.Property;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinHandler_BungeeCord extends SkinHandler {
 
     @Override

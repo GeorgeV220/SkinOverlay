@@ -6,11 +6,14 @@ import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SGameProfile_Velocity extends SGameProfile {
 
     public SGameProfile_Velocity(String name, UUID uuid) {

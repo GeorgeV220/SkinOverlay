@@ -7,6 +7,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.profile.ProfileCreatedEvent;
 import com.georgev22.skinoverlay.event.events.profile.property.SPropertyAddEvent;
 import com.georgev22.skinoverlay.event.events.profile.property.SPropertyRemoveEvent;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -16,6 +17,7 @@ import java.util.UUID;
 /**
  * The SGameProfile class represents a simplified version of a GameProfile, containing a player's name, UUID, and properties.
  */
+@ApiStatus.OverrideOnly
 public abstract class SGameProfile {
 
     protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();

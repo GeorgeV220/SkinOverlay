@@ -6,6 +6,7 @@ import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.property.IProperty;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +17,8 @@ import java.util.concurrent.ExecutionException;
  * SkinsRestorerHook class implements the SkinHook interface for handling skin property
  * data for players using the SkinsRestorer plugin.
  */
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinsRestorerHook implements SkinHook {
     /**
      * SkinsRestorerAPI object for accessing the SkinsRestorer API.

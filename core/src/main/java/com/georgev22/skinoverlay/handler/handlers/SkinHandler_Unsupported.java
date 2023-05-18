@@ -11,12 +11,15 @@ import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinHandler_Unsupported extends SkinHandler {
 
     @Override

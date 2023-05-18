@@ -6,9 +6,12 @@ import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.UUID;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SGameProfileMojang extends SGameProfile {
 
     public SGameProfileMojang(String name, UUID uuid) {

@@ -4,11 +4,14 @@ import com.georgev22.api.libraryloader.annotations.MavenLibrary;
 import net.glowstone.util.library.Library;
 import net.glowstone.util.library.LibraryManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinOverlayGlowStone extends JavaPlugin {
 
     private SkinOverlayPluginImpl skinOverlayPluginImpl;

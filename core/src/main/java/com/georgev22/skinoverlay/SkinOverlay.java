@@ -1,9 +1,6 @@
 package com.georgev22.skinoverlay;
 
-import co.aikar.commands.BungeeCommandManager;
-import co.aikar.commands.CommandManager;
-import co.aikar.commands.PaperCommandManager;
-import co.aikar.commands.VelocityCommandManager;
+import co.aikar.commands.*;
 import com.georgev22.library.database.DatabaseType;
 import com.georgev22.library.database.DatabaseWrapper;
 import com.georgev22.library.maps.HashObjectMap;
@@ -38,6 +35,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -50,12 +48,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class SkinOverlay {
+public final class SkinOverlay {
 
+    @Getter
+    @Setter
     private static SkinOverlay instance = null;
 
     @Getter
-    private SkinOverlayImpl skinOverlay;
+    private final SkinOverlayImpl skinOverlay;
 
     @Getter
     @Setter
@@ -70,6 +70,7 @@ public class SkinOverlay {
 
     @Getter
     @Setter
+    @ApiStatus.Internal
     private PluginMessageUtils pluginMessageUtils;
 
     @Getter
@@ -88,8 +89,8 @@ public class SkinOverlay {
     @Getter
     private File skinsDataFolder;
 
-    @Getter
     @Setter
+    @ApiStatus.Internal
     private CommandManager<?, ?, ?, ?, ?, ?> commandManager;
 
     @Getter
@@ -119,12 +120,11 @@ public class SkinOverlay {
             loadedUsers.append(user.getId(), user);
     });
 
-    public static SkinOverlay getInstance() {
-        return instance == null ? (instance = new SkinOverlay()) : instance;
+    public SkinOverlay(SkinOverlayImpl skinOverlay) {
+        this.skinOverlay = skinOverlay;
     }
 
-    public void onLoad(SkinOverlayImpl skinOverlay) {
-        this.skinOverlay = skinOverlay;
+    public void onLoad() {
         fileManager = FileManager.getInstance();
         try {
             fileManager.loadFiles();
@@ -180,6 +180,7 @@ public class SkinOverlay {
             getLogger().warning("Be prepared for a lot of log messages");
             eventManager.register(new DebugListeners());
         }
+        this.setupCommands();
     }
 
     public void onDisable() {
@@ -409,7 +410,7 @@ public class SkinOverlay {
      * @throws SQLException           If there's an issue with the connection or configuration.
      * @throws ClassNotFoundException If the specified database driver can't be found.
      */
-    public void setupDatabase() throws Exception {
+    private void setupDatabase() throws Exception {
         ObjectMap<String, Pair<String, String>> map = new HashObjectMap<String, Pair<String, String>>()
                 .append("user_id", Pair.create("VARCHAR(38)", "NULL"))
                 .append("user_json", Pair.create("LONGTEXT", "NULL"));
@@ -499,7 +500,7 @@ public class SkinOverlay {
      * Registers and sets up the commands for this SkinOverlay.
      * If the SkinOverlay is not a proxy and the 'PROXY' option is enabled, no commands will be registered.
      */
-    public void setupCommands() {
+    private void setupCommands() {
         if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
@@ -551,14 +552,18 @@ public class SkinOverlay {
      * Unregisters the commands for this SkinOverlay.
      * If the SkinOverlay is not a proxy and the 'PROXY' option is enabled, no commands will be unregistered.
      */
-    public void unregisterCommands() {
+    private void unregisterCommands() {
         if (!type().isProxy() && OptionsUtil.PROXY.getBooleanValue())
             return;
-        switch (type()) {
-            case BUKKIT -> ((PaperCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
-            case BUNGEE -> ((BungeeCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
-            case VELOCITY -> ((VelocityCommandManager) commandManager).unregisterCommand(new SkinOverlayCommand());
-        }
+        List<RootCommand> rootCommands = new ArrayList<>(commandManager.getRegisteredRootCommands());
+        rootCommands.forEach(rootCommand -> {
+            switch (type()) {
+                case BUKKIT -> ((PaperCommandManager) commandManager).unregisterCommand(rootCommand.getDefCommand());
+                case BUNGEE -> ((BungeeCommandManager) commandManager).unregisterCommand(rootCommand.getDefCommand());
+                case VELOCITY ->
+                        ((VelocityCommandManager) commandManager).unregisterCommand(rootCommand.getDefCommand());
+            }
+        });
     }
 
     /**
@@ -566,6 +571,7 @@ public class SkinOverlay {
      * If a 'lang_en.yml' language file exists in the data folder, it will be used as the default language file.
      * Otherwise, the default English language file provided by the command manager will be used.
      */
+    @ApiStatus.Internal
     public void loadCommandLocales() {
         try {
             // Set the default locale to English

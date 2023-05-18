@@ -22,6 +22,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bstats.bungeecord.Metrics;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -40,11 +41,13 @@ import java.util.logging.Logger;
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
 @MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     private int tick = 0;
-
     private boolean enabled = false;
+    private SkinOverlay skinOverlay;
 
     private BungeeAudiences adventure;
 
@@ -56,24 +59,24 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     @Override
     public void onLoad() {
+        this.skinOverlay = new SkinOverlay(this);
         skinOverlayBungee = this;
         try {
             new LibraryLoader(this.getClass(), this.getDataFolder()).loadAll(true);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
-        SkinOverlay.getInstance().onLoad(this);
+        skinOverlay.onLoad();
     }
 
     @Override
     public void onEnable() {
         this.adventure = BungeeAudiences.create(this);
         getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
-        SkinOverlay.getInstance().setSkinHandler(new SkinHandler_BungeeCord());
-        SkinOverlay.getInstance().setCommandManager(new BungeeCommandManager(this));
-        SkinOverlay.getInstance().onEnable();
-        SkinOverlay.getInstance().setupCommands();
-        SkinOverlay.getInstance().setPluginMessageUtils(new BungeeCordPluginMessageUtils());
+        skinOverlay.setSkinHandler(new SkinHandler_BungeeCord());
+        skinOverlay.setCommandManager(new BungeeCommandManager(this));
+        skinOverlay.onEnable();
+        skinOverlay.setPluginMessageUtils(new BungeeCordPluginMessageUtils());
         BungeeMinecraftUtils.registerListeners(this, new PlayerListeners(), new DeveloperInformListener());
         getProxy().registerChannel("skinoverlay:bungee");
         getProxy().registerChannel("skinoverlay:message");
@@ -84,7 +87,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     @Override
     public void onDisable() {
-        SkinOverlay.getInstance().onDisable();
+        skinOverlay.onDisable();
         getProxy().getScheduler().cancel(this);
         if (this.adventure != null) {
             this.adventure.close();

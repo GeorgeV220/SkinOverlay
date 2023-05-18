@@ -16,7 +16,10 @@ import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
 import com.georgev22.skinoverlay.event.events.user.data.add.UserAddDataEvent;
 import com.georgev22.skinoverlay.event.events.user.data.load.UserPostLoadEvent;
 import com.georgev22.skinoverlay.event.events.user.data.load.UserPreLoadEvent;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class DebugListeners implements EventListener {
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();

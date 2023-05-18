@@ -12,10 +12,13 @@ import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.util.GameProfile;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
+@ApiStatus.Internal
+@ApiStatus.NonExtendable
 public class SkinHandler_Velocity extends SkinHandler {
 
     @Override
