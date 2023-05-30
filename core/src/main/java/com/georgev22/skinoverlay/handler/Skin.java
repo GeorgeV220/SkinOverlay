@@ -7,35 +7,42 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.Base64;
 import java.util.UUID;
 
 @ApiStatus.NonExtendable
-public class Skin extends Entity {
+public class Skin extends Entity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private SProperty property;
-    private SkinOptions skinOptions = new SkinOptions("default");
+    private SkinOptions skinOptions;
 
     public Skin(UUID uuid) {
         super(uuid);
+        addCustomData("entity_id", uuid.toString());
+        this.skinOptions = new SkinOptions("default");
     }
 
     public Skin(UUID uuid, SProperty sProperty) {
         super(uuid);
+        addCustomData("entity_id", uuid.toString());
         this.property = sProperty;
+        this.skinOptions = new SkinOptions("default");
     }
 
     public Skin(UUID uuid, SProperty sProperty, String skinName) {
         super(uuid);
+        addCustomData("entity_id", uuid.toString());
         this.property = sProperty;
         this.skinOptions = new SkinOptions(skinName);
     }
 
     public Skin(UUID uuid, SProperty sProperty, SkinOptions skinOptions) {
         super(uuid);
+        addCustomData("entity_id", uuid.toString());
         this.property = sProperty;
         this.skinOptions = skinOptions;
     }
@@ -57,7 +64,7 @@ public class Skin extends Entity {
     }
 
     public @Nullable String skinURL() {
-        return new JsonParser().parse(new String(Base64.getDecoder().decode(property.value())))
+        return JsonParser.parseString(new String(Base64.getDecoder().decode(property.value())))
                 .getAsJsonObject()
                 .getAsJsonObject("textures")
                 .getAsJsonObject("SKIN")
