@@ -1,3 +1,10 @@
+## [5.3.1](https://github.com/GeorgeV220/SkinOverlay/compare/v5.3.0...v5.3.1) (2023-05-30)
+
+
+### Bug Fixes
+
+* **core:** update database and save user modifications ([0dd7686](https://github.com/GeorgeV220/SkinOverlay/commit/0dd7686e4889eb0e671a49303bb1b0f4afc51bec))
+
 # [5.3.0](https://github.com/GeorgeV220/SkinOverlay/compare/v5.2.0...v5.3.0) (2023-05-18)
 
 
