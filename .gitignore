@@ -22,7 +22,7 @@
 /mc-1-19-3/build/classes/java/main/
 
 # IntelliJ
-
+/.fleet/
 /.idea/dictionaries/
 /.idea/libraries/
 /.idea/*.xml
