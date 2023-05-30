@@ -15,6 +15,7 @@ import com.georgev22.skinoverlay.utilities.*;
 import com.georgev22.skinoverlay.utilities.config.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.georgev22.skinoverlay.utilities.player.User;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +28,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 @CommandAlias("skinoverlay|soverlay|skino")
@@ -58,39 +60,36 @@ public final class SkinOverlayCommand extends BaseCommand {
     @Description("{@@Commands.Descriptions.SkinOverlay.reload}")
     @CommandPermission("skinoverlay.reload")
     public void reload(final @NotNull CommandIssuer issuer) {
-        skinOverlay.getUserManager().getLoadedEntities().forEach((uuid, loadedUser) -> skinOverlay.getUserManager().getEntity(uuid).handle((user, throwable) -> {
-            if (throwable != null) {
-                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
-                return null;
-            }
-            UserEvent event = new UserEvent(user, false);
-            skinOverlay.getEventManager().callEvent(event);
-            return user;
-        }).thenApply(user -> {
-            if (user == null) {
-                return null;
-            }
-            UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent(user, false);
-            skinOverlay.getEventManager().callEvent(modifyDataEvent);
-            if (modifyDataEvent.isCancelled())
-                return user;
-            if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
-                return user;
-            }
-            skinOverlay.getUserManager().save(user);
-            return user;
-        }).thenAccept(user -> {
-            if (user != null) {
-                Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
-                if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline()) {
-                    PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), user, false);
+        skinOverlay.getUserManager().getLoadedEntities().forEach((uuid, userSupplier) -> CompletableFuture.supplyAsync(() -> userSupplier)
+                .thenApply(user -> {
+                    UserEvent event = new UserEvent(user, false);
                     skinOverlay.getEventManager().callEvent(event);
-                    if (event.isCancelled())
-                        return;
-                    skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);
-                }
-            }
-        }));
+                    return user;
+                }).thenApply(user -> {
+                    if (user == null) {
+                        return null;
+                    }
+                    UserModifyDataEvent modifyDataEvent = new UserModifyDataEvent(user, false);
+                    skinOverlay.getEventManager().callEvent(modifyDataEvent);
+                    if (modifyDataEvent.isCancelled())
+                        return user;
+                    if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                        return user;
+                    }
+                    skinOverlay.getUserManager().save(user);
+                    return user;
+                }).thenAccept(user -> {
+                    if (user != null) {
+                        Optional<PlayerObject> optionalPlayerObject = skinOverlay.getPlayer(user.getId());
+                        if (optionalPlayerObject.isPresent() && optionalPlayerObject.get().isOnline()) {
+                            PlayerObjectPreUpdateSkinEvent event = new PlayerObjectPreUpdateSkinEvent(optionalPlayerObject.get(), user, false);
+                            skinOverlay.getEventManager().callEvent(event);
+                            if (event.isCancelled())
+                                return;
+                            skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);
+                        }
+                    }
+                }));
         skinOverlay.getFileManager().getConfig().reloadFile();
         try {
             MessagesUtil.repairPaths(Locale.fromString(OptionsUtil.LOCALE.getStringValue()));
@@ -131,7 +130,7 @@ public final class SkinOverlayCommand extends BaseCommand {
         skinOverlay.getSkinManager().getEntity(skinUUID)
                 .handleAsync((skin, throwable) -> {
                     if (throwable != null) {
-                        skinOverlay.getLogger().log(Level.SEVERE, "Error SkinCommand 130:", throwable);
+                        skinOverlay.getLogger().log(Level.SEVERE, "Error overlay 1:", throwable);
                     }
                     return skin;
                 })
@@ -186,7 +185,14 @@ public final class SkinOverlayCommand extends BaseCommand {
             }
 
             var skinOptions = args.length == 8
-                    ? new SkinOptions(args[0], Boolean.parseBoolean(args[1]), Boolean.parseBoolean(args[2]), Boolean.parseBoolean(args[3]), Boolean.parseBoolean(args[4]), Boolean.parseBoolean(args[5]), Boolean.parseBoolean(args[6]), Boolean.parseBoolean(args[7]))
+                    ? new SkinOptions(args[0],
+                    Boolean.parseBoolean(args[1]),
+                    Boolean.parseBoolean(args[2]),
+                    Boolean.parseBoolean(args[3]),
+                    Boolean.parseBoolean(args[4]),
+                    Boolean.parseBoolean(args[5]),
+                    Boolean.parseBoolean(args[6]),
+                    Boolean.parseBoolean(args[7]))
                     : new SkinOptions("custom2");
 
             if (args.length > 1 & args.length < 3) {
@@ -205,7 +211,7 @@ public final class SkinOverlayCommand extends BaseCommand {
             skinOverlay.getSkinManager().getEntity(skinUUID)
                     .handleAsync((skin, throwable) -> {
                         if (throwable != null) {
-                            skinOverlay.getLogger().log(Level.SEVERE, "Error SkinCommand 197:", throwable);
+                            skinOverlay.getLogger().log(Level.SEVERE, "Error url 1:", throwable);
                         }
                         return skin;
                     })
@@ -272,12 +278,6 @@ public final class SkinOverlayCommand extends BaseCommand {
             PlayerObject playerObject = skinOverlay.getPlayer(issuer.getUniqueId()).orElseThrow();
             UUID skinUUID = Utilities.generateUUID("default" + playerObject.playerUUID().toString());
             skinOverlay.getSkinManager().getEntity(skinUUID)
-                    .handle((skin, throwable) -> {
-                        if (throwable != null) {
-                            skinOverlay.getLogger().log(Level.SEVERE, "Error:", throwable);
-                        }
-                        return skin;
-                    })
                     .handle((skin, throwable) -> skin == null ? new Skin(skinUUID, null, "default") : skin)
                     .thenAccept(skin -> skinOverlay.getSkinHandler().setSkin(
                                     () -> null,
@@ -305,7 +305,7 @@ public final class SkinOverlayCommand extends BaseCommand {
         skinOverlay.getSkinManager().getEntity(skinUUID)
                 .handle((skin, throwable) -> {
                     if (throwable != null) {
-                        skinOverlay.getLogger().log(Level.SEVERE, "Error:", throwable);
+                        skinOverlay.getLogger().log(Level.SEVERE, "Error clear 1:", throwable);
                     }
                     return skin;
                 })
