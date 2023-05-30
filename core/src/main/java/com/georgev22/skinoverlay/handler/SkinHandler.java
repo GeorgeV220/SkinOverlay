@@ -73,7 +73,7 @@ public abstract class SkinHandler {
         Validate.notNull(playerObject);
         skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
-                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                skinOverlay.getLogger().log(Level.SEVERE, "Error while retrieving the user: ", throwable);
                 return null;
             }
             return user;
@@ -87,20 +87,25 @@ public abstract class SkinHandler {
             if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                 return;
             }
-            skinOverlay.getUserManager().save(user);
+            skinOverlay.getUserManager().save(user).handleAsync((unused, throwable) -> {
+                if (throwable != null) {
+                    skinOverlay.getLogger().log(Level.SEVERE, "Error while saving the user:", throwable);
+                }
+                return unused;
+            });
         });
     }
 
     public CompletableFuture<User> setSkin(ImageSupplier imageSupplier, Skin skin, @NotNull PlayerObject playerObject) {
         return skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handleAsync((user, throwable) -> {
             if (throwable != null) {
-                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                skinOverlay.getLogger().log(Level.SEVERE, "Error while retrieving the user: ", throwable);
                 return null;
             }
             return user;
         }).thenApplyAsync(user -> {
             if (user == null) {
-                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user");
+                skinOverlay.getLogger().log(Level.SEVERE, "Error while retrieving the user");
                 return null;
             }
             Image overlay;
@@ -123,14 +128,24 @@ public abstract class SkinHandler {
                         if (skin.skinProperty() == null && !Objects.equals(skin.skinProperty(), property)) {
                             skin.setProperty(property);
                             skin.setBase(user.defaultSkin());
-                            skinOverlay.getSkinManager().save(skin);
+                            skinOverlay.getSkinManager().save(skin).handleAsync((unused, throwable) -> {
+                                if (throwable != null) {
+                                    skinOverlay.getLogger().log(Level.SEVERE, "Error while saving the user:", throwable);
+                                }
+                                return unused;
+                            });
                         }
                         user.addCustomData("skin", skin);
                         break;
                     }
                     if (((skin.base() != null & user.defaultSkin() != null) & skin.skinProperty() != null) && Objects.equals(Objects.requireNonNull(skin.base()).skinURL(), user.defaultSkin().skinURL())) {
                         skin.setBase(user.defaultSkin());
-                        skinOverlay.getSkinManager().save(skin);
+                        skinOverlay.getSkinManager().save(skin).handleAsync((unused, throwable) -> {
+                            if (throwable != null) {
+                                skinOverlay.getLogger().log(Level.SEVERE, "Error while saving the user:", throwable);
+                            }
+                            return unused;
+                        });
                         user.addCustomData("skin", skin);
                         break;
                     }
@@ -168,7 +183,12 @@ public abstract class SkinHandler {
                             if (skin.skinProperty() == null && !Objects.equals(skin.skinProperty(), property)) {
                                 skin.setProperty(property);
                                 skin.setBase(user.defaultSkin());
-                                skinOverlay.getSkinManager().save(skin);
+                                skinOverlay.getSkinManager().save(skin).handleAsync((unused, throwable) -> {
+                                    if (throwable != null) {
+                                        skinOverlay.getLogger().log(Level.SEVERE, "Error while saving the user:", throwable);
+                                    }
+                                    return unused;
+                                });
                             }
                             user.addCustomData("skin", skin);
                         }
@@ -190,7 +210,12 @@ public abstract class SkinHandler {
                 if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                     return user;
                 }
-                skinOverlay.getUserManager().save(user);
+                skinOverlay.getUserManager().save(user).handleAsync((unused, throwable) -> {
+                    if (throwable != null) {
+                        skinOverlay.getLogger().log(Level.SEVERE, "Error while saving the user:", throwable);
+                    }
+                    return unused;
+                });
             }
             return user;
         }).thenApply(user -> {
@@ -206,7 +231,7 @@ public abstract class SkinHandler {
     public void updateSkin(@NotNull PlayerObject playerObject, boolean forOthers) {
         skinOverlay.getUserManager().getEntity(playerObject.playerUUID()).handle((user, throwable) -> {
             if (throwable != null) {
-                skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
+                skinOverlay.getLogger().log(Level.SEVERE, "Error while retrieving the user: ", throwable);
                 return null;
             }
             return user;
@@ -228,7 +253,7 @@ public abstract class SkinHandler {
                 if (throwable instanceof OperationNotSupportedException)
                     skinOverlay.getLogger().info("Unsupported Minecraft Version");
                 else
-                    skinOverlay.getLogger().log(Level.SEVERE, "Error: ", throwable);
+                    skinOverlay.getLogger().log(Level.SEVERE, "Error while updating player skin: ", throwable);
                 return unused;
             }
             return unused;
@@ -240,7 +265,7 @@ public abstract class SkinHandler {
     protected void updateSkin1(@NotNull User user, PlayerObject playerObject, boolean forOthers) {
         updateSkin(playerObject, user.skin()).handleAsync((unused, throwable) -> {
             if (throwable != null) {
-                skinOverlay.getLogger().log(Level.SEVERE, "Error", throwable);
+                skinOverlay.getLogger().log(Level.SEVERE, "Error while updating player skin: ", throwable);
             }
             return unused;
         });
