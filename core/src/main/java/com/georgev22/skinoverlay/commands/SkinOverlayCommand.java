@@ -143,19 +143,29 @@ public final class SkinOverlayCommand extends BaseCommand {
                     }
                     return skin;
                 })
-                .thenAccept(skin -> skinOverlay.getSkinHandler().setSkin(
-                        () -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")),
-                        skin,
-                        target.orElseThrow()
-                ).thenAccept(
-                        entity -> MessagesUtil.DONE.msg(
-                                issuer,
-                                new HashObjectMap<String, String>()
-                                        .append("%player%", target.orElseThrow().playerName())
-                                        .append("%url%", entity.skin().skinURL()),
-                                true
-                        )
-                ));
+                .thenAccept(skin ->
+                        skinOverlay.getSkinHandler().setSkin(
+                                () -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png")),
+                                skin,
+                                target.orElseThrow()
+                        ).handle((user, throwable) -> {
+                            if (throwable != null) {
+                                skinOverlay.getLogger().log(Level.SEVERE, "Error 1", throwable);
+                            }
+                            return user;
+                        }).thenAccept(user -> MessagesUtil.DONE.msg(
+                                        issuer,
+                                        new HashObjectMap<String, String>()
+                                                .append("%player%", target.orElseThrow().playerName())
+                                                .append("%url%", user.skin().skinURL()),
+                                        true
+                                )
+                        ).handle((unused, throwable) -> {
+                            if (throwable != null) {
+                                skinOverlay.getLogger().log(Level.SEVERE, "Error 2", throwable);
+                            }
+                            return unused;
+                        }));
 
     }
 
