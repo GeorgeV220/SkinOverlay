@@ -30,9 +30,9 @@ public enum OptionsUtil {
 
     DATABASE_USERS_TABLE_NAME("database.SQL.users table name", "skinoverlay_users", Optional.of("database.SQL.table name")),
 
-    DATABASE_SKINS_TABLE_NAME("database.SQL.skins table name", "skinoverlay_users", Optional.empty()),
+    DATABASE_SKINS_TABLE_NAME("database.SQL.skins table name", "skinoverlay_skins", Optional.empty()),
 
-    DATABASE_SQLITE("database.SQLite.file name", "skinoverlay", Optional.empty()),
+    DATABASE_FILE_NAME("database.SQL.SQLite file name", "skinoverlay", Optional.of("database.SQLite.file name")),
 
     DATABASE_MONGO_HOST("database.MongoDB.host", "localhost", Optional.empty()),
 

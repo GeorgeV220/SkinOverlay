@@ -257,7 +257,7 @@ public abstract class PlayerObject {
         if (userPreLoadEvent.isCancelled()) {
             return;
         }
-        skinOverlay.getUserCompletableFutureManager().add(skinOverlay.getCompletableFutureConsumer(), skinOverlay.getUserManager().getEntity(playerUUID())
+        skinOverlay.getUserManager().getEntity(playerUUID())
                 .handleAsync((user, throwable) -> {
                     if (throwable != null) {
                         skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
@@ -286,7 +286,13 @@ public abstract class PlayerObject {
                         if (!event.isCancelled()) {
                             if (user.getCustomData(event.getData().key()) == null && !Objects.equals(user.getCustomData(event.getData().key()), event.getData().value())) {
                                 user.addCustomData(event.getData().key(), event.getData().value());
-                                skinOverlay.getSkinManager().save(user.defaultSkin());
+                                skinOverlay.getSkinManager().save(user.defaultSkin()).handleAsync((unused, saveThrowable) -> {
+                                    if (saveThrowable != null) {
+                                        skinOverlay.getLogger().log(Level.SEVERE, "Error: ", saveThrowable);
+                                        return unused;
+                                    }
+                                    return unused;
+                                });
                             }
                         }
                     } catch (IOException | ExecutionException | InterruptedException e) {
@@ -318,7 +324,13 @@ public abstract class PlayerObject {
                         if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                             return user;
                         }
-                        skinOverlay.getUserManager().save(userModifyDataEvent.getUser());
+                        skinOverlay.getUserManager().save(userModifyDataEvent.getUser()).handleAsync((unused, saveThrowable) -> {
+                            if (saveThrowable != null) {
+                                skinOverlay.getLogger().log(Level.SEVERE, "Error: ", saveThrowable);
+                                return unused;
+                            }
+                            return unused;
+                        });
                     }
                     return userModifyDataEvent.getUser();
                 }).handleAsync((user, throwable) -> {
@@ -354,7 +366,7 @@ public abstract class PlayerObject {
                         return userPostLoadEvent.getUser();
                     }
                     return null;
-                }));
+                });
     }
 
     /**
@@ -365,7 +377,6 @@ public abstract class PlayerObject {
      */
     public void playerQuit() {
         skinOverlay.getSkinOverlay().onlinePlayers().remove(playerUUID());
-        skinOverlay.getLoadedUsers().remove(playerUUID());
         if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
@@ -383,7 +394,13 @@ public abstract class PlayerObject {
                     if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                         return;
                     }
-                    skinOverlay.getUserManager().save(userModifyDataEvent.getUser());
+                    skinOverlay.getUserManager().save(userModifyDataEvent.getUser()).handleAsync((unused, saveThrowable) -> {
+                        if (saveThrowable != null) {
+                            skinOverlay.getLogger().log(Level.SEVERE, "Error: ", saveThrowable);
+                            return unused;
+                        }
+                        return unused;
+                    });
                 }
             }
         });
@@ -413,6 +430,7 @@ public abstract class PlayerObject {
                 SkinOptions skinOptions = user.skin().skinOptions();
                 if (skinOptions == null)
                     return;
+                skinOverlay.getLogger().info("Skin name " + skinOptions.getSkinName());
                 if (skinOptions.getSkinName().equals("default"))
                     return;
                 skinOverlay.getSkinHandler().updateSkin(event.getPlayerObject(), true);
