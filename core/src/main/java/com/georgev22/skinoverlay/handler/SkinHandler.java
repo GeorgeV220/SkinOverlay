@@ -139,6 +139,7 @@ public abstract class SkinHandler {
                         break;
                     }
                     if (((skin.base() != null & user.defaultSkin() != null) & skin.skinProperty() != null) && Objects.equals(Objects.requireNonNull(skin.base()).skinURL(), user.defaultSkin().skinURL())) {
+                        skin.setProperty(skin.skinProperty());
                         skin.setBase(user.defaultSkin());
                         skinOverlay.getSkinManager().save(skin).handleAsync((unused, throwable) -> {
                             if (throwable != null) {
