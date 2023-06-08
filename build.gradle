@@ -117,7 +117,7 @@ dependencies {
     implementation "com.georgev22.library:utilities:${libraryVersion}:all"
     implementation "com.georgev22.library:yaml:${libraryVersion}:all"
     implementation "com.georgev22.library:minecraft:${libraryVersion}"
-    implementation 'com.georgev22.api:libraryloader:1.4.0'
+    implementation 'com.georgev22.api:libraryloader:1.5.1'
 
     implementation "org.bstats:bstats-bukkit:3.0.2"
     implementation "org.bstats:bstats-bungeecord:3.0.1"
