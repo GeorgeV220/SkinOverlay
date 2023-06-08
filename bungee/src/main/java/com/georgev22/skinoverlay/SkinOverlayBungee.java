@@ -51,6 +51,8 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
     private BungeeAudiences adventure;
 
+    private LibraryLoader libraryLoader;
+
     private static SkinOverlayBungee skinOverlayBungee;
 
     public static SkinOverlayBungee getInstance() {
@@ -62,7 +64,8 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
         this.skinOverlay = new SkinOverlay(this);
         skinOverlayBungee = this;
         try {
-            new LibraryLoader(this.getClass(), this.getDataFolder()).loadAll(true);
+            this.libraryLoader = new LibraryLoader(this.getClass().getClassLoader(), this.getDataFolder());
+            this.libraryLoader.loadAll(this, true);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
@@ -94,6 +97,11 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
             this.adventure = null;
         }
         enabled = false;
+        try {
+            this.libraryLoader.unloadAll();
+        } catch (InvalidDependencyException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

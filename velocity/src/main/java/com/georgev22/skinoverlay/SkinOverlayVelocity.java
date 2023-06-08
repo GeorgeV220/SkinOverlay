@@ -12,8 +12,8 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.handlers.SkinHandler_Velocity;
 import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
-import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.VelocityPluginMessageUtils;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.georgev22.skinoverlay.utilities.player.PlayerObjectVelocity;
@@ -71,6 +71,8 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     private ScheduledTask scheduledTask;
 
+    private LibraryLoader libraryLoader;
+
     private int tick = 0;
 
     private boolean enabled = false;
@@ -110,7 +112,8 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     public void onLoad() {
         try {
-            new LibraryLoader(this.getClass(), this.dataFolder()).loadAll(true);
+            this.libraryLoader = new LibraryLoader(this.getClass().getClassLoader(), this.dataFolder());
+            this.libraryLoader.loadAll(this, true);
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
@@ -136,6 +139,11 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
         skinOverlay.onDisable();
         scheduledTask.cancel();
         enabled = false;
+        try {
+            this.libraryLoader.unloadAll();
+        } catch (InvalidDependencyException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
