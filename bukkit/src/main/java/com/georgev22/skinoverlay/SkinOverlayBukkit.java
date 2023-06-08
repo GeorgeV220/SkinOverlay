@@ -43,7 +43,6 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
 
     @Override
     public void onLoad() {
-        skinOverlay = new SkinOverlay(this);
         try {
             if (getCurrentVersion().isBelow(V1_16_R3)) {
                 this.libraryLoader = new LibraryLoader(this.getClassLoader(), this.getDataFolder());
@@ -52,6 +51,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         } catch (InvalidDependencyException | UnknownDependencyException e) {
             throw new RuntimeException(e);
         }
+        skinOverlay = new SkinOverlay(this);
         skinOverlay.onLoad();
     }
 
