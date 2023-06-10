@@ -74,6 +74,10 @@ allprojects {
         compileOnly "com.georgev22.library:yaml:${libraryVersion}:all"
         compileOnly "com.georgev22.library:minecraft:${libraryVersion}"
 
+        compileOnly 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
+        compileOnly 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
+        compileOnly 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
+
         compileOnly "org.bstats:bstats-bukkit:3.0.2"
         compileOnly "org.bstats:bstats-bungeecord:3.0.1"
         compileOnly "org.bstats:bstats-velocity:3.0.1"
@@ -84,9 +88,6 @@ allprojects {
         compileOnly 'net.kyori:adventure-api:4.13.1'
         compileOnly 'net.kyori:adventure-text-serializer-legacy:4.13.1'
         compileOnly 'com.google.code.gson:gson:2.10.1'
-        compileOnly 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
-        compileOnly 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
-        compileOnly 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
         compileOnly 'com.georgev22.api:libraryloader:1.5.1'
         compileOnly 'org.jetbrains:annotations:24.0.1'
         compileOnly 'commons-codec:commons-codec:1.15'
@@ -119,16 +120,16 @@ dependencies {
     implementation "com.georgev22.library:minecraft:${libraryVersion}"
     implementation 'com.georgev22.api:libraryloader:1.5.1'
 
+    implementation 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
+    implementation 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
+    implementation 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
+
     implementation "org.bstats:bstats-bukkit:3.0.2"
     implementation "org.bstats:bstats-bungeecord:3.0.1"
     implementation "org.bstats:bstats-velocity:3.0.1"
 
     implementation "net.kyori:adventure-platform-bukkit:4.3.0"
     implementation "net.kyori:adventure-platform-bungeecord:4.3.0"
-
-    implementation 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
-    implementation 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
-    implementation 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
 
     implementation 'com.google.code.gson:gson:2.10.1'
 
