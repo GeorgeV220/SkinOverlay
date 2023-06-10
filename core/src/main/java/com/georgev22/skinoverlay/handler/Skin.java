@@ -15,7 +15,7 @@ import java.util.UUID;
 public class Skin extends Entity implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private SProperty property;
     private SkinOptions skinOptions;
@@ -29,22 +29,22 @@ public class Skin extends Entity implements Serializable {
     public Skin(UUID uuid, SProperty sProperty) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
-        this.property = sProperty;
-        this.skinOptions = new SkinOptions("default");
+        addCustomData("property", this.property = sProperty);
+        addCustomData("skinOptions", this.skinOptions = new SkinOptions("default"));
     }
 
     public Skin(UUID uuid, SProperty sProperty, String skinName) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
-        this.property = sProperty;
-        this.skinOptions = new SkinOptions(skinName);
+        addCustomData("property", this.property = sProperty);
+        addCustomData("skinOptions", this.skinOptions = new SkinOptions(skinName));
     }
 
     public Skin(UUID uuid, SProperty sProperty, SkinOptions skinOptions) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
-        this.property = sProperty;
-        this.skinOptions = skinOptions;
+        addCustomData("property", this.property = sProperty);
+        addCustomData("skinOptions", this.skinOptions = skinOptions);
     }
 
     public @Nullable SProperty skinProperty() {
