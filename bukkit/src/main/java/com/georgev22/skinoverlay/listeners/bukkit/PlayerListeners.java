@@ -4,6 +4,7 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectConnectionEvent;
 import com.georgev22.skinoverlay.handler.Skin;
+import com.georgev22.skinoverlay.utilities.SkinOptions;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
@@ -21,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
@@ -69,11 +69,11 @@ public class PlayerListeners implements Listener, PluginMessageListener {
         boolean b = Boolean.parseBoolean(decrypt(in.readUTF()));
         PlayerObject playerObject = skinOverlay.getPlayer(uuid).orElseThrow();
         if (b) {
-            skinOverlay.getSkinHandler().setSkin(skin, playerObject);
+            skinOverlay.getSkinHandler().setSkin(playerObject, skin);
         } else {
             if (subChannel.equalsIgnoreCase("change")) {
                 if (!skin.skinOptions().getSkinName().contains("custom")) {
-                    skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), skin.skinOptions().getSkinName() + ".png")), skin, playerObject);
+                    skinOverlay.getSkinHandler().setSkin(playerObject, skin);
                 } else {
                     URL url = new URL(skin.skinOptions().getUrl());
                     ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -89,10 +89,15 @@ public class PlayerListeners implements Listener, PluginMessageListener {
                             output.write(buffer, 0, bytesRead);
                         }
                     }
-                    skinOverlay.getSkinHandler().setSkin(() -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())), skin, playerObject);
+                    skinOverlay.getSkinHandler().retrieveOrGenerateSkin(
+                            playerObject,
+                            () -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())),
+                            new SkinOptions()).thenAccept(userSkin -> {
+                        skinOverlay.getSkinHandler().setSkin(playerObject, skin);
+                    });
                 }
             } else if (subChannel.equalsIgnoreCase("reset")) {
-                skinOverlay.getSkinHandler().setSkin(() -> null, skin, playerObject);
+                skinOverlay.getSkinHandler().setSkin(playerObject, skin);
             }
         }
     }
