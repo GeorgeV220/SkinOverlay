@@ -1,3 +1,20 @@
+# [6.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v5.3.1...v6.0.0) (2023-06-11)
+
+
+### Features
+
+* Add SkinException class to handle runtime exceptions related to skin overlay ([dc53c82](https://github.com/GeorgeV220/SkinOverlay/commit/dc53c82f0fde2abd386981ec8354236af00c6bd7))
+* **config:** add mineskin api key option to config.yml ([890256e](https://github.com/GeorgeV220/SkinOverlay/commit/890256ec2bd1b39519fdf5792d516a45bb5505c1))
+* **Glowstone:** Dropped glowstone support ([74b8036](https://github.com/GeorgeV220/SkinOverlay/commit/74b803686549f9cc677bf3117b825195a631b15a))
+* Implement the new changes of SkinHandler ([43935d4](https://github.com/GeorgeV220/SkinOverlay/commit/43935d404abd678d1be33b9e5d21f73a8d6178f7))
+* Rewrite SkinHandler ([3912014](https://github.com/GeorgeV220/SkinOverlay/commit/39120148daf34e3d6176e6ad3b792cf17adb04bd))
+* This is an empty commit read desc ([5434fde](https://github.com/GeorgeV220/SkinOverlay/commit/5434fded81bd341520b14b9abfe541a0734068f9))
+
+
+### BREAKING CHANGES
+
+* The old saved data won't work with the new release because of numerous internal and API changes.
+
 ## [5.3.1](https://github.com/GeorgeV220/SkinOverlay/compare/v5.3.0...v5.3.1) (2023-05-30)
 
 
