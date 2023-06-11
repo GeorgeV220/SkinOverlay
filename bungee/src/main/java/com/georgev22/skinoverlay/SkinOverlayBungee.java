@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 @MavenLibrary(groupId = "commons-io", artifactId = "commons-io", version = "2.11.0")
 @MavenLibrary(groupId = "commons-codec", artifactId = "commons-codec", version = "1.15")
 @MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
+@MavenLibrary(groupId = "org.jsoup", artifactId = "jsoup", version = "1.15.3")
 @MavenLibrary("com.mojang:authlib:3.11.50:https://nexus.velocitypowered.com/repository/maven-public/")
 @MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
 @ApiStatus.Internal
