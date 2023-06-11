@@ -64,6 +64,8 @@ allprojects {
         maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url = 'https://nexus.velocitypowered.com/repository/maven-public/' }
         maven { url = 'https://repo.dmulloy2.net/repository/public/' }
+        maven { url = 'https://repo.inventivetalent.org/repository/public/' }
+        maven { url = 'https://jitpack.io' }
     }
 
     dependencies {
@@ -71,30 +73,40 @@ allprojects {
         compileOnly "com.georgev22.library:maps:${libraryVersion}:all"
         compileOnly "com.georgev22.library:scheduler:${libraryVersion}:all"
         compileOnly "com.georgev22.library:utilities:${libraryVersion}:all"
-        compileOnly "com.georgev22.library:yaml:${libraryVersion}:all"
+        compileOnly "com.georgev22.library:yaml:${libraryVersion}"
         compileOnly "com.georgev22.library:minecraft:${libraryVersion}"
 
-        compileOnly 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
-        compileOnly 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
-        compileOnly 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
+        compileOnly "com.georgev22.api:libraryloader:${libraryLoaderVersion}"
 
-        compileOnly "org.bstats:bstats-bukkit:3.0.2"
-        compileOnly "org.bstats:bstats-bungeecord:3.0.1"
-        compileOnly "org.bstats:bstats-velocity:3.0.1"
+        compileOnly "co.aikar:acf-paper:${acfVersion}"
+        compileOnly "co.aikar:acf-bungee:${acfVersion}"
+        compileOnly "co.aikar:acf-velocity:${acfVersion}"
 
-        compileOnly 'net.skinsrestorer:skinsrestorer-api:14.2.10'
+        compileOnly "org.bstats:bstats-bukkit:${bstatsVersion}"
+        compileOnly "org.bstats:bstats-bungeecord:${bstatsVersion}"
+        compileOnly "org.bstats:bstats-velocity:${bstatsVersion}"
 
-        compileOnly 'org.apache.logging.log4j:log4j-api:2.20.0'
-        compileOnly 'net.kyori:adventure-api:4.13.1'
-        compileOnly 'net.kyori:adventure-text-serializer-legacy:4.13.1'
-        compileOnly 'com.google.code.gson:gson:2.10.1'
-        compileOnly 'com.georgev22.api:libraryloader:1.5.1'
-        compileOnly 'org.jetbrains:annotations:24.0.1'
-        compileOnly 'commons-codec:commons-codec:1.15'
-        compileOnly 'commons-io:commons-io:2.11.0'
-        compileOnly 'commons-lang:commons-lang:2.6'
-        compileOnly 'org.mongodb:mongodb-driver:3.12.13'
-        compileOnly 'com.mojang:authlib:3.11.50'
+        compileOnly "net.skinsrestorer:skinsrestorer-api:${skinsRestorerVersion}"
+
+        compileOnly "net.kyori:adventure-api:${adventureVersion}"
+        compileOnly "net.kyori:adventure-text-serializer-legacy:${adventureVersion}"
+
+        compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+
+        compileOnly "com.google.code.gson:gson:${gsonVersion}"
+        compileOnly "com.google.guava:guava:${guavaVersion}"
+
+        compileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+
+        compileOnly "commons-codec:commons-codec:${commonscodecVersion}"
+        compileOnly "commons-io:commons-io:${commonsioVersion}"
+        compileOnly "commons-lang:commons-lang:${commonslangVersion}"
+
+        compileOnly "org.mongodb:mongodb-driver:${mongodbVersion}"
+
+        compileOnly "com.mojang:authlib:${authlibVersion}"
+
+        compileOnly "com.github.aematsubara:MineskinClient:${mineskinVersion}"
     }
 }
 
@@ -116,24 +128,27 @@ dependencies {
     implementation "com.georgev22.library:maps:${libraryVersion}:all"
     implementation "com.georgev22.library:scheduler:${libraryVersion}:all"
     implementation "com.georgev22.library:utilities:${libraryVersion}:all"
-    implementation "com.georgev22.library:yaml:${libraryVersion}:all"
+    implementation "com.georgev22.library:yaml:${libraryVersion}"
     implementation "com.georgev22.library:minecraft:${libraryVersion}"
-    implementation 'com.georgev22.api:libraryloader:1.5.1'
 
-    implementation 'co.aikar:acf-paper:0.5.1-G-1.0-SNAPSHOT'
-    implementation 'co.aikar:acf-bungee:0.5.1-G-1.0-SNAPSHOT'
-    implementation 'co.aikar:acf-velocity:0.5.1-G-1.0-SNAPSHOT'
+    implementation "com.georgev22.api:libraryloader:${libraryLoaderVersion}"
 
-    implementation "org.bstats:bstats-bukkit:3.0.2"
-    implementation "org.bstats:bstats-bungeecord:3.0.1"
-    implementation "org.bstats:bstats-velocity:3.0.1"
+    implementation "co.aikar:acf-paper:${acfVersion}"
+    implementation "co.aikar:acf-bungee:${acfVersion}"
+    implementation "co.aikar:acf-velocity:${acfVersion}"
 
-    implementation "net.kyori:adventure-platform-bukkit:4.3.0"
-    implementation "net.kyori:adventure-platform-bungeecord:4.3.0"
+    implementation "org.bstats:bstats-bukkit:${bstatsVersion}"
+    implementation "org.bstats:bstats-bungeecord:${bstatsVersion}"
+    implementation "org.bstats:bstats-velocity:${bstatsVersion}"
 
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation "net.kyori:adventure-platform-bukkit:${adventurePlatformVersion}"
+    implementation "net.kyori:adventure-platform-bungeecord:${adventurePlatformVersion}"
 
-    implementation 'io.papermc:paperlib:1.0.8'
+    implementation "com.google.code.gson:gson:${gsonVersion}"
+
+    implementation "io.papermc:paperlib:${paperlibVersion}"
+
+    implementation "com.github.aematsubara:MineskinClient:${mineskinVersion}"
 
     implementation project(path: ':core')
     implementation project(path: ':bukkit')
@@ -149,6 +164,8 @@ dependencies {
 
 shadowJar {
     archiveClassifier.set('')
+    exclude("org/jsoup/**")
+    relocate 'org.mineskin', "${packageName}.mineskin"
     relocate 'com.google.gson', "${packageName}.gson"
     relocate 'co.aikar.commands', "${packageName}.commands.acf"
     relocate 'co.aikar.locales', "${packageName}.commands.acf.locales"
