@@ -7,7 +7,6 @@ import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileMojang;
-import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -30,7 +29,18 @@ public class SkinHandler_Unsupported extends SkinHandler {
     }
 
     @Override
-    public GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
+    public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
+        skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+                return false;
+            }
+            return aBoolean;
+        });
+    }
+
+    @Override
+    public GameProfile getInternalGameProfile(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         GameProfile gameProfile = new GameProfile(playerObject.playerUUID(), playerObject.playerName());
         if (!gameProfile.getProperties().containsKey("textures")) {
             SProperty property = getSkin(playerObject);
@@ -44,17 +54,12 @@ public class SkinHandler_Unsupported extends SkinHandler {
         if (sGameProfiles.containsKey(playerObject)) {
             return sGameProfiles.get(playerObject);
         }
-        return sGameProfiles.append(playerObject, wrapper(this.getGameProfile0(playerObject))).get(playerObject);
+        return sGameProfiles.append(playerObject, wrapper(this.getInternalGameProfile(playerObject))).get(playerObject);
     }
 
     public static @NotNull SGameProfile wrapper(@NotNull GameProfile gameProfile) {
         ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
         gameProfile.getProperties().forEach((s, property) -> propertyObjectMap.append(s, new SProperty(property.getName(), property.getValue(), property.getSignature())));
         return new SGameProfileMojang(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
-    }
-
-    @Override
-    protected void updateSkin0(User user, PlayerObject playerObject, boolean forOthers) {
-        updateSkin1(user, playerObject, forOthers);
     }
 }

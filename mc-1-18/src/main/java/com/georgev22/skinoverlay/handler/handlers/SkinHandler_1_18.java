@@ -5,7 +5,6 @@ import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.mojang.authlib.GameProfile;
@@ -89,7 +88,30 @@ public final class SkinHandler_1_18 extends SkinHandler {
     }
 
     @Override
-    public GameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
+    public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
+        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
+            Player player = (Player) playerObject.player();
+            player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+            player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+            skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
+                if (throwable != null) {
+                    throwable.printStackTrace();
+                    return false;
+                }
+                return aBoolean;
+            }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                if (aBoolean)
+                    skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                        Player p = (Player) playerObjects.player();
+                        p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                        p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                    });
+            }));
+        }, 20L);
+    }
+
+    @Override
+    public @NotNull GameProfile getInternalGameProfile(@NotNull PlayerObject playerObject) {
         Player player = (Player) playerObject.player();
         final CraftPlayer craftPlayer = (CraftPlayer) player;
         final ServerPlayer entityPlayer = craftPlayer.getHandle();
@@ -101,36 +123,11 @@ public final class SkinHandler_1_18 extends SkinHandler {
         if (sGameProfiles.containsKey(playerObject)) {
             return sGameProfiles.get(playerObject);
         }
-        return sGameProfiles.append(playerObject, wrapper(this.getGameProfile0(playerObject))).get(playerObject);
+        return sGameProfiles.append(playerObject, wrapper(this.getInternalGameProfile(playerObject))).get(playerObject);
     }
 
     private void sendPacket(@NotNull ServerPlayer player, Packet<?> packet) {
         player.connection.send(packet);
-    }
-
-    @Override
-    protected void updateSkin0(User user, PlayerObject playerObject, boolean forOthers) {
-        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
-            Player player = (Player) playerObject.player();
-            player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-            player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-            skinOverlay.getSkinHandler().updateSkin(playerObject, user.skin()).handleAsync((aBoolean, throwable) -> {
-                if (throwable != null) {
-                    throwable.printStackTrace();
-                    return false;
-                }
-                return aBoolean;
-            }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
-                if (aBoolean)
-                    if (forOthers) {
-                        skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                            Player p = (Player) playerObjects.player();
-                            p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                            p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                        });
-                    }
-            }));
-        }, 20L);
     }
 }
 

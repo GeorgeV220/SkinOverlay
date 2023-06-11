@@ -4,7 +4,6 @@ import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.Skin;
-import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
@@ -27,7 +26,8 @@ import java.util.logging.Level;
 
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftReflection.getNMSClass;
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftReflection.getOBCClass;
-import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.*;
+import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.V1_16_R1;
+import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion;
 import static com.georgev22.library.utilities.Utils.Reflection.*;
 
 @ApiStatus.Internal
@@ -288,13 +288,36 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
     }
 
     @Override
-    public GameProfile getGameProfile0(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
+    public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
+        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
+            Player player = (Player) playerObject.player();
+            player.hidePlayer(player);
+            player.showPlayer(player);
+            skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
+                if (throwable != null) {
+                    throwable.printStackTrace();
+                    return false;
+                }
+                return aBoolean;
+            }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                if (aBoolean)
+                    skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
+                        Player p = (Player) playerObjects.player();
+                        p.hidePlayer(player);
+                        p.showPlayer(player);
+                    });
+            }));
+        }, 20L);
+    }
+
+    @Override
+    public GameProfile getInternalGameProfile(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         try {
             Class<?> craftPlayerClass = getOBCClass("entity.CraftPlayer");
             org.bukkit.entity.Player player = (org.bukkit.entity.Player) playerObject.player();
             return (GameProfile) fetchMethodAndInvoke(craftPlayerClass, "getProfile", player, new Object[]{}, new Class[]{});
         } catch (Exception e) {
-            return super.getGameProfile0(playerObject);
+            return super.getInternalGameProfile(playerObject);
         }
     }
 
@@ -303,35 +326,10 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
         if (sGameProfiles.containsKey(playerObject)) {
             return sGameProfiles.get(playerObject);
         }
-        return sGameProfiles.append(playerObject, wrapper(this.getGameProfile0(playerObject))).get(playerObject);
+        return sGameProfiles.append(playerObject, wrapper(this.getInternalGameProfile(playerObject))).get(playerObject);
     }
 
     private void sendPacket(Object playerConnection, Object packet) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         fetchMethodAndInvoke(playerConnection.getClass(), "sendPacket", playerConnection, new Object[]{packet}, new Class<?>[]{this.packet});
-    }
-
-    @Override
-    protected void updateSkin0(User user, PlayerObject playerObject, boolean forOthers) {
-        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
-            Player player = (Player) playerObject.player();
-            player.hidePlayer(player);
-            player.showPlayer(player);
-            skinOverlay.getSkinHandler().updateSkin(playerObject, user.skin()).handleAsync((aBoolean, throwable) -> {
-                if (throwable != null) {
-                    throwable.printStackTrace();
-                    return false;
-                }
-                return aBoolean;
-            }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
-                if (aBoolean)
-                    if (forOthers) {
-                        skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                            Player p = (Player) playerObjects.player();
-                            p.hidePlayer(player);
-                            p.showPlayer(player);
-                        });
-                    }
-            }));
-        }, 20L);
     }
 }

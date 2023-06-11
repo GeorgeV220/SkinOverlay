@@ -8,7 +8,6 @@ import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileBungee;
-import com.georgev22.skinoverlay.utilities.player.User;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.connection.InitialHandler;
@@ -42,7 +41,18 @@ public class SkinHandler_BungeeCord extends SkinHandler {
     }
 
     @Override
-    public SGameProfile getGameProfile0(@NotNull PlayerObject playerObject) {
+    public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
+        skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+                return false;
+            }
+            return aBoolean;
+        });
+    }
+
+    @Override
+    public SGameProfile getInternalGameProfile(@NotNull PlayerObject playerObject) {
         ObjectMap<String, SProperty> properties = new HashObjectMap<>();
         for (Property property : ((InitialHandler) ((ProxiedPlayer) playerObject.player()).getPendingConnection()).getLoginProfile().getProperties()) {
             properties.append(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature()));
@@ -55,11 +65,6 @@ public class SkinHandler_BungeeCord extends SkinHandler {
         if (sGameProfiles.containsKey(playerObject)) {
             return sGameProfiles.get(playerObject);
         }
-        return sGameProfiles.append(playerObject, this.getGameProfile0(playerObject)).get(playerObject);
-    }
-
-    @Override
-    protected void updateSkin0(User user, PlayerObject playerObject, boolean forOthers) {
-        updateSkin1(user, playerObject, forOthers);
+        return sGameProfiles.append(playerObject, this.getInternalGameProfile(playerObject)).get(playerObject);
     }
 }
