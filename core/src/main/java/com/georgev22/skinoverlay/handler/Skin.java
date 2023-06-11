@@ -72,16 +72,6 @@ public class Skin extends Entity implements Serializable {
                 .getAsString();
     }
 
-    @Deprecated
-    public @Nullable Skin base() {
-        return getCustomData("base");
-    }
-
-    @Deprecated
-    public void setBase(Skin skin) {
-        addCustomData("base", skin);
-    }
-
     @Override
     public String toString() {
         return "Skin{" +
