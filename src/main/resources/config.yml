@@ -3,6 +3,7 @@ Options:
   debug: false
   proxy: false
   secret: "SECRET HERE"
+  mineskin api key: "none"
   # Supported locales: en, fr, de, it, es, pt, nl, no, sv, da, fi, pl, cs, sk, hu, ro, bg, el, ru, tr, zh, ja, ko, en_US, en_GR, es_ES, es_MX, pt_BR, fr_CA
   # You must have a file with the locale you want for example messages_en_US.yml or messages_el.yml
   locale: "en_US"

@@ -16,6 +16,8 @@ public enum OptionsUtil {
 
     SECRET("secret", "SECRET HERE", Optional.empty()),
 
+    MINESKIN_API_KEY("mineskin api key", "none", Optional.empty()),
+
     COMMAND_SKINOVERLAY("commands.skinoverlay", true, Optional.empty()),
 
     DATABASE_HOST("database.SQL.host", "localhost", Optional.empty()),
