@@ -23,14 +23,14 @@ public class Skin extends Entity implements Serializable {
     public Skin(UUID uuid) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
-        this.skinOptions = new SkinOptions("default");
+        this.skinOptions = new SkinOptions();
     }
 
     public Skin(UUID uuid, SProperty sProperty) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
         addCustomData("property", this.property = sProperty);
-        addCustomData("skinOptions", this.skinOptions = new SkinOptions("default"));
+        addCustomData("skinOptions", this.skinOptions = new SkinOptions());
     }
 
     public Skin(UUID uuid, SProperty sProperty, String skinName) {
@@ -72,10 +72,12 @@ public class Skin extends Entity implements Serializable {
                 .getAsString();
     }
 
+    @Deprecated
     public @Nullable Skin base() {
         return getCustomData("base");
     }
 
+    @Deprecated
     public void setBase(Skin skin) {
         addCustomData("base", skin);
     }
