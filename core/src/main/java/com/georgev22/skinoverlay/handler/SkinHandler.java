@@ -87,11 +87,9 @@ public abstract class SkinHandler {
         UUID skinUUID = Utilities.generateUUID(skinOptions.getSkinName() + playerObject.playerUUID().toString());
         return skinOverlay.getSkinManager().exists(skinUUID).thenApply(result -> {
             if (result) {
-                skinOverlay.getLogger().info("Cached skin: " + skinUUID);
                 return skinOverlay.getSkinManager().getEntity(skinUUID).join();
             } else {
                 try {
-                    skinOverlay.getLogger().info("New skin: " + skinUUID);
                     if (imageSupplier == null) {
                         throw new SkinException("ImageSupplier cannot be null");
                     }
