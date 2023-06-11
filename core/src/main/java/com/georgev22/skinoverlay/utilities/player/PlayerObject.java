@@ -285,6 +285,9 @@ public abstract class PlayerObject {
                                         true));
                         if (!event.isCancelled()) {
                             user.addCustomData(event.getData().key(), event.getData().value());
+                            if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                                return event.getUser();
+                            }
                             skinOverlay.getSkinManager().save((Skin) event.getData().value()).handleAsync((unused, saveThrowable) -> {
                                 if (saveThrowable != null) {
                                     skinOverlay.getLogger().log(Level.SEVERE, "Error: ", saveThrowable);
@@ -311,7 +314,7 @@ public abstract class PlayerObject {
                             .callEvent(new UserModifyDataEvent(user, true));
                     if (!userModifyDataEvent.isCancelled()) {
                         if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
-                            return user;
+                            return userModifyDataEvent.getUser();
                         }
                         skinOverlay.getUserManager().save(userModifyDataEvent.getUser()).handleAsync((unused, saveThrowable) -> {
                             if (saveThrowable != null) {

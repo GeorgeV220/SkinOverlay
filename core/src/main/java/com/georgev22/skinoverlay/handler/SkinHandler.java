@@ -129,6 +129,9 @@ public abstract class SkinHandler {
                     }
                     SProperty property = new SProperty("textures", texture.value, texture.signature);
                     Skin skin = new Skin(skinUUID, property, skinOptions);
+                    if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                        return skin;
+                    }
                     skinOverlay.getSkinManager().save(skin);
                     return skin;
                 } catch (IOException | ExecutionException | InterruptedException | RuntimeException exception) {
@@ -157,9 +160,11 @@ public abstract class SkinHandler {
                             return;
                         }
                         user.addCustomData("skin", skin);
-                        skinOverlay.getUserManager().save(user);
-
                         applySkin(playerObject, skin);
+                        if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                            return;
+                        }
+                        skinOverlay.getUserManager().save(user);
                     }
                 });
     }
