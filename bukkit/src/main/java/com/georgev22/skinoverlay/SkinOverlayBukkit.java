@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay;
 
 import co.aikar.commands.PaperCommandManager;
 import com.georgev22.api.libraryloader.LibraryLoader;
+import com.georgev22.api.libraryloader.annotations.MavenLibrary;
 import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.maps.ObservableObjectMap;
@@ -31,6 +32,16 @@ import java.util.logging.Logger;
 
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.*;
 
+@MavenLibrary(groupId = "org.mongodb", artifactId = "mongo-java-driver", version = "3.12.7")
+@MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.22")
+@MavenLibrary(groupId = "org.xerial", artifactId = "sqlite-jdbc", version = "3.34.0")
+@MavenLibrary(groupId = "com.google.guava", artifactId = "guava", version = "30.1.1-jre")
+@MavenLibrary(groupId = "org.postgresql", artifactId = "postgresql", version = "42.2.18")
+@MavenLibrary(groupId = "commons-io", artifactId = "commons-io", version = "2.11.0")
+@MavenLibrary(groupId = "commons-codec", artifactId = "commons-codec", version = "1.15")
+@MavenLibrary(groupId = "commons-lang", artifactId = "commons-lang", version = "2.6")
+@MavenLibrary(groupId = "org.jsoup", artifactId = "jsoup", version = "1.15.3")
+@MavenLibrary("org.apache.commons:commons-lang3:3.12.0:https://repo1.maven.org/maven2/")
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
 public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
