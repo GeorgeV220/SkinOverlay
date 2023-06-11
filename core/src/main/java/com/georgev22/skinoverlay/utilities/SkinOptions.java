@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class SkinOptions implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * The name of the skin.
@@ -59,6 +59,21 @@ public class SkinOptions implements Serializable {
     private final boolean hat;
 
     /**
+     * Creates a new SkinOptions instance for the default skin.
+     */
+    public SkinOptions() {
+        this.skinName = "default";
+        this.url = null;
+        this.cape = true;
+        this.jacket = true;
+        this.left_sleeve = true;
+        this.right_sleeve = true;
+        this.left_pants = true;
+        this.right_pants = true;
+        this.hat = true;
+    }
+
+    /**
      * Creates a new SkinOptions instance with the given skin name.
      *
      * @param skinName the name of the skin
@@ -66,13 +81,13 @@ public class SkinOptions implements Serializable {
     public SkinOptions(@NotNull String skinName) {
         this.skinName = skinName;
         this.url = null;
-        this.cape = false;
-        this.jacket = false;
-        this.left_sleeve = false;
-        this.right_sleeve = false;
-        this.left_pants = false;
-        this.right_pants = false;
-        this.hat = false;
+        this.cape = OptionsUtil.OVERLAY_CAPE.getBooleanValue(skinName);
+        this.jacket = OptionsUtil.OVERLAY_JACKET.getBooleanValue(skinName);
+        this.left_sleeve = OptionsUtil.OVERLAY_LEFT_SLEEVE.getBooleanValue(skinName);
+        this.right_sleeve = OptionsUtil.OVERLAY_RIGHT_SLEEVE.getBooleanValue(skinName);
+        this.left_pants = OptionsUtil.OVERLAY_LEFT_PANTS.getBooleanValue(skinName);
+        this.right_pants = OptionsUtil.OVERLAY_RIGHT_PANTS.getBooleanValue(skinName);
+        this.hat = OptionsUtil.OVERLAY_HAT.getBooleanValue(skinName);
     }
 
     /**
@@ -105,16 +120,7 @@ public class SkinOptions implements Serializable {
      * @return a byte that represents the flags for the skin
      */
     public byte getFlags() {
-        return !skinName.equalsIgnoreCase("custom") ? skinName.equalsIgnoreCase("default") | skinName.equalsIgnoreCase("custom2") ?
-                (byte) (Flags.CAPE.flag | Flags.JACKET.flag | Flags.LEFT_SLEEVE.flag | Flags.RIGHT_SLEEVE.flag | Flags.LEFT_PANTS.flag | Flags.RIGHT_PANTS.flag | Flags.HEAD.flag) :
-                (byte) ((OptionsUtil.OVERLAY_CAPE.getBooleanValue(skinName) ? Flags.CAPE.flag : Flags.NOTHING.flag) |
-                        (OptionsUtil.OVERLAY_JACKET.getBooleanValue(skinName) ? Flags.JACKET.flag : Flags.NOTHING.flag) |
-                        (OptionsUtil.OVERLAY_LEFT_SLEEVE.getBooleanValue(skinName) ? Flags.LEFT_SLEEVE.flag : Flags.NOTHING.flag) |
-                        (OptionsUtil.OVERLAY_RIGHT_SLEEVE.getBooleanValue(skinName) ? Flags.RIGHT_SLEEVE.flag : Flags.NOTHING.flag) |
-                        (OptionsUtil.OVERLAY_LEFT_PANTS.getBooleanValue(skinName) ? Flags.LEFT_PANTS.flag : Flags.NOTHING.flag) |
-                        (OptionsUtil.OVERLAY_RIGHT_PANTS.getBooleanValue(skinName) ? Flags.RIGHT_PANTS.flag : Flags.NOTHING.flag) |
-                        (OptionsUtil.OVERLAY_HAT.getBooleanValue(skinName) ? Flags.HEAD.flag : Flags.NOTHING.flag)) : (byte) ((cape ? Flags.CAPE.flag : Flags.NOTHING.flag) |
-                (jacket ? Flags.JACKET.flag : Flags.NOTHING.flag) |
+        return (byte) ((jacket ? Flags.JACKET.flag : Flags.NOTHING.flag) |
                 (left_sleeve ? Flags.LEFT_SLEEVE.flag : Flags.NOTHING.flag) |
                 (right_sleeve ? Flags.RIGHT_SLEEVE.flag : Flags.NOTHING.flag) |
                 (left_pants ? Flags.LEFT_PANTS.flag : Flags.NOTHING.flag) |
