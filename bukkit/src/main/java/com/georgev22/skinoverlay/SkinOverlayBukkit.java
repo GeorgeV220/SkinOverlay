@@ -13,6 +13,8 @@ import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bukkit.PaperPlayerListeners;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BukkitPluginMessageUtils;
+import com.georgev22.skinoverlay.utilities.bukkit.SkinOverlayBukkitScheduler;
+import com.georgev22.skinoverlay.utilities.bukkit.SkinOverlayFoliaScheduler;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -52,6 +54,8 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     private BukkitAudiences adventure;
     private SkinOverlay skinOverlay;
 
+    private SkinOverlayBukkitScheduler scheduler;
+
     @Override
     public void onLoad() {
         try {
@@ -70,17 +74,28 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     public void onEnable() {
         if (BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(V1_16_R1))
             this.adventure = BukkitAudiences.create(this);
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
+        if (isFolia()) {
+            this.scheduler = new SkinOverlayFoliaScheduler();
+        } else {
+            this.scheduler = new SkinOverlayBukkitScheduler();
+        }
+        scheduler.createRepeatingTask(this, () -> {
             tick++;
             SchedulerManager.getScheduler().mainThreadHeartbeat(tick);
-        }, 0, 1L);
+        }, 1L, 1L);
         switch (getCurrentVersion()) {
             case V1_17_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_17());
             case V1_18_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_18());
             case V1_18_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_18_R2());
             case V1_19_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_19());
             case V1_19_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_19_R2());
-            case V1_19_R3 -> skinOverlay.setSkinHandler(new SkinHandler_1_19_R3());
+            case V1_19_R3 -> {
+                if (isFolia()) {
+                    skinOverlay.setSkinHandler(new SkinHandler_Folia_1_19_R3());
+                } else {
+                    skinOverlay.setSkinHandler(new SkinHandler_1_19_R3());
+                }
+            }
             case UNKNOWN -> skinOverlay.setSkinHandler(new SkinHandler_Unsupported());
             default -> skinOverlay.setSkinHandler(new SkinHandler_Legacy());
         }
@@ -105,7 +120,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         Bukkit.getServer().getMessenger().unregisterIncomingPluginChannel(this);
         Bukkit.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
         skinOverlay.onDisable();
-        Bukkit.getScheduler().cancelTasks(this);
+        scheduler.cancelTasks(this);
         if (this.adventure != null) {
             this.adventure.close();
             this.adventure = null;
@@ -199,5 +214,14 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return this.adventure;
+    }
+
+    private boolean isFolia() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 }

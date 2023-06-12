@@ -19,4 +19,7 @@ include 'mc-1-17'
 include 'bungee'
 include 'velocity'
 include 'mc-1-19-4'
+include 'folia'
+include 'folia:folia-1-19-4'
+findProject(':folia:folia-1-19-4')?.name = 'folia-1-19-4'
 
