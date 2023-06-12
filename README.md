@@ -18,7 +18,7 @@ You can have your project depend on SkinOverlay as a dependency through the foll
         <repository>
             <id>reposilite-repository</id>
             <name>GeorgeV22 Repository</name>
-            <url>https://repo.georgev22.com/{repository}</url>
+            <url>https://repo.georgev22.com/releases</url>
         </repository>
     </repositories>
 
@@ -26,7 +26,7 @@ You can have your project depend on SkinOverlay as a dependency through the foll
         <dependency>
             <groupId>com.georgev22</groupId>
             <artifactId>skinoverlay</artifactId>
-            <version>3.10.0</version>
+            <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -40,27 +40,19 @@ You can include SkinOverlay into your gradle project using the following lines:
 ```groovy
 repositories {
     maven {
-        url "https://repo.georgev22.com/{repository}"
+        url "https://repo.georgev22.com/releases"
     }
 }
 
 dependencies {
-    compileOnly "com.georgev22:skinoverlay:3.10.0"
+    compileOnly "com.georgev22:skinoverlay:6.0.0"
 }
 ```
 
 # Building SkinOverlay
 
-### Maven
-SkinOverlay can be built by running the following: `mvn package`. The resultant jar is built and written
-to `target/skinoverlay-{version}.jar`.
-
-The build directories can be cleaned instead using the `mvn clean` command.
-
-If you want to clean (install) and build the plugin use `mvn clean package` (or `mvn clean install package`) command.
-
 ### Gradle
-SkinOverlay can be built by running the following: `gradle clean build :mc-1-17:reobfJar :mc-1-18:reobfJar :mc-1-18-2:reobfJar :mc-1-19:reobfJar :mc-1-19-3:reobfJar shadowJar`. The resultant jar is built and written
+SkinOverlay can be built by running the following: `clean build :multiver:mc-1-17:reobfJar :multiver:mc-1-18:reobfJar :multiver:mc-1-18-2:reobfJar :multiver:mc-1-19:reobfJar :multiver:mc-1-19-3:reobfJar :multiver:mc-1-19-4:reobfJar shadowJar`. The resultant jar is built and written
 to `build/libs/skinoverlay-{version}.jar`.
 
 The build directories can be cleaned instead using the `gradle clean` command.

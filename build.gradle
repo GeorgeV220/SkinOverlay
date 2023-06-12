@@ -136,12 +136,12 @@ dependencies {
     implementation project(path: ':bukkit')
     implementation project(path: ':bungee')
     implementation project(path: ':velocity')
-    implementation project(path: ':mc-1-17', configuration: 'reobf')
-    implementation project(path: ':mc-1-18', configuration: 'reobf')
-    implementation project(path: ':mc-1-18-2', configuration: 'reobf')
-    implementation project(path: ':mc-1-19', configuration: 'reobf')
-    implementation project(path: ':mc-1-19-3', configuration: 'reobf')
-    implementation project(path: ':mc-1-19-4', configuration: 'reobf')
+    implementation project(path: ':multiver:mc-1-17', configuration: 'reobf')
+    implementation project(path: ':multiver:mc-1-18', configuration: 'reobf')
+    implementation project(path: ':multiver:mc-1-18-2', configuration: 'reobf')
+    implementation project(path: ':multiver:mc-1-19', configuration: 'reobf')
+    implementation project(path: ':multiver:mc-1-19-3', configuration: 'reobf')
+    implementation project(path: ':multiver:mc-1-19-4', configuration: 'reobf')
 }
 
 shadowJar {
