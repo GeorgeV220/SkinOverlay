@@ -1,3 +1,10 @@
+# [6.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v6.0.0...v6.1.0) (2023-06-12)
+
+
+### Features
+
+* Add support for FoliaMC server software in SkinHandler for Minecraft 1.19.4 ([4d1a6b1](https://github.com/GeorgeV220/SkinOverlay/commit/4d1a6b1f087d87f3355b43cc3d446f3a19dd6395))
+
 # [6.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v5.3.1...v6.0.0) (2023-06-11)
 
 
