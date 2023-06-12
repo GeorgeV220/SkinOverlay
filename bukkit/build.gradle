@@ -3,7 +3,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "io.papermc.paper:paper-api:${mcVersion}-R0.1-SNAPSHOT"
+    compileOnly 'dev.folia:folia-api:1.19.4-R0.1-SNAPSHOT'
     compileOnly "io.papermc:paperlib:${paperlibVersion}"
     compileOnly project(path: ':core')
     compileOnly project(path: ':mc-1-17', configuration: 'reobf')
@@ -12,6 +12,7 @@ dependencies {
     compileOnly project(path: ':mc-1-19', configuration: 'reobf')
     compileOnly project(path: ':mc-1-19-3', configuration: 'reobf')
     compileOnly project(path: ':mc-1-19-4', configuration: 'reobf')
+    compileOnly project(path: ':folia:folia-1-19-4')
 
     implementation "net.kyori:adventure-platform-bukkit:4.3.0"
 }
