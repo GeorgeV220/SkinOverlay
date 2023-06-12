@@ -1,0 +1,21 @@
+main: ${bukkitMain}
+name: ${pluginName}
+version: ${version}
+authors:
+  - ${author}
+api-version: 1.13
+load: POSTWORLD
+folia-supported: true
+softdepend:
+  - PlaceholderAPI
+  - SkinsRestorer
+libraries:
+  - org.jsoup:jsoup:1.15.3
+  - org.mongodb:mongo-java-driver:3.12.13
+  - mysql:mysql-connector-java:8.0.32
+  - org.xerial:sqlite-jdbc:3.41.2.1
+  - com.google.guava:guava:31.1-jre
+  - org.postgresql:postgresql:42.6.0
+  - commons-io:commons-io:2.11.0
+  - commons-lang:commons-lang:2.6
+  - commons-codec:commons-codec:1.15
