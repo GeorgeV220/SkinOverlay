@@ -52,12 +52,12 @@ dependencies {
 # Building SkinOverlay
 
 ### Gradle
-SkinOverlay can be built by running the following: `clean build :multiver:mc-1-17:reobfJar :multiver:mc-1-18:reobfJar :multiver:mc-1-18-2:reobfJar :multiver:mc-1-19:reobfJar :multiver:mc-1-19-3:reobfJar :multiver:mc-1-19-4:reobfJar shadowJar`. The resultant jar is built and written
+SkinOverlay can be built by running the following: `gradle clean build :multiver:mc-1-17:reobfJar :multiver:mc-1-18:reobfJar :multiver:mc-1-18-2:reobfJar :multiver:mc-1-19:reobfJar :multiver:mc-1-19-3:reobfJar :multiver:mc-1-19-4:reobfJar :multiver:mc-1-20:reobfJar shadowJar`. The resultant jar is built and written
 to `build/libs/skinoverlay-{version}.jar`.
 
 The build directories can be cleaned instead using the `gradle clean` command.
 
-If you want to clean (install) and build the plugin use `gradle clean build :mc-1-17:reobfJar :mc-1-18:reobfJar :mc-1-18-2:reobfJar :mc-1-19:reobfJar :mc-1-19-3:reobfJar shadowJar` command.
+If you want to clean (install) and build the plugin use `gradle clean build :multiver:mc-1-17:reobfJar :multiver:mc-1-18:reobfJar :multiver:mc-1-18-2:reobfJar :multiver:mc-1-19:reobfJar :multiver:mc-1-19-3:reobfJar :multiver:mc-1-19-4:reobfJar :multiver:mc-1-20:reobfJar shadowJar` command.
 
 # Contributing
 
