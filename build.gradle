@@ -144,6 +144,7 @@ dependencies {
     implementation project(path: ':multiver:mc-1-19-4', configuration: 'reobf')
     implementation project(path: ':multiver:mc-1-20', configuration: 'reobf')
     implementation project(path: ':folia:folia-1-19-4')
+    implementation project(path: ':folia:folia-1-20')
 }
 
 shadowJar {
