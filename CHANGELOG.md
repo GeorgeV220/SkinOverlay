@@ -1,3 +1,12 @@
+# [6.2.0](https://github.com/GeorgeV220/SkinOverlay/compare/v6.1.0...v6.2.0) (2023-06-24)
+
+
+### Features
+
+* Add support for Minecraft 1.20 in build.gradle ([79f5037](https://github.com/GeorgeV220/SkinOverlay/commit/79f5037606e4451154e6f3d27b43b25f072820ca))
+* **folia:** Add support for Folia 1.20 ([392a727](https://github.com/GeorgeV220/SkinOverlay/commit/392a72796f90b0597ea5fd6dfd5f736b583638ad))
+* **multiver:** Add support for Minecraft 1.20 version ([4bd9488](https://github.com/GeorgeV220/SkinOverlay/commit/4bd94881de603d0c4e5d9375434e6e7d41c42c88))
+
 # [6.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v6.0.0...v6.1.0) (2023-06-12)
 
 
