@@ -38,7 +38,6 @@ public final class SkinHandler_1_20 extends SkinHandler {
                 final CraftPlayer craftPlayer = (CraftPlayer) player;
                 final ServerPlayer entityPlayer = craftPlayer.getHandle();
 
-
                 ClientboundPlayerInfoRemovePacket removePlayer = new ClientboundPlayerInfoRemovePacket(List.of(entityPlayer.getUUID()));
                 ClientboundPlayerInfoUpdatePacket addPlayer = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityPlayer));
                 ServerLevel world = entityPlayer.serverLevel();
