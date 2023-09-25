@@ -1,3 +1,10 @@
+## [6.2.1](https://github.com/GeorgeV220/SkinOverlay/compare/v6.2.0...v6.2.1) (2023-09-25)
+
+
+### Bug Fixes
+
+* Fixed Folia support. You will need the reobf jar in order to use skin overlay ([6f43846](https://github.com/GeorgeV220/SkinOverlay/commit/6f4384648285609e9b5cdf6db5903615541727b7))
+
 # [6.2.0](https://github.com/GeorgeV220/SkinOverlay/compare/v6.1.0...v6.2.0) (2023-06-24)
 
 
