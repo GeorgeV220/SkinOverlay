@@ -13,8 +13,9 @@ import com.georgev22.skinoverlay.event.events.user.data.load.UserPostLoadEvent;
 import com.georgev22.skinoverlay.event.events.user.data.load.UserPreLoadEvent;
 import com.georgev22.skinoverlay.exceptions.UserException;
 import com.georgev22.skinoverlay.handler.SGameProfile;
+import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.Skin;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
+import com.georgev22.skinoverlay.handler.skin.SkinParts;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
@@ -278,9 +279,11 @@ public abstract class PlayerObject {
                                         user,
                                         Pair.create(
                                                 "defaultSkin",
-                                                new Skin(skinUUID, gameProfile().getProperties().get("textures") != null
-                                                        ? gameProfile().getProperties().get("textures")
-                                                        : skinOverlay.getSkinHandler().getSkin(playerObject()))
+                                                new Skin(skinUUID,
+                                                        gameProfile().getProperties().get("textures") != null
+                                                                ? gameProfile().getProperties().get("textures")
+                                                                : skinOverlay.getSkinHandler().getSkin(playerObject()),
+                                                        "default")
                                         ),
                                         true));
                         if (!event.isCancelled()) {
@@ -419,13 +422,13 @@ public abstract class PlayerObject {
                         .callEvent(new PlayerObjectPreUpdateSkinEvent(this, user, true));
                 if (event.isCancelled())
                     return;
-                SkinOptions skinOptions = user.skin().skinOptions();
-                if (skinOptions == null)
+                SkinParts skinParts = user.skin().skinParts();
+                if (skinParts == null)
                     return;
-                skinOverlay.getLogger().info("Skin name " + skinOptions.getSkinName());
-                if (skinOptions.getSkinName().equals("default"))
+                skinOverlay.getLogger().info("Skin name " + skinParts.getSkinName());
+                if (skinParts.getSkinName().equals("default"))
                     return;
-                skinOverlay.getSkinHandler().retrieveOrGenerateSkin(event.getPlayerObject(), null, skinOptions)
+                skinOverlay.getSkinHandler().retrieveOrGenerateSkin(event.getPlayerObject(), null, skinParts)
                         .thenAccept(skin -> skinOverlay.getSkinHandler().setSkin(playerObject(), skin));
             }
         }).handleAsync((unused, throwable) -> {
