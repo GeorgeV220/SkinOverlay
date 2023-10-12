@@ -1,15 +1,19 @@
 package com.georgev22.skinoverlay.handler;
 
 import com.georgev22.library.utilities.EntityManager.Entity;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
+import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.handler.skin.SkinParts;
+import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.logging.Level;
 
 @ApiStatus.NonExtendable
 public class Skin extends Entity implements Serializable {
@@ -18,45 +22,46 @@ public class Skin extends Entity implements Serializable {
     private static final long serialVersionUID = 2L;
 
     private SProperty property;
-    private SkinOptions skinOptions;
+    private SkinParts skinParts;
 
     public Skin(UUID uuid) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
-        this.skinOptions = new SkinOptions();
-    }
-
-    public Skin(UUID uuid, SProperty sProperty) {
-        super(uuid);
-        addCustomData("entity_id", uuid.toString());
-        addCustomData("property", this.property = sProperty);
-        addCustomData("skinOptions", this.skinOptions = new SkinOptions());
+        this.skinParts = new SkinParts();
     }
 
     public Skin(UUID uuid, SProperty sProperty, String skinName) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
         addCustomData("property", this.property = sProperty);
-        addCustomData("skinOptions", this.skinOptions = new SkinOptions(skinName));
+        try {
+            addCustomData("skinParts", this.skinParts = new SkinParts(
+                    new SerializableBufferedImage(SkinOverlay.getInstance().getSkinHandler().getSkinImage(sProperty)),
+                    skinName
+            ));
+        } catch (IOException e) {
+            SkinOverlay.getInstance().getLogger().log(Level.SEVERE, "Could not load skin " + skinName, e);
+            addCustomData("skinParts", this.skinParts = new SkinParts(null, skinName));
+        }
     }
 
-    public Skin(UUID uuid, SProperty sProperty, SkinOptions skinOptions) {
+    public Skin(UUID uuid, SProperty sProperty, SkinParts skinParts) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
         addCustomData("property", this.property = sProperty);
-        addCustomData("skinOptions", this.skinOptions = skinOptions);
+        addCustomData("skinParts", this.skinParts = skinParts);
     }
 
     public @Nullable SProperty skinProperty() {
         return getCustomData("property") != null ? getCustomData("property") : property;
     }
 
-    public SkinOptions skinOptions() {
-        return getCustomData("skinOptions") != null ? getCustomData("skinOptions") : skinOptions;
+    public SkinParts skinParts() {
+        return getCustomData("skinParts") != null ? getCustomData("skinParts") : skinParts;
     }
 
-    public void setSkinOptions(SkinOptions skinOptions) {
-        addCustomData("skinOptions", this.skinOptions = skinOptions);
+    public void setSkinParts(SkinParts skinParts) {
+        addCustomData("skinParts", this.skinParts = skinParts);
     }
 
     public void setProperty(SProperty property) {
@@ -76,7 +81,7 @@ public class Skin extends Entity implements Serializable {
     public String toString() {
         return "Skin{" +
                 "property=" + property +
-                ", skinOptions=" + skinOptions +
+                ", skinParts=" + skinParts +
                 ", skinURL=" + skinURL() +
                 '}';
     }

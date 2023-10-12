@@ -4,7 +4,8 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectConnectionEvent;
 import com.georgev22.skinoverlay.handler.Skin;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
+import com.georgev22.skinoverlay.handler.skin.SkinParts;
+import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
@@ -72,10 +73,10 @@ public class PlayerListeners implements Listener, PluginMessageListener {
             skinOverlay.getSkinHandler().setSkin(playerObject, skin);
         } else {
             if (subChannel.equalsIgnoreCase("change")) {
-                if (!skin.skinOptions().getSkinName().contains("custom")) {
+                if (!skin.skinParts().getSkinName().contains("custom")) {
                     skinOverlay.getSkinHandler().setSkin(playerObject, skin);
                 } else {
-                    URL url = new URL(skin.skinOptions().getUrl());
+                    URL url = new URL(Objects.requireNonNull(skin.skinURL()));
                     ByteArrayOutputStream output = new ByteArrayOutputStream();
 
                     try (InputStream stream = url.openStream()) {
@@ -89,10 +90,11 @@ public class PlayerListeners implements Listener, PluginMessageListener {
                             output.write(buffer, 0, bytesRead);
                         }
                     }
+                    skin.setSkinParts(new SkinParts(new SerializableBufferedImage(ImageIO.read(new ByteArrayInputStream(output.toByteArray()))), skin.skinParts().getSkinName()));
                     skinOverlay.getSkinHandler().retrieveOrGenerateSkin(
                             playerObject,
-                            () -> ImageIO.read(new ByteArrayInputStream(output.toByteArray())),
-                            new SkinOptions()).thenAccept(userSkin -> {
+                            () -> skin.skinParts().getFullSkin().getBufferedImage(),
+                            skin.skinParts()).thenAccept(userSkin -> {
                         skinOverlay.getSkinHandler().setSkin(playerObject, skin);
                     });
                 }

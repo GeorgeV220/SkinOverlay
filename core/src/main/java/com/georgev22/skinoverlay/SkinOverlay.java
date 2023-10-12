@@ -369,7 +369,7 @@ public final class SkinOverlay {
         ObjectMap<String, Pair<String, String>> skinMap = new HashObjectMap<String, Pair<String, String>>()
                 .append("entity_id", Pair.create("VARCHAR(38)", "NULL"))
                 .append("property", Pair.create("BLOB", "NULL"))
-                .append("skinOptions", Pair.create("BLOB", "NULL"));
+                .append("skinParts", Pair.create("BLOB", "NULL"));
         switch (OptionsUtil.DATABASE_TYPE.getStringValue()) {
             case "MySQL" -> {
                 if (databaseWrapper == null || !databaseWrapper.isConnected()) {
