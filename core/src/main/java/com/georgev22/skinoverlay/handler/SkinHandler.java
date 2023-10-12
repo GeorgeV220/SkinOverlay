@@ -4,7 +4,10 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.exceptions.SkinException;
-import com.georgev22.skinoverlay.utilities.SkinOptions;
+import com.georgev22.skinoverlay.handler.skin.MinecraftSkinRenderer;
+import com.georgev22.skinoverlay.handler.skin.Part;
+import com.georgev22.skinoverlay.handler.skin.SkinParts;
+import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
@@ -24,7 +27,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -79,19 +84,17 @@ public abstract class SkinHandler {
      */
     public abstract SGameProfile getGameProfile(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException;
 
-    public CompletableFuture<Skin> retrieveOrGenerateSkin(@NotNull PlayerObject playerObject, @Nullable ImageSupplier imageSupplier, @NotNull SkinOptions skinOptions) {
-        if (skinOptions == null) {
-            throw new SkinException("SkinOptions cannot be null");
-        }
-
-        UUID skinUUID = Utilities.generateUUID(skinOptions.getSkinName() + playerObject.playerUUID().toString());
+    public CompletableFuture<Skin> retrieveOrGenerateSkin(@NotNull PlayerObject playerObject, @Nullable ImageSupplier imageSupplier, @NotNull SkinParts skinParts) {
+        UUID skinUUID = Utilities.generateUUID(skinParts.getSkinName() + playerObject.playerUUID().toString());
         return skinOverlay.getSkinManager().exists(skinUUID).thenApply(result -> {
             if (result) {
+                skinOverlay.getLogger().info("Skin: " + skinUUID + " found for player: " + playerObject.playerName());
                 return skinOverlay.getSkinManager().getEntity(skinUUID).join();
             } else {
                 try {
                     if (imageSupplier == null) {
-                        throw new SkinException("ImageSupplier cannot be null");
+                        skinOverlay.getLogger().log(Level.SEVERE, "ImageSupplier cannot be null", new SkinException("ImageSupplier cannot be null"));
+                        return null;
                     }
 
                     Image overlay = imageSupplier.get();
@@ -108,25 +111,67 @@ public abstract class SkinHandler {
                     }
 
                     if (obj == null) {
-                        throw new SkinException("Property object cannot be null");
+                        skinOverlay.getLogger().log(Level.SEVERE, "Property object cannot be null", new SkinException("Property object cannot be null"));
+                        return null;
                     }
 
                     String base64 = obj.getAsJsonObject().get("value").getAsString();
                     String value = new String(Base64.getDecoder().decode(base64));
                     JsonElement textureJson = JsonParser.parseString(value);
                     String skinUrl = textureJson.getAsJsonObject().getAsJsonObject("textures").getAsJsonObject("SKIN").get("url").getAsString();
-                    BufferedImage bufferedImage = ImageIO.read(new URL(skinUrl));
-                    BufferedImage image = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), 2);
-                    Graphics2D canvas = image.createGraphics();
-                    canvas.drawImage(bufferedImage, 0, 0, null);
+
+                    BufferedImage currentSkin = ImageIO.read(new URL(skinUrl));
+
+                    SkinParts currentSkinParts = new SkinParts(new SerializableBufferedImage(currentSkin), "currentSkin");
+                    currentSkinParts.createParts();
+
+                    List<Part> newSkinParts = new ArrayList<>();
+                    for (Part part : currentSkinParts.getParts().values()) {
+                        if (part.name().startsWith("Jacket")) {
+                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_JACKET.getBooleanValue(skinParts.getSkinName())) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Hat")) {
+                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_HAT.getBooleanValue(skinParts.getSkinName())) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Left_Sleeve")) {
+                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_LEFT_SLEEVE.getBooleanValue(skinParts.getSkinName())) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Right_Sleeve")) {
+                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_RIGHT_SLEEVE.getBooleanValue(skinParts.getSkinName())) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Left_Pants")) {
+                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_LEFT_PANTS.getBooleanValue(skinParts.getSkinName())) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Right_Pants")) {
+                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_RIGHT_PANTS.getBooleanValue(skinParts.getSkinName())) {
+                                continue;
+                            }
+                        }
+                        newSkinParts.add(part);
+                    }
+                    MinecraftSkinRenderer minecraftSkinRenderer = new MinecraftSkinRenderer(newSkinParts.toArray(Part[]::new));
+                    minecraftSkinRenderer.createFullSkinImage();
+                    BufferedImage skinToBeGenerated = new BufferedImage(currentSkin.getWidth(), currentSkin.getHeight(), 2);
+                    Graphics2D canvas = skinToBeGenerated.createGraphics();
+                    canvas.drawImage(minecraftSkinRenderer.getFullSkinImage().getBufferedImage(), 0, 0, null);
                     canvas.drawImage(overlay, 0, 0, null);
                     canvas.dispose();
-                    Texture texture = mineskinClient.generateUpload(image).get().data.texture;
+                    Texture texture = mineskinClient.generateUpload(skinToBeGenerated).get().data.texture;
                     if (texture == null) {
                         throw new SkinException("Texture cannot be null");
                     }
                     SProperty property = new SProperty("textures", texture.value, texture.signature);
-                    Skin skin = new Skin(skinUUID, property, skinOptions);
+                    Skin skin = new Skin(skinUUID, property, skinParts);
                     if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                         return skin;
                     }
@@ -361,6 +406,29 @@ public abstract class SkinHandler {
         return playerObject.isBedrock() ? this.getXUIDSkin(this.getXUID(playerObject)) : this.getJavaSkin(playerObject);
     }
 
+    public BufferedImage getSkinImage(final @NotNull SProperty sProperty) throws IOException {
+        String url = JsonParser.parseString(new String(Base64.getDecoder().decode(sProperty.value())))
+                .getAsJsonObject()
+                .getAsJsonObject("textures")
+                .getAsJsonObject("SKIN")
+                .get("url")
+                .getAsString();
+        return ImageIO.read(new URL(url));
+    }
+
+    public BufferedImage getSkinImage(final @NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
+        SProperty sProperty = playerObject.gameProfile().getProperties().get("textures") != null
+                ? playerObject.gameProfile().getProperties().get("textures")
+                : skinOverlay.getSkinHandler().getSkin(playerObject);
+        String url = JsonParser.parseString(new String(Base64.getDecoder().decode(sProperty.value())))
+                .getAsJsonObject()
+                .getAsJsonObject("textures")
+                .getAsJsonObject("SKIN")
+                .get("url")
+                .getAsString();
+        return ImageIO.read(new URL(url));
+    }
+
     /**
      * This method checks if a Minecraft username is a premium account.
      * A premium account is one that has paid for the game.
@@ -394,7 +462,7 @@ public abstract class SkinHandler {
                 return false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            skinOverlay.getLogger().log(Level.SEVERE, "Unable to check if username " + username + " is a premium account.", e);
             return false;
         }
     }
