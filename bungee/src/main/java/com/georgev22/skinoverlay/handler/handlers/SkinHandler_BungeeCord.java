@@ -16,6 +16,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
@@ -28,14 +29,15 @@ public class SkinHandler_BungeeCord extends SkinHandler {
                 ProxiedPlayer proxiedPlayer = (ProxiedPlayer) playerObject.player();
                 skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
                 skinOverlay.getPluginMessageUtils().setObject(proxiedPlayer.getServer().getInfo());
-                if (skin.skinOptions().getSkinName().equalsIgnoreCase("default")) {
+                if (skin.skinParts().getSkinName().equalsIgnoreCase("default")) {
                     skinOverlay.getPluginMessageUtils().sendDataToServer("reset", playerObject.playerUUID().toString(), Utils.serializeObjectToString(skin), "true");
                 } else {
                     skinOverlay.getPluginMessageUtils().sendDataToServer("change", playerObject.playerUUID().toString(), Utils.serializeObjectToString(skin), "true");
                 }
                 return true;
             } catch (Exception exception) {
-                throw new RuntimeException(exception);
+                skinOverlay.getLogger().log(Level.SEVERE, exception.getMessage(), exception);
+                return false;
             }
         });
     }
@@ -44,7 +46,7 @@ public class SkinHandler_BungeeCord extends SkinHandler {
     public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
             if (throwable != null) {
-                throwable.printStackTrace();
+                skinOverlay.getLogger().log(Level.SEVERE, "Error updating skin", throwable);
                 return false;
             }
             return aBoolean;

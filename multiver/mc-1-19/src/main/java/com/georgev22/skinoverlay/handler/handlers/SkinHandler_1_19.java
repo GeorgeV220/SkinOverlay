@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 import static com.georgev22.skinoverlay.handler.handlers.SkinHandler_Unsupported.wrapper;
 
@@ -72,14 +73,14 @@ public final class SkinHandler_1_19 extends SkinHandler {
 
                 sendPacket(entityPlayer, respawn);
 
-                SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
+                /*SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
 
-                synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skin.skinOptions().getFlags());
+                synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skin.skinParts().getFlags());
 
 
                 ClientboundSetEntityDataPacket clientboundSetEntityDataPacket = new ClientboundSetEntityDataPacket(entityPlayer.getId(), synchedEntityData, true);
 
-                sendPacket(entityPlayer, clientboundSetEntityDataPacket);
+                sendPacket(entityPlayer, clientboundSetEntityDataPacket);*/
 
                 entityPlayer.onUpdateAbilities();
 
@@ -103,7 +104,7 @@ public final class SkinHandler_1_19 extends SkinHandler {
             player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
                 if (throwable != null) {
-                    throwable.printStackTrace();
+                    skinOverlay.getLogger().log(Level.SEVERE, "Error updating skin", throwable);
                     return false;
                 }
                 return aBoolean;
@@ -131,7 +132,7 @@ public final class SkinHandler_1_19 extends SkinHandler {
                 }
             } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException |
                      InvocationTargetException exception) {
-                exception.printStackTrace();
+                skinOverlay.getLogger().log(Level.SEVERE, exception.getMessage(), exception);
             }
         return entityPlayer.getGameProfile();
     }

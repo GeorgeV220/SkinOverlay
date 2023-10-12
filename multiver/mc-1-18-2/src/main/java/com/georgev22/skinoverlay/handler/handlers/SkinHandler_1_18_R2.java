@@ -9,10 +9,10 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.*;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
+import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 import static com.georgev22.skinoverlay.handler.handlers.SkinHandler_Unsupported.wrapper;
 
@@ -64,14 +65,14 @@ public final class SkinHandler_1_18_R2 extends SkinHandler {
 
                 sendPacket(entityPlayer, respawn);
 
-                SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
+                /*SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
 
-                synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skin.skinOptions().getFlags());
+                synchedEntityData.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skin.skinParts().getFlags());
 
 
                 ClientboundSetEntityDataPacket clientboundSetEntityDataPacket = new ClientboundSetEntityDataPacket(entityPlayer.getId(), synchedEntityData, true);
 
-                sendPacket(entityPlayer, clientboundSetEntityDataPacket);
+                sendPacket(entityPlayer, clientboundSetEntityDataPacket);*/
 
                 entityPlayer.onUpdateAbilities();
 
@@ -95,7 +96,7 @@ public final class SkinHandler_1_18_R2 extends SkinHandler {
             player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
                 if (throwable != null) {
-                    throwable.printStackTrace();
+                    skinOverlay.getLogger().log(Level.SEVERE, "Error updating skin", throwable);
                     return false;
                 }
                 return aBoolean;

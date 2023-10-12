@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
@@ -32,7 +33,7 @@ public class SkinHandler_Unsupported extends SkinHandler {
     public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
             if (throwable != null) {
-                throwable.printStackTrace();
+                skinOverlay.getLogger().log(Level.SEVERE, "Error updating skin", throwable);
                 return false;
             }
             return aBoolean;

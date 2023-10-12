@@ -11,9 +11,6 @@ import com.mojang.authlib.GameProfile;
 import io.papermc.lib.PaperLib;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
@@ -30,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 import static com.georgev22.skinoverlay.handler.handlers.SkinHandler_Unsupported.wrapper;
 
@@ -70,15 +68,15 @@ public final class SkinHandler_1_19_R2 extends SkinHandler {
 
                 sendPacket(entityPlayer, respawn);
 
-                SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
+                /*SynchedEntityData synchedEntityData = entityPlayer.getEntityData();
 
                 EntityDataAccessor<Byte> entityDataAccessor;
 
-                synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skin.skinOptions().getFlags());
+                synchedEntityData.set(entityDataAccessor = new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), skin.skinParts().getFlags());
 
                 synchedEntityData.markDirty(entityDataAccessor);
 
-                synchedEntityData.refresh(entityPlayer);
+                synchedEntityData.refresh(entityPlayer);*/
 
                 entityPlayer.onUpdateAbilities();
 
@@ -102,7 +100,7 @@ public final class SkinHandler_1_19_R2 extends SkinHandler {
             player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
                 if (throwable != null) {
-                    throwable.printStackTrace();
+                    skinOverlay.getLogger().log(Level.SEVERE, "Error updating skin", throwable);
                     return false;
                 }
                 return aBoolean;
@@ -130,7 +128,7 @@ public final class SkinHandler_1_19_R2 extends SkinHandler {
                 }
             } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException |
                      InvocationTargetException exception) {
-                exception.printStackTrace();
+                skinOverlay.getLogger().log(Level.SEVERE, exception.getMessage(), exception);
             }
         return entityPlayer.gameProfile;
     }

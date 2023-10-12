@@ -26,8 +26,6 @@ import java.util.logging.Level;
 
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftReflection.getNMSClass;
 import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftReflection.getOBCClass;
-import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.V1_16_R1;
-import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion;
 import static com.georgev22.library.utilities.Utils.Reflection.*;
 
 @ApiStatus.Internal
@@ -86,6 +84,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
     @Override
     public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         return CompletableFuture.supplyAsync(() -> {
+            //noinspection CommentedOutCode
             try {
                 Player player = (Player) playerObject.player();
 
@@ -227,7 +226,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
 
                 sendPacket(playerConnection, respawn);
 
-                Object dataWatcher;
+                /*Object dataWatcher;
                 try {
                     dataWatcher = fetchMethodAndInvoke(entityPlayer.getClass(), "getDataWatcher", entityPlayer, new Object[0], new Class[0]);
                 } catch (Exception e) {
@@ -249,11 +248,11 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                                 dataWatcher.getClass(),
                                 "set",
                                 dataWatcher,
-                                new Object[]{dataWatcherObject, skin.skinOptions().getFlags()},
+                                new Object[]{dataWatcherObject, skin.skinParts().getFlags()},
                                 new Class[]{dataWatcherObject.getClass(), Object.class});
                     } else {
                         //1.8.8 data watcher (Spigot and Spigot forks like FlamePaper Titanium and PandaSpigot)
-                        fetchMethodAndInvoke(dataWatcher.getClass(), "watch", dataWatcher, new Object[]{10, skin.skinOptions().getFlags()}, new Class[]{int.class, Object.class});
+                        fetchMethodAndInvoke(dataWatcher.getClass(), "watch", dataWatcher, new Object[]{10, skin.skinParts().getFlags()}, new Class[]{int.class, Object.class});
                     }
                     try {
                         sendPacket(playerConnection, invokeConstructor(getNMSClass("PacketPlayOutEntityMetadata"), player.getEntityId(), dataWatcher, false));
@@ -262,7 +261,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                     }
                 } else {
                     skinOverlay.getLogger().log(Level.WARNING, "DataWatcher is null!!");
-                }
+                }*/
 
                 fetchMethodAndInvoke(entityPlayer.getClass(), "updateAbilities", entityPlayer, new Object[0], new Class[0]);
 
@@ -295,7 +294,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
             player.showPlayer(player);
             skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
                 if (throwable != null) {
-                    throwable.printStackTrace();
+                    skinOverlay.getLogger().log(Level.SEVERE, "Error updating skin", throwable);
                     return false;
                 }
                 return aBoolean;
