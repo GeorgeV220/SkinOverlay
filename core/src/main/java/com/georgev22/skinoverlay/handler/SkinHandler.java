@@ -107,32 +107,32 @@ public abstract class SkinHandler {
                     List<Part> newSkinParts = new ArrayList<>();
                     for (Part part : currentSkinParts.getParts().values()) {
                         if (part.name().startsWith("Jacket")) {
-                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_JACKET.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_JACKET.getBooleanValue(skinParts.getSkinName())) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Hat")) {
-                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_HAT.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_HAT.getBooleanValue(skinParts.getSkinName())) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Left_Sleeve")) {
-                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_LEFT_SLEEVE.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_LEFT_SLEEVE.getBooleanValue(skinParts.getSkinName())) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Right_Sleeve")) {
-                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_RIGHT_SLEEVE.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_RIGHT_SLEEVE.getBooleanValue(skinParts.getSkinName())) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Left_Pants")) {
-                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_LEFT_PANTS.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_LEFT_PANTS.getBooleanValue(skinParts.getSkinName())) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Right_Pants")) {
-                            if (!part.isEmpty() & !OptionsUtil.OVERLAY_RIGHT_PANTS.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_RIGHT_PANTS.getBooleanValue(skinParts.getSkinName())) {
                                 continue;
                             }
                         }

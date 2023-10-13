@@ -60,19 +60,18 @@ public enum OptionsUtil {
 
     UPDATER("updater.enabled", true, Optional.empty()),
 
-    OVERLAY_CAPE("overlays.%s.cape", false, Optional.empty()),
+    PARTS_OVERLAY_JACKET("parts.overlay.%s.jacket", false, Optional.of("overlays.%s.jacket")),
 
-    OVERLAY_JACKET("overlays.%s.jacket", false, Optional.empty()),
+    PARTS_OVERLAY_LEFT_SLEEVE("parts.overlay.%s.left_sleeve", false, Optional.of("overlays.%s.left_sleeve")),
 
-    OVERLAY_LEFT_SLEEVE("overlays.%s.left_sleeve", false, Optional.empty()),
+    PARTS_OVERLAY_RIGHT_SLEEVE("parts.overlay.%s.right_sleeve", false, Optional.of("overlays.%s.right_sleeve")),
 
-    OVERLAY_RIGHT_SLEEVE("overlays.%s.right_sleeve", false, Optional.empty()),
+    PARTS_OVERLAY_LEFT_PANTS("parts.overlay.%s.left_pants", false, Optional.of("overlays.%s.left_pants")),
 
-    OVERLAY_LEFT_PANTS("overlays.%s.left_pants", false, Optional.empty()),
+    PARTS_OVERLAY_RIGHT_PANTS("parts.overlay.%s.right_pants", false, Optional.of("overlays.%s.right_pants")),
 
-    OVERLAY_RIGHT_PANTS("overlays.%s.right_pants", false, Optional.empty()),
+    PARTS_OVERLAY_HAT("parts.overlay.%s.hat", false, Optional.of("overlays.%s.hat")),
 
-    OVERLAY_HAT("overlays.%s.hat", false, Optional.empty()),
     DEFAULT_SKIN_UUID("default skin uuid", "8667ba71-b85a-4004-af54-457a9734eed7", Optional.empty()),
     SKIN_HOOK("skin hook", "SkinsRestorer", Optional.empty()),
     LOCALE("locale", "en_US", Optional.empty());
