@@ -99,28 +99,7 @@ public abstract class SkinHandler {
 
                     Image overlay = imageSupplier.get();
 
-                    byte[] profileBytes = getProfileBytes(playerObject, null);
-
-                    JsonElement json = JsonParser.parseString(new String(profileBytes));
-                    JsonArray properties = json.getAsJsonObject().get("properties").getAsJsonArray();
-                    JsonElement obj = null;
-                    for (JsonElement object : properties) {
-                        if (!object.getAsJsonObject().get("name").getAsString().equals("textures")) continue;
-                        obj = object;
-                        break;
-                    }
-
-                    if (obj == null) {
-                        skinOverlay.getLogger().log(Level.SEVERE, "Property object cannot be null", new SkinException("Property object cannot be null"));
-                        return null;
-                    }
-
-                    String base64 = obj.getAsJsonObject().get("value").getAsString();
-                    String value = new String(Base64.getDecoder().decode(base64));
-                    JsonElement textureJson = JsonParser.parseString(value);
-                    String skinUrl = textureJson.getAsJsonObject().getAsJsonObject("textures").getAsJsonObject("SKIN").get("url").getAsString();
-
-                    BufferedImage currentSkin = ImageIO.read(new URL(skinUrl));
+                    BufferedImage currentSkin = this.getSkinImage(this.getProfileBytes(playerObject, null));
 
                     SkinParts currentSkinParts = new SkinParts(new SerializableBufferedImage(currentSkin), "currentSkin");
                     currentSkinParts.createParts();
@@ -443,6 +422,51 @@ public abstract class SkinHandler {
                 .get("url")
                 .getAsString();
         return ImageIO.read(new URL(url));
+    }
+
+    /**
+     * Retrieves a skin image from the provided profile bytes.
+     *
+     * @param profileBytes The profile bytes containing skin information.
+     * @return The BufferedImage representing the player's skin.
+     * @throws IOException If an I/O error occurs while fetching the image.
+     */
+    public BufferedImage getSkinImage(final byte @NotNull [] profileBytes) throws IOException {
+        JsonElement json = JsonParser.parseString(new String(profileBytes));
+        JsonArray properties = json.getAsJsonObject().getAsJsonArray("properties");
+
+        JsonElement textures = findTexturesProperty(properties);
+        if (textures == null) {
+            skinOverlay.getLogger().log(Level.SEVERE, "Property object 'textures' not found", new SkinException("Property object 'textures' not found"));
+            return null;
+        }
+
+        String base64Texture = textures.getAsJsonObject().get("value").getAsString();
+        String decodedTexture = new String(Base64.getDecoder().decode(base64Texture));
+
+        JsonElement textureJson = JsonParser.parseString(decodedTexture);
+        String skinUrl = textureJson.getAsJsonObject()
+                .getAsJsonObject("textures")
+                .getAsJsonObject("SKIN")
+                .get("url")
+                .getAsString();
+
+        return ImageIO.read(new URL(skinUrl));
+    }
+
+    /**
+     * Find the 'textures' property within a JsonArray of properties.
+     *
+     * @param properties The JsonArray of properties to search for 'textures'.
+     * @return The JsonElement representing the 'textures' property, or null if not found.
+     */
+    public JsonElement findTexturesProperty(@NotNull JsonArray properties) {
+        for (JsonElement property : properties) {
+            if (property.isJsonObject() && "textures".equals(property.getAsJsonObject().get("name").getAsString())) {
+                return property;
+            }
+        }
+        return null;
     }
 
     /**
