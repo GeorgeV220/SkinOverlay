@@ -406,6 +406,13 @@ public abstract class SkinHandler {
         return playerObject.isBedrock() ? this.getXUIDSkin(this.getXUID(playerObject)) : this.getJavaSkin(playerObject);
     }
 
+    /**
+     * Retrieves a skin image from the provided SProperty.
+     *
+     * @param sProperty The SProperty containing the skin information.
+     * @return The BufferedImage representing the player's skin.
+     * @throws IOException If an I/O error occurs while fetching the image.
+     */
     public BufferedImage getSkinImage(final @NotNull SProperty sProperty) throws IOException {
         String url = JsonParser.parseString(new String(Base64.getDecoder().decode(sProperty.value())))
                 .getAsJsonObject()
@@ -416,6 +423,15 @@ public abstract class SkinHandler {
         return ImageIO.read(new URL(url));
     }
 
+    /**
+     * Retrieves a skin image from the provided PlayerObject.
+     *
+     * @param playerObject The PlayerObject for which to fetch the skin.
+     * @return The BufferedImage representing the player's skin.
+     * @throws IOException          If an I/O error occurs while fetching the image.
+     * @throws ExecutionException   If an exception occurs during execution.
+     * @throws InterruptedException If the execution is interrupted.
+     */
     public BufferedImage getSkinImage(final @NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         SProperty sProperty = playerObject.gameProfile().getProperties().get("textures") != null
                 ? playerObject.gameProfile().getProperties().get("textures")
