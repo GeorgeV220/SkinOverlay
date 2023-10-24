@@ -8,12 +8,23 @@ public abstract class Section {
     private final int y1;
     private final int x2;
     private final int y2;
+    private final int width;
+    private final int height;
 
     public Section(int x1, int y1, int x2, int y2) {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
+
+        if (y1 > y2) {
+            int temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+
+        this.width = x2 - x1;
+        this.height = y2 - y1;
     }
 
     @Override

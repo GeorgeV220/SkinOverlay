@@ -119,21 +119,12 @@ public class SkinParts implements Serializable {
     }
 
     private @NotNull Part createPart(@NotNull Section section) {
-        int x1 = section.getX1();
-        int y1 = section.getY1();
-        int x2 = section.getX2();
-        int y2 = section.getY2();
+        int x = section.getX1();
+        int y = section.getY1();
+        int width = section.getWidth();
+        int height = section.getHeight();
 
-        if (y1 > y2) {
-            int temp = y1;
-            y1 = y2;
-            y2 = temp;
-        }
-
-        int width = x2 - x1;
-        int height = y2 - y1;
-
-        BufferedImage partImage = fullSkin.getBufferedImage().getSubimage(x1, y1, width, height);
+        BufferedImage partImage = fullSkin.getBufferedImage().getSubimage(x, y, width, height);
         int[] pixelData = partImage.getRGB(0, 0, width, height, null, 0, width);
 
         boolean isAreaTransparent = true;
@@ -146,7 +137,7 @@ public class SkinParts implements Serializable {
         }
 
         String partName = section.getClass().getSimpleName();
-        return new Part(partName, new SerializableBufferedImage(partImage), x1, y1, width, height, isAreaTransparent);
+        return new Part(partName, new SerializableBufferedImage(partImage), x, y, width, height, isAreaTransparent);
     }
 
     public Part getPart(String partName) {
