@@ -1,7 +1,9 @@
-package com.georgev22.skinoverlay.handler;
+package com.georgev22.skinoverlay.storage.data;
 
-import com.georgev22.library.utilities.EntityManager.Entity;
+import com.georgev22.library.maps.ConcurrentObjectMap;
+import com.georgev22.library.utilities.Entity;
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.skin.SkinParts;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.google.gson.JsonParser;
@@ -16,22 +18,24 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 @ApiStatus.NonExtendable
-public class Skin extends Entity implements Serializable {
+public class Skin implements Entity, Serializable {
 
     @Serial
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
+
+    private final ConcurrentObjectMap<String, Object> customData;
 
     private SProperty property;
     private SkinParts skinParts;
 
     public Skin(UUID uuid) {
-        super(uuid);
+        this.customData = new ConcurrentObjectMap<>();
         addCustomData("entity_id", uuid.toString());
         this.skinParts = new SkinParts();
     }
 
     public Skin(UUID uuid, SProperty sProperty, String skinName) {
-        super(uuid);
+        this.customData = new ConcurrentObjectMap<>();
         addCustomData("entity_id", uuid.toString());
         addCustomData("property", this.property = sProperty);
         try {
@@ -46,7 +50,7 @@ public class Skin extends Entity implements Serializable {
     }
 
     public Skin(UUID uuid, SProperty sProperty, SkinParts skinParts) {
-        super(uuid);
+        this.customData = new ConcurrentObjectMap<>();
         addCustomData("entity_id", uuid.toString());
         addCustomData("property", this.property = sProperty);
         addCustomData("skinParts", this.skinParts = skinParts);
@@ -84,5 +88,15 @@ public class Skin extends Entity implements Serializable {
                 ", skinParts=" + skinParts +
                 ", skinURL=" + skinURL() +
                 '}';
+    }
+
+    @Override
+    public UUID getId() {
+        return this.getCustomData("entity_id") != null ? UUID.fromString(this.getCustomData("entity_id")) : null;
+    }
+
+    @Override
+    public ConcurrentObjectMap<String, Object> getCustomData() {
+        return this.customData;
     }
 }

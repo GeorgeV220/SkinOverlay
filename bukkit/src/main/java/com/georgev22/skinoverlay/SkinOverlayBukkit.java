@@ -91,6 +91,7 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
             case V1_19_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_19_R2());
             case V1_19_R3 -> skinOverlay.setSkinHandler(new SkinHandler_1_19_R3());
             case V1_20_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_20());
+            case V1_20_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_20_2());
             case UNKNOWN -> skinOverlay.setSkinHandler(new SkinHandler_Unsupported());
             default -> skinOverlay.setSkinHandler(new SkinHandler_Legacy());
         }

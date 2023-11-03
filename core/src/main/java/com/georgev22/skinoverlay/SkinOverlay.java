@@ -15,7 +15,6 @@ import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
 import com.georgev22.skinoverlay.event.EventManager;
 import com.georgev22.skinoverlay.event.HandlerList;
-import com.georgev22.skinoverlay.handler.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.hook.hooks.SkinHookImpl;
@@ -23,6 +22,9 @@ import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
+import com.georgev22.skinoverlay.storage.data.User;
+import com.georgev22.skinoverlay.storage.manager.SkinManager;
+import com.georgev22.skinoverlay.storage.manager.UserManager;
 import com.georgev22.skinoverlay.utilities.Locale;
 import com.georgev22.skinoverlay.utilities.PluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.Updater;
@@ -31,7 +33,6 @@ import com.georgev22.skinoverlay.utilities.config.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import com.georgev22.skinoverlay.utilities.player.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.ApiStatus;
@@ -83,10 +84,10 @@ public final class SkinOverlay {
     private CommandManager<?, ?, ?, ?, ?, ?> commandManager;
 
     @Getter
-    private EntityManager<User> userManager;
+    private UserManager userManager;
 
     @Getter
-    private EntityManager<Skin> skinManager;
+    private SkinManager skinManager;
 
     @Getter
     private EventManager eventManager;
@@ -420,15 +421,15 @@ public final class SkinOverlay {
                             OptionsUtil.DATABASE_MONGO_DATABASE.getStringValue(),
                             getLogger());
                     databaseWrapper.connect();
-                    this.userManager = new EntityManager<>(databaseWrapper, OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue(), User.class);
-                    this.skinManager = new EntityManager<>(databaseWrapper, OptionsUtil.DATABASE_MONGO_SKINS_COLLECTION.getStringValue(), Skin.class);
+                    this.userManager = new UserManager(databaseWrapper, OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue());
+                    this.skinManager = new SkinManager(databaseWrapper, OptionsUtil.DATABASE_MONGO_SKINS_COLLECTION.getStringValue());
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MongoDB");
                 }
             }
             default -> {
                 databaseWrapper = null;
-                this.userManager = new EntityManager<>(new File(this.getDataFolder(), "userdata"), null, User.class);
-                this.skinManager = new EntityManager<>(new File(this.getDataFolder(), "skindata"), null, Skin.class);
+                this.userManager = new UserManager(new File(this.getDataFolder(), "userdata"), null);
+                this.skinManager = new SkinManager(new File(this.getDataFolder(), "skindata"), null);
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: File");
             }
         }
@@ -450,8 +451,8 @@ public final class SkinOverlay {
         databaseWrapper.connect();
         databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
         databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
-        this.userManager = new EntityManager<>(databaseWrapper, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), User.class);
-        this.skinManager = new EntityManager<>(databaseWrapper, OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), Skin.class);
+        this.userManager = new UserManager(databaseWrapper, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+        this.skinManager = new SkinManager(databaseWrapper, OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue());
     }
 
 

@@ -13,6 +13,7 @@ dependencies {
     compileOnly project(path: ':multiver:mc-1-19-3', configuration: 'reobf')
     compileOnly project(path: ':multiver:mc-1-19-4', configuration: 'reobf')
     compileOnly project(path: ':multiver:mc-1-20', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc-1-20-2', configuration: 'reobf')
 
     implementation "net.kyori:adventure-platform-bukkit:4.3.0"
 }

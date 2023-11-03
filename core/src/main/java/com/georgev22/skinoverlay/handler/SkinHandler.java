@@ -7,6 +7,7 @@ import com.georgev22.skinoverlay.exceptions.SkinException;
 import com.georgev22.skinoverlay.handler.skin.MinecraftSkinRenderer;
 import com.georgev22.skinoverlay.handler.skin.Part;
 import com.georgev22.skinoverlay.handler.skin.SkinParts;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;

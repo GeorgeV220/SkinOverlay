@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.handler.handlers;
 import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
-import com.georgev22.skinoverlay.handler.Skin;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;

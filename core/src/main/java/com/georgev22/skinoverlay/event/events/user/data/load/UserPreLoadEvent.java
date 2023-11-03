@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.event.events.user.data.load;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.UserEvent;
 import com.georgev22.skinoverlay.event.interfaces.Cancellable;
-import com.georgev22.skinoverlay.utilities.player.User;
+import com.georgev22.skinoverlay.storage.data.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;

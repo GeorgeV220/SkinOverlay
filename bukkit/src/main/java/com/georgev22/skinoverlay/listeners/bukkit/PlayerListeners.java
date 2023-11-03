@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.listeners.bukkit;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectConnectionEvent;
-import com.georgev22.skinoverlay.handler.Skin;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.handler.skin.SkinParts;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;

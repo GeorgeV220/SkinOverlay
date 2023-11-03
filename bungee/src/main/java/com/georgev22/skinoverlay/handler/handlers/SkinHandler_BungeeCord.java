@@ -5,7 +5,7 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
-import com.georgev22.skinoverlay.handler.Skin;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileBungee;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
