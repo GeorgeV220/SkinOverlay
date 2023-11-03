@@ -42,92 +42,93 @@ Options:
   #Currently available Skin Hooks: None, SkinsRestorer and Custom.
   #With the custom option, you need to have your own plugin that sets the SkinOverlay.getInstance().setSkinHook(SkinHook).
   skin hook: None
-  overlays:
-    policeman:
-      hat: true
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    mustache:
-      hat: true
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    alley:
-      hat: false
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    bubbo_transparent:
-      hat: false
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    fire_demon:
-      hat: true
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    flame:
-      hat: true
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    glare:
-      hat: true
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    hoodie:
-      hat: true
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    migrator:
-      hat: true
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    pirate:
-      hat: true
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
-    smoking:
-      hat: true
-      right_sleeve: true
-      left_sleeve: true
-      jacket: true
-      right_pants: true
-      left_pants: true
-      cape: true
+  parts:
+    overlay:
+      policeman:
+        hat: true
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      mustache:
+        hat: true
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      alley:
+        hat: false
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      bubbo_transparent:
+        hat: false
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      fire_demon:
+        hat: true
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      flame:
+        hat: true
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      glare:
+        hat: true
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      hoodie:
+        hat: true
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      migrator:
+        hat: true
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      pirate:
+        hat: true
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
+      smoking:
+        hat: true
+        right_sleeve: true
+        left_sleeve: true
+        jacket: true
+        right_pants: true
+        left_pants: true
+        cape: true
