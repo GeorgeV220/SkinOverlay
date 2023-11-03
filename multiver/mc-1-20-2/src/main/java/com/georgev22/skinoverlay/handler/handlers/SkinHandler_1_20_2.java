@@ -1,8 +1,12 @@
 
 package com.georgev22.skinoverlay.handler.handlers;
 
+import com.georgev22.library.maps.HashObjectMap;
+import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
+import com.georgev22.skinoverlay.handler.SProperty;
+import com.georgev22.skinoverlay.handler.profile.SGameProfileMojang;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -23,8 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
-
-import static com.georgev22.skinoverlay.handler.handlers.SkinHandler_Unsupported.wrapper;
 
 public final class SkinHandler_1_20_2 extends SkinHandler {
 
@@ -115,6 +117,12 @@ public final class SkinHandler_1_20_2 extends SkinHandler {
             return sGameProfiles.get(playerObject);
         }
         return sGameProfiles.append(playerObject, wrapper(this.getInternalGameProfile(playerObject))).get(playerObject);
+    }
+
+    public static @NotNull SGameProfile wrapper(@NotNull GameProfile gameProfile) {
+        ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
+        gameProfile.getProperties().forEach((s, property) -> propertyObjectMap.append(s, new SProperty(property.name(), property.value(), property.signature())));
+        return new SGameProfileMojang(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
     }
 
     private void sendPacket(@NotNull ServerPlayer player, Packet<?> packet) {
