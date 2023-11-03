@@ -143,6 +143,7 @@ dependencies {
     implementation project(path: ':multiver:mc-1-19-3', configuration: 'reobf')
     implementation project(path: ':multiver:mc-1-19-4', configuration: 'reobf')
     implementation project(path: ':multiver:mc-1-20', configuration: 'reobf')
+    implementation project(path: ':multiver:mc-1-20-2', configuration: 'reobf')
 }
 
 shadowJar {
@@ -155,6 +156,7 @@ shadowJar {
     relocate 'org.bstats', "${packageName}.bstats"
     relocate 'com.georgev22.api.libraryloader', "${packageName}.libraryloader"
     relocate 'com.georgev22.library', "${packageName}.library"
+    relocate 'org.yaml.snakeyaml', "${packageName}.snakeyaml"
     relocate 'io.papermc.lib', "${packageName}.paperlib"
 }
 
