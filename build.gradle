@@ -51,10 +51,10 @@ allprojects {
     }
 
     dependencies {
-        compileOnly "com.georgev22.library:database:${libraryVersion}:all"
-        compileOnly "com.georgev22.library:maps:${libraryVersion}:all"
-        compileOnly "com.georgev22.library:scheduler:${libraryVersion}:all"
-        compileOnly "com.georgev22.library:utilities:${libraryVersion}:all"
+        compileOnly "com.georgev22.library:database:${libraryVersion}"
+        compileOnly "com.georgev22.library:maps:${libraryVersion}"
+        compileOnly "com.georgev22.library:scheduler:${libraryVersion}"
+        compileOnly "com.georgev22.library:utilities:${libraryVersion}"
         compileOnly "com.georgev22.library:yaml:${libraryVersion}"
         compileOnly "com.georgev22.library:minecraft:${libraryVersion}"
 
@@ -106,10 +106,10 @@ repositories {
 }
 
 dependencies {
-    implementation "com.georgev22.library:database:${libraryVersion}:all"
-    implementation "com.georgev22.library:maps:${libraryVersion}:all"
-    implementation "com.georgev22.library:scheduler:${libraryVersion}:all"
-    implementation "com.georgev22.library:utilities:${libraryVersion}:all"
+    implementation "com.georgev22.library:database:${libraryVersion}"
+    implementation "com.georgev22.library:maps:${libraryVersion}"
+    implementation "com.georgev22.library:scheduler:${libraryVersion}"
+    implementation "com.georgev22.library:utilities:${libraryVersion}"
     implementation "com.georgev22.library:yaml:${libraryVersion}"
     implementation "com.georgev22.library:minecraft:${libraryVersion}"
 
