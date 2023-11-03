@@ -4,13 +4,15 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
-import net.skinsrestorer.api.SkinsRestorerAPI;
-import net.skinsrestorer.api.property.IProperty;
+import net.skinsrestorer.api.SkinsRestorer;
+import net.skinsrestorer.api.SkinsRestorerProvider;
+import net.skinsrestorer.api.property.SkinProperty;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -23,7 +25,7 @@ public class SkinsRestorerHook implements SkinHook {
     /**
      * SkinsRestorerAPI object for accessing the SkinsRestorer API.
      */
-    private final SkinsRestorerAPI skinsRestorerAPI;
+    private final SkinsRestorer skinsRestorerAPI;
 
     /**
      * SkinOverlay object for accessing the SkinOverlay plugin.
@@ -35,7 +37,7 @@ public class SkinsRestorerHook implements SkinHook {
      * Initializes the SkinsRestorerAPI object.
      */
     public SkinsRestorerHook() {
-        skinsRestorerAPI = SkinsRestorerAPI.getApi();
+        skinsRestorerAPI = SkinsRestorerProvider.get();
     }
 
     /**
@@ -53,15 +55,8 @@ public class SkinsRestorerHook implements SkinHook {
     @Nullable
     public SProperty getProperty(@NotNull PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
         try {
-            String skinName = skinsRestorerAPI.getSkinName(playerObject.playerName());
-            if (skinName == null) {
-                return null;
-            }
-            IProperty iProperty = skinsRestorerAPI.getSkinData(skinName);
-            if (iProperty == null) {
-                return null;
-            }
-            return new SProperty(iProperty.getName(), iProperty.getValue(), iProperty.getSignature());
+            Optional<SkinProperty> property = skinsRestorerAPI.getPlayerStorage().getSkinForPlayer(playerObject.playerUUID(), playerObject.playerName());
+            return property.map(skinProperty -> new SProperty(SkinProperty.TEXTURES_NAME, skinProperty.getValue(), skinProperty.getSignature())).orElse(null);
         } catch (Exception exception) {
             return skinOverlay.getDefaultSkinHook().getProperty(playerObject);
         }
