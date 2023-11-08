@@ -13,8 +13,9 @@ import com.georgev22.skinoverlay.event.events.user.data.load.UserPostLoadEvent;
 import com.georgev22.skinoverlay.event.events.user.data.load.UserPreLoadEvent;
 import com.georgev22.skinoverlay.exceptions.UserException;
 import com.georgev22.skinoverlay.handler.SGameProfile;
-import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.handler.skin.SkinParts;
+import com.georgev22.skinoverlay.storage.data.Skin;
+import com.georgev22.skinoverlay.storage.data.User;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
@@ -258,11 +259,12 @@ public abstract class PlayerObject {
             return;
         }
         skinOverlay.getUserManager().getEntity(playerUUID())
-                .handleAsync((user, throwable) -> {
+                .handleAsync((entity, throwable) -> {
                     if (throwable != null) {
                         skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                         return null;
                     }
+                    User user = (User) entity;
                     if (user == null) {
                         throw new UserException("User not found!");
                     }
@@ -374,14 +376,15 @@ public abstract class PlayerObject {
         if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             return;
         }
-        skinOverlay.getUserManager().getEntity(playerUUID()).handleAsync((user, throwable) -> {
+        skinOverlay.getUserManager().getEntity(playerUUID()).handleAsync((entity, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
             }
-            return user;
-        }).thenAcceptAsync(user -> {
-            if (user != null) {
+            return entity;
+        }).thenAcceptAsync(entity -> {
+            if (entity != null) {
+                User user = (User) entity;
                 UserModifyDataEvent userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
                         .callEvent(new UserModifyDataEvent(user, true));
                 if (!userModifyDataEvent.isCancelled()) {
@@ -407,16 +410,17 @@ public abstract class PlayerObject {
      * Updates the player's skin using the SkinHandler.
      */
     public void updateSkin() {
-        skinOverlay.getUserManager().getEntity(playerUUID()).handleAsync((user, throwable) -> {
+        skinOverlay.getUserManager().getEntity(playerUUID()).handleAsync((entity, throwable) -> {
             if (throwable != null) {
                 skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                 return null;
             }
             if (!isOnline())
-                return user;
-            return user;
-        }).thenAcceptAsync(user -> {
-            if (user != null) {
+                return entity;
+            return entity;
+        }).thenAcceptAsync(entity -> {
+            if (entity != null) {
+                User user = (User) entity;
                 PlayerObjectPreUpdateSkinEvent event = (PlayerObjectPreUpdateSkinEvent) skinOverlay.getEventManager()
                         .callEvent(new PlayerObjectPreUpdateSkinEvent(this, user, true));
                 if (event.isCancelled())
