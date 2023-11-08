@@ -24,16 +24,20 @@ public class Skin extends Data implements Serializable {
     private SProperty property;
     private SkinParts skinParts;
 
+    private String skinName;
+
     public Skin(UUID uuid) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
-        this.skinParts = new SkinParts();
+        addCustomData("skinParts", this.skinParts = new SkinParts());
+        addCustomData("skinName", this.skinName = "empty");
     }
 
     public Skin(UUID uuid, SProperty sProperty, String skinName) {
         super(uuid);
         addCustomData("entity_id", uuid.toString());
         addCustomData("property", this.property = sProperty);
+        addCustomData("skinName", this.skinName = skinName);
         try {
             addCustomData("skinParts", this.skinParts = new SkinParts(
                     new SerializableBufferedImage(SkinOverlay.getInstance().getSkinHandler().getSkinImage(sProperty)),
@@ -50,6 +54,7 @@ public class Skin extends Data implements Serializable {
         addCustomData("entity_id", uuid.toString());
         addCustomData("property", this.property = sProperty);
         addCustomData("skinParts", this.skinParts = skinParts);
+        addCustomData("skinName", this.skinName = skinParts.getSkinName());
     }
 
     public @Nullable SProperty skinProperty() {
@@ -60,12 +65,20 @@ public class Skin extends Data implements Serializable {
         return getCustomData("skinParts") != null ? getCustomData("skinParts") : skinParts;
     }
 
+    public String skinName() {
+        return skinName;
+    }
+
     public void setSkinParts(SkinParts skinParts) {
         addCustomData("skinParts", this.skinParts = skinParts);
     }
 
     public void setProperty(SProperty property) {
         addCustomData("property", this.property = property);
+    }
+
+    public void setSkinName(String skinName) {
+        this.skinName = skinName;
     }
 
     public @Nullable String skinURL() {
