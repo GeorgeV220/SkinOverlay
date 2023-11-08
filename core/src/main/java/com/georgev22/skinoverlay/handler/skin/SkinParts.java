@@ -7,14 +7,42 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 public class SkinParts implements Serializable {
+
+    private static final SerializableBufferedImage steveSkin;
+
+    static {
+        try {
+            URL url = new URL("https://s.namemc.com/i/12b92a9206470fe2.png");
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+            try (InputStream stream = url.openStream()) {
+                byte[] buffer = new byte[4096];
+
+                while (true) {
+                    int bytesRead = stream.read(buffer);
+                    if (bytesRead < 0) {
+                        break;
+                    }
+                    output.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                steveSkin = null;
+                throw new RuntimeException(e);
+            }
+            steveSkin = new SerializableBufferedImage(ImageIO.read(new ByteArrayInputStream(output.toByteArray())));
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private volatile SerializableBufferedImage fullSkin;
 
     private String skinName;
@@ -22,11 +50,7 @@ public class SkinParts implements Serializable {
     private final Map<String, Part> parts;
 
     public SkinParts() {
-        this(null, null);
-    }
-
-    public SkinParts(SerializableBufferedImage fullSkin) {
-        this(fullSkin, null);
+        this(steveSkin, "Steve");
     }
 
     public SkinParts(SerializableBufferedImage fullSkin, String skinName) {
