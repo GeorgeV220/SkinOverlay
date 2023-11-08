@@ -88,9 +88,9 @@ public abstract class SkinHandler {
     public CompletableFuture<Skin> retrieveOrGenerateSkin(@NotNull PlayerObject playerObject, @Nullable ImageSupplier imageSupplier, @NotNull SkinParts skinParts) {
         UUID skinUUID = Utilities.generateUUID(skinParts.getSkinName() + playerObject.playerUUID().toString());
         return skinOverlay.getSkinManager().exists(skinUUID).thenApply(result -> {
-            if (result) {
+            if (result && skinOverlay.getSkinManager().getEntity(skinUUID).join() instanceof Skin skin) {
                 skinOverlay.getLogger().info("Skin: " + skinUUID + " found for player: " + playerObject.playerName());
-                return skinOverlay.getSkinManager().getEntity(skinUUID).join();
+                return skin;
             } else {
                 try {
                     if (imageSupplier == null) {
