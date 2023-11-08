@@ -10,7 +10,6 @@ import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.maps.UnmodifiableObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.EntityManager;
-import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
 import com.georgev22.skinoverlay.event.EventManager;
@@ -30,6 +29,7 @@ import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.config.FileManager;
 import com.georgev22.skinoverlay.utilities.config.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.config.SkinFileCache;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import lombok.Getter;
@@ -91,6 +91,9 @@ public final class SkinOverlay {
     @Getter
     private EventManager eventManager;
 
+    @Getter
+    private SkinFileCache skinFileCache;
+
     public SkinOverlay(SkinOverlayImpl skinOverlay) {
         this.skinOverlay = skinOverlay;
         instance = this;
@@ -109,6 +112,7 @@ public final class SkinOverlay {
             getLogger().log(Level.SEVERE, "Error loading the language file: ", e);
         }
         eventManager = new EventManager(getLogger(), this.getClass());
+        skinFileCache = new SkinFileCache();
     }
 
     public void onEnable() {
@@ -119,22 +123,10 @@ public final class SkinOverlay {
                 }
             }
             case "skinoverlay" -> setSkinHook(new SkinHookImpl());
-            default -> setSkinHook(null);
+            default -> setSkinHook(defaultSkinHook);
         }
         this.skinsDataFolder = new File(this.getDataFolder(), "skins");
-        if (!this.skinsDataFolder.exists()) {
-            if (this.skinsDataFolder.mkdirs()) {
-                getLogger().log(Level.INFO, "Skins data folder was successfully created!!");
-            }
-            for (String resource : new String[]{"alley", "bubbo_transparent", "fire_demon", "flame", "glare", "hoodie", "migrator", "pirate", "smoking", "policeman", "mustache"}) {
-                if (new File(this.skinsDataFolder, resource + ".png").exists()) continue;
-                try {
-                    Utils.saveResource("skins/" + resource + ".png", false, this.getDataFolder(), this.getClass());
-                } catch (Exception e) {
-                    this.getLogger().log(Level.WARNING, "Cannot save default skins: ", e.getCause());
-                }
-            }
-        }
+        this.skinFileCache.cache();
 
         try {
             setupDatabase();
