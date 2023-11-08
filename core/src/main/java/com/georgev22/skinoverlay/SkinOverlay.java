@@ -22,9 +22,8 @@ import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
-import com.georgev22.skinoverlay.storage.data.User;
-import com.georgev22.skinoverlay.storage.manager.SkinManager;
-import com.georgev22.skinoverlay.storage.manager.UserManager;
+import com.georgev22.skinoverlay.storage.data.Data;
+import com.georgev22.skinoverlay.storage.manager.DataManager;
 import com.georgev22.skinoverlay.utilities.Locale;
 import com.georgev22.skinoverlay.utilities.PluginMessageUtils;
 import com.georgev22.skinoverlay.utilities.Updater;
@@ -84,10 +83,10 @@ public final class SkinOverlay {
     private CommandManager<?, ?, ?, ?, ?, ?> commandManager;
 
     @Getter
-    private UserManager userManager;
+    private DataManager userManager;
 
     @Getter
-    private SkinManager skinManager;
+    private DataManager skinManager;
 
     @Getter
     private EventManager eventManager;
@@ -421,15 +420,15 @@ public final class SkinOverlay {
                             OptionsUtil.DATABASE_MONGO_DATABASE.getStringValue(),
                             getLogger());
                     databaseWrapper.connect();
-                    this.userManager = new UserManager(databaseWrapper, OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue());
-                    this.skinManager = new SkinManager(databaseWrapper, OptionsUtil.DATABASE_MONGO_SKINS_COLLECTION.getStringValue());
+                    this.userManager = new DataManager(databaseWrapper, OptionsUtil.DATABASE_MONGO_USERS_COLLECTION.getStringValue());
+                    this.skinManager = new DataManager(databaseWrapper, OptionsUtil.DATABASE_MONGO_SKINS_COLLECTION.getStringValue());
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MongoDB");
                 }
             }
             default -> {
                 databaseWrapper = null;
-                this.userManager = new UserManager(new File(this.getDataFolder(), "userdata"), null);
-                this.skinManager = new SkinManager(new File(this.getDataFolder(), "skindata"), null);
+                this.userManager = new DataManager(new File(this.getDataFolder(), "userdata"), null);
+                this.skinManager = new DataManager(new File(this.getDataFolder(), "skindata"), null);
                 getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: File");
             }
         }
@@ -449,10 +448,14 @@ public final class SkinOverlay {
 
     private void sqlConnect(ObjectMap<String, Pair<String, String>> map, ObjectMap<String, Pair<String, String>> skinMap) throws SQLException, ClassNotFoundException {
         databaseWrapper.connect();
+        if (databaseWrapper.getSQLDatabase() == null) {
+            this.getLogger().log(Level.SEVERE, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database is not connected");
+            return;
+        }
         databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
         databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
-        this.userManager = new UserManager(databaseWrapper, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
-        this.skinManager = new SkinManager(databaseWrapper, OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue());
+        this.userManager = new DataManager(databaseWrapper, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
+        this.skinManager = new DataManager(databaseWrapper, OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue());
     }
 
 
@@ -486,8 +489,8 @@ public final class SkinOverlay {
      *
      * @param managerListeners the list of listeners to be added
      */
-    public void registerUserManagerListeners(@NotNull List<ObservableListener<UUID, User>> managerListeners) {
-        for (ObservableListener<UUID, User> managerListener : managerListeners) {
+    public void registerUserManagerListeners(@NotNull List<ObservableListener<UUID, Data>> managerListeners) {
+        for (ObservableListener<UUID, Data> managerListener : managerListeners) {
             this.userManager.getLoadedEntities().addListener(managerListener);
         }
     }

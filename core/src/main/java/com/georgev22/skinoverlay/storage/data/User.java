@@ -1,21 +1,16 @@
 package com.georgev22.skinoverlay.storage.data;
 
-import com.georgev22.library.maps.ConcurrentObjectMap;
-import com.georgev22.library.utilities.Entity;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class User implements Entity, Serializable {
+public class User extends Data implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 2L;
-
-    private final ConcurrentObjectMap<String, Object> customData;
+    private static final long serialVersionUID = 3L;
 
     public User(UUID uuid) {
-        this.customData = new ConcurrentObjectMap<>();
+        super(uuid);
         addCustomData("entity_id", uuid.toString());
     }
 
@@ -30,10 +25,5 @@ public class User implements Entity, Serializable {
     @Override
     public UUID getId() {
         return this.getCustomData("entity_id") != null ? UUID.fromString(this.getCustomData("entity_id")) : null;
-    }
-
-    @Override
-    public ConcurrentObjectMap<String, Object> getCustomData() {
-        return this.customData;
     }
 }

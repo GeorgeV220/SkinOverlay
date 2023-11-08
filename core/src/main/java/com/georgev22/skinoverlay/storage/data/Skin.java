@@ -1,7 +1,5 @@
 package com.georgev22.skinoverlay.storage.data;
 
-import com.georgev22.library.maps.ConcurrentObjectMap;
-import com.georgev22.library.utilities.Entity;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.skin.SkinParts;
@@ -18,24 +16,22 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 @ApiStatus.NonExtendable
-public class Skin implements Entity, Serializable {
+public class Skin extends Data implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 3L;
-
-    private final ConcurrentObjectMap<String, Object> customData;
+    private static final long serialVersionUID = 4L;
 
     private SProperty property;
     private SkinParts skinParts;
 
     public Skin(UUID uuid) {
-        this.customData = new ConcurrentObjectMap<>();
+        super(uuid);
         addCustomData("entity_id", uuid.toString());
         this.skinParts = new SkinParts();
     }
 
     public Skin(UUID uuid, SProperty sProperty, String skinName) {
-        this.customData = new ConcurrentObjectMap<>();
+        super(uuid);
         addCustomData("entity_id", uuid.toString());
         addCustomData("property", this.property = sProperty);
         try {
@@ -50,7 +46,7 @@ public class Skin implements Entity, Serializable {
     }
 
     public Skin(UUID uuid, SProperty sProperty, SkinParts skinParts) {
-        this.customData = new ConcurrentObjectMap<>();
+        super(uuid);
         addCustomData("entity_id", uuid.toString());
         addCustomData("property", this.property = sProperty);
         addCustomData("skinParts", this.skinParts = skinParts);
@@ -93,10 +89,5 @@ public class Skin implements Entity, Serializable {
     @Override
     public UUID getId() {
         return this.getCustomData("entity_id") != null ? UUID.fromString(this.getCustomData("entity_id")) : null;
-    }
-
-    @Override
-    public ConcurrentObjectMap<String, Object> getCustomData() {
-        return this.customData;
     }
 }
