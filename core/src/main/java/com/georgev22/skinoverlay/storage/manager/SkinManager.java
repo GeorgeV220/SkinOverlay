@@ -8,7 +8,8 @@ import com.georgev22.library.maps.ObjectMap.Pair;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.utilities.EntityManager;
 import com.georgev22.library.utilities.Utils;
-import com.georgev22.skinoverlay.storage.data.Data;
+import com.georgev22.skinoverlay.storage.data.Skin;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import com.mongodb.annotations.Beta;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,18 +22,18 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The {@link DataManager} class is responsible for managing {@link Data} objects in a persistence storage.
+ * The {@link SkinManager} class is responsible for managing {@link Skin} objects in a persistence storage.
  * It supports multiple storage types including MySQL, SQLite, PostgreSQL, MongoDB, and FILE.
- * The class provides methods for checking if a {@link Data} exists,
- * loading a {@link Data}, and creating a {@link Data}.
+ * The class provides methods for checking if a {@link Skin} exists,
+ * loading a {@link Skin}, and creating a {@link Skin}.
  *
  * @author <a href="https://github.com/GeorgeV220">GeorgeV220</a>
  */
-public class DataManager implements EntityManager<Data> {
+public class SkinManager implements EntityManager<Skin> {
     private final File entitiesDirectory;
     private final DatabaseWrapper database;
     private final String collection;
-    private final ObservableObjectMap<UUID, Data> loadedEntities = new ObservableObjectMap<>();
+    private final ObservableObjectMap<UUID, Skin> loadedEntities = new ObservableObjectMap<>();
 
     /**
      * Constructor for the EntityManager class
@@ -40,7 +41,7 @@ public class DataManager implements EntityManager<Data> {
      * @param obj            the object to be used for storage (DatabaseWrapper or File)
      * @param collectionName the name of the collection to be used for MONGODB and SQL, null for other types
      */
-    public DataManager(Object obj, @Nullable String collectionName) {
+    public SkinManager(Object obj, @Nullable String collectionName) {
         this.collection = collectionName;
         if (obj instanceof File folder) {
             this.entitiesDirectory = folder;
@@ -58,13 +59,13 @@ public class DataManager implements EntityManager<Data> {
     }
 
     /**
-     * Loads the {@link Data} with the specified ID
+     * Loads the {@link Skin} with the specified ID
      *
      * @param entityId the {@link UUID} of the entity to be loaded
-     * @return a {@link CompletableFuture} containing the loaded {@link Data} object
+     * @return a {@link CompletableFuture} containing the loaded {@link Skin} object
      */
     @Override
-    public CompletableFuture<Data> load(UUID entityId) {
+    public CompletableFuture<Skin> load(UUID entityId) {
         return exists(entityId)
                 .thenCompose(exists -> {
                     if (exists) {
@@ -72,7 +73,7 @@ public class DataManager implements EntityManager<Data> {
                             if (entitiesDirectory != null) {
                                 File file = new File(entitiesDirectory, entityId + ".entity");
                                 try {
-                                    Data entity = (Data) Utils.deserializeObject(file.getAbsolutePath());
+                                    Skin entity = (Skin) Utils.deserializeObject(file.getAbsolutePath());
                                     loadedEntities.append(entityId, entity);
                                     return entity;
                                 } catch (IOException | ClassNotFoundException e) {
@@ -80,14 +81,14 @@ public class DataManager implements EntityManager<Data> {
                                 }
                             } else if (database != null) {
                                 Pair<String, List<DatabaseObject>> retrievedData = database.retrieveData(collection, Pair.create("entity_id", entityId.toString()));
-                                Data entity = new Data(entityId);
+                                Skin entity = new Skin(entityId);
                                 retrievedData.value().forEach(databaseObject -> {
                                     ObjectMap<String, Object> databaseObjectData = databaseObject.data();
                                     databaseObjectData.forEach(entity::addCustomData);
                                 });
                                 return entity;
                             } else {
-                                return new Data(entityId);
+                                return new Skin(entityId);
                             }
                         });
                     } else {
@@ -97,13 +98,13 @@ public class DataManager implements EntityManager<Data> {
     }
 
     /**
-     * Saves the specified {@link Data}.
+     * Saves the specified {@link Skin}.
      *
-     * @param entity the {@link Data} to save
-     * @return a {@link CompletableFuture} that completes when the {@link Data} is saved
+     * @param entity the {@link Skin} to save
+     * @return a {@link CompletableFuture} that completes when the {@link Skin} is saved
      */
     @Override
-    public CompletableFuture<Void> save(Data entity) {
+    public CompletableFuture<Void> save(Skin entity) {
         return CompletableFuture.runAsync(() -> {
             if (entitiesDirectory != null) {
                 File file = new File(entitiesDirectory, entity.getId() + ".entity");
@@ -129,11 +130,11 @@ public class DataManager implements EntityManager<Data> {
     /**
      * Deletes the specified entity.
      *
-     * @param entity the {@link Data} to delete
-     * @return a {@link CompletableFuture} that completes when the {@link Data} is deleted
+     * @param entity the {@link Skin} to delete
+     * @return a {@link CompletableFuture} that completes when the {@link Skin} is deleted
      */
     @Override
-    public CompletableFuture<Void> delete(Data entity) {
+    public CompletableFuture<Void> delete(Skin entity) {
         return CompletableFuture.runAsync(() -> {
             if (entitiesDirectory != null) {
                 File file = new File(entitiesDirectory, entity.getId() + ".entity");
@@ -153,21 +154,21 @@ public class DataManager implements EntityManager<Data> {
     }
 
     /**
-     * Creates a new {@link Data} with the specified entity ID.
+     * Creates a new {@link Skin} with the specified entity ID.
      *
      * @param entityId the {@link UUID} of the entity to create
-     * @return a {@link CompletableFuture} that returns the newly created {@link Data}
+     * @return a {@link CompletableFuture} that returns the newly created {@link Skin}
      */
     @Override
-    public CompletableFuture<Data> createEntity(UUID entityId) {
-        return CompletableFuture.completedFuture(loadedEntities.append(entityId, new Data(entityId)).get(entityId));
+    public CompletableFuture<Skin> createEntity(UUID entityId) {
+        return CompletableFuture.completedFuture(loadedEntities.append(entityId, new Skin(entityId)).get(entityId));
     }
 
     /**
-     * Determines if a {@link Data} with the specified entity ID exists.
+     * Determines if a {@link Skin} with the specified entity ID exists.
      *
      * @param entityId the {@link UUID} of the entity to check
-     * @return a {@link CompletableFuture} that returns true if a {@link Data} with the specified ID exists, false otherwise
+     * @return a {@link CompletableFuture} that returns true if a {@link Skin} with the specified ID exists, false otherwise
      */
     @Override
     public CompletableFuture<Boolean> exists(UUID entityId) {
@@ -183,17 +184,17 @@ public class DataManager implements EntityManager<Data> {
     }
 
     /**
-     * Retrieves the {@link Data} with the given {@link UUID}.
+     * Retrieves the {@link Skin} with the given {@link UUID}.
      * <p>
      * If the entity is already loaded, it is returned immediately.
      * If not, it is loaded
      * asynchronously and returned in a {@link CompletableFuture}.
      *
      * @param entityId the {@link UUID} of the entity to retrieve
-     * @return a {@link CompletableFuture} that will contain the {@link Data} with the given id
+     * @return a {@link CompletableFuture} that will contain the {@link Skin} with the given id
      */
     @Override
-    public CompletableFuture<Data> getEntity(UUID entityId) {
+    public CompletableFuture<Skin> getEntity(UUID entityId) {
         if (loadedEntities.containsKey(entityId)) {
             return CompletableFuture.completedFuture(loadedEntities.get(entityId));
         }
@@ -202,13 +203,13 @@ public class DataManager implements EntityManager<Data> {
     }
 
     /**
-     * Saves all the loaded {@link Data}s in the {@link #loadedEntities} map.
-     * For each {@link Data} in the map,
-     * this method calls the {@link #save(Data)} method to persist the {@link Data}.
+     * Saves all the loaded {@link Skin}s in the {@link #loadedEntities} map.
+     * For each {@link Skin} in the map,
+     * this method calls the {@link #save(Skin)} method to persist the {@link Skin}.
      */
     @Override
     public void saveAll() {
-        ObjectMap<UUID, Data> entities = new ObservableObjectMap<UUID, Data>().append(loadedEntities);
+        ObjectMap<UUID, Skin> entities = new ObservableObjectMap<UUID, Skin>().append(loadedEntities);
         entities.forEach((uuid, entity) -> save(entity));
     }
 
@@ -236,10 +237,10 @@ public class DataManager implements EntityManager<Data> {
     /**
      * Retrieves the current map of loaded entities.
      *
-     * @return the map of loaded entities with UUID as the key and Data object as the value
+     * @return the map of loaded entities with UUID as the key and Skin object as the value
      */
     @Override
-    public ObservableObjectMap<UUID, Data> getLoadedEntities() {
+    public ObservableObjectMap<UUID, Skin> getLoadedEntities() {
         return loadedEntities;
     }
 }
