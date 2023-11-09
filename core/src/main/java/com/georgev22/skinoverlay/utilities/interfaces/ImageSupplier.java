@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay.utilities.interfaces;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
@@ -14,5 +14,5 @@ public interface ImageSupplier {
      * @return the image supplied by this function
      * @throws IOException if an I/O error occurs while getting the image
      */
-    Image get() throws IOException;
+    BufferedImage get() throws IOException;
 }
