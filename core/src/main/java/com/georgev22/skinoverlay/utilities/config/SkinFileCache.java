@@ -54,7 +54,7 @@ public class SkinFileCache {
             this.skinOverlay.getLogger().info("skins folder didn't exist, creating one and copy the default skins for it.");
         }
 
-        for (File file : Objects.requireNonNull(this.skinOverlay.getSkinsDataFolder().listFiles((dir, name) -> name.endsWith(".yml")))) {
+        for (File file : Objects.requireNonNull(this.skinOverlay.getSkinsDataFolder().listFiles((dir, name) -> name.endsWith(".png")))) {
             final String skinName = file.getName().substring(0, file.getName().length() - 4);
 
             if (skinName.isEmpty()) {
