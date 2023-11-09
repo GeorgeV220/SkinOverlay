@@ -60,21 +60,11 @@ public enum OptionsUtil {
 
     UPDATER("updater.enabled", true, Optional.empty()),
 
-    PARTS_OVERLAY_JACKET("parts.overlay.%s.jacket", false, Optional.of("overlays.%s.jacket")),
-
-    PARTS_OVERLAY_LEFT_SLEEVE("parts.overlay.%s.left_sleeve", false, Optional.of("overlays.%s.left_sleeve")),
-
-    PARTS_OVERLAY_RIGHT_SLEEVE("parts.overlay.%s.right_sleeve", false, Optional.of("overlays.%s.right_sleeve")),
-
-    PARTS_OVERLAY_LEFT_PANTS("parts.overlay.%s.left_pants", false, Optional.of("overlays.%s.left_pants")),
-
-    PARTS_OVERLAY_RIGHT_PANTS("parts.overlay.%s.right_pants", false, Optional.of("overlays.%s.right_pants")),
-
-    PARTS_OVERLAY_HAT("parts.overlay.%s.hat", false, Optional.of("overlays.%s.hat")),
-
     DEFAULT_SKIN_UUID("default skin uuid", "8667ba71-b85a-4004-af54-457a9734eed7", Optional.empty()),
+
     SKIN_HOOK("skin hook", "SkinsRestorer", Optional.empty()),
-    LOCALE("locale", "en_US", Optional.empty());
+    LOCALE("locale", "en_US", Optional.empty()),
+    ;
     private static final SkinOverlay mainPlugin = SkinOverlay.getInstance();
     private final String pathName;
     private final Object value;
