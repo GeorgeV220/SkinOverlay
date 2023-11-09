@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.handler;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.exceptions.SkinException;
 import com.georgev22.skinoverlay.handler.skin.MinecraftSkinRenderer;
@@ -11,6 +12,8 @@ import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
+import com.georgev22.skinoverlay.utilities.config.OverlayOptionsUtil;
+import com.georgev22.skinoverlay.utilities.config.SkinConfigurationFile;
 import com.georgev22.skinoverlay.utilities.interfaces.ImageSupplier;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.google.gson.*;
@@ -88,9 +91,9 @@ public abstract class SkinHandler {
     public CompletableFuture<Skin> retrieveOrGenerateSkin(@NotNull PlayerObject playerObject, @Nullable ImageSupplier imageSupplier, @NotNull SkinParts skinParts) {
         UUID skinUUID = Utilities.generateUUID(skinParts.getSkinName() + playerObject.playerUUID().toString());
         return skinOverlay.getSkinManager().exists(skinUUID).thenApply(result -> {
-            if (result && skinOverlay.getSkinManager().getEntity(skinUUID).join() instanceof Skin skin) {
+            if (result) {
                 skinOverlay.getLogger().info("Skin: " + skinUUID + " found for player: " + playerObject.playerName());
-                return skin;
+                return skinOverlay.getSkinManager().getLoadedEntities().get(skinUUID);
             } else {
                 try {
                     if (imageSupplier == null) {
@@ -98,54 +101,105 @@ public abstract class SkinHandler {
                         return null;
                     }
 
-                    Image overlay = imageSupplier.get();
+                    SkinConfigurationFile skinConfigurationFile = this.skinOverlay.getSkinFileCache().getCacheSkinConfig(skinParts.getSkinName());
 
-                    BufferedImage currentSkin = this.getSkinImage(this.getProfileBytes(playerObject, null));
+                    if (skinConfigurationFile == null) {
+                        skinOverlay.getLogger().log(Level.SEVERE, "SkinConfigurationFile cannot be null", new SkinException("SkinConfigurationFile cannot be null"));
+                        return null;
+                    }
+
+                    FileConfiguration fileConfiguration = skinConfigurationFile.getFileConfiguration();
+
+                    BufferedImage currentSkin = this.getSkinImage(this.getProfileBytes(playerObject, this.skinOverlay.getSkinHook().getProperty(playerObject)));
 
                     SkinParts currentSkinParts = new SkinParts(new SerializableBufferedImage(currentSkin), "currentSkin");
                     currentSkinParts.createParts();
 
-                    List<Part> newSkinParts = new ArrayList<>();
-                    for (Part part : currentSkinParts.getParts().values()) {
+                    BufferedImage overlay = imageSupplier.get();
+
+                    List<Part> overlaySkinParts = new ArrayList<>();
+                    for (Part part : skinParts.getParts().values()) {
                         if (part.name().startsWith("Jacket")) {
-                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_JACKET.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_OVERLAY_JACKET.getBooleanValue(fileConfiguration)) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Hat")) {
-                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_HAT.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_OVERLAY_HAT.getBooleanValue(fileConfiguration)) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Left_Sleeve")) {
-                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_LEFT_SLEEVE.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_OVERLAY_LEFT_SLEEVE.getBooleanValue(fileConfiguration)) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Right_Sleeve")) {
-                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_RIGHT_SLEEVE.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_OVERLAY_RIGHT_SLEEVE.getBooleanValue(fileConfiguration)) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Left_Pants")) {
-                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_LEFT_PANTS.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_OVERLAY_LEFT_PANTS.getBooleanValue(fileConfiguration)) {
                                 continue;
                             }
                         }
                         if (part.name().startsWith("Right_Pants")) {
-                            if (!part.isEmpty() & !OptionsUtil.PARTS_OVERLAY_RIGHT_PANTS.getBooleanValue(skinParts.getSkinName())) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_OVERLAY_RIGHT_PANTS.getBooleanValue(fileConfiguration)) {
+                                continue;
+                            }
+                        }
+                        overlaySkinParts.add(part);
+                    }
+
+                    List<Part> newSkinParts = new ArrayList<>();
+                    for (Part part : currentSkinParts.getParts().values()) {
+                        if (part.name().startsWith("Jacket")) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_PLAYER_JACKET.getBooleanValue(fileConfiguration)) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Hat")) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_PLAYER_HAT.getBooleanValue(fileConfiguration)) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Left_Sleeve")) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_PLAYER_LEFT_SLEEVE.getBooleanValue(fileConfiguration)) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Right_Sleeve")) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_PLAYER_RIGHT_SLEEVE.getBooleanValue(fileConfiguration)) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Left_Pants")) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_PLAYER_LEFT_PANTS.getBooleanValue(fileConfiguration)) {
+                                continue;
+                            }
+                        }
+                        if (part.name().startsWith("Right_Pants")) {
+                            if (!part.isEmpty() & !OverlayOptionsUtil.PARTS_PLAYER_RIGHT_PANTS.getBooleanValue(fileConfiguration)) {
                                 continue;
                             }
                         }
                         newSkinParts.add(part);
                     }
-                    MinecraftSkinRenderer minecraftSkinRenderer = new MinecraftSkinRenderer(newSkinParts.toArray(Part[]::new));
-                    minecraftSkinRenderer.createFullSkinImage();
+
+                    MinecraftSkinRenderer defaultSkinRenderer = new MinecraftSkinRenderer(newSkinParts.toArray(Part[]::new));
+                    defaultSkinRenderer.createFullSkinImage();
+
+                    MinecraftSkinRenderer overlaySkinRenderer = new MinecraftSkinRenderer(overlaySkinParts.toArray(Part[]::new));
+                    overlaySkinRenderer.createFullSkinImage();
+
                     BufferedImage skinToBeGenerated = new BufferedImage(currentSkin.getWidth(), currentSkin.getHeight(), 2);
                     Graphics2D canvas = skinToBeGenerated.createGraphics();
-                    canvas.drawImage(minecraftSkinRenderer.getFullSkinImage().getBufferedImage(), 0, 0, null);
-                    canvas.drawImage(overlay, 0, 0, null);
+
+                    canvas.drawImage(defaultSkinRenderer.getFullSkinImage().getBufferedImage(), 0, 0, null);
+                    canvas.drawImage(overlaySkinRenderer.getFullSkinImage().getBufferedImage(), 0, 0, null);
                     canvas.dispose();
+
                     Texture texture = mineskinClient.generateUpload(skinToBeGenerated).get().data.texture;
                     if (texture == null) {
                         throw new SkinException("Texture cannot be null");
@@ -367,7 +421,7 @@ public abstract class SkinHandler {
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
     public SProperty getJavaSkin(final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException {
-        if (skinOverlay.getSkinHook() != null && skinOverlay.getSkinHook().getProperty(playerObject) != null) {
+        if (skinOverlay.getSkinHook().getProperty(playerObject) != null) {
             return skinOverlay.getSkinHook().getProperty(playerObject);
         }
         return skinOverlay.getDefaultSkinHook().getProperty(playerObject);
