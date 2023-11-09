@@ -1,3 +1,38 @@
+# [7.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v6.2.1...v7.0.0) (2023-11-09)
+
+
+### Bug Fixes
+
+* **commands:** Fix method signature and add try-catch block for loading skins ([c19d79c](https://github.com/GeorgeV220/SkinOverlay/commit/c19d79c33fc96fbeed56b97c43d50db0a1c907bc))
+* Fix file extension check in SkinFileCache ([14164df](https://github.com/GeorgeV220/SkinOverlay/commit/14164dfd975e2b6a0ce70b581e409b6886819bc6))
+* Move width/height to Section ([daf098b](https://github.com/GeorgeV220/SkinOverlay/commit/daf098b3228f73e4cfdb3cead31cb4ae32b4b5a5))
+* rename overlay options ([cf08f38](https://github.com/GeorgeV220/SkinOverlay/commit/cf08f38ab474caf3302b83b106c421ef7666048a))
+* Return existing skin if it is an instance of Skin class ([844474d](https://github.com/GeorgeV220/SkinOverlay/commit/844474d560b03f89f664442e54d87a89e0682165))
+
+
+### Features
+
+* add mc-1-20-2 implementation and relocate snakeyaml ([534a193](https://github.com/GeorgeV220/SkinOverlay/commit/534a1931a6e17b44152158515e57c223d1357664))
+* Add overlay skin rendering and configuration ([c1d6342](https://github.com/GeorgeV220/SkinOverlay/commit/c1d6342348af4a30414e57ed97962e109150a2a6))
+* Add SerializableBufferedImage class for serializing BufferedImage objects ([73cb9c3](https://github.com/GeorgeV220/SkinOverlay/commit/73cb9c3beb3957af1deea4eb63fc040218439a8c))
+* Add skin configuration files and utility classes ([e76f799](https://github.com/GeorgeV220/SkinOverlay/commit/e76f799a1114d9b12468b940a600efa4167edb76))
+* Add SkinFileCache to improve performance ([cc55fa2](https://github.com/GeorgeV220/SkinOverlay/commit/cc55fa24877f665043207f53ae65982410a682c7))
+* Add support for Minecraft version 1.20.2 ([b5c7f92](https://github.com/GeorgeV220/SkinOverlay/commit/b5c7f92ab29d787e8e694b0e2b25c644b5c27dfd))
+* **core:** add DataManager and Data classes ([1e21d59](https://github.com/GeorgeV220/SkinOverlay/commit/1e21d592d503f469ad6dd2d33fe5b3d16326b531))
+* **manager:** add UserManager class for managing User objects ([54d32cd](https://github.com/GeorgeV220/SkinOverlay/commit/54d32cdb7e02346ef3f5d759223d20028f37eb3f))
+* Moved the Skin and User classes ([9e30f2a](https://github.com/GeorgeV220/SkinOverlay/commit/9e30f2afd45087d7214f8b075454769f01eed153))
+* **PlayerObject:** Add support for default skin parts ([984b743](https://github.com/GeorgeV220/SkinOverlay/commit/984b743c25ae1d21baa71ad322f18116620433ec))
+* Removed SkinOptions and the unused CompletableFutureManager class ([511866e](https://github.com/GeorgeV220/SkinOverlay/commit/511866ee9a490fe400959c2efe8ed74bf259cd4f))
+* **Skin:** Add classes to manage skin parts ([c93b2f5](https://github.com/GeorgeV220/SkinOverlay/commit/c93b2f5170cd19853c105577077d37dc0298410c))
+* **SkinHandler:** Add support for overlaying different parts of the skin ([c037e0a](https://github.com/GeorgeV220/SkinOverlay/commit/c037e0a790f0eba590198529ec5e518a6529c88f))
+* Update DataManager to UserManager and SkinManager ([aa158e9](https://github.com/GeorgeV220/SkinOverlay/commit/aa158e9501baca0e8e58a70ea1f01c1ab2e35134))
+* Update skinsRestorerVersion to 15.0.3 ([6f4bebd](https://github.com/GeorgeV220/SkinOverlay/commit/6f4bebd0df48f61eebe4e17ec3e8b77e8ae9ff77))
+
+
+### BREAKING CHANGES
+
+* API classes changed
+
 ## [6.2.1](https://github.com/GeorgeV220/SkinOverlay/compare/v6.2.0...v6.2.1) (2023-09-25)
 
 
