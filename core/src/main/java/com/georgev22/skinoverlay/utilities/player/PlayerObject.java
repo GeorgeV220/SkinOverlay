@@ -15,7 +15,6 @@ import com.georgev22.skinoverlay.exceptions.UserException;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.skin.SkinParts;
 import com.georgev22.skinoverlay.storage.data.Skin;
-import com.georgev22.skinoverlay.storage.data.User;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.Utilities;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
@@ -264,20 +263,19 @@ public abstract class PlayerObject {
                         skinOverlay.getLogger().log(Level.SEVERE, "Error retrieving user: ", throwable);
                         return null;
                     }
-                    User user = (User) entity;
-                    if (user == null) {
+                    if (entity == null) {
                         throw new UserException("User not found!");
                     }
                     UserModifyDataEvent userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
-                            .callEvent(new UserModifyDataEvent(user, true));
+                            .callEvent(new UserModifyDataEvent(entity, true));
                     if (userModifyDataEvent.isCancelled()) {
-                        return user;
+                        return entity;
                     }
                     UUID skinUUID = Utilities.generateUUID("default" + playerUUID().toString());
                     try {
                         UserAddDataEvent event = (UserAddDataEvent) skinOverlay.getEventManager()
                                 .callEvent(new UserAddDataEvent(
-                                        user,
+                                        entity,
                                         Pair.create(
                                                 "defaultSkin",
                                                 new Skin(skinUUID,
@@ -288,7 +286,7 @@ public abstract class PlayerObject {
                                         ),
                                         true));
                         if (!event.isCancelled()) {
-                            user.addCustomData(event.getData().key(), event.getData().value());
+                            entity.addCustomData(event.getData().key(), event.getData().value());
                             if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                                 return event.getUser();
                             }
@@ -306,16 +304,16 @@ public abstract class PlayerObject {
 
                     UserAddDataEvent event = (UserAddDataEvent) skinOverlay.getEventManager()
                             .callEvent(new UserAddDataEvent(
-                                    user,
-                                    Pair.create("skin", user.defaultSkin()),
+                                    entity,
+                                    Pair.create("skin", entity.defaultSkin()),
                                     true)
                             );
                     if (!event.isCancelled()) {
-                        user.addCustomDataIfNotExists(event.getData().key(), event.getData().value());
+                        entity.addCustomDataIfNotExists(event.getData().key(), event.getData().value());
                     }
 
                     userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
-                            .callEvent(new UserModifyDataEvent(user, true));
+                            .callEvent(new UserModifyDataEvent(entity, true));
                     if (!userModifyDataEvent.isCancelled()) {
                         if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                             return userModifyDataEvent.getUser();
@@ -384,9 +382,8 @@ public abstract class PlayerObject {
             return entity;
         }).thenAcceptAsync(entity -> {
             if (entity != null) {
-                User user = (User) entity;
                 UserModifyDataEvent userModifyDataEvent = (UserModifyDataEvent) skinOverlay.getEventManager()
-                        .callEvent(new UserModifyDataEvent(user, true));
+                        .callEvent(new UserModifyDataEvent(entity, true));
                 if (!userModifyDataEvent.isCancelled()) {
                     if (!skinOverlay.getSkinOverlay().type().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                         return;
@@ -420,12 +417,11 @@ public abstract class PlayerObject {
             return entity;
         }).thenAcceptAsync(entity -> {
             if (entity != null) {
-                User user = (User) entity;
                 PlayerObjectPreUpdateSkinEvent event = (PlayerObjectPreUpdateSkinEvent) skinOverlay.getEventManager()
-                        .callEvent(new PlayerObjectPreUpdateSkinEvent(this, user, true));
+                        .callEvent(new PlayerObjectPreUpdateSkinEvent(this, entity, true));
                 if (event.isCancelled())
                     return;
-                SkinParts skinParts = user.skin().skinParts();
+                SkinParts skinParts = entity.skin().skinParts();
                 if (skinParts == null)
                     return;
                 skinOverlay.getLogger().info("Skin name " + skinParts.getSkinName());
