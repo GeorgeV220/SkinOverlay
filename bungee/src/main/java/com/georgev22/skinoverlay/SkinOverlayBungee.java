@@ -173,7 +173,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     }
 
     @Override
-    public Object plugin() {
+    public Plugin plugin() {
         return this;
     }
 

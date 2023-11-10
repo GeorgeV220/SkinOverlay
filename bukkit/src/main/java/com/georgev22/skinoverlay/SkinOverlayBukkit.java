@@ -23,6 +23,7 @@ import io.papermc.lib.PaperLib;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
@@ -191,12 +192,12 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     }
 
     @Override
-    public Object plugin() {
+    public JavaPlugin plugin() {
         return this;
     }
 
     @Override
-    public Object serverImpl() {
+    public Server serverImpl() {
         return this.getServer();
     }
 

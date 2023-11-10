@@ -94,14 +94,14 @@ public interface SkinOverlayImpl {
      *
      * @return The plugin instance.
      */
-    Object plugin();
+    <T> T plugin();
 
     /**
      * Returns the server implementation instance.
      *
      * @return The server implementation instance.
      */
-    Object serverImpl();
+    <T> T serverImpl();
 
     /**
      * Returns the version of the server implementation.

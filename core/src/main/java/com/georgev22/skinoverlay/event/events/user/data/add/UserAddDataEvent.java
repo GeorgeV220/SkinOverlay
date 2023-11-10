@@ -1,9 +1,9 @@
 package com.georgev22.skinoverlay.event.events.user.data.add;
 
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.skinoverlay.event.interfaces.Cancellable;
 import com.georgev22.skinoverlay.event.HandlerList;
 import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
+import com.georgev22.skinoverlay.event.interfaces.Cancellable;
 import com.georgev22.skinoverlay.storage.data.User;
 import org.jetbrains.annotations.NotNull;
 

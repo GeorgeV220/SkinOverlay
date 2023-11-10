@@ -9,7 +9,6 @@ import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.utilities.EntityManager;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.storage.data.Skin;
-import com.georgev22.skinoverlay.storage.data.Skin;
 import com.mongodb.annotations.Beta;
 import org.jetbrains.annotations.Nullable;
 

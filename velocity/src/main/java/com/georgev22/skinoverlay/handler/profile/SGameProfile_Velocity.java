@@ -29,7 +29,7 @@ public class SGameProfile_Velocity extends SGameProfile {
         PlayerObject playerObject = this.skinOverlay.getPlayer(getUUID()).orElseThrow();
         List<GameProfile.Property> propertyList = new ArrayList<>();
         this.getProperties().forEach((s, sProperty) -> propertyList.add(new GameProfile.Property(sProperty.name(), sProperty.value(), sProperty.signature())));
-        ConnectedPlayer connectedPlayer = (ConnectedPlayer) playerObject.player();
+        ConnectedPlayer connectedPlayer = playerObject.player();
 
         connectedPlayer.setGameProfileProperties(propertyList);
     }

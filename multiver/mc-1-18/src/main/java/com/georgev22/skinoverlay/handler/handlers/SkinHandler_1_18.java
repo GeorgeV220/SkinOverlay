@@ -20,7 +20,6 @@ import net.minecraft.world.level.biome.BiomeManager;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -83,8 +82,8 @@ public final class SkinHandler_1_18 extends SkinHandler {
     public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
             Player player = playerObject.player();
-            player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-            player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+            player.hidePlayer(skinOverlay.getSkinOverlay().plugin(), player);
+            player.showPlayer(skinOverlay.getSkinOverlay().plugin(), player);
             skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
                 if (throwable != null) {
                     skinOverlay.getLogger().log(Level.SEVERE, "Error updating skin", throwable);
@@ -95,8 +94,8 @@ public final class SkinHandler_1_18 extends SkinHandler {
                 if (aBoolean)
                     skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
                         Player p = playerObjects.player();
-                        p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
-                        p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
+                        p.hidePlayer(skinOverlay.getSkinOverlay().plugin(), player);
+                        p.showPlayer(skinOverlay.getSkinOverlay().plugin(), player);
                     });
             }));
         }, 20L);

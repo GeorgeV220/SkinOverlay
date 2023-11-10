@@ -1,9 +1,8 @@
 package com.georgev22.skinoverlay.listeners;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.event.annotations.EventHandler;
-import com.georgev22.skinoverlay.event.interfaces.EventListener;
 import com.georgev22.skinoverlay.event.EventPriority;
+import com.georgev22.skinoverlay.event.annotations.EventHandler;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectEvent;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectUserEvent;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateSkinEvent;
@@ -16,6 +15,7 @@ import com.georgev22.skinoverlay.event.events.user.data.UserModifyDataEvent;
 import com.georgev22.skinoverlay.event.events.user.data.add.UserAddDataEvent;
 import com.georgev22.skinoverlay.event.events.user.data.load.UserPostLoadEvent;
 import com.georgev22.skinoverlay.event.events.user.data.load.UserPreLoadEvent;
+import com.georgev22.skinoverlay.event.interfaces.EventListener;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal

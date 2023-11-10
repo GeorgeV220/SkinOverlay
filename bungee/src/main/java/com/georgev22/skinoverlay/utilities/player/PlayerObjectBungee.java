@@ -1,13 +1,13 @@
 package com.georgev22.skinoverlay.utilities.player;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BungeeMinecraftUtils;
 import com.georgev22.skinoverlay.SkinOverlay;
 import net.kyori.adventure.audience.Audience;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.List;
+import java.util.UUID;
 
 public class PlayerObjectBungee extends PlayerObject {
     private final ProxiedPlayer proxiedPlayer;
