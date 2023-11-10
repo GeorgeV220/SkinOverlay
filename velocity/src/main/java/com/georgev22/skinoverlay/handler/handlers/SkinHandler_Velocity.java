@@ -5,9 +5,9 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
-import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfile_Velocity;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.util.GameProfile;
@@ -25,7 +25,7 @@ public class SkinHandler_Velocity extends SkinHandler {
     public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Player player = (Player) playerObject.player();
+                Player player = playerObject.player();
                 skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
                 skinOverlay.getPluginMessageUtils().setObject(player.getCurrentServer().orElseThrow().getServerInfo());
                 if (skin.skinParts().getSkinName().equalsIgnoreCase("default")) {

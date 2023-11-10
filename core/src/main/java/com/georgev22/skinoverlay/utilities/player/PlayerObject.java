@@ -49,7 +49,7 @@ public abstract class PlayerObject {
      *
      * @return The player object.
      */
-    public abstract Object player();
+    public abstract <T> T player();
 
     /**
      * Returns the audience of the player.

@@ -5,9 +5,9 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
-import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileBungee;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.connection.InitialHandler;
@@ -26,7 +26,7 @@ public class SkinHandler_BungeeCord extends SkinHandler {
     public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                ProxiedPlayer proxiedPlayer = (ProxiedPlayer) playerObject.player();
+                ProxiedPlayer proxiedPlayer = playerObject.player();
                 skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:bungee");
                 skinOverlay.getPluginMessageUtils().setObject(proxiedPlayer.getServer().getInfo());
                 if (skin.skinParts().getSkinName().equalsIgnoreCase("default")) {

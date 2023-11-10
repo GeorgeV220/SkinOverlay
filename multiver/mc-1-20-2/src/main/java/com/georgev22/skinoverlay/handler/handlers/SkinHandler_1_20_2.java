@@ -6,9 +6,9 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
+import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.handler.profile.SGameProfileMojang;
 import com.georgev22.skinoverlay.storage.data.Skin;
-import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.protocol.Packet;
@@ -34,12 +34,13 @@ public final class SkinHandler_1_20_2 extends SkinHandler {
     public CompletableFuture<Boolean> updateSkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Player player = (Player) playerObject.player();
+                Player player = playerObject.player();
                 final CraftPlayer craftPlayer = (CraftPlayer) player;
                 final ServerPlayer entityPlayer = craftPlayer.getHandle();
 
                 ClientboundPlayerInfoRemovePacket removePlayer = new ClientboundPlayerInfoRemovePacket(List.of(entityPlayer.getUUID()));
                 ClientboundPlayerInfoUpdatePacket addPlayer = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityPlayer));
+                //noinspection resource
                 ServerLevel world = entityPlayer.serverLevel();
                 ServerPlayerGameMode gamemode = entityPlayer.gameMode;
 
@@ -71,6 +72,7 @@ public final class SkinHandler_1_20_2 extends SkinHandler {
                 sendPacket(entityPlayer, pos);
                 sendPacket(entityPlayer, slot);
                 craftPlayer.updateScaledHealth();
+                //noinspection UnstableApiUsage
                 player.updateInventory();
                 entityPlayer.resetSentInfo();
                 return true;
@@ -83,7 +85,7 @@ public final class SkinHandler_1_20_2 extends SkinHandler {
     @Override
     public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
         SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
-            Player player = (Player) playerObject.player();
+            Player player = playerObject.player();
             player.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             player.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
             skinOverlay.getSkinHandler().updateSkin(playerObject, skin).handleAsync((aBoolean, throwable) -> {
@@ -95,7 +97,7 @@ public final class SkinHandler_1_20_2 extends SkinHandler {
             }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
                 if (aBoolean)
                     skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
-                        Player p = (Player) playerObjects.player();
+                        Player p = playerObjects.player();
                         p.hidePlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                         p.showPlayer((Plugin) skinOverlay.getSkinOverlay().plugin(), player);
                     });
@@ -105,7 +107,7 @@ public final class SkinHandler_1_20_2 extends SkinHandler {
 
     @Override
     public GameProfile getInternalGameProfile(@NotNull PlayerObject playerObject) {
-        Player player = (Player) playerObject.player();
+        Player player = playerObject.player();
         final CraftPlayer craftPlayer = (CraftPlayer) player;
         final ServerPlayer entityPlayer = craftPlayer.getHandle();
         return entityPlayer.getGameProfile();

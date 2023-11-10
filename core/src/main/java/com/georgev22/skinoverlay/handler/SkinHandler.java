@@ -71,7 +71,7 @@ public abstract class SkinHandler {
      *
      * @param playerObject {@link PlayerObject} object
      * @return {@link PlayerObject}'s internal game profile
-     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws IOException          When an I/O exception to some sort has occurred.
      * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
@@ -82,7 +82,7 @@ public abstract class SkinHandler {
      *
      * @param playerObject {@link PlayerObject} object
      * @return {@link PlayerObject}'s {@link SGameProfile}
-     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws IOException          When an I/O exception to some sort has occurred.
      * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
@@ -252,7 +252,7 @@ public abstract class SkinHandler {
      * @param playerObject {@link PlayerObject} object
      * @param property     If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
      * @return {@link PlayerObject}'s {@link SGameProfile} bytes
-     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws IOException          When an I/O exception to some sort has occurred.
      * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
@@ -266,7 +266,7 @@ public abstract class SkinHandler {
      * @param playerObject {@link PlayerObject} object
      * @param property     If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
      * @return {@link PlayerObject}'s {@link SGameProfile} bytes
-     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws IOException          When an I/O exception to some sort has occurred.
      * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
@@ -293,7 +293,7 @@ public abstract class SkinHandler {
      * @param playerObject {@link PlayerObject} object
      * @param property     If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
      * @return {@link PlayerObject}'s {@link SGameProfile} bytes
-     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws IOException          When an I/O exception to some sort has occurred.
      * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
@@ -308,7 +308,7 @@ public abstract class SkinHandler {
      *
      * @param playerObject {@link PlayerObject}'s object
      * @return a JSON for the specified Bedrock Player
-     * @throws IOException When an I/O exception of some sort has occurred.
+     * @throws IOException When an I/O exception to some sort has occurred.
      */
     public JsonObject createJsonForBedrock(@NotNull final PlayerObject playerObject) throws IOException {
         final byte[] profileBytes = new Utilities.Request().openConnection(String.format("https://api.geysermc.org/v2/skin/%s", this.getXUID(playerObject))).getRequest().finalizeRequest().getBytes();
@@ -332,7 +332,7 @@ public abstract class SkinHandler {
      * @param playerObject {@link PlayerObject}'s object
      * @param property     If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
      * @return a JSON from a {@link SGameProfile} or {@link SProperty}
-     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws IOException          When an I/O exception to some sort has occurred.
      * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
@@ -355,7 +355,7 @@ public abstract class SkinHandler {
      *
      * @param playerObject {@link PlayerObject}'s object
      * @return the XUID for the specified Bedrock Player
-     * @throws IOException When an I/O exception of some sort has occurred.
+     * @throws IOException When an I/O exception to some sort has occurred.
      */
     public String getXUID(@NotNull final PlayerObject playerObject) throws IOException {
         Utilities.Request request = new Utilities.Request().openConnection(String.format("https://api.geysermc.org/v2/xbox/xuid/%s", playerObject.playerName().replace(".", ""))).getRequest().finalizeRequest();
@@ -378,7 +378,7 @@ public abstract class SkinHandler {
      *
      * @param playerName The player's Minecraft username.
      * @return The UUID for the specified Java Player.
-     * @throws IOException If an I/O exception of some sort has occurred.
+     * @throws IOException If an I/O exception to some sort has occurred.
      */
     public UUID getUUID(final String playerName) throws IOException {
         if (!isUsernamePremium(playerName)) {
@@ -403,7 +403,7 @@ public abstract class SkinHandler {
      *
      * @param xuid Player's XUID (check {@link #getXUID(PlayerObject)})
      * @return the Skin {@link SProperty} for the specified Bedrock Player
-     * @throws IOException When an I/O exception of some sort has occurred.
+     * @throws IOException When an I/O exception to some sort has occurred.
      */
     public SProperty getXUIDSkin(final String xuid) throws IOException {
         final Utilities.Request profileBytes = new Utilities.Request().openConnection(String.format("https://api.geysermc.org/v2/skin/%s", xuid)).getRequest().finalizeRequest();
@@ -416,7 +416,7 @@ public abstract class SkinHandler {
      *
      * @param playerObject {@link PlayerObject}'s object
      * @return the Skin {@link SProperty} for the specified Java Player
-     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws IOException          When an I/O exception to some sort has occurred.
      * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
@@ -432,7 +432,7 @@ public abstract class SkinHandler {
      *
      * @param playerObject {@link PlayerObject}'s object
      * @return the Skin {@link SProperty} for the specified {@link PlayerObject}
-     * @throws IOException          When an I/O exception of some sort has occurred.
+     * @throws IOException          When an I/O exception to some sort has occurred.
      * @throws ExecutionException   When attempting to retrieve the result of a task that aborted by throwing an exception.
      * @throws InterruptedException When a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted
      */
