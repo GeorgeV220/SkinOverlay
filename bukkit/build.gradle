@@ -6,14 +6,15 @@ dependencies {
     compileOnly 'dev.folia:folia-api:1.19.4-R0.1-SNAPSHOT'
     compileOnly "io.papermc:paperlib:${paperlibVersion}"
     compileOnly project(path: ':core')
-    compileOnly project(path: ':multiver:mc-1-17', configuration: 'reobf')
-    compileOnly project(path: ':multiver:mc-1-18', configuration: 'reobf')
-    compileOnly project(path: ':multiver:mc-1-18-2', configuration: 'reobf')
-    compileOnly project(path: ':multiver:mc-1-19', configuration: 'reobf')
-    compileOnly project(path: ':multiver:mc-1-19-3', configuration: 'reobf')
-    compileOnly project(path: ':multiver:mc-1-19-4', configuration: 'reobf')
-    compileOnly project(path: ':multiver:mc-1-20', configuration: 'reobf')
-    compileOnly project(path: ':multiver:mc-1-20-2', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc_1_17_R1', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc_1_18_R1', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc_1_18_R2', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc_1_19_R1', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc_1_19_R2', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc_1_19_R3', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc_1_20_R1', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc_1_20_R2', configuration: 'reobf')
+    compileOnly project(path: ':multiver:mc_1_20_R3', configuration: 'reobf')
 
     implementation "net.kyori:adventure-platform-bukkit:4.3.0"
 }

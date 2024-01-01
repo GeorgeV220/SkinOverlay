@@ -85,14 +85,15 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
             SchedulerManager.getScheduler().mainThreadHeartbeat(tick);
         }, 1L, 1L);
         switch (getCurrentVersion()) {
-            case V1_17_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_17());
-            case V1_18_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_18());
+            case V1_17_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_17_R1());
+            case V1_18_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_18_R1());
             case V1_18_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_18_R2());
-            case V1_19_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_19());
+            case V1_19_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_19_R1());
             case V1_19_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_19_R2());
             case V1_19_R3 -> skinOverlay.setSkinHandler(new SkinHandler_1_19_R3());
-            case V1_20_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_20());
-            case V1_20_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_20_2());
+            case V1_20_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_20_R1());
+            case V1_20_R2 -> skinOverlay.setSkinHandler(new SkinHandler_1_20_R2());
+            case V1_20_R3 -> skinOverlay.setSkinHandler(new SkinHandler_1_20_R3());
             case UNKNOWN -> skinOverlay.setSkinHandler(new SkinHandler_Unsupported());
             default -> skinOverlay.setSkinHandler(new SkinHandler_Legacy());
         }
