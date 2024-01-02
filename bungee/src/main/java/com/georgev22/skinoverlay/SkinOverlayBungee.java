@@ -7,7 +7,7 @@ import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.minecraft.BungeeMinecraftUtils;
-import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.minecraft.scheduler.MinecraftBungeeScheduler;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.handlers.SkinHandler_BungeeCord;
 import com.georgev22.skinoverlay.listeners.bungee.DeveloperInformListener;
@@ -46,7 +46,6 @@ import java.util.logging.Logger;
 @ApiStatus.NonExtendable
 public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
 
-    private int tick = 0;
     private boolean enabled = false;
     private SkinOverlay skinOverlay;
 
@@ -76,7 +75,7 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     @Override
     public void onEnable() {
         this.adventure = BungeeAudiences.create(this);
-        getProxy().getScheduler().schedule(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++), 0, 50L, TimeUnit.MILLISECONDS);
+        skinOverlay.setMinecraftScheduler(new MinecraftBungeeScheduler<Plugin, Object, Object, Object>());
         skinOverlay.setSkinHandler(new SkinHandler_BungeeCord());
         skinOverlay.setCommandManager(new BungeeCommandManager(this));
         skinOverlay.onEnable();
@@ -92,7 +91,6 @@ public class SkinOverlayBungee extends Plugin implements SkinOverlayImpl {
     @Override
     public void onDisable() {
         skinOverlay.onDisable();
-        getProxy().getScheduler().cancel(this);
         if (this.adventure != null) {
             this.adventure.close();
             this.adventure = null;

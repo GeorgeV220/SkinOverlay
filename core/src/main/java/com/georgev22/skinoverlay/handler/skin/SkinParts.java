@@ -68,6 +68,10 @@ public class SkinParts implements Serializable {
         if (fullSkin == null) {
             return;
         }
+        if (isOldSkin()) {
+            SerializableBufferedImage fullSkin = this.fullSkin;
+            this.fullSkin = convertSkin(fullSkin);
+        }
         parts.put("Head_Top", createPart(new Head_Top()));
         parts.put("Head_Bottom", createPart(new Head_Bottom()));
         parts.put("Head_Right", createPart(new Head_Right()));
@@ -178,6 +182,29 @@ public class SkinParts implements Serializable {
                 System.out.println(e.getMessage());
             }
         }
+    }
+
+    public boolean isOldSkin() {
+        BufferedImage image = this.fullSkin.getBufferedImage();
+        return image.getWidth() == 64 && image.getHeight() == 32;
+    }
+
+    public SerializableBufferedImage convertSkin(@NotNull SerializableBufferedImage original) {
+        BufferedImage orig = original.getBufferedImage();
+        BufferedImage newImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
+
+        // Copy top half of the original image
+        newImage.getGraphics().drawImage(orig, 0, 0, 64, 32, null);
+
+        // Copy left leg from the original image
+        BufferedImage leftLeg = orig.getSubimage(0, 16, 16, 16);
+        newImage.getGraphics().drawImage(leftLeg, 16, 48, null);
+
+        // Copy right leg from the original image
+        BufferedImage rightLeg = orig.getSubimage(40, 16, 16, 16);
+        newImage.getGraphics().drawImage(rightLeg, 32, 48, null);
+
+        return new SerializableBufferedImage(newImage);
     }
 
     @Override

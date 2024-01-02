@@ -1,6 +1,5 @@
 package com.georgev22.skinoverlay.listeners.velocity;
 
-import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectConnectionEvent;
 import com.georgev22.skinoverlay.utilities.Utilities;
@@ -58,7 +57,7 @@ public class PlayerListeners {
             String subChannel = in.readUTF();
             if (subChannel.equalsIgnoreCase("playerJoin")) {
                 UUID playerUUID = UUID.fromString(Objects.requireNonNull(Utilities.decrypt(in.readUTF())));
-                SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> skinOverlay.getPlayer(playerUUID).ifPresent(PlayerObject::updateSkin));
+               this.skinOverlay.getMinecraftScheduler().runTask(skinOverlay.getPlugin(), () -> skinOverlay.getPlayer(playerUUID).ifPresent(PlayerObject::updateSkin));
             }
         }
     }

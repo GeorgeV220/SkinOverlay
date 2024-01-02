@@ -1,7 +1,6 @@
 package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.exceptions.ReflectionException;
-import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -235,7 +234,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                 fetchMethodAndInvoke(entityPlayer.getClass(), "triggerHealthUpdate", entityPlayer, new Object[0], new Class[0]);
 
                 if (player.isOp()) {
-                    SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+                    this.skinOverlay.getMinecraftScheduler().runTask(this.skinOverlay.getSkinOverlay().plugin(), () -> {
                         player.setOp(false);
                         player.setOp(true);
                     });
@@ -245,12 +244,12 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                      NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
-        }, runnable -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), runnable));
+        }, runnable -> this.skinOverlay.getMinecraftScheduler().runTask(this.skinOverlay.getSkinOverlay().plugin(), runnable));
     }
 
     @Override
     public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
-        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
+        this.skinOverlay.getMinecraftScheduler().createDelayedTask(this.skinOverlay.getSkinOverlay().plugin(), () -> {
             Player player = playerObject.player();
             player.hidePlayer(player);
             player.showPlayer(player);
@@ -260,7 +259,7 @@ public class SkinHandler_Legacy extends SkinHandler_Unsupported {
                     return false;
                 }
                 return aBoolean;
-            }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+            }).thenAccept(aBoolean -> this.skinOverlay.getMinecraftScheduler().runTask(this.skinOverlay.getSkinOverlay().plugin(), () -> {
                 if (aBoolean)
                     skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
                         Player p = playerObjects.player();

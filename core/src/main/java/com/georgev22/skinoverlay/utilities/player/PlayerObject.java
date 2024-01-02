@@ -3,7 +3,6 @@ package com.georgev22.skinoverlay.utilities.player;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObjectMap.Pair;
-import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.event.events.player.PlayerObjectUserEvent;
 import com.georgev22.skinoverlay.event.events.player.skin.PlayerObjectPreUpdateSkinEvent;
@@ -200,7 +199,7 @@ public abstract class PlayerObject {
             return;
         }
 
-        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
+        this.skinOverlay.getMinecraftScheduler().createDelayedTask(this.skinOverlay.getSkinOverlay().plugin(), () -> {
             if (!isOnline() && player() == null) {
                 return;
             }
@@ -349,14 +348,15 @@ public abstract class PlayerObject {
                         if (!OptionsUtil.PROXY.getBooleanValue())
                             updateSkin();
 
-                        if (skinOverlay.type().equals(Type.BUKKIT) & OptionsUtil.PROXY.getBooleanValue())
-                            SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
+                        if (skinOverlay.type().equals(Type.BUKKIT) & OptionsUtil.PROXY.getBooleanValue()) {
+                            this.skinOverlay.getMinecraftScheduler().runAsyncTask(this.skinOverlay.getSkinOverlay().plugin(), () -> {
                                 skinOverlay.getPluginMessageUtils().setChannel("skinoverlay:message");
                                 if (isOnline())
                                     skinOverlay.getPluginMessageUtils().sendDataToPlayer("playerJoin", this, playerUUID().toString());
                                 else
                                     skinOverlay.getLogger().warning("Player " + playerName() + " is not online");
                             });
+                        }
                         return userPostLoadEvent.getUser();
                     }
                     return null;

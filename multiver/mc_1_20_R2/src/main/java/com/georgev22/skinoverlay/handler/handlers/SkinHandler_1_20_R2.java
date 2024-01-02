@@ -2,7 +2,6 @@ package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.exceptions.SkinException;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
@@ -71,7 +70,7 @@ public final class SkinHandler_1_20_R2 extends SkinHandler {
 
     @Override
     public void applySkin(@NotNull PlayerObject playerObject, @NotNull Skin skin) {
-        SchedulerManager.getScheduler().runTaskLater(skinOverlay.getClass(), () -> {
+        this.skinOverlay.getMinecraftScheduler().getScheduler().createDelayedTask(skinOverlay.getPlugin(), () -> {
             Player player = playerObject.player();
             player.hidePlayer(skinOverlay.getSkinOverlay().plugin(), player);
             player.showPlayer(skinOverlay.getSkinOverlay().plugin(), player);
@@ -81,12 +80,12 @@ public final class SkinHandler_1_20_R2 extends SkinHandler {
                     return false;
                 }
                 return aBoolean;
-            }).thenAccept(aBoolean -> SchedulerManager.getScheduler().runTask(skinOverlay.getClass(), () -> {
+            }).thenAccept(aBoolean -> this.skinOverlay.getMinecraftScheduler().runTask(skinOverlay.getPlugin(), () -> {
                 if (aBoolean)
                     skinOverlay.onlinePlayers().stream().filter(playerObjects -> playerObjects != playerObject).forEach(playerObjects -> {
                         Player p = playerObjects.player();
-                        p.hidePlayer(skinOverlay.getSkinOverlay().plugin(), player);
-                        p.showPlayer(skinOverlay.getSkinOverlay().plugin(), player);
+                        p.hidePlayer(skinOverlay.getPlugin(), player);
+                        p.showPlayer(skinOverlay.getPlugin(), player);
                     });
             }));
         }, 20L);

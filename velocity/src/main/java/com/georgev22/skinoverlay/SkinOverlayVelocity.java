@@ -7,7 +7,7 @@ import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.minecraft.VelocityMinecraftUtils;
-import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.minecraft.scheduler.VelocityMinecraftScheduler;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.handlers.SkinHandler_Velocity;
 import com.georgev22.skinoverlay.listeners.velocity.DeveloperInformListener;
@@ -70,8 +70,6 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     private final SkinOverlay skinOverlay;
 
-    private ScheduledTask scheduledTask;
-
     private LibraryLoader libraryLoader;
 
     private int tick = 0;
@@ -124,7 +122,7 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     public void onEnable() {
         this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.create("skinoverlay", "test"));
-        this.scheduledTask = getProxy().getScheduler().buildTask(this, () -> SchedulerManager.getScheduler().mainThreadHeartbeat(tick++)).repeat(Duration.ofMillis(50L)).schedule();
+        this.skinOverlay.setMinecraftScheduler(new VelocityMinecraftScheduler<>());
         skinOverlay.setSkinHandler(new SkinHandler_Velocity());
         skinOverlay.setCommandManager(new VelocityCommandManager(getProxy(), this, dataFolder()));
         skinOverlay.onEnable();
@@ -138,7 +136,6 @@ public class SkinOverlayVelocity implements SkinOverlayImpl {
 
     public void onDisable() {
         skinOverlay.onDisable();
-        scheduledTask.cancel();
         enabled = false;
         try {
             this.libraryLoader.unloadAll();

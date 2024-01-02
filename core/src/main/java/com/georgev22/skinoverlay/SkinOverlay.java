@@ -8,7 +8,7 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObjectMap.Pair;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.maps.UnmodifiableObjectMap;
-import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.minecraft.scheduler.MinecraftScheduler;
 import com.georgev22.library.utilities.EntityManager;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
@@ -95,6 +95,10 @@ public final class SkinOverlay {
     @Getter
     private SkinFileCache skinFileCache;
 
+    @Setter
+    @Getter
+    private MinecraftScheduler<?, ?, ?, ?> minecraftScheduler;
+
     public SkinOverlay(SkinOverlayImpl skinOverlay) {
         this.skinOverlay = skinOverlay;
         instance = this;
@@ -153,7 +157,7 @@ public final class SkinOverlay {
             databaseWrapper.disconnect();
         }
         unregisterCommands();
-        SchedulerManager.getScheduler().cancelTasks(this.getClass());
+        this.minecraftScheduler.cancelTasks(this.skinOverlay.plugin());
         HandlerList.unregisterAll();
     }
 
@@ -246,7 +250,7 @@ public final class SkinOverlay {
      *
      * @return The plugin instance.
      */
-    public Object getPlugin() {
+    public <T> T getPlugin() {
         return skinOverlay.plugin();
     }
 

@@ -1,6 +1,5 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -35,7 +34,7 @@ public class Updater {
             return;
         if (onlineVersion == null)
             return;
-        SchedulerManager.getScheduler().runTaskTimerAsynchronously(skinOverlay.getClass(), () -> {
+        this.skinOverlay.getMinecraftScheduler().createAsyncRepeatingTask(skinOverlay.getPlugin(), () -> {
             skinOverlay.getSkinOverlay().print("Checking for Updates ... ");
             if (compareVersions(onlineVersion.replace("v", ""), localVersion.replace("v", "")) == 0) {
                 skinOverlay.getSkinOverlay().print("You are running the newest build.");
@@ -57,7 +56,7 @@ public class Updater {
             return;
         if (onlineVersion == null)
             return;
-        SchedulerManager.getScheduler().runTaskAsynchronously(skinOverlay.getClass(), () -> {
+        this.skinOverlay.getMinecraftScheduler().runAsyncTask(skinOverlay.getPlugin(), () -> {
             playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6Checking for Updates ...");
             if (compareVersions(onlineVersion.replace("v", ""), localVersion.replace("v", "")) == 0) {
                 playerObject.sendMessage("&e&lSkinOverlay Updater &8» &6You are running the newest build.");

@@ -7,14 +7,14 @@ import com.georgev22.api.libraryloader.exceptions.InvalidDependencyException;
 import com.georgev22.api.libraryloader.exceptions.UnknownDependencyException;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
-import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.library.minecraft.scheduler.MinecraftBukkitScheduler;
+import com.georgev22.library.minecraft.scheduler.MinecraftFoliaScheduler;
+import com.georgev22.library.minecraft.scheduler.MinecraftScheduler;
 import com.georgev22.skinoverlay.handler.handlers.*;
 import com.georgev22.skinoverlay.listeners.bukkit.DeveloperInformListener;
 import com.georgev22.skinoverlay.listeners.bukkit.PaperPlayerListeners;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
 import com.georgev22.skinoverlay.utilities.BukkitPluginMessageUtils;
-import com.georgev22.skinoverlay.utilities.bukkit.SkinOverlayBukkitScheduler;
-import com.georgev22.skinoverlay.utilities.bukkit.SkinOverlayFoliaScheduler;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
@@ -22,9 +22,9 @@ import com.georgev22.skinoverlay.utilities.player.PlayerObjectBukkit;
 import io.papermc.lib.PaperLib;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -50,12 +50,10 @@ import static com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVers
 public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
     private LibraryLoader libraryLoader;
 
-    private int tick = 0;
-
     private BukkitAudiences adventure;
     private SkinOverlay skinOverlay;
 
-    private SkinOverlayBukkitScheduler scheduler;
+    private MinecraftScheduler<Plugin, Location, World, Chunk> scheduler;
 
     @Override
     public void onLoad() {
@@ -76,14 +74,11 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         if (BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isBelow(V1_16_R1))
             this.adventure = BukkitAudiences.create(this);
         if (isFolia()) {
-            this.scheduler = new SkinOverlayFoliaScheduler();
+            this.scheduler = new MinecraftFoliaScheduler();
         } else {
-            this.scheduler = new SkinOverlayBukkitScheduler();
+            this.scheduler = new MinecraftBukkitScheduler();
         }
-        scheduler.createRepeatingTask(this, () -> {
-            tick++;
-            SchedulerManager.getScheduler().mainThreadHeartbeat(tick);
-        }, 1L, 1L);
+        this.skinOverlay.setMinecraftScheduler(this.scheduler);
         switch (getCurrentVersion()) {
             case V1_17_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_17_R1());
             case V1_18_R1 -> skinOverlay.setSkinHandler(new SkinHandler_1_18_R1());
@@ -118,7 +113,6 @@ public class SkinOverlayBukkit extends JavaPlugin implements SkinOverlayImpl {
         Bukkit.getServer().getMessenger().unregisterIncomingPluginChannel(this);
         Bukkit.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
         skinOverlay.onDisable();
-        scheduler.cancelTasks(this);
         if (this.adventure != null) {
             this.adventure.close();
             this.adventure = null;
