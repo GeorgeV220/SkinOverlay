@@ -73,7 +73,7 @@ public final class SkinHandler_1_19_R3 extends SkinHandler {
             } catch (Exception exception) {
                 throw new SkinException(exception);
             }
-        });
+        }, runnable -> this.skinOverlay.getMinecraftScheduler().runTask(this.skinOverlay.getPlugin(), runnable));
     }
 
     @Override
