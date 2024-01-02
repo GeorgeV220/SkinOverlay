@@ -1,8 +1,8 @@
-
 package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.scheduler.SchedulerManager;
 import com.georgev22.library.utilities.Utils;
+import com.georgev22.skinoverlay.exceptions.SkinException;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SkinHandler;
 import com.georgev22.skinoverlay.storage.data.Skin;
@@ -14,8 +14,9 @@ import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.biome.BiomeManager;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
@@ -40,9 +40,6 @@ public final class SkinHandler_1_19_R2 extends SkinHandler {
                 final CraftPlayer craftPlayer = (CraftPlayer) player;
                 final ServerPlayer entityPlayer = craftPlayer.getHandle();
 
-
-                ClientboundPlayerInfoRemovePacket removePlayer = new ClientboundPlayerInfoRemovePacket(List.of(entityPlayer.getUUID()));
-                ClientboundPlayerInfoUpdatePacket addPlayer = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityPlayer));
                 ServerLevel world = entityPlayer.getLevel();
                 ServerPlayerGameMode gamemode = entityPlayer.gameMode;
 
@@ -54,29 +51,33 @@ public final class SkinHandler_1_19_R2 extends SkinHandler {
                         gamemode.getPreviousGameModeForPlayer(),
                         world.isDebug(),
                         world.isFlat(),
-                        (byte) 3,
+                        ClientboundRespawnPacket.KEEP_ALL_DATA,
                         entityPlayer.getLastDeathLocation()
                 );
 
-                Location l = player.getLocation();
-                ClientboundPlayerPositionPacket pos = new ClientboundPlayerPositionPacket(l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<>(), 0, false);
-                ClientboundSetCarriedItemPacket slot = new ClientboundSetCarriedItemPacket(player.getInventory().getHeldItemSlot());
-
-                sendPacket(entityPlayer, removePlayer);
-                sendPacket(entityPlayer, addPlayer);
+                sendPacket(entityPlayer, new ClientboundPlayerInfoRemovePacket(List.of(player.getUniqueId())));
+                sendPacket(entityPlayer, ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityPlayer)));
 
                 sendPacket(entityPlayer, respawn);
 
                 entityPlayer.onUpdateAbilities();
 
-                sendPacket(entityPlayer, pos);
-                sendPacket(entityPlayer, slot);
-                craftPlayer.updateScaledHealth();
-                player.updateInventory();
+                entityPlayer.connection.teleport(player.getLocation());
+
                 entityPlayer.resetSentInfo();
+
+                PlayerList playerList = entityPlayer.server.getPlayerList();
+                playerList.sendPlayerPermissionLevel(entityPlayer);
+                playerList.sendLevelInfo(entityPlayer, world);
+                playerList.sendAllPlayerInfo(entityPlayer);
+
+                for (MobEffectInstance mobEffect : entityPlayer.getActiveEffects()) {
+                    ClientboundUpdateMobEffectPacket effect = new ClientboundUpdateMobEffectPacket(entityPlayer.getId(), mobEffect);
+                    sendPacket(entityPlayer, effect);
+                }
                 return true;
             } catch (Exception exception) {
-                throw new RuntimeException(exception);
+                throw new SkinException(exception);
             }
         });
     }

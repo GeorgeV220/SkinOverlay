@@ -1,9 +1,9 @@
-
 package com.georgev22.skinoverlay.handler.handlers;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.scheduler.SchedulerManager;
+import com.georgev22.skinoverlay.exceptions.SkinException;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
@@ -15,14 +15,12 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.ServerPlayerGameMode;
-import net.minecraft.world.level.biome.BiomeManager;
-import org.bukkit.Location;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.effect.MobEffectInstance;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
@@ -36,47 +34,37 @@ public final class SkinHandler_1_20_R2 extends SkinHandler {
                 Player player = playerObject.player();
                 final CraftPlayer craftPlayer = (CraftPlayer) player;
                 final ServerPlayer entityPlayer = craftPlayer.getHandle();
-
-                ClientboundPlayerInfoRemovePacket removePlayer = new ClientboundPlayerInfoRemovePacket(List.of(entityPlayer.getUUID()));
-                ClientboundPlayerInfoUpdatePacket addPlayer = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityPlayer));
-                //noinspection resource
                 ServerLevel world = entityPlayer.serverLevel();
-                ServerPlayerGameMode gamemode = entityPlayer.gameMode;
 
+                CommonPlayerSpawnInfo spawnInfo = entityPlayer.createCommonSpawnInfo(world);
                 ClientboundRespawnPacket respawn = new ClientboundRespawnPacket(
-                        new CommonPlayerSpawnInfo(
-                                world.dimensionTypeId(),
-                                world.dimension(),
-                                BiomeManager.obfuscateSeed(world.getSeed()),
-                                gamemode.getGameModeForPlayer(),
-                                gamemode.getPreviousGameModeForPlayer(),
-                                world.isDebug(),
-                                world.isFlat(),
-                                entityPlayer.getLastDeathLocation(),
-                                entityPlayer.getPortalCooldown()
-                        ),
-                        (byte) 3
+                        spawnInfo,
+                        ClientboundRespawnPacket.KEEP_ALL_DATA
                 );
-                Location l = player.getLocation();
-                ClientboundPlayerPositionPacket pos = new ClientboundPlayerPositionPacket(l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<>(), 0);
-                ClientboundSetCarriedItemPacket slot = new ClientboundSetCarriedItemPacket(player.getInventory().getHeldItemSlot());
 
-                sendPacket(entityPlayer, removePlayer);
-                sendPacket(entityPlayer, addPlayer);
+                sendPacket(entityPlayer, new ClientboundPlayerInfoRemovePacket(List.of(player.getUniqueId())));
+                sendPacket(entityPlayer, ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityPlayer)));
 
                 sendPacket(entityPlayer, respawn);
 
                 entityPlayer.onUpdateAbilities();
 
-                sendPacket(entityPlayer, pos);
-                sendPacket(entityPlayer, slot);
-                craftPlayer.updateScaledHealth();
-                //noinspection UnstableApiUsage
-                player.updateInventory();
+                entityPlayer.connection.teleport(player.getLocation());
+
                 entityPlayer.resetSentInfo();
+
+                PlayerList playerList = entityPlayer.server.getPlayerList();
+                playerList.sendPlayerPermissionLevel(entityPlayer);
+                playerList.sendLevelInfo(entityPlayer, world);
+                playerList.sendAllPlayerInfo(entityPlayer);
+
+                for (MobEffectInstance mobEffect : entityPlayer.getActiveEffects()) {
+                    ClientboundUpdateMobEffectPacket effect = new ClientboundUpdateMobEffectPacket(entityPlayer.getId(), mobEffect);
+                    sendPacket(entityPlayer, effect);
+                }
                 return true;
             } catch (Exception exception) {
-                throw new RuntimeException(exception);
+                throw new SkinException(exception);
             }
         });
     }
