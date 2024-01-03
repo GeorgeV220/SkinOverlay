@@ -14,13 +14,13 @@ import java.util.UUID;
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
-public class SGameProfile_Velocity extends SGameProfile {
+public class SGameProfileVelocity extends SGameProfile {
 
-    public SGameProfile_Velocity(String name, UUID uuid) {
+    public SGameProfileVelocity(String name, UUID uuid) {
         super(name, uuid);
     }
 
-    public SGameProfile_Velocity(String name, UUID uuid, ObjectMap<String, SProperty> properties) {
+    public SGameProfileVelocity(String name, UUID uuid, ObjectMap<String, SProperty> properties) {
         super(name, uuid, properties);
     }
 

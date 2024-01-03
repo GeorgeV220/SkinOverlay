@@ -6,7 +6,7 @@ import com.georgev22.library.utilities.Utils;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.handler.profile.SGameProfile_Velocity;
+import com.georgev22.skinoverlay.handler.profile.SGameProfileVelocity;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.velocitypowered.api.proxy.Player;
@@ -67,6 +67,6 @@ public class SkinHandler_Velocity extends SkinHandler {
     public static @NotNull SGameProfile wrapper(@NotNull GameProfile gameProfile) {
         ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
         gameProfile.getProperties().forEach(property -> propertyObjectMap.append(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature())));
-        return new SGameProfile_Velocity(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
+        return new SGameProfileVelocity(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
     }
 }
