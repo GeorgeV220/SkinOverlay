@@ -11,21 +11,28 @@ import com.georgev22.library.maps.UnmodifiableObjectMap;
 import com.georgev22.library.minecraft.scheduler.MinecraftScheduler;
 import com.georgev22.library.utilities.EntityManager;
 import com.georgev22.library.yaml.file.FileConfiguration;
+import com.georgev22.library.yaml.serialization.ConfigurationSerialization;
 import com.georgev22.skinoverlay.commands.SkinOverlayCommand;
 import com.georgev22.skinoverlay.event.EventManager;
 import com.georgev22.skinoverlay.event.HandlerList;
+import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
+import com.georgev22.skinoverlay.handler.skin.Part;
+import com.georgev22.skinoverlay.handler.skin.SkinParts;
 import com.georgev22.skinoverlay.hook.SkinHook;
 import com.georgev22.skinoverlay.hook.hooks.SkinHookImpl;
 import com.georgev22.skinoverlay.hook.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.DebugListeners;
 import com.georgev22.skinoverlay.listeners.ObservableListener;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.storage.data.User;
+import com.georgev22.skinoverlay.storage.gsonAdapters.*;
 import com.georgev22.skinoverlay.storage.manager.SkinManager;
 import com.georgev22.skinoverlay.storage.manager.UserManager;
 import com.georgev22.skinoverlay.utilities.Locale;
 import com.georgev22.skinoverlay.utilities.PluginMessageUtils;
+import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Updater;
 import com.georgev22.skinoverlay.utilities.config.FileManager;
 import com.georgev22.skinoverlay.utilities.config.MessagesUtil;
@@ -33,6 +40,8 @@ import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.config.SkinFileCache;
 import com.georgev22.skinoverlay.utilities.interfaces.SkinOverlayImpl;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.ApiStatus;
@@ -99,6 +108,9 @@ public final class SkinOverlay {
     @Getter
     private MinecraftScheduler<?, ?, ?, ?> minecraftScheduler;
 
+    @Getter
+    private Gson gson;
+
     public SkinOverlay(SkinOverlayImpl skinOverlay) {
         this.skinOverlay = skinOverlay;
         instance = this;
@@ -121,6 +133,21 @@ public final class SkinOverlay {
     }
 
     public void onEnable() {
+        ConfigurationSerialization.registerClass(User.class, "SkinOverlayUser");
+        ConfigurationSerialization.registerClass(Skin.class, "SkinOverlaySkin");
+        ConfigurationSerialization.registerClass(SkinParts.class, "SkinParts");
+        ConfigurationSerialization.registerClass(Part.class, "SkinPart");
+        ConfigurationSerialization.registerClass(SProperty.class, "SProperty");
+        ConfigurationSerialization.registerClass(SerializableBufferedImage.class, "SerializableBufferedImage");
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(SerializableBufferedImage.class, new SerializableBufferedImageTypeAdapter())
+                .registerTypeAdapter(Part.class, new PartTypeAdapter())
+                .registerTypeAdapter(SkinParts.class, new SkinPartsTypeAdapter())
+                .registerTypeAdapter(SProperty.class, new SPropertyTypeAdapter())
+                .registerTypeAdapter(Skin.class, new SkinTypeAdapter())
+                .registerTypeAdapter(User.class, new UserTypeAdapter())
+                //.setPrettyPrinting()
+                .create();
         switch (OptionsUtil.SKIN_HOOK.getStringValue().toLowerCase(Locale.ENGLISH_US.getLocale())) {
             case "skinsrestorer" -> {
                 if (skinOverlay.isPluginEnabled(type().equals(SkinOverlayImpl.Type.VELOCITY) ? "skinsrestorer" : "SkinsRestorer")) {
@@ -361,12 +388,7 @@ public final class SkinOverlay {
     private void setupDatabase() throws Exception {
         ObjectMap<String, Pair<String, String>> map = new HashObjectMap<String, Pair<String, String>>()
                 .append("entity_id", Pair.create("VARCHAR(38)", "NULL"))
-                .append("skin", Pair.create("BLOB", "NULL"))
-                .append("defaultSkin", Pair.create("BLOB", "NULL"));
-        ObjectMap<String, Pair<String, String>> skinMap = new HashObjectMap<String, Pair<String, String>>()
-                .append("entity_id", Pair.create("VARCHAR(38)", "NULL"))
-                .append("property", Pair.create("BLOB", "NULL"))
-                .append("skinParts", Pair.create("BLOB", "NULL"));
+                .append("data", Pair.create("LONGTEXT", "NULL"));
         switch (OptionsUtil.DATABASE_TYPE.getStringValue()) {
             case "MySQL" -> {
                 if (databaseWrapper == null || !databaseWrapper.isConnected()) {
@@ -377,7 +399,7 @@ public final class SkinOverlay {
                             OptionsUtil.DATABASE_PASSWORD.getStringValue(),
                             OptionsUtil.DATABASE_DATABASE.getStringValue(),
                             getLogger());
-                    sqlConnect(map, skinMap);
+                    sqlConnect(map);
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: MySQL");
                 }
             }
@@ -390,7 +412,7 @@ public final class SkinOverlay {
                             OptionsUtil.DATABASE_PASSWORD.getStringValue(),
                             OptionsUtil.DATABASE_DATABASE.getStringValue(),
                             getLogger());
-                    sqlConnect(map, skinMap);
+                    sqlConnect(map);
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: PostgreSQL");
                 }
             }
@@ -403,7 +425,7 @@ public final class SkinOverlay {
                             "",
                             OptionsUtil.DATABASE_FILE_NAME.getStringValue(),
                             getLogger());
-                    sqlConnect(map, skinMap);
+                    sqlConnect(map);
                     getLogger().log(Level.INFO, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database: SQLite");
                 }
             }
@@ -443,14 +465,14 @@ public final class SkinOverlay {
 
     }
 
-    private void sqlConnect(ObjectMap<String, Pair<String, String>> map, ObjectMap<String, Pair<String, String>> skinMap) throws SQLException, ClassNotFoundException {
+    private void sqlConnect(ObjectMap<String, Pair<String, String>> map) throws SQLException, ClassNotFoundException {
         databaseWrapper.connect();
         if (databaseWrapper.getSQLDatabase() == null) {
             this.getLogger().log(Level.SEVERE, "[" + getDescription().name() + "] [" + getDescription().version() + "] Database is not connected");
             return;
         }
         databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue(), map);
-        databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), skinMap);
+        databaseWrapper.getSQLDatabase().createTable(OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue(), map);
         this.userManager = new UserManager(databaseWrapper, OptionsUtil.DATABASE_USERS_TABLE_NAME.getStringValue());
         this.skinManager = new SkinManager(databaseWrapper, OptionsUtil.DATABASE_SKINS_TABLE_NAME.getStringValue());
     }

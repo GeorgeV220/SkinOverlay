@@ -7,17 +7,14 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObjectMap.Pair;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.utilities.EntityManager;
-import com.georgev22.library.utilities.Utils;
+import com.georgev22.library.yaml.file.YamlConfiguration;
+import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.mongodb.annotations.Beta;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -33,6 +30,7 @@ public class SkinManager implements EntityManager<Skin> {
     private final DatabaseWrapper database;
     private final String collection;
     private final ObservableObjectMap<UUID, Skin> loadedEntities = new ObservableObjectMap<>();
+    private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     /**
      * Constructor for the EntityManager class
@@ -46,7 +44,9 @@ public class SkinManager implements EntityManager<Skin> {
             this.entitiesDirectory = folder;
             this.database = null;
             if (!this.entitiesDirectory.exists()) {
-                this.entitiesDirectory.mkdirs();
+                if (this.entitiesDirectory.mkdirs()) {
+                    this.skinOverlay.getLogger().info("Created entities directory: " + this.entitiesDirectory.getAbsolutePath());
+                }
             }
         } else if (obj instanceof DatabaseWrapper databaseWrapper) {
             this.entitiesDirectory = null;
@@ -70,21 +70,23 @@ public class SkinManager implements EntityManager<Skin> {
                     if (exists) {
                         return CompletableFuture.supplyAsync(() -> {
                             if (entitiesDirectory != null) {
-                                File file = new File(entitiesDirectory, entityId + ".entity");
+                                File file = new File(entitiesDirectory, entityId + ".yml");
                                 try {
-                                    Skin entity = (Skin) Utils.deserializeObject(file.getAbsolutePath());
+                                    YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+                                    Skin entity = (Skin) yamlConfiguration.get("entity");
                                     loadedEntities.append(entityId, entity);
                                     return entity;
-                                } catch (IOException | ClassNotFoundException e) {
+                                } catch (Exception e) {
                                     throw new RuntimeException(e);
                                 }
                             } else if (database != null) {
                                 Pair<String, List<DatabaseObject>> retrievedData = database.retrieveData(collection, Pair.create("entity_id", entityId.toString()));
-                                Skin entity = new Skin(entityId);
-                                retrievedData.value().forEach(databaseObject -> {
-                                    ObjectMap<String, Object> databaseObjectData = databaseObject.data();
-                                    databaseObjectData.forEach(entity::addCustomData);
-                                });
+                                Optional<Skin> optionalEntity = retrievedData.value().stream()
+                                        .filter(databaseObject -> databaseObject.data().get("data") != null)
+                                        .map(databaseObject -> Skin.fromJson((String) databaseObject.data().get("data")))
+                                        .findFirst();
+                                Skin entity = optionalEntity.orElseGet(() -> new Skin(entityId));
+                                loadedEntities.append(entityId, entity);
                                 return entity;
                             } else {
                                 return new Skin(entityId);
@@ -106,15 +108,19 @@ public class SkinManager implements EntityManager<Skin> {
     public CompletableFuture<Void> save(Skin entity) {
         return CompletableFuture.runAsync(() -> {
             if (entitiesDirectory != null) {
-                File file = new File(entitiesDirectory, entity.getId() + ".entity");
+                File file = new File(entitiesDirectory, entity.getId() + ".yml");
                 try {
-                    Utils.serializeObject(entity, file.getAbsolutePath());
-                } catch (IOException e) {
+                    YamlConfiguration yamlConfiguration = new YamlConfiguration();
+                    yamlConfiguration.set("entity", entity);
+                    yamlConfiguration.save(file);
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (database != null) {
                 exists(entity.getId()).thenAccept(result -> {
-                    ObjectMap<String, Object> entityData = new HashObjectMap<>(entity.getCustomData());
+                    ObjectMap<String, Object> entityData = new HashObjectMap<>();
+                    entityData.append("entity_id", entity.getId().toString());
+                    entityData.append("data", entity.toJson());
                     if (result) {
                         database.updateData(collection, Pair.create("entity_id", entity.getId().toString()), Pair.create("$set", entityData.removeEntry("entity_id")), null);
                     } else {
@@ -136,15 +142,18 @@ public class SkinManager implements EntityManager<Skin> {
     public CompletableFuture<Void> delete(Skin entity) {
         return CompletableFuture.runAsync(() -> {
             if (entitiesDirectory != null) {
-                File file = new File(entitiesDirectory, entity.getId() + ".entity");
+                File file = new File(entitiesDirectory, entity.getId() + ".yml");
                 if (file.exists()) {
-                    file.delete();
+                    if (file.delete()) {
+                        this.skinOverlay.getLogger().info("Deleted Skin: " + file.getAbsolutePath());
+                    }
                 }
             } else if (database != null) {
                 exists(entity.getId()).thenAccept(result -> {
                     ObjectMap<String, Object> entityData = new HashObjectMap<>(entity.getCustomData());
                     if (result) {
-                        database.removeData(collection, Pair.create("entity_id", entity.getId()), null);
+                        database.removeData(collection, Pair.create("entity_id", entity.getId().toString()), null);
+                        this.skinOverlay.getLogger().info("Deleted Skin: " + entity.getId());
                     }
                 });
             }
@@ -173,9 +182,9 @@ public class SkinManager implements EntityManager<Skin> {
     public CompletableFuture<Boolean> exists(UUID entityId) {
         return CompletableFuture.supplyAsync(() -> {
             if (entitiesDirectory != null) {
-                return new File(entitiesDirectory, entityId + ".entity").exists();
+                return new File(entitiesDirectory, entityId + ".yml").exists();
             } else if (database != null) {
-                return database.exists(collection, Pair.create("entity_id", entityId), null);
+                return database.exists(collection, Pair.create("entity_id", entityId.toString()), null);
             } else {
                 return false;
             }
@@ -222,9 +231,9 @@ public class SkinManager implements EntityManager<Skin> {
     public void loadAll() {
         List<UUID> entityIDs = new ArrayList<>();
         if (entitiesDirectory != null) {
-            File[] files = this.entitiesDirectory.listFiles((dir, name) -> name.endsWith(".entity"));
+            File[] files = this.entitiesDirectory.listFiles((dir, name) -> name.endsWith(".yml"));
             if (files != null) {
-                Arrays.stream(files).forEach(file -> entityIDs.add(UUID.fromString(file.getName().replace(".entity", ""))));
+                Arrays.stream(files).forEach(file -> entityIDs.add(UUID.fromString(file.getName().replace(".yml", ""))));
             }
         } else if (database != null) {
             Pair<String, List<DatabaseObject>> data = database.retrieveData(collection, Pair.create("entity_id", null));
