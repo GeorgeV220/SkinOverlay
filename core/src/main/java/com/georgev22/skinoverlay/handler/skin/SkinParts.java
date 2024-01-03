@@ -1,5 +1,8 @@
 package com.georgev22.skinoverlay.handler.skin;
 
+import com.georgev22.library.yaml.serialization.ConfigurationSerializable;
+import com.georgev22.library.yaml.serialization.SerializableAs;
+import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.handler.skin.Section.*;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import lombok.Getter;
@@ -12,8 +15,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents different sections and parts of a player's skin.
+ */
 @Getter
-public class SkinParts implements Serializable {
+@SerializableAs("SkinParts")
+public class SkinParts implements ConfigurationSerializable {
 
     private static final SerializableBufferedImage steveSkin;
 
@@ -43,16 +50,25 @@ public class SkinParts implements Serializable {
         }
     }
 
-    private volatile SerializableBufferedImage fullSkin;
+    private SerializableBufferedImage fullSkin;
 
     private String skinName;
 
     private final Map<String, Part> parts;
 
+    /**
+     * Default constructor for SkinParts using the Steve skin.
+     */
     public SkinParts() {
         this(steveSkin, "Steve");
     }
 
+    /**
+     * Constructor for SkinParts with a specified full skin and skin name.
+     *
+     * @param fullSkin The full skin image.
+     * @param skinName The name of the skin.
+     */
     public SkinParts(SerializableBufferedImage fullSkin, String skinName) {
         this.parts = new HashMap<>();
         if (fullSkin != null) {
@@ -64,6 +80,9 @@ public class SkinParts implements Serializable {
         createParts();
     }
 
+    /**
+     * Creates different parts based on the full skin image.
+     */
     public void createParts() {
         if (fullSkin == null) {
             return;
@@ -146,6 +165,12 @@ public class SkinParts implements Serializable {
         parts.put("Left_Sleeve_Back", createPart(new Left_Sleeve_Back()));
     }
 
+    /**
+     * Creates a part image based on the specified section.
+     *
+     * @param section The section for which the part image is created.
+     * @return A Part object representing the created part.
+     */
     private @NotNull Part createPart(@NotNull Section section) {
         int x = section.getX1();
         int y = section.getY1();
@@ -168,10 +193,21 @@ public class SkinParts implements Serializable {
         return new Part(partName, new SerializableBufferedImage(partImage), x, y, width, height, isAreaTransparent);
     }
 
+    /**
+     * Retrieves a specific part by name.
+     *
+     * @param partName The name of the part.
+     * @return The Part object corresponding to the specified name.
+     */
     public Part getPart(String partName) {
         return parts.get(partName);
     }
 
+    /**
+     * Saves images of all parts to the specified output directory.
+     *
+     * @param outputDirectory The directory to save the part images.
+     */
     public void savePartImages(File outputDirectory) {
         for (Part part : parts.values()) {
             String fileName = part.name() + ".png";
@@ -184,11 +220,22 @@ public class SkinParts implements Serializable {
         }
     }
 
+    /**
+     * Checks if the skin is an old format (64x32).
+     *
+     * @return True if the skin is in the old format, false otherwise.
+     */
     public boolean isOldSkin() {
         BufferedImage image = this.fullSkin.getBufferedImage();
         return image.getWidth() == 64 && image.getHeight() == 32;
     }
 
+    /**
+     * Converts an old format skin to the new format (64x64).
+     *
+     * @param original The original skin image in old format.
+     * @return The converted skin image in new format.
+     */
     public SerializableBufferedImage convertSkin(@NotNull SerializableBufferedImage original) {
         BufferedImage orig = original.getBufferedImage();
         BufferedImage newImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
@@ -207,6 +254,52 @@ public class SkinParts implements Serializable {
         return new SerializableBufferedImage(newImage);
     }
 
+
+    /**
+     * Serializes the SkinParts object to a map for YAML serialization.
+     *
+     * @return A map containing the serialized data.
+     */
+    @Override
+    public @NotNull Map<String, Object> serialize() {
+        return Map.of("bufferedImage", this.fullSkin, "skinName", this.skinName);
+    }
+
+    /**
+     * Deserializes the YAML-compatible map to a SkinParts object.
+     *
+     * @param map The YAML-compatible map containing skin information.
+     * @return The deserialized SkinParts object.
+     */
+    public static @NotNull SkinParts deserialize(@NotNull Map<String, Object> map) {
+        return new SkinParts((SerializableBufferedImage) map.get("bufferedImage"), (String) map.get("skinName"));
+    }
+
+
+    /**
+     * Serializes the SkinParts object to a JSON string.
+     *
+     * @return The serialized JSON string.
+     */
+    public String toJson() {
+        return SkinOverlay.getInstance().getGson().toJson(this);
+    }
+
+    /**
+     * Deserializes a JSON string to a SkinParts object.
+     *
+     * @param json The JSON string to deserialize.
+     * @return The deserialized SkinParts object.
+     */
+    public static SkinParts fromJson(String json) {
+        return SkinOverlay.getInstance().getGson().fromJson(json, SkinParts.class);
+    }
+
+    /**
+     * Returns a string representation of the SkinParts object.
+     *
+     * @return A string representation of the SkinParts object.
+     */
     @Override
     public String toString() {
         return "SkinParts{" +
