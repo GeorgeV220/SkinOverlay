@@ -3,7 +3,8 @@ Messages:
   Only Player Command: '&c&l(!)&c Μόνο οι παίκτες μπορούν να εκτελέσουν αυτήν την εντολή!'
   Offline Player: '&c&l(!)&c Ο παίκτης %player% είναι εκτός σύνδεσης!'
   Overlay Applied: '&a&l(!)&a Εφαρμόστηκε το επικάλυμμα %url% στον παίκτη!'
-  Overlay Reset: '&a&l(!)&a Επαναφορά προεπιλεγμένου δέρματος(%player%)!!'
+  Overlay Reset: '&a&l(!)&a Επαναφορά προεπιλεγμένου επικαλύμματος(%player%)!!'
+  Overlay Not Found: '&c&l(!)&c Το επικάλυμμα %overlay% δεν βρέθηκε!'
   Insufficient arguments: '&c&l(!)&c Μη επαρκείς παράμετροι (%command%)'
 Commands:
   Descriptions:

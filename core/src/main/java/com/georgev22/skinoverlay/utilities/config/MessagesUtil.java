@@ -23,6 +23,7 @@ public enum MessagesUtil {
     OFFLINE_PLAYER("Messages.Offline Player", "&c&l(!)&c Player %player% is offline!"),
     DONE("Messages.Overlay Applied", "&a&l(!)&a Overlay %url% applied!"),
     RESET("Messages.Overlay Reset", "&a&l(!)&a Default skin applied(%player%)!!"),
+    OVERLAY_NOT_FOUND("Messages.Overlay Not Found", "&c&l(!)&c Overlay %overlay% not found!"),
     INSUFFICIENT_ARGUMENTS("Messages.Insufficient arguments", "&c&l(!)&c Insufficient arguments (%command%)"),
     COMMANDS_DESCRIPTIONS_SKINOVERLAY_HELP("Commands.Descriptions.SkinOverlay.help", "Shows the help page"),
     COMMANDS_DESCRIPTIONS_SKINOVERLAY_OVERLAY("Commands.Descriptions.SkinOverlay.overlay", "Wear a specific overlay from the plugin files"),

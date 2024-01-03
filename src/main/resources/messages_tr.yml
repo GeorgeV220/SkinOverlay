@@ -4,6 +4,7 @@ Messages:
   Offline Player: '&c&l(!)&c %player% adlı oyuncu çevrimdışı!'
   Overlay Applied: '&a&l(!)&a %url% kaplaması uygulandı!'
   Overlay Reset: '&a&l(!)&a Varsayılan cilt uygulandı (%player%)!'
+  Overlay Not Found: '&c&l(!)&c %overlay% kaplaması bulunamadı!'
   Insufficient arguments: '&c&l(!)&c Yetersiz argüman(lar)! (%command%)'
 Commands:
   Descriptions:

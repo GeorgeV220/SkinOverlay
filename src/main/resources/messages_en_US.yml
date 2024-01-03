@@ -4,6 +4,7 @@ Messages:
   Offline Player: '&c&l(!)&c Player %player% is offline!'
   Overlay Applied: '&a&l(!)&a Overlay %url% applied!'
   Overlay Reset: '&a&l(!)&a Default skin applied(%player%)!!'
+  Overlay Not Found: '&c&l(!)&c Overlay %overlay% not found!'
   Insufficient arguments: '&c&l(!)&c Insufficient arguments (%command%)'
 Commands:
   Descriptions:

@@ -92,7 +92,12 @@ public final class SkinOverlayCommand extends BaseCommand {
         }
         SkinParts skinParts;
         try {
-            skinParts = new SkinParts(new SerializableBufferedImage(ImageIO.read(new File(skinOverlay.getSkinsDataFolder(), overlay + ".png"))), overlay);
+            File overlayFile = new File(skinOverlay.getSkinsDataFolder(), overlay + ".png");
+            if (!overlayFile.exists()) {
+                MessagesUtil.OVERLAY_NOT_FOUND.msg(issuer, new HashObjectMap<String, String>().append("%overlay%", overlay), true);
+                return;
+            }
+            skinParts = new SkinParts(new SerializableBufferedImage(ImageIO.read(overlayFile)), overlay);
         } catch (IOException e) {
             skinOverlay.getLogger().log(Level.SEVERE, "Error while trying to load the skin: ", e);
             return;
