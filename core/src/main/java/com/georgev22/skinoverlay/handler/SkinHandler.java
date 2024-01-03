@@ -88,17 +88,28 @@ public abstract class SkinHandler {
      */
     public abstract SGameProfile getGameProfile(@NotNull final PlayerObject playerObject) throws IOException, ExecutionException, InterruptedException;
 
-    public CompletableFuture<Skin> retrieveOrGenerateSkin(@NotNull PlayerObject playerObject, @Nullable ImageSupplier imageSupplier, @NotNull SkinParts skinParts) {
+    public CompletableFuture<Skin> retrieveOrGenerateSkin(@NotNull PlayerObject playerObject, @Nullable ImageSupplier image, @NotNull SkinParts skinParts) {
         UUID skinUUID = Utilities.generateUUID(skinParts.getSkinName() + playerObject.playerUUID().toString());
-        return skinOverlay.getSkinManager().exists(skinUUID).thenApply(result -> {
+        return skinOverlay.getSkinManager().exists(skinUUID).thenApplyAsync(result -> {
             if (result) {
                 skinOverlay.getLogger().info("Skin: " + skinUUID + " found for player: " + playerObject.playerName());
                 return skinOverlay.getSkinManager().getLoadedEntities().get(skinUUID);
             } else {
                 try {
+                    ImageSupplier imageSupplier = image;
                     if (imageSupplier == null) {
-                        skinOverlay.getLogger().log(Level.SEVERE, "ImageSupplier cannot be null", new SkinException("ImageSupplier cannot be null"));
-                        return null;
+                        imageSupplier = () -> {
+                            try {
+                                return this.getSkinImage(playerObject);
+                            } catch (ExecutionException | InterruptedException e) {
+                                this.skinOverlay.getLogger().log(Level.SEVERE, "Failed to get image", e);
+                                return null;
+                            }
+                        };
+                        if (imageSupplier.get() == null) {
+                            skinOverlay.getLogger().log(Level.SEVERE, "ImageSupplier cannot be null", new SkinException("ImageSupplier cannot be null"));
+                            return null;
+                        }
                     }
 
                     SkinConfigurationFile skinConfigurationFile = this.skinOverlay.getSkinFileCache().getCacheSkinConfig(skinParts.getSkinName());
