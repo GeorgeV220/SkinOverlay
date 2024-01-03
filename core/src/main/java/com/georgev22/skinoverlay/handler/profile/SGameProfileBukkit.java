@@ -12,13 +12,13 @@ import java.util.UUID;
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
-public class SGameProfileMojang extends SGameProfile {
+public class SGameProfileBukkit extends SGameProfile {
 
-    public SGameProfileMojang(String name, UUID uuid) {
+    public SGameProfileBukkit(String name, UUID uuid) {
         super(name, uuid);
     }
 
-    public SGameProfileMojang(String name, UUID uuid, ObjectMap<String, SProperty> properties) {
+    public SGameProfileBukkit(String name, UUID uuid, ObjectMap<String, SProperty> properties) {
         super(name, uuid, properties);
     }
 

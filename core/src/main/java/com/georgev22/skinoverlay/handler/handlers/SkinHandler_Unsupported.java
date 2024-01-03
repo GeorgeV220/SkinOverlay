@@ -5,7 +5,7 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.skinoverlay.handler.SGameProfile;
 import com.georgev22.skinoverlay.handler.SProperty;
 import com.georgev22.skinoverlay.handler.SkinHandler;
-import com.georgev22.skinoverlay.handler.profile.SGameProfileMojang;
+import com.georgev22.skinoverlay.handler.profile.SGameProfileBukkit;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.player.PlayerObject;
 import com.mojang.authlib.GameProfile;
@@ -61,6 +61,6 @@ public class SkinHandler_Unsupported extends SkinHandler {
     public static @NotNull SGameProfile wrapper(@NotNull GameProfile gameProfile) {
         ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
         gameProfile.getProperties().forEach((s, property) -> propertyObjectMap.append(s, new SProperty(property.getName(), property.getValue(), property.getSignature())));
-        return new SGameProfileMojang(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
+        return new SGameProfileBukkit(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
     }
 }
