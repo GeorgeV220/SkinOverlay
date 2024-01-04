@@ -28,7 +28,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew build :multiver:mc-1-17:reobfJar :multiver:mc-1-18:reobfJar :multiver:mc-1-18-2:reobfJar :multiver:mc-1-19:reobfJar :multiver:mc-1-19-3:reobfJar :multiver:mc-1-19-4:reobfJar shadowJar -x test
+        run: ./gradlew build :multiver:mc_1_17_R1:reobfJar :multiver:mc_1_18_R1:reobfJar :multiver:mc_1_18_R2:reobfJar :multiver:mc_1_19_R1:reobfJar :multiver:mc_1_19_R2:reobfJar :multiver:mc_1_19_R3:reobfJar :multiver:mc_1_20_R1:reobfJar :multiver:mc_1_20_R2:reobfJar :multiver:mc_1_20_R3:reobfJar shadowJar -x test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
