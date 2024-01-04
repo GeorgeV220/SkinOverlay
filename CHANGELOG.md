@@ -1,3 +1,22 @@
+# [7.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v7.0.0...v7.1.0) (2024-01-04)
+
+
+### Bug Fixes
+
+* add async support and image fallback for skin retrieval ([b48932c](https://github.com/GeorgeV220/SkinOverlay/commit/b48932c24207fec188470c0bd85ee721b95888dd))
+* Send the packet sync ([71737e8](https://github.com/GeorgeV220/SkinOverlay/commit/71737e8bf7413324e013db026d178769b5141b8d))
+
+
+### Features
+
+* add gson adapters for skin overlay data classes ([49cceff](https://github.com/GeorgeV220/SkinOverlay/commit/49cceffa2cb028be27796c5792ad86db6e985da1))
+* add overlay not found message for all languages ([2806402](https://github.com/GeorgeV220/SkinOverlay/commit/28064024d99a30c33e3ef1c21bf15a27b20efa5c))
+* add YAML and JSON serialization support for skin classes (#master) ([0d6c609](https://github.com/GeorgeV220/SkinOverlay/commit/0d6c609dac49c56675ac59258ab382ab8ace81a6))
+* add YAML serialization support for User and Skin classes ([cbe28eb](https://github.com/GeorgeV220/SkinOverlay/commit/cbe28eb9fa4ebe18ed97d48149b7a18cc6257101))
+* Added 1.20.4 support. Changed module names. ([fbf0a4c](https://github.com/GeorgeV220/SkinOverlay/commit/fbf0a4c4c829f707d137def5b0e78556a4c3e2e9))
+* register and serialize custom classes for skin overlay ([b0fe0b0](https://github.com/GeorgeV220/SkinOverlay/commit/b0fe0b0e0b75c24b10c7501582596d71033c828c))
+* Use new MinecraftScheduler instead of SchedulerManager ([1fdc594](https://github.com/GeorgeV220/SkinOverlay/commit/1fdc5944e5905616a3157ee0d1a7001ffab2d35d))
+
 # [7.0.0](https://github.com/GeorgeV220/SkinOverlay/compare/v6.2.1...v7.0.0) (2023-11-09)
 
 
