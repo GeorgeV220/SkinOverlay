@@ -12,6 +12,7 @@ sourceSets {
     main {
         blossom {
             javaSources {
+                property("pluginId", project.property("pluginName").toString().toLowerCase())
                 property("pluginName", project.property("pluginName").toString())
                 property("version", version.toString())
                 property("description", rootProject.description)
