@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay.command;
 
+import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.annotation.CommandAlias;
 import com.georgev22.skinoverlay.command.annotation.Subcommand;
 import com.georgev22.skinoverlay.command.resolvers.ArgumentResolver;
@@ -12,18 +13,13 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public abstract class CommandManager {
 
+    protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();
     private final List<Consumer<CommandIssuer>> globalPreprocessors = new ArrayList<>();
     private final List<BiConsumer<CommandIssuer, CommandContext>> globalPostprocessors = new ArrayList<>();
-    private final Logger logger;
     private final Map<String, ArgumentResolver> resolvers = new HashMap<>();
-
-    public CommandManager(Logger logger) {
-        this.logger = logger;
-    }
 
     public void registerCommand(@NotNull BaseCommand command) {
         try {
@@ -41,7 +37,7 @@ public abstract class CommandManager {
                 }
             }
         } catch (Exception e) {
-            this.logger.log(Level.SEVERE, "Failed to register command: " + command.getClass().getName(), e);
+            this.skinOverlay.getLogger().log(Level.SEVERE, "Failed to register command: " + command.getClass().getName(), e);
         }
     }
 
