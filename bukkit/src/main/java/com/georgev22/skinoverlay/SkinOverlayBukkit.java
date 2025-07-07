@@ -5,10 +5,14 @@ import com.georgev22.skinoverlay.command.BukkitCommandManager;
 import com.georgev22.skinoverlay.hooks.SkinHookNoop;
 import com.georgev22.skinoverlay.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
+import com.georgev22.skinoverlay.listeners.bukkit.PluginMessageListenerImpl;
+import com.georgev22.skinoverlay.message.RedisManager;
+import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.providers.*;
 import com.georgev22.skinoverlay.scheduler.MinecraftBukkitScheduler;
 import com.georgev22.skinoverlay.scheduler.MinecraftFoliaScheduler;
 import com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -118,6 +122,27 @@ public class SkinOverlayBukkit extends JavaPlugin {
             );
         }
         this.skinOverlay.onLoad();
+
+        if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage")) {
+            new PluginMessageListenerImpl((uuid, skin) -> {
+                SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
+                if (player != null) {
+                    skinOverlay.getSkinApplier().setSkin(player, skin);
+                }
+            });
+        } else {
+            this.skinOverlay.setMessageManager(new RedisManager(
+                    OptionsUtil.REDIS_HOST.getStringValue(),
+                    OptionsUtil.REDIS_PORT.getIntValue(),
+                    OptionsUtil.REDIS_PASSWORD.getStringValue()
+            ));
+            skinOverlay.getMessageManager().subscribeSkinProperty((uuid, skin) -> {
+                SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
+                if (player != null) {
+                    skinOverlay.getSkinApplier().setSkin(player, skin);
+                }
+            });
+        }
     }
 
     @Override

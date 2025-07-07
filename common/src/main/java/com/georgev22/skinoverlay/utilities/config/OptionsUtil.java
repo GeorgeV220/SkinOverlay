@@ -32,7 +32,12 @@ public enum OptionsUtil {
 
     SKIN_HOOK("skin hook", "SkinsRestorer", Optional.empty()),
     LOCALE("locale", "en_US", Optional.empty()),
-    SAVE_INTERVAL("save interval", 20, Optional.empty()),;
+    SAVE_INTERVAL("save interval", 20, Optional.empty()),
+    CONNECTION_TYPE("connection type", "PluginMessage", Optional.empty()),
+    REDIS_HOST("redis.host", "localhost", Optional.empty()),
+    REDIS_PORT("redis.port", 6379, Optional.empty()),
+    REDIS_PASSWORD("redis.password", "", Optional.empty()),
+    ;
     private static final SkinOverlay mainPlugin = SkinOverlay.getInstance();
     private final String pathName;
     private final Object value;
