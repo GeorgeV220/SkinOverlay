@@ -1,6 +1,7 @@
 package com.georgev22.skinoverlay;
 
 import com.georgev22.skinoverlay.appliers.VelocitySkinApplier;
+import com.georgev22.skinoverlay.command.VelocityCommandManager;
 import com.georgev22.skinoverlay.hooks.SkinHookNoop;
 import com.georgev22.skinoverlay.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.message.RedisManager;
@@ -54,6 +55,7 @@ public class SkinOverlayVelocity {
         this.skinOverlay.setDataFolder(dataDirectoryFile);
         this.skinOverlay.setPlugin(this);
         this.skinOverlay.setScheduler(new VelocityMinecraftScheduler<>(server));
+        this.skinOverlay.setCommandManager(new VelocityCommandManager(server));
         this.skinOverlay.onLoad();
 
         if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage")) {
