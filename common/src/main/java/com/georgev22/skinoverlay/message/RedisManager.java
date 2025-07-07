@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.message;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.skin.SProperty;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import org.jetbrains.annotations.NotNull;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
@@ -9,7 +9,7 @@ import redis.clients.jedis.JedisPubSub;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class RedisManager {
+public class RedisManager implements MessageManager {
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
     private final String host;
     private final int port;
@@ -28,12 +28,14 @@ public class RedisManager {
         }
     }
 
-    public void publishSkinProperty(String channel, @NotNull UUID playerUUID, String value, String signature) {
-        String message = playerUUID + "|" + value + "|" + signature;
-        jedis.publish(channel, message);
+    @Override
+    public void publishSkinProperty(@NotNull UUID playerUUID, @NotNull Skin skin) {
+        String message = playerUUID + "|" + skin.toBase64();
+        jedis.publish("skinoverlay:skinupdate", message);
     }
 
-    public void subscribeSkinProperty(String channel, SkinPropertyHandler handler) {
+    @Override
+    public void subscribeSkinProperty(@NotNull SkinPropertyHandler handler) {
         subscriberThread = new Thread(() -> {
             while (running && !Thread.currentThread().isInterrupted()) {
                 try (Jedis subJedis = new Jedis(host, port)) {
@@ -45,29 +47,23 @@ public class RedisManager {
                         @Override
                         public void onMessage(String ch, String message) {
                             try {
-                                String[] parts = message.split("\\|", 3);
-                                if (parts.length != 3) {
+                                String[] parts = message.split("\\|", 2);
+                                if (parts.length != 2) {
                                     System.err.println("Invalid skin property message: " + message);
                                     return;
                                 }
                                 UUID uuid = UUID.fromString(parts[0]);
-                                String value = parts[1];
-                                String signature = parts[2];
-                                SProperty property = new SProperty(value, signature);
+                                String base64Skin = parts[1];
+                                Skin skin = Skin.fromBase64(base64Skin);
 
-//                                if (scheduler != null) {
-//                                    scheduler.runTask(() -> handler.handle(uuid, property));
-//                                } else {
-//                                    handler.handle(uuid, property);
-//                                }
-                                skinOverlay.getScheduler().runTask(skinOverlay.getPlugin(), () -> handler.handle(uuid, property));
+                                skinOverlay.getScheduler().runTask(skinOverlay.getPlugin(), () -> handler.handle(uuid, skin));
                             } catch (Exception e) {
                                 skinOverlay.getLogger().log(Level.SEVERE, "Invalid skin property message: " + message, e);
                             }
                         }
                     };
 
-                    subJedis.subscribe(jedisPubSub, channel);
+                    subJedis.subscribe(jedisPubSub, "skinoverlay:skinupdate");
                 } catch (Exception e) {
                     skinOverlay.getLogger().log(Level.SEVERE, "Redis subscribe connection lost, retrying in 5 seconds...", e);
                     try {
@@ -85,18 +81,12 @@ public class RedisManager {
         subscriberThread.start();
     }
 
-    /**
-     * Stop subscriber thread and close resources.
-     */
+    @Override
     public void close() {
         running = false;
         if (subscriberThread != null) {
             subscriberThread.interrupt();
         }
         jedis.close();
-    }
-
-    public interface SkinPropertyHandler {
-        void handle(UUID uuid, SProperty property);
     }
 }

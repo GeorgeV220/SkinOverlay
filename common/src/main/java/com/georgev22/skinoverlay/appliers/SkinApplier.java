@@ -27,7 +27,7 @@ public abstract class SkinApplier {
         SGameProfile gameProfile = skinOverlay.getGameProfileProvider().getGameProfile(player);
         gameProfile.setProperty("textures", skin.getProperty());
         skinOverlay.getGameProfileProvider().applyUpdatedGameProfile(player);
-        applySkin(player);
+        applySkin(player, skin);
 
         // Should we save the skin in the database?
         if (!skinOverlay.isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
@@ -54,7 +54,18 @@ public abstract class SkinApplier {
      *
      * @param player Player's {@link SPlayer} object.
      */
-    protected abstract void applySkin(@NotNull final SPlayer player);
+    protected void applySkin(@NotNull final SPlayer player) {
+    }
+
+    /**
+     * Apply the skin for the specified {@link SPlayer}
+     *
+     * @param player Player's {@link SPlayer} object.
+     * @param skin         Skin
+     */
+    protected void applySkin(@NotNull final SPlayer player, @NotNull final Skin skin) {
+        applySkin(player);
+    }
 
     protected abstract @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SPlayer player);
 

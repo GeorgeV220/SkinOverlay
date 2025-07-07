@@ -10,6 +10,7 @@ import com.georgev22.skinoverlay.event.events.player.SPlayerJoinEvent;
 import com.georgev22.skinoverlay.event.events.player.SPlayerLeaveEvent;
 import com.georgev22.skinoverlay.hooks.SkinHook;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
+import com.georgev22.skinoverlay.message.MessageManager;
 import com.georgev22.skinoverlay.providers.GameProfileProvider;
 import com.georgev22.skinoverlay.providers.PlayerProvider;
 import com.georgev22.skinoverlay.providers.SkinProvider;
@@ -72,6 +73,7 @@ public class SkinOverlay {
     private boolean isOnlineMode;
     private boolean isProxy;
     private File dataFolder;
+    private MessageManager messageManager;
 
     /**
      * Loads the plugin components. Should be called during plugin load phase.
@@ -424,5 +426,23 @@ public class SkinOverlay {
      */
     public EventBus getEventBus() {
         return eventBus;
+    }
+
+    /**
+     * Sets the MessageManager instance.
+     *
+     * @param messageManager the MessageManager
+     */
+    public void setMessageManager(MessageManager messageManager) {
+        this.messageManager = messageManager;
+    }
+
+    /**
+     * Gets the MessageManager instance.
+     *
+     * @return the MessageManager
+     */
+    public MessageManager getMessageManager() {
+        return messageManager;
     }
 }

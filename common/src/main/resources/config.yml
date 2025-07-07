@@ -32,3 +32,14 @@ Options:
   # - Set a reasonable save interval to balance between performance and data safety.
   # - If you're running a highly active server with frequent changes, consider a lower save interval to reduce data loss risk.
   save interval: 20  # Time in SECONDS between saves. Adjust based on server load and performance needs.
+
+  # The following option is used to specify which protocol the proxy/backend server will use to send/listen the skin data.
+  # Available options: "PluginMessage" and "Redis"
+  # If you are using a backend server that doesn't support the Bungee/Velocity PluginMessage protocol, please set it to "Redis".
+  connection type: "PluginMessage"
+
+  # Redis connection details
+  redis:
+    host: "localhost"
+    port: 6379
+    password: ""

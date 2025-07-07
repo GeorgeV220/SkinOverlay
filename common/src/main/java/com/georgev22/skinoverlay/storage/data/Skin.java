@@ -1,11 +1,14 @@
 package com.georgev22.skinoverlay.storage.data;
 
 import com.georgev22.skinoverlay.skin.SProperty;
+import com.georgev22.skinoverlay.storage.gson.SkinTypeAdapter;
 import com.georgev22.skinoverlay.utilities.CustomData;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
 import com.google.gson.JsonParser;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
@@ -157,5 +160,15 @@ public class Skin implements Entity {
     @Override
     public int hashCode() {
         return this.skinUniqueId.hashCode();
+    }
+
+    @ApiStatus.Internal
+    public String toBase64() {
+        return Base64.getEncoder().encodeToString(SkinTypeAdapter.toJson(this).getBytes(StandardCharsets.UTF_8));
+    }
+
+    @ApiStatus.Internal
+    public static Skin fromBase64(String base64) {
+        return SkinTypeAdapter.fromJson("", new String(Base64.getDecoder().decode(base64), StandardCharsets.UTF_8));
     }
 }
