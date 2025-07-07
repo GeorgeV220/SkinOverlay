@@ -1,0 +1,15 @@
+Options:
+  overlay:
+    hat: false
+    right_sleeve: false
+    left_sleeve: false
+    jacket: false
+    right_pants: false
+    left_pants: false
+  player:
+    hat: false
+    right_sleeve: false
+    left_sleeve: false
+    jacket: false
+    right_pants: false
+    left_pants: false
