@@ -22,9 +22,9 @@ public class VelocityAudienceProvider implements AudienceProvider {
     private final ProxyServer server;
     private final Set<Player> players = ConcurrentHashMap.newKeySet();
 
-    public VelocityAudienceProvider(@NotNull ProxyServer server) {
+    public VelocityAudienceProvider(@NotNull Object plugin, @NotNull ProxyServer server) {
         this.server = server;
-        server.getEventManager().register(this, this);
+        server.getEventManager().register(plugin, this);
 
         players.addAll(server.getAllPlayers());
     }
