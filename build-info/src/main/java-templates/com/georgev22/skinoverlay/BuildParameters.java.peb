@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay;
 public class BuildParameters {
     public static final String VERSION = "{{ version }}";
     public static final String PLUGIN_NAME = "{{ pluginName }}";
+    public static final String PLUGIN_ID = "{{ pluginId }}";
     public static final String AUTHOR = "{{ author }}";
     public static final String DESCRIPTION = "{{ description }}";
     public static final String URL = "{{ url }}";
