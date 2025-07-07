@@ -29,7 +29,7 @@ public class SkinOverlayBukkit extends JavaPlugin {
         this.skinOverlay.setPlugin(this);
         this.skinOverlay.setLogger(this.getLogger());
         this.skinOverlay.setDataFolder(this.getDataFolder());
-        this.skinOverlay.setCommandManager(new BukkitCommandManager(this.getLogger(), this));
+        this.skinOverlay.setCommandManager(new BukkitCommandManager(this));
         this.skinOverlay.setPlayerProvider(new BukkitPlayerProvider());
 
         if (BukkitMinecraftUtils.isPaper() && getCurrentVersion().isAboveOrEqual(V1_20_R1)) {

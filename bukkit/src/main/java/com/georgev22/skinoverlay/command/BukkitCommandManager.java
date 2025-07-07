@@ -6,14 +6,12 @@ import org.bukkit.command.CommandMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.util.logging.Logger;
 
 public class BukkitCommandManager extends CommandManager {
 
     private final SkinOverlayBukkit plugin;
 
-    public BukkitCommandManager(Logger logger, SkinOverlayBukkit plugin) {
-        super(logger);
+    public BukkitCommandManager(SkinOverlayBukkit plugin) {
         this.plugin = plugin;
     }
 
