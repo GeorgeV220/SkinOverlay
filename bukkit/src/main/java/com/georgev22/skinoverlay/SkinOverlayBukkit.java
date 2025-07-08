@@ -123,25 +123,27 @@ public class SkinOverlayBukkit extends JavaPlugin {
         }
         this.skinOverlay.onLoad();
 
-        if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage")) {
-            new PluginMessageListenerImpl((uuid, skin) -> {
-                SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
-                if (player != null) {
-                    skinOverlay.getSkinApplier().setSkin(player, skin);
-                }
-            });
-        } else {
-            this.skinOverlay.setMessageManager(new RedisManager(
-                    OptionsUtil.REDIS_HOST.getStringValue(),
-                    OptionsUtil.REDIS_PORT.getIntValue(),
-                    OptionsUtil.REDIS_PASSWORD.getStringValue()
-            ));
-            skinOverlay.getMessageManager().subscribeSkinProperty((uuid, skin) -> {
-                SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
-                if (player != null) {
-                    skinOverlay.getSkinApplier().setSkin(player, skin);
-                }
-            });
+        if (OptionsUtil.PROXY.getBooleanValue()) {
+            if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage")) {
+                new PluginMessageListenerImpl((uuid, skin) -> {
+                    SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
+                    if (player != null) {
+                        skinOverlay.getSkinApplier().setSkin(player, skin);
+                    }
+                });
+            } else {
+                this.skinOverlay.setMessageManager(new RedisManager(
+                        OptionsUtil.REDIS_HOST.getStringValue(),
+                        OptionsUtil.REDIS_PORT.getIntValue(),
+                        OptionsUtil.REDIS_PASSWORD.getStringValue()
+                ));
+                skinOverlay.getMessageManager().subscribeSkinProperty((uuid, skin) -> {
+                    SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
+                    if (player != null) {
+                        skinOverlay.getSkinApplier().setSkin(player, skin);
+                    }
+                });
+            }
         }
     }
 
