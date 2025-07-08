@@ -17,20 +17,18 @@ version = project.property("version") as String
 dependencies {
     api(project(":build-info"))
     compileOnly(libs.skinsrestorer.api)
+    // ADVENTURE
+    compileOnly(libs.adventure.api)
+    compileOnly(libs.adventure.platform.api)
+    compileOnly(libs.adventure.text.minimessage)
+    compileOnly(libs.adventure.text.serializer.legacy)
+
 
     implementation(libs.hikari) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
     implementation(libs.gson)
-    // ADVENTURE
-    implementation(libs.adventure.api)
-    implementation(libs.adventure.platform.api)
-    implementation(libs.adventure.text.minimessage)
-    implementation(libs.adventure.text.serializer.legacy)
-    implementation(libs.adventure.text.serializer.gson) {
-        exclude(group = "com.google.code.gson", module = "gson")
-    }
 
     // MINESKIN CLIENT
     implementation(libs.mineskinclient.client) {
@@ -54,10 +52,7 @@ dependencies {
 
 configurations.configureEach {
     resolutionStrategy {
-        force(libs.adventure.api)
-        force(libs.adventure.platform.api)
         force(libs.adventure.text.serializer.legacy)
-        force(libs.adventure.text.serializer.gson)
         force(libs.adventure.text.minimessage)
         force(libs.jetbrains.annotations)
     }
@@ -77,4 +72,9 @@ tasks.processResources {
         expand(props)
         filteringCharset = "UTF-8"
     }
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("skinoverlay")
+    archiveClassifier.set("common")
 }

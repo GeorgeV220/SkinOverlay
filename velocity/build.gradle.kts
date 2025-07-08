@@ -13,9 +13,11 @@ dependencies {
     compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
 
-    implementation(project(":common"))
+    implementation(project(":common")) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
     implementation(libs.bstats.velocity)
-    implementation(libs.adventure.platform.api)
+    compileOnly(libs.adventure.platform.api)
 }
 
 configurations.configureEach {
@@ -24,7 +26,7 @@ configurations.configureEach {
 
 tasks.shadowJar {
     archiveBaseName.set("skinoverlay")
-    archiveClassifier.set("shadow")
+    archiveClassifier.set("velocity")
     relocate("org.mineskin", "${project.property("packageName")}.mineskin")
     relocate("com.google.gson", "${project.property("packageName")}.gson")
     relocate("com.google.errorprone", "${project.property("packageName")}.gson.errorprone")
@@ -34,7 +36,9 @@ tasks.shadowJar {
     relocate("org.yaml.snakeyaml", "${project.property("packageName")}.yaml")
     relocate("org.intellij.lang", "${project.property("packageName")}.jetbrains")
     relocate("org.jetbrains", "${project.property("packageName")}.jetbrains")
-    relocate("net.kyori", "${project.property("packageName")}.kyori")
+    relocate("org.json", "${project.property("packageName")}.json")
+    relocate("org.apache.commons.pool2", "${project.property("packageName")}.pool2")
+    relocate("redis.clients", "${project.property("packageName")}.jedis")
 }
 
 tasks.named("publish") {
