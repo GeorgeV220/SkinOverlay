@@ -109,6 +109,9 @@ public abstract class PlayerEntityManager implements EntityManager<PlayerData> {
     }
 
     protected void saveEntityWithRetry(PlayerData entity) {
+        if (!SkinOverlay.getInstance().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+            return;
+        }
         int maxRetries = 3;
         int retryCount = 0;
         boolean success = false;

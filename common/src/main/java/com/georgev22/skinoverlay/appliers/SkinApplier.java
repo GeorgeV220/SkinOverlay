@@ -7,7 +7,6 @@ import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.storage.EntityManager;
 import com.georgev22.skinoverlay.storage.data.PlayerData;
 import com.georgev22.skinoverlay.storage.data.Skin;
-import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -28,11 +27,6 @@ public abstract class SkinApplier {
         gameProfile.setProperty("textures", skin.getProperty());
         skinOverlay.getGameProfileProvider().applyUpdatedGameProfile(player);
         applySkin(player, skin);
-
-        // Should we save the skin in the database?
-        if (!skinOverlay.isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
-            return;
-        }
 
         Optional<EntityManager<PlayerData>> optionalPlayerDataEntityManager = EntityManagerRegistry.getManager(PlayerData.class);
         if (optionalPlayerDataEntityManager.isEmpty()) {

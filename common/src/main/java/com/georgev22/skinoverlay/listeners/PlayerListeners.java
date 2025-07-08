@@ -67,9 +67,6 @@ public class PlayerListeners {
             this.mainPlugin.getSkinApplier().setSkin(player, playerData.getCurrentSkin());
         }
 
-        if (!this.mainPlugin.isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
-            return;
-        }
         skinEntityManager.save(defaultSkin);
         playerDataEntityManager.save(playerData);
     }
