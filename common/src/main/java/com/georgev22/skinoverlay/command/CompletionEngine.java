@@ -21,7 +21,7 @@ public class CompletionEngine {
             return new ArrayList<>();
         }
 
-        String segment = parts[args.length - 1];
+        String segment = args.length == 0 ? parts[0] : parts[args.length - 1];
         Collection<String> completions = new ArrayList<>();
 
         for (String option : segment.split("\\|")) {
