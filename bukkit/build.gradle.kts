@@ -11,14 +11,17 @@ repositories {
 
 dependencies {
     compileOnly(libs.folia.api)
-    compileOnly(libs.adventure.api)
     compileOnly(libs.placeholder.api)
     compileOnly(libs.auth.lib.legacy)
 
     implementation(libs.bstats.bukkit)
     implementation(libs.adventure.platform.bukkit)
+    implementation(libs.adventure.text.minimessage)
+    implementation(libs.adventure.text.serializer.legacy)
 
-    implementation(project(":common"))
+    implementation(project(":common")) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
     implementation(project(":bukkit:versions:mc1_17_R1", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_18_R1", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_18_R2", configuration = "reobf"))
@@ -39,6 +42,8 @@ dependencies {
 configurations.configureEach {
     resolutionStrategy {
         force(libs.adventure.platform.bukkit)
+        force(libs.adventure.text.minimessage)
+        force(libs.adventure.text.serializer.legacy)
         force(libs.folia.api)
         dependencySubstitution {
             substitute(module("org.spigotmc:spigot-api"))
@@ -53,7 +58,7 @@ configurations.configureEach {
 
 tasks.shadowJar {
     archiveBaseName.set("skinoverlay")
-    archiveClassifier.set("shadow")
+    archiveClassifier.set("bukkit")
     relocate("org.mineskin", "${project.property("packageName")}.mineskin")
     relocate("com.google.gson", "${project.property("packageName")}.gson")
     relocate("com.google.errorprone", "${project.property("packageName")}.gson.errorprone")
@@ -63,7 +68,10 @@ tasks.shadowJar {
     relocate("org.yaml.snakeyaml", "${project.property("packageName")}.yaml")
     relocate("org.intellij.lang", "${project.property("packageName")}.jetbrains")
     relocate("org.jetbrains", "${project.property("packageName")}.jetbrains")
+    relocate("org.json", "${project.property("packageName")}.json")
+    relocate("org.apache.commons.pool2", "${project.property("packageName")}.pool2")
     relocate("net.kyori", "${project.property("packageName")}.kyori")
+    relocate("redis.clients", "${project.property("packageName")}.jedis")
 }
 
 tasks.named("publish") {
