@@ -86,6 +86,7 @@ public abstract class SkinEntityManager implements EntityManager<Skin> {
     public Optional<Skin> create(@NotNull String id, @NotNull Consumer<Skin> consumer) {
         Skin skin = new Skin(UUID.fromString(id));
         consumer.accept(skin);
+        saveEntityWithRetry(skin);
         return Optional.of(skin);
     }
 
@@ -107,6 +108,9 @@ public abstract class SkinEntityManager implements EntityManager<Skin> {
     }
 
     protected void saveEntityWithRetry(Skin entity) {
+        if (!SkinOverlay.getInstance().isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+            return;
+        }
         int maxRetries = 3;
         int retryCount = 0;
         boolean success = false;
