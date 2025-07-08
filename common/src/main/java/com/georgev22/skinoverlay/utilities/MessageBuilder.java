@@ -2,8 +2,6 @@ package com.georgev22.skinoverlay.utilities;
 
 import com.georgev22.skinoverlay.maps.HashObjectMap;
 import com.georgev22.skinoverlay.maps.ObjectMap;
-import com.georgev22.skinoverlay.maps.Pair;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -13,9 +11,9 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +44,7 @@ import java.util.Collections;
  *     .clickEvent(ClickEvent.Action.RUN_COMMAND, "/help")
  *     .hoverEvent("Click to run /help")
  *     .append(" for more info.")
- *     .send(player);
+ *     .build();
  *
  * // Using MiniMessage for more complex formatting
  * messageBuilder
@@ -54,48 +52,17 @@ import java.util.Collections;
  *     .appendMiniMessage("<yellow> Click <underlined><red>here</red></underlined> for more info.</yellow>")
  *     .clickEvent(ClickEvent.Action.RUN_COMMAND, "/help")
  *     .hoverEvent("Click to run /help")
- *     .send(player);
+ *     .build();
  * }</pre>
  */
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class MessageBuilder {
-
-    /**
-     * Color map for mapping legacy colors to MiniMessage colors.
-     * <p>
-     * Map key: Legacy color code <br>
-     * Map value: <br>
-     * - Pair key: MiniMessage color (e.g., {@literal <color>}) <br>
-     * - Pair value: Indicates if the color needs to be closed (e.g., {@literal </color>})
-     */
-    @NotNull
-    public static final ObjectMap<String, Pair<String, Boolean>> COLOR_MAP = new HashObjectMap<String, Pair<String, Boolean>>()
-            .append("0", Pair.create("black", true))
-            .append("1", Pair.create("dark_blue", true))
-            .append("2", Pair.create("dark_green", true))
-            .append("3", Pair.create("dark_aqua", true))
-            .append("4", Pair.create("dark_red", true))
-            .append("5", Pair.create("dark_purple", true))
-            .append("6", Pair.create("gold", true))
-            .append("7", Pair.create("gray", true))
-            .append("8", Pair.create("dark_gray", true))
-            .append("9", Pair.create("blue", true))
-            .append("a", Pair.create("green", true))
-            .append("b", Pair.create("aqua", true))
-            .append("c", Pair.create("red", true))
-            .append("d", Pair.create("light_purple", true))
-            .append("e", Pair.create("yellow", true))
-            .append("f", Pair.create("white", true))
-            .append("l", Pair.create("bold", false))
-            .append("m", Pair.create("strikethrough", false))
-            .append("n", Pair.create("underline", false))
-            .append("o", Pair.create("italic", false))
-            .append("r", Pair.create("reset", true))
-            .append("k", Pair.create("obfuscated", false));
     private final ArrayList<TextDecoration> currentDecorations;
     private TextComponent.Builder componentBuilder;
     private TextColor currentColor = NamedTextColor.WHITE;
     private ClickEvent currentClickEvent;
     private HoverEvent<?> currentHoverEvent;
+    private ObjectMap<String, String> placeholders = new HashObjectMap<>();
 
     /**
      * Constructs a new MessageBuilder instance.
@@ -116,61 +83,6 @@ public class MessageBuilder {
     }
 
     /**
-     * Translates legacy color codes (e.g., {@literal &}colorCode) to MiniMessage colors (e.g., {@literal <color>}).
-     *
-     * @param message The message to translate.
-     * @return The translated message with MiniMessage formatting.
-     */
-    public static String translateLegacyColors(String message) {
-        boolean colorMode = false;
-        boolean tagNeedToClose = false;
-        String tagToClose = "";
-
-        StringBuilder newText = new StringBuilder();
-
-        for (char ch : message.toCharArray()) {
-            if (ch == '&' && colorMode) {
-                newText.append('&');
-                continue;
-            }
-
-            if (ch == '&') {
-                colorMode = true;
-                continue;
-            }
-
-            if (colorMode && COLOR_MAP.containsKey(String.valueOf(ch))) {
-                if (tagNeedToClose) {
-                    tagNeedToClose = false;
-                    newText.append("</").append(tagToClose).append(">");
-                }
-
-                newText.append("<").append(COLOR_MAP.get(String.valueOf(ch)).key()).append(">");
-
-                if (!COLOR_MAP.get(String.valueOf(ch)).value()) {
-                    tagNeedToClose = true;
-                    tagToClose = COLOR_MAP.get(String.valueOf(ch)).key();
-                }
-
-                colorMode = false;
-                continue;
-            } else if (colorMode) {
-                colorMode = false;
-                newText.append('&');
-            }
-
-            newText.append(ch);
-        }
-
-        if (tagNeedToClose) {
-            newText.append("</").append(tagToClose).append(">");
-        }
-
-        message = newText.toString();
-        return message;
-    }
-
-    /**
      * Appends plain text to the message and applies the current styles.
      *
      * <p>Example usage:</p>
@@ -186,6 +98,7 @@ public class MessageBuilder {
      * @return The MessageBuilder instance for method chaining.
      */
     public MessageBuilder append(String text) {
+        text = replacePlaceholders(text);
         TextComponent.Builder textComponent = Component.text()
                 .content(text)
                 .color(currentColor);
@@ -203,6 +116,17 @@ public class MessageBuilder {
         }
 
         componentBuilder.append(textComponent.build());
+        return this;
+    }
+
+    /**
+     * Appends a component to the message.
+     *
+     * @param component The component to append.
+     * @return The MessageBuilder instance for method chaining.
+     */
+    public MessageBuilder append(Component component) {
+        componentBuilder.append(component);
         return this;
     }
 
@@ -238,7 +162,7 @@ public class MessageBuilder {
      * @return The MessageBuilder instance for method chaining.
      */
     public MessageBuilder appendMiniMessage(String miniMessage, TagResolver tagResolver) {
-        componentBuilder.append(miniMessage(miniMessage, tagResolver));
+        componentBuilder.append(miniMessage(miniMessage, tagResolver)).decoration(TextDecoration.ITALIC, false);
         return this;
     }
 
@@ -249,11 +173,9 @@ public class MessageBuilder {
      * @param tagResolver The TagResolver to use, can be null if not needed.
      * @return The converted Component.
      */
-    private @NotNull Component miniMessage(String message, @Nullable TagResolver tagResolver) {
-        if (tagResolver != null) {
-            return MiniMessage.miniMessage().deserialize(translateLegacyColors(message), tagResolver);
-        }
-        return MiniMessage.miniMessage().deserialize(translateLegacyColors(message));
+    private @NotNull Component miniMessage(String message, TagResolver tagResolver) {
+        message = replacePlaceholders(message);
+        return MessageParser.miniMessage(message, tagResolver);
     }
 
     /**
@@ -327,6 +249,7 @@ public class MessageBuilder {
      * @return The MessageBuilder instance for method chaining.
      */
     public MessageBuilder clickEvent(ClickEvent.Action action, String value) {
+        value = replacePlaceholders(value);
         this.currentClickEvent = ClickEvent.clickEvent(action, value);
         return this;
     }
@@ -345,26 +268,9 @@ public class MessageBuilder {
      * @return The MessageBuilder instance for method chaining.
      */
     public MessageBuilder hoverEvent(String hoverText) {
+        hoverText = replacePlaceholders(hoverText);
         this.currentHoverEvent = HoverEvent.showText(miniMessage(hoverText, null));
         return this;
-    }
-
-    /**
-     * Sends the constructed message to the specified player.
-     *
-     * <p>Example usage:</p>
-     * <pre>{@code
-     * messageBuilder
-     *     .append("Hello, ")
-     *     .append(player.getName())
-     *     .append("!")
-     *     .send(player);
-     * }</pre>
-     *
-     * @param audience The player to send the message to.
-     */
-    public void send(Audience audience) {
-        audience.sendMessage(componentBuilder.build());
     }
 
     /**
@@ -384,6 +290,26 @@ public class MessageBuilder {
     }
 
     /**
+     * Serializes the built component into a string using Legacy format.
+     *
+     * <p>Example usage:</p>
+     * <pre>{@code
+     * String messageString = messageBuilder
+     *     .append("Hello, World!")
+     *     .buildLegacyString();
+     * }</pre>
+     *
+     * @return The serialized Legacy string.
+     */
+    public String buildLegacyString() {
+        return LegacyComponentSerializer.builder()
+                .hexColors()
+                .useUnusualXRepeatedCharacterHexFormat()
+                .build()
+                .serialize(build());
+    }
+
+    /**
      * Builds the component and resets the current MessageBuilder.
      *
      * <p>Example usage:</p>
@@ -399,6 +325,24 @@ public class MessageBuilder {
         Component component = this.build();
         this.reset();
         return component;
+    }
+
+    /**
+     * Builds the Legacy string and resets the current MessageBuilder.
+     *
+     * <p>Example usage:</p>
+     * <pre>{@code
+     * String legacyString = messageBuilder
+     *     .append("Hello, World!")
+     *     .buildAndResetLegacyString();
+     * }</pre>
+     *
+     * @return The serialized Legacy string.
+     */
+    public String buildAndResetLegacyString() {
+        String legacyString = this.buildLegacyString();
+        this.reset();
+        return legacyString;
     }
 
     /**
@@ -438,6 +382,50 @@ public class MessageBuilder {
 
     public MessageBuilder reset() {
         this.componentBuilder = Component.text();
+        this.placeholders.clear();
         return this.resetStyles();
+    }
+
+    /**
+     * Sets the placeholders for the message.
+     *
+     * @param placeholders The placeholders to set.
+     * @return The MessageBuilder instance for method chaining.
+     */
+    public MessageBuilder placeholders(ObjectMap<String, String> placeholders) {
+        this.placeholders = new HashObjectMap<>(placeholders);
+        return this;
+    }
+
+    /**
+     * Clears all placeholders from the message.
+     *
+     * @return The MessageBuilder instance for method chaining.
+     */
+    public MessageBuilder clearPlaceholders() {
+        this.placeholders.clear();
+        return this;
+    }
+
+    /**
+     * Adds a placeholder to the message.
+     *
+     * @param key   The placeholder key.
+     * @param value The placeholder value.
+     * @return The MessageBuilder instance for method chaining.
+     */
+    public MessageBuilder addPlaceholder(String key, String value) {
+        this.placeholders.put(key, value);
+        return this;
+    }
+
+    /**
+     * Replaces placeholders in the given string with their corresponding values.
+     *
+     * @param input The input string containing placeholders.
+     * @return The input string with placeholders replaced.
+     */
+    private String replacePlaceholders(String input) {
+        return Utils.placeHolder(input, placeholders, true);
     }
 }
