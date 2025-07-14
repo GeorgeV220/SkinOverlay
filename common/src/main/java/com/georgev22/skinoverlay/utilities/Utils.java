@@ -11,6 +11,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.crypto.*;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.invoke.MethodHandle;
@@ -24,8 +27,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -1157,6 +1164,78 @@ public final class Utils {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    /**
+     * Decrypts a Base64-encoded string that was encrypted using AES encryption with a salt prepended.
+     *
+     * @param encryptedText the Base64-encoded string to decrypt (including the prepended 16-byte salt)
+     * @param secret        the secret password used for key derivation
+     * @return the decrypted plaintext string
+     * @throws NoSuchAlgorithmException  if the PBKDF2WithHmacSHA256 algorithm is not available
+     * @throws InvalidKeySpecException   if the key specification is invalid
+     * @throws NoSuchPaddingException    if the padding mechanism is not available
+     * @throws InvalidKeyException       if the key is invalid
+     * @throws IllegalBlockSizeException if the encrypted data length is incorrect
+     * @throws BadPaddingException       if the padding of the data is incorrect
+     */
+    @Contract("_, _ -> new")
+    public static @NotNull String decrypt(String encryptedText, @NotNull String secret) throws
+            NoSuchAlgorithmException,
+            InvalidKeySpecException,
+            NoSuchPaddingException,
+            InvalidKeyException,
+            IllegalBlockSizeException,
+            BadPaddingException {
+        byte[] salt = Arrays.copyOfRange(Base64.getDecoder().decode(encryptedText), 0, 16);
+        KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, 65536, 256);
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        byte[] keyBytes = factory.generateSecret(spec).getEncoded();
+        SecretKey key = new SecretKeySpec(keyBytes, "AES");
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] encryptedBytes = Arrays.copyOfRange(Base64.getDecoder().decode(encryptedText), 16, Base64.getDecoder().decode(encryptedText).length);
+        byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+        return new String(decryptedBytes, StandardCharsets.UTF_8);
+    }
+
+
+    /**
+     * Encrypts a string using AES encryption with a randomly generated salt and returns the result as a Base64-encoded string.
+     * The resulting string includes the salt prepended to the encrypted data.
+     *
+     * @param plaintext the plaintext string to encrypt
+     * @param secret    the secret password used for key derivation
+     * @return the Base64-encoded string containing the salt and encrypted data
+     * @throws NoSuchAlgorithmException  if the PBKDF2WithHmacSHA256 algorithm is not available
+     * @throws InvalidKeySpecException   if the key specification is invalid
+     * @throws NoSuchPaddingException    if the padding mechanism is not available
+     * @throws InvalidKeyException       if the key is invalid
+     * @throws IllegalBlockSizeException if the data size is invalid
+     * @throws BadPaddingException       if the data is improperly padded
+     */
+    public static @NotNull String encrypt(@NotNull String plaintext, @NotNull String secret) throws
+            NoSuchAlgorithmException,
+            InvalidKeySpecException,
+            NoSuchPaddingException,
+            InvalidKeyException,
+            IllegalBlockSizeException,
+            BadPaddingException {
+
+        byte[] salt = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+        KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, 65536, 256);
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        byte[] keyBytes = factory.generateSecret(spec).getEncoded();
+        SecretKey key = new SecretKeySpec(keyBytes, "AES");
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encryptedBytes = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
+        byte[] combined = new byte[16 + encryptedBytes.length];
+        System.arraycopy(salt, 0, combined, 0, 16);
+        System.arraycopy(encryptedBytes, 0, combined, 16, encryptedBytes.length);
+        return Base64.getEncoder().encodeToString(combined);
     }
 
     public static final class Assertions {
