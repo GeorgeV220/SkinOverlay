@@ -2,8 +2,6 @@ package com.georgev22.skinoverlay.message;
 
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.proxy.Player;
@@ -13,6 +11,8 @@ import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -34,8 +34,7 @@ public class VelocityPluginMessageManager extends MessageManager {
 
     @Override
     public void publishSkinProperty(@NotNull UUID playerUUID, @NotNull Skin skin) {
-        String message = playerUUID + "|" + skin.toBase64();
-        byte[] data = toByteArray("skinupdate", message);
+        byte[] data = toByteArray("skinupdate", playerUUID.toString(), skin.toBase64());
 
         if (OptionsUtil.DEBUG.getBooleanValue()) {
             this.mainPlugin.getLogger().info("Sending plugin message with size " + data.length + " bytes to player " + playerUUID);
@@ -90,30 +89,31 @@ public class VelocityPluginMessageManager extends MessageManager {
             return;
         }
 
-        //event.setResult(PluginMessageEvent.ForwardResult.handled());
-
-
         if (!(event.getSource() instanceof ServerConnection serverConnection)) {
             return;
         }
-        Player player = serverConnection.getPlayer();
 
-        ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
-        String channel = in.readUTF();
-        if (channel.isEmpty()) {
+        MessageData data;
+        try {
+            data = this.readByteArray(event.getData());
+        } catch (IOException e) {
+            this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing plugin message", e);
+            return;
+        }
+        if (data.subChannel().isEmpty()) {
             this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing channel from plugin message");
             return;
         }
-        if (!channel.equalsIgnoreCase("playerjoin")) {
+        if (!data.subChannel().equalsIgnoreCase("playerjoin")) {
             this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing channel from plugin message");
             return;
         }
-        String message = in.readUTF();
+        String stringUUID = data.dataEntries()[0];
         UUID uuid;
         try {
-            uuid = UUID.fromString(message);
+            uuid = UUID.fromString(stringUUID);
         } catch (Exception e) {
-            this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing UUID from plugin message: " + message, e);
+            this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing UUID from plugin message: " + Arrays.toString(data.dataEntries()), e);
             return;
         }
         playerJoinHandler.accept(uuid);
