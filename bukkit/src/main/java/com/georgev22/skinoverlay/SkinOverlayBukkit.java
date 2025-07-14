@@ -6,6 +6,7 @@ import com.georgev22.skinoverlay.hooks.SkinHookNoop;
 import com.georgev22.skinoverlay.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
 import com.georgev22.skinoverlay.listeners.bukkit.PluginMessageListenerImpl;
+import com.georgev22.skinoverlay.message.MessageManagerNoop;
 import com.georgev22.skinoverlay.message.RedisManager;
 import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.providers.*;
@@ -122,29 +123,6 @@ public class SkinOverlayBukkit extends JavaPlugin {
             );
         }
         this.skinOverlay.onLoad();
-
-        if (OptionsUtil.PROXY.getBooleanValue()) {
-            if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage")) {
-                new PluginMessageListenerImpl((uuid, skin) -> {
-                    SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
-                    if (player != null) {
-                        skinOverlay.getSkinApplier().setSkin(player, skin);
-                    }
-                });
-            } else {
-                this.skinOverlay.setMessageManager(new RedisManager(
-                        OptionsUtil.REDIS_HOST.getStringValue(),
-                        OptionsUtil.REDIS_PORT.getIntValue(),
-                        OptionsUtil.REDIS_PASSWORD.getStringValue()
-                ));
-                skinOverlay.getMessageManager().subscribeSkinProperty((uuid, skin) -> {
-                    SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
-                    if (player != null) {
-                        skinOverlay.getSkinApplier().setSkin(player, skin);
-                    }
-                });
-            }
-        }
     }
 
     @Override
@@ -156,6 +134,25 @@ public class SkinOverlayBukkit extends JavaPlugin {
                 new PlayerListeners()
         );
 
+        if (OptionsUtil.PROXY.getBooleanValue()) {
+            if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage")) {
+                this.skinOverlay.setMessageManager(new PluginMessageListenerImpl());
+            } else if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("Redis")) {
+                this.skinOverlay.setMessageManager(new RedisManager(
+                        OptionsUtil.REDIS_HOST.getStringValue(),
+                        OptionsUtil.REDIS_PORT.getIntValue(),
+                        OptionsUtil.REDIS_PASSWORD.getStringValue()
+                ));
+            } else {
+                this.skinOverlay.setMessageManager(new MessageManagerNoop());
+            }
+            skinOverlay.getMessageManager().subscribeSkinProperty((uuid, skin) -> {
+                SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
+                if (player != null) {
+                    skinOverlay.getSkinApplier().setSkin(player, skin);
+                }
+            });
+        }
         // call onEnable
         skinOverlay.onEnable();
     }

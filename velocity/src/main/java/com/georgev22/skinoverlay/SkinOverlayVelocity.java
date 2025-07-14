@@ -4,11 +4,15 @@ import com.georgev22.skinoverlay.appliers.VelocitySkinApplier;
 import com.georgev22.skinoverlay.command.VelocityCommandManager;
 import com.georgev22.skinoverlay.hooks.SkinHookNoop;
 import com.georgev22.skinoverlay.hooks.SkinsRestorerHook;
+import com.georgev22.skinoverlay.message.MessageManagerNoop;
 import com.georgev22.skinoverlay.message.RedisManager;
 import com.georgev22.skinoverlay.message.VelocityPluginMessageManager;
 import com.georgev22.skinoverlay.providers.VelocityGameProfileProvider;
 import com.georgev22.skinoverlay.providers.VelocityPlayerProvider;
+import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.scheduler.VelocityMinecraftScheduler;
+import com.georgev22.skinoverlay.storage.data.PlayerData;
+import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
@@ -18,11 +22,14 @@ import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.logging.Logger;
+
+import static com.georgev22.skinoverlay.message.VelocityPluginMessageManager.inChannelIdentifier;
 
 @Plugin(
         id = BuildParameters.PLUGIN_ID,
@@ -57,16 +64,8 @@ public class SkinOverlayVelocity {
         this.skinOverlay.setScheduler(new VelocityMinecraftScheduler<>(server));
         this.skinOverlay.setCommandManager(new VelocityCommandManager(server));
         this.skinOverlay.onLoad();
-
-        if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage")) {
-            this.skinOverlay.setMessageManager(new VelocityPluginMessageManager(server));
-        } else {
-            this.skinOverlay.setMessageManager(new RedisManager(
-                    OptionsUtil.REDIS_HOST.getStringValue(),
-                    OptionsUtil.REDIS_PORT.getIntValue(),
-                    OptionsUtil.REDIS_PASSWORD.getStringValue()
-            ));
-        }
+        if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage"))
+            this.server.getChannelRegistrar().register(inChannelIdentifier);
     }
 
     @Subscribe
@@ -81,7 +80,36 @@ public class SkinOverlayVelocity {
         this.skinOverlay.setPlayerProvider(new VelocityPlayerProvider(server));
         this.skinOverlay.setAudienceProvider(new VelocityAudienceProvider(this, server));
         this.skinOverlay.setOnlineMode(server.getConfiguration().isOnlineMode());
-
+        if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage")) {
+            VelocityPluginMessageManager velocityPluginMessageManager = new VelocityPluginMessageManager(server);
+            this.skinOverlay.setMessageManager(velocityPluginMessageManager);
+            this.server.getEventManager().register(this, velocityPluginMessageManager);
+            this.server.sendMessage(Component.text("[SkinOverlay] Plugin message connection type: " + OptionsUtil.CONNECTION_TYPE.getStringValue()));
+        } else if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("Redis")) {
+            this.skinOverlay.setMessageManager(new RedisManager(
+                    OptionsUtil.REDIS_HOST.getStringValue(),
+                    OptionsUtil.REDIS_PORT.getIntValue(),
+                    OptionsUtil.REDIS_PASSWORD.getStringValue()
+            ));
+        } else {
+            this.skinOverlay.setMessageManager(new MessageManagerNoop());
+        }
+        this.skinOverlay.getMessageManager().subscribePlayerJoin(uuid -> {
+            this.server.sendMessage(Component.text("[SkinOverlay] Player " + uuid + " has joined the server."));
+            this.skinOverlay.getScheduler().runAsyncTask(this.skinOverlay.getPlugin(), () -> {
+                EntityManagerRegistry.getManager(PlayerData.class)
+                        .flatMap(entityManager -> entityManager.findById(uuid))
+                        .ifPresent(playerData -> {
+                            Skin skin = playerData.getCurrentSkin();
+                            if (skin != null) {
+                                this.skinOverlay.getSkinApplier().setSkin(
+                                        this.skinOverlay.getPlayerProvider().getSPlayer(uuid),
+                                        skin
+                                );
+                            }
+                        });
+            });
+        });
         this.skinOverlay.onEnable();
     }
 
