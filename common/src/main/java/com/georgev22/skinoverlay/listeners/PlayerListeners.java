@@ -11,6 +11,7 @@ import com.georgev22.skinoverlay.storage.EntityManager;
 import com.georgev22.skinoverlay.storage.data.PlayerData;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.Utils;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -24,6 +25,19 @@ public class PlayerListeners {
 
     public void onPlayerJoin(@NotNull SPlayerJoinEvent event) {
         SPlayer player = event.getPlayer();
+
+        if (!mainPlugin.isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+            // If we don't delay the publishPlayerJoin, the proxy won't receive the plugin message (idk why)
+            this.mainPlugin.getScheduler().createDelayedForEntity(
+                    this.mainPlugin.getPlugin(),
+                    () -> mainPlugin.getMessageManager().publishPlayerJoin(player.getUniqueId()),
+                    () -> {
+                    },
+                    player.getPlayer(),
+                    20L
+            );
+            return;
+        }
 
         Optional<EntityManager<PlayerData>> playerDataManagerOpt = EntityManagerRegistry.getManager(PlayerData.class);
         Optional<EntityManager<Skin>> skinManagerOpt = EntityManagerRegistry.getManager(Skin.class);
