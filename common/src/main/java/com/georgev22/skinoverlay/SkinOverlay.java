@@ -233,7 +233,7 @@ public class SkinOverlay {
      * Sets the plugin instance.
      *
      * @param plugin the plugin instance
-     * @param <T> plugin type
+     * @param <T>    plugin type
      */
     public <T> void setPlugin(T plugin) {
         this.plugin = plugin;
@@ -244,8 +244,9 @@ public class SkinOverlay {
      *
      * @return the MinecraftScheduler
      */
-    public MinecraftScheduler<?, ?, ?, ?, ?> getScheduler() {
-        return scheduler;
+    public <Plugin, Location, World, Chunk, Entity> MinecraftScheduler<Plugin, Location, World, Chunk, Entity> getScheduler() {
+        //noinspection unchecked
+        return (MinecraftScheduler<Plugin, Location, World, Chunk, Entity>) scheduler;
     }
 
     /**
