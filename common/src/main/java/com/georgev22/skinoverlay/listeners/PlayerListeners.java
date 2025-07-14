@@ -11,7 +11,6 @@ import com.georgev22.skinoverlay.storage.EntityManager;
 import com.georgev22.skinoverlay.storage.data.PlayerData;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.Utils;
-import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -25,68 +24,54 @@ public class PlayerListeners {
 
     public void onPlayerJoin(@NotNull SPlayerJoinEvent event) {
         SPlayer player = event.getPlayer();
-        Optional<EntityManager<PlayerData>> optionalPlayerDataEntityManager = EntityManagerRegistry.getManager(PlayerData.class);
-        if (optionalPlayerDataEntityManager.isEmpty()) {
+
+        Optional<EntityManager<PlayerData>> playerDataManagerOpt = EntityManagerRegistry.getManager(PlayerData.class);
+        Optional<EntityManager<Skin>> skinManagerOpt = EntityManagerRegistry.getManager(Skin.class);
+
+        if (playerDataManagerOpt.isEmpty() || skinManagerOpt.isEmpty()) {
             return;
         }
 
-        Optional<EntityManager<Skin>> optionalSkinEntityManager = EntityManagerRegistry.getManager(Skin.class);
-        if (optionalSkinEntityManager.isEmpty()) {
+        EntityManager<PlayerData> playerDataManager = playerDataManagerOpt.get();
+        EntityManager<Skin> skinManager = skinManagerOpt.get();
+
+        PlayerData playerData = playerDataManager.findById(player.getUniqueId()).orElse(null);
+
+        if (playerData == null) {
             return;
         }
 
-        EntityManager<PlayerData> playerDataEntityManager = optionalPlayerDataEntityManager.get();
-
-        EntityManager<Skin> skinEntityManager = optionalSkinEntityManager.get();
-
-        Optional<PlayerData> optionalPlayerData = playerDataEntityManager.findById(player.getUniqueId());
-        if (optionalPlayerData.isEmpty()) {
-            optionalPlayerData = playerDataEntityManager.create(player.getUniqueId().toString(), ignore -> {
-            });
-            if (optionalPlayerData.isEmpty()) {
-                return;
-            }
-        }
         SGameProfile gameProfile = player.getGameProfile();
         SProperty property = gameProfile.getProperty("textures");
+
         if (property == null) {
             try {
                 property = mainPlugin.getSkinProvider().getJavaSkin(player);
             } catch (IOException e) {
-                this.mainPlugin.getLogger().log(Level.SEVERE, "Error loading Skin:", e);
+                mainPlugin.getLogger().log(Level.SEVERE, "Error loading Skin:", e);
                 return;
             }
         }
-        UUID uuid = Utils.generateUUID("default" + player.getUniqueId().toString());
-        Skin defaultSkin = optionalSkinEntityManager.get().findById(uuid).orElse(new Skin(uuid));
+
+        UUID uuid = Utils.generateUUID("default" + player.getUniqueId());
+        Skin defaultSkin = skinManager.findById(uuid).orElseGet(() -> new Skin(uuid));
         defaultSkin.setProperty(property);
 
-        PlayerData playerData = optionalPlayerData.get();
         playerData.setDefaultSkin(defaultSkin);
+
         if (playerData.getCurrentSkin() != null && !playerData.getCurrentSkin().equals(defaultSkin)) {
-            this.mainPlugin.getSkinApplier().setSkin(player, playerData.getCurrentSkin());
+            mainPlugin.getSkinApplier().setSkin(player, playerData.getCurrentSkin());
         }
 
-        skinEntityManager.save(defaultSkin);
-        playerDataEntityManager.save(playerData);
+        skinManager.save(defaultSkin);
+        playerDataManager.save(playerData);
     }
 
     public void onPlayerLeave(@NotNull SPlayerLeaveEvent event) {
         SPlayer player = event.getPlayer();
-        Optional<EntityManager<PlayerData>> optionalPlayerDataEntityManager = EntityManagerRegistry.getManager(PlayerData.class);
-        if (optionalPlayerDataEntityManager.isEmpty()) {
-            return;
-        }
-        EntityManager<PlayerData> playerDataEntityManager = optionalPlayerDataEntityManager.get();
-        Optional<PlayerData> optionalPlayerData = playerDataEntityManager.findById(player.getUniqueId());
-        if (optionalPlayerData.isEmpty()) {
-            return;
-        }
-        PlayerData playerData = optionalPlayerData.get();
-        if (!this.mainPlugin.isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
-            return;
-        }
-        playerDataEntityManager.save(playerData);
+        EntityManagerRegistry.getManager(PlayerData.class)
+                .ifPresent(entityManager -> entityManager.findById(player.getUniqueId())
+                        .ifPresent(entityManager::save));
     }
 
 }
