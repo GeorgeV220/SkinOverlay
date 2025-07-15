@@ -1,3 +1,32 @@
+# [8.0.0-beta.1](https://github.com/GeorgeV220/SkinOverlay/compare/v7.1.0...v8.0.0-beta.1) (2025-07-15)
+
+
+### Bug Fixes
+
+* **completion:** handle empty args array in tab completion ([9dffca3](https://github.com/GeorgeV220/SkinOverlay/commit/9dffca35a088c4b460354a880a7ca8ebf71f19a1))
+* prevent saving entities in non-proxy mode when proxy enabled ([1381f51](https://github.com/GeorgeV220/SkinOverlay/commit/1381f515fd828813a4c9127c9879cd93b69bcab2))
+* **velocity:** pass plugin instance to audience provider ([2996a13](https://github.com/GeorgeV220/SkinOverlay/commit/2996a136fad4f9e99d0e560636700350f0ed650c))
+
+
+### Features
+
+* add Redis and PluginMessage support for skin synchronization ([a649393](https://github.com/GeorgeV220/SkinOverlay/commit/a64939330c35bbe5aa2cc3ef9fe912c57d2a504a))
+* conditionally initialize message handling based on proxy setting ([d77f772](https://github.com/GeorgeV220/SkinOverlay/commit/d77f772a828c7d02c88bc1a54102fb37660e6c4c))
+* **messaging:** recode messaging system with encryption and channels ([9deaaf1](https://github.com/GeorgeV220/SkinOverlay/commit/9deaaf1c25dfa24f9d47d8bf07004fd32dd25736))
+* **player:** delay publishPlayerJoin when PROXY enabled and not proxy ([07ae9a5](https://github.com/GeorgeV220/SkinOverlay/commit/07ae9a599559e6eb13b506cd1230a9a4f92527c3))
+* recode encryption and message handling ([0c901ef](https://github.com/GeorgeV220/SkinOverlay/commit/0c901ef9066b34dce5615c3d0bfb8503408380d9))
+* Recode of the entire plugin ([2ec6cf8](https://github.com/GeorgeV220/SkinOverlay/commit/2ec6cf855e7e29e9c157fff5e984a0a978dfe417))
+* Start recode ([6470152](https://github.com/GeorgeV220/SkinOverlay/commit/6470152d4d02eb8fb1faeff376539b9546efba98))
+* **utilities:** refactor message handling and add MessageParser ([2f35d09](https://github.com/GeorgeV220/SkinOverlay/commit/2f35d09962416ae0c759087cb37d21541c44f944))
+* Velocity support ([345924c](https://github.com/GeorgeV220/SkinOverlay/commit/345924c6c4e105ffb2129e4c2686a07cdfaec1c3))
+* **velocity:** add VelocityCommandManager initialization ([f9b59c5](https://github.com/GeorgeV220/SkinOverlay/commit/f9b59c5afc5c43b63d49dc1f8b5b71bcdecfe224))
+
+
+### BREAKING CHANGES
+
+* Old configs and save data may not be compatible with the new version
+* Removed all old classes for the recode
+
 # [7.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v7.0.0...v7.1.0) (2024-01-04)
 
 
