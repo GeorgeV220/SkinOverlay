@@ -18,6 +18,7 @@ dependencies {
     }
     implementation(libs.bstats.velocity)
     compileOnly(libs.adventure.platform.api)
+    compileOnly(libs.log4j.api)
 }
 
 configurations.configureEach {
