@@ -4,6 +4,7 @@ import com.georgev22.skinoverlay.appliers.VelocitySkinApplier;
 import com.georgev22.skinoverlay.command.VelocityCommandManager;
 import com.georgev22.skinoverlay.hooks.SkinHookNoop;
 import com.georgev22.skinoverlay.hooks.SkinsRestorerHook;
+import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
 import com.georgev22.skinoverlay.message.MessageManagerNoop;
 import com.georgev22.skinoverlay.message.RedisManager;
 import com.georgev22.skinoverlay.message.VelocityPluginMessageManager;
@@ -23,7 +24,6 @@ import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -85,7 +85,7 @@ public class SkinOverlayVelocity {
             VelocityPluginMessageManager velocityPluginMessageManager = new VelocityPluginMessageManager(server);
             this.skinOverlay.setMessageManager(velocityPluginMessageManager);
             this.server.getEventManager().register(this, velocityPluginMessageManager);
-            this.server.sendMessage(Component.text("[SkinOverlay] Plugin message connection type: " + OptionsUtil.CONNECTION_TYPE.getStringValue()));
+            this.skinOverlay.getLogger().info("Plugin message connection type: " + OptionsUtil.CONNECTION_TYPE.getStringValue());
         } else if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("Redis")) {
             this.skinOverlay.setMessageManager(new RedisManager(
                     OptionsUtil.REDIS_HOST.getStringValue(),
@@ -96,7 +96,9 @@ public class SkinOverlayVelocity {
             this.skinOverlay.setMessageManager(new MessageManagerNoop());
         }
         this.skinOverlay.getMessageManager().subscribePlayerJoin(uuid -> {
-            this.server.sendMessage(Component.text("[SkinOverlay] Player " + uuid + " has joined the server."));
+            if (OptionsUtil.DEBUG.getBooleanValue()) {
+                this.skinOverlay.getLogger().info("Player " + uuid + " has joined the server.");
+            }
             this.skinOverlay.getScheduler().runAsyncTask(this.skinOverlay.getPlugin(), () -> {
                 EntityManagerRegistry.getManager(PlayerData.class)
                         .flatMap(entityManager -> entityManager.findById(uuid))
@@ -111,6 +113,8 @@ public class SkinOverlayVelocity {
                         });
             });
         });
+
+        this.server.getEventManager().register(this, new PlayerListeners());
         this.skinOverlay.onEnable();
     }
 
