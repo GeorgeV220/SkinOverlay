@@ -23,6 +23,9 @@ dependencies {
     compileOnly(libs.adventure.text.minimessage)
     compileOnly(libs.adventure.text.serializer.legacy)
 
+    // log4j
+    compileOnly(libs.log4j.api)
+
 
     implementation(libs.hikari) {
         exclude(group = "org.slf4j", module = "slf4j-api")

@@ -13,6 +13,7 @@ import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.scheduler.VelocityMinecraftScheduler;
 import com.georgev22.skinoverlay.storage.data.PlayerData;
 import com.georgev22.skinoverlay.storage.data.Skin;
+import com.georgev22.skinoverlay.utilities.LoggerWrapper;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
@@ -24,10 +25,10 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.logging.Logger;
 
 import static com.georgev22.skinoverlay.message.VelocityPluginMessageManager.inChannelIdentifier;
 
@@ -49,14 +50,14 @@ public class SkinOverlayVelocity {
     @Inject
     public SkinOverlayVelocity(ProxyServer server, Logger logger, @DataDirectory @NotNull Path dataDirectory) {
         this.server = server;
-        this.skinOverlay.setLogger(logger);
+        this.skinOverlay.setLogger(new LoggerWrapper(logger));
         this.skinOverlay.setProxy(true);
         File dataDirectoryFile = dataDirectory.toFile();
         if (!dataDirectoryFile.exists()) {
             if (dataDirectoryFile.mkdirs()) {
-                logger.info("Folder " + dataDirectory + " has been created!");
+                this.skinOverlay.getLogger().info("Folder " + dataDirectory + " has been created!");
             } else {
-                logger.warning("Failed to create folder " + dataDirectory);
+                this.skinOverlay.getLogger().warning("Failed to create folder " + dataDirectory);
             }
         }
         this.skinOverlay.setDataFolder(dataDirectoryFile);
