@@ -1,3 +1,16 @@
+# [8.0.0-beta.2](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.1...v8.0.0-beta.2) (2025-07-16)
+
+
+### Bug Fixes
+
+* **provider:** handle default skin not found case ([4ae9cd6](https://github.com/GeorgeV220/SkinOverlay/commit/4ae9cd62e22b184bf9c63f222ef2637b783f58eb))
+
+
+### Features
+
+* **logging:** add LoggerWrapper for unified logging integration ([82b1121](https://github.com/GeorgeV220/SkinOverlay/commit/82b112180486cca39592993afde599d7852c9af0))
+* **velocity:** add player event listeners and debug logging ([a626d79](https://github.com/GeorgeV220/SkinOverlay/commit/a626d793c6eb0161c0f2b8547486260d1f97b8a0))
+
 # [8.0.0-beta.1](https://github.com/GeorgeV220/SkinOverlay/compare/v7.1.0...v8.0.0-beta.1) (2025-07-15)
 
 
