@@ -73,6 +73,22 @@ public class SkinProvider {
             if (exists) {
                 skinOverlay.getLogger().info("Skin: " + skinUUID + " found for player: " + player.getName());
                 return skinManager.findById(skinUUID);
+            } else if (skinParts.getSkinName().equalsIgnoreCase("default")) {
+                this.skinOverlay.getLogger().warning("Default skin not found for player: " + player.getName());
+                try {
+                    SProperty property = this.getSkin(player);
+                    Skin skin = new Skin(skinUUID);
+                    skin.setProperty(property);
+                    skin.setSkinParts(skinParts);
+                    if (!this.skinOverlay.isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
+                        return Optional.of(skin);
+                    }
+                    skinManager.save(skin);
+                    return Optional.of(skin);
+                } catch (IOException | ExecutionException | InterruptedException e) {
+                    this.skinOverlay.getLogger().log(Level.SEVERE, "Failed to get skin for player: " + player.getName(), e);
+                    return Optional.empty();
+                }
             } else {
                 try {
                     SkinConfigurationFile skinConfigurationFile = this.skinOverlay.getSkinFileCache().getCacheSkinConfig(skinParts.getSkinName());
@@ -208,10 +224,10 @@ public class SkinProvider {
     /**
      * Retrieves {@link SPlayer}'s {@link SGameProfile} bytes
      *
-     * @param player {@link SPlayer} object
-     * @param property     If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
+     * @param player   {@link SPlayer} object
+     * @param property If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
      * @return {@link SPlayer}'s {@link SGameProfile} bytes
-     * @throws IOException          When an I/O exception to some sort has occurred.
+     * @throws IOException When an I/O exception to some sort has occurred.
      */
     public byte[] getProfileBytes(@NotNull final SPlayer player, @Nullable SProperty property) throws IOException {
         return player.isBedrock() ? this.getBedrockProfileBytes(player, property) : this.getJavaProfileBytes(player, property);
@@ -220,10 +236,10 @@ public class SkinProvider {
     /**
      * Retrieves Bedrock {@link SPlayer}'s {@link SGameProfile} bytes
      *
-     * @param player {@link SPlayer} object
-     * @param property     If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
+     * @param player   {@link SPlayer} object
+     * @param property If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
      * @return {@link SPlayer}'s {@link SGameProfile} bytes
-     * @throws IOException          When an I/O exception to some sort has occurred.
+     * @throws IOException When an I/O exception to some sort has occurred.
      */
     public byte[] getBedrockProfileBytes(@NotNull final SPlayer player, final SProperty property) throws IOException {
         return property != null ?
@@ -234,10 +250,10 @@ public class SkinProvider {
     /**
      * Retrieves Java {@link SPlayer}'s {@link SGameProfile} bytes
      *
-     * @param player {@link SPlayer} object
-     * @param property     If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
+     * @param player   {@link SPlayer} object
+     * @param property If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
      * @return {@link SPlayer}'s {@link SGameProfile} bytes
-     * @throws IOException          When an I/O exception to some sort has occurred.
+     * @throws IOException When an I/O exception to some sort has occurred.
      */
     public byte[] getJavaProfileBytes(@NotNull final SPlayer player, @Nullable SProperty property) throws IOException {
         return property != null ?
@@ -398,7 +414,7 @@ public class SkinProvider {
      *
      * @param player {@link SPlayer}'s object
      * @return the Skin {@link SProperty} for the specified Java Player
-     * @throws IOException          When an I/O exception to some sort has occurred.
+     * @throws IOException When an I/O exception to some sort has occurred.
      */
     public SProperty getJavaSkin(final SPlayer player) throws IOException {
         if (skinOverlay.getSkinHook().getProperty(player) != null) {
@@ -477,8 +493,8 @@ public class SkinProvider {
     /**
      * Creates a JSON from a {@link SGameProfile} or {@link SProperty}
      *
-     * @param player {@link SPlayer}'s object
-     * @param property     If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
+     * @param player   {@link SPlayer}'s object
+     * @param property If you want to use a {@link SProperty} instead of {@link SGameProfile} ones
      * @return a JSON from a {@link SGameProfile} or {@link SProperty}
      */
     public JsonObject createJsonFromProperty(@NotNull final SPlayer player, @Nullable SProperty property) {
