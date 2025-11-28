@@ -37,6 +37,7 @@ dependencies {
     implementation(project(":bukkit:versions:mc1_21_R3", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_21_R4", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_21_R5", configuration = "reobf"))
+    implementation(project(":bukkit:versions:mc1_21_R6", configuration = "reobf"))
 }
 
 configurations.configureEach {

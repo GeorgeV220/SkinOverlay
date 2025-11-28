@@ -99,6 +99,10 @@ public class SkinOverlayBukkit extends JavaPlugin {
                     this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_21_R5());
                     this.skinOverlay.setSkinApplier(new SkinApplier_1_21_R5());
                 }
+                case V1_21_R6 -> {
+                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_21_R6());
+                    this.skinOverlay.setSkinApplier(new SkinApplier_1_21_R6());
+                }
                 default -> {
                     this.setEnabled(false);
                     throw new RuntimeException("SkinOverlay does not support " + getCurrentVersion());
