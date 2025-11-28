@@ -113,6 +113,8 @@ public class SkinOverlayBukkit extends JavaPlugin {
 
         if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer")) {
             this.skinOverlay.setSkinHook(new SkinsRestorerHook());
+            this.skinOverlay.setGameProfileProvider(new GameProfileProvider_SkinsRestorer());
+            this.skinOverlay.setSkinApplier(new NoopSkinApplier());
         } else {
             this.skinOverlay.setSkinHook(new SkinHookNoop());
         }
