@@ -1,3 +1,61 @@
+# [8.0.0-beta.3](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.2...v8.0.0-beta.3) (2025-11-30)
+
+
+* feat(core)!: introduce new command architecture and remove legacy message utilities ([f7768af](https://github.com/GeorgeV220/SkinOverlay/commit/f7768af1de07742f9f330c6b8b2fc462c8aaf25d))
+
+
+### Features
+
+* add command aliases for subcommands ([7a4f837](https://github.com/GeorgeV220/SkinOverlay/commit/7a4f8372629cd8252ab99fb05f9834f705b3c8d2))
+* add info subcommand to main command ([26939ea](https://github.com/GeorgeV220/SkinOverlay/commit/26939eae5a8477f986f5a77963f58547169fa673))
+* add no-op game profile provider and handle unsupported versions ([1dae36e](https://github.com/GeorgeV220/SkinOverlay/commit/1dae36eb1861b590be88349904e0cbe29b079924))
+* add reflect library and update package relocation paths ([7632063](https://github.com/GeorgeV220/SkinOverlay/commit/76320631a4f4e924b87ff9f968e73f244a75cc6b))
+* add SkinsRestorer integration and refactor skin applier ([b073d48](https://github.com/GeorgeV220/SkinOverlay/commit/b073d48ebd5f2ff70103d8f6b4b0e1f629cb5c6f))
+* add support for Minecraft 1.21.10-R0.1-SNAPSHOT ([85f5fce](https://github.com/GeorgeV220/SkinOverlay/commit/85f5fce25f26b8b9e94a43a07ec5b29ebaf700bf))
+* extend Minecraft 1.21 support range for Bukkit ([6942d02](https://github.com/GeorgeV220/SkinOverlay/commit/6942d021e1607a23bcb6c9e2a662a5fbf8cf5da0))
+
+
+### BREAKING CHANGES
+
+* - Removed legacy message system (MessageBuilder, MessageParser, MessagesUtil)
+- Removed PlayerOnly annotation
+- Replaced old message configuration with new MessageEntry-based system
+- Existing message configs and command usages must be updated to the new architecture
+
+feat(commands):
+- Added new annotations: Default, CommandTarget
+- Added MethodCommand for method-based command handling
+- Added registry system for extensible command targets (Registry, AbstractRegistry, CommandTargetRegistry)
+
+feat(messages):
+- Introduced new MessageEntry interface and MessageBuilder
+- Added MessagesRegistry for message management
+- Added CoreMessages and CommandMessages enums
+
+refactor(commands):
+- Reworked annotation processing with improved documentation and functionality
+- Enhanced CompletionEngine with a more robust resolver system
+- Added PreProcessor and PostProcessor interfaces
+- Rebuilt argument resolution and tab completion
+- Updated all command implementations and subcommands to the new system
+- Migrated all subcommands to use @Default
+- Improved command aliases, permissions, and descriptions
+
+refactor(config):
+- Updated CFG class with improved error handling
+- Removed legacy message configuration support
+
+refactor(utils):
+- Updated CustomData with cloning capabilities
+- Added Copyable interface and DeepCloner utility
+- General improvements across various utility functions
+
+chore(commands):
+- Refactored SkinOverlayMain and all subcommands to new architecture
+- Updated command completions and implementations
+
+Overall, this commit removes outdated messaging utilities and introduces a fully redesigned, extensible command and message system with better annotations, processors, registries, and utilities.
+
 # [8.0.0-beta.2](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.1...v8.0.0-beta.2) (2025-07-16)
 
 
