@@ -1,6 +1,7 @@
 package com.georgev22.skinoverlay.command.commands.sub;
 
 import com.georgev22.skinoverlay.command.CommandIssuer;
+import com.georgev22.skinoverlay.command.annotation.CommandAlias;
 import com.georgev22.skinoverlay.command.annotation.Default;
 import com.georgev22.skinoverlay.command.annotation.Permission;
 import com.georgev22.skinoverlay.command.annotation.Subcommand;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.logging.Level;
 
 @Subcommand("reload")
+@CommandAlias("soreload")
 @Permission("skinoverlay.reload")
 public class ReloadSubCommand extends SkinOverlayBaseCommand {
     @Default

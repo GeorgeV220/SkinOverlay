@@ -1,7 +1,6 @@
 package com.georgev22.skinoverlay.command.commands.sub;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.command.CommandContext;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
@@ -19,10 +18,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Optional;
 import java.util.logging.Level;
 
 @Subcommand("url")
+@CommandAlias("sowearurl")
 @Permission("skinoverlay.wear.url")
 @Description("Wear an overlay on a player's skin")
 @CommandCompletion("<link> @players")

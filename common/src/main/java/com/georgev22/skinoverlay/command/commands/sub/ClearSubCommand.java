@@ -1,7 +1,6 @@
 package com.georgev22.skinoverlay.command.commands.sub;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.command.CommandContext;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
@@ -12,9 +11,8 @@ import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
 @Subcommand({"clear", "reset"})
+@CommandAlias("soclear")
 @CommandCompletion("@players")
 @Description("Removes the skin overlay")
 @Permission("skinoverlay.wear.clear")

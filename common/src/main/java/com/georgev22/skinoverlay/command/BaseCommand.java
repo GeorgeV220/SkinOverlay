@@ -257,18 +257,20 @@ public abstract class BaseCommand {
     /**
      * Adds a nested BaseCommand as a subcommand.
      *
-     * @param command the subcommand to add
+     * @param subCommand the subcommand to add
      */
-    public void addSubcommand(@NotNull BaseCommand command) {
-        if (command.subCommandAliases.length == 0 && !(command instanceof MethodCommand)) {
+    public void addSubcommand(@NotNull BaseCommand subCommand) {
+        if (subCommand.subCommandAliases.length == 0 && !(subCommand instanceof MethodCommand)) {
             throw new IllegalArgumentException("Subcommand must define at least one alias");
         }
-        for (String alias : command.subCommandAliases) {
-            subcommands.put(alias.toLowerCase(), command);
+        for (String alias : subCommand.subCommandAliases) {
+            subcommands.put(alias.toLowerCase(), subCommand);
         }
-        if (command instanceof MethodCommand && ((MethodCommand) command).isDefault()) {
-            command.subcommands.put("__default__", command);
+        if (subCommand instanceof MethodCommand && ((MethodCommand) subCommand).isDefault()) {
+            subCommand.subcommands.put("__default__", subCommand);
         }
+        if (subCommand.aliases != null && subCommand.aliases.length != 0)
+            SkinOverlay.getInstance().getCommandManager().registerCommand(subCommand);
     }
 
     /**

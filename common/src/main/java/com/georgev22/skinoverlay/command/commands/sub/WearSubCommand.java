@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 @Subcommand({"wear", "overlay"})
+@CommandAlias("sowear")
 @Permission("skinoverlay.wear.overlay")
 @Description("Wear an overlay on a player's skin")
 @CommandCompletion("@overlays @players")

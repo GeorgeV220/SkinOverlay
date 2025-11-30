@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay.command.commands.sub;
 import com.georgev22.skinoverlay.BuildParameters;
 import com.georgev22.skinoverlay.command.CommandContext;
 import com.georgev22.skinoverlay.command.CommandIssuer;
+import com.georgev22.skinoverlay.command.annotation.CommandAlias;
 import com.georgev22.skinoverlay.command.annotation.Default;
 import com.georgev22.skinoverlay.command.annotation.Permission;
 import com.georgev22.skinoverlay.command.annotation.Subcommand;
@@ -10,6 +11,7 @@ import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
 import org.jetbrains.annotations.NotNull;
 
 @Subcommand("info")
+@CommandAlias("soinfo")
 @Permission("skinoverlay.info")
 public class InfoSubCommand extends SkinOverlayBaseCommand {
 
