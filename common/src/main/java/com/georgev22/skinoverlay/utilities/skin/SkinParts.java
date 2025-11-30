@@ -5,6 +5,7 @@ import com.georgev22.skinoverlay.maps.HashObjectMap;
 import com.georgev22.skinoverlay.maps.ObjectMap;
 import com.georgev22.skinoverlay.maps.UnmodifiableObjectMap;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
+import com.georgev22.skinoverlay.utilities.skin.Section.SectionType;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -88,78 +89,9 @@ public class SkinParts {
             SerializableBufferedImage fullSkin = this.fullSkin;
             this.fullSkin = convertSkin(fullSkin);
         }
-        parts.put("Head_Top", createPart(Section.SectionType.Head_Top.getSection()));
-        parts.put("Head_Bottom", createPart(Section.SectionType.Head_Bottom.getSection()));
-        parts.put("Head_Right", createPart(Section.SectionType.Head_Right.getSection()));
-        parts.put("Head_Front", createPart(Section.SectionType.Head_Front.getSection()));
-        parts.put("Head_Left", createPart(Section.SectionType.Head_Left.getSection()));
-        parts.put("Head_Back", createPart(Section.SectionType.Head_Back.getSection()));
-        parts.put("Hat_Top", createPart(Section.SectionType.Hat_Top.getSection()));
-        parts.put("Hat_Bottom", createPart(Section.SectionType.Hat_Bottom.getSection()));
-        parts.put("Hat_Right", createPart(Section.SectionType.Hat_Right.getSection()));
-        parts.put("Hat_Front", createPart(Section.SectionType.Hat_Front.getSection()));
-        parts.put("Hat_Left", createPart(Section.SectionType.Hat_Left.getSection()));
-        parts.put("Hat_Back", createPart(Section.SectionType.Hat_Back.getSection()));
-        parts.put("Right_Leg_Top", createPart(Section.SectionType.Right_Leg_Top.getSection()));
-        parts.put("Right_Leg_Bottom", createPart(Section.SectionType.Right_Leg_Bottom.getSection()));
-        parts.put("Right_Leg_Right", createPart(Section.SectionType.Right_Leg_Right.getSection()));
-        parts.put("Right_Leg_Front", createPart(Section.SectionType.Right_Leg_Front.getSection()));
-        parts.put("Right_Leg_Left", createPart(Section.SectionType.Right_Leg_Left.getSection()));
-        parts.put("Right_Leg_Back", createPart(Section.SectionType.Right_Leg_Back.getSection()));
-        parts.put("Torso_Top", createPart(Section.SectionType.Torso_Top.getSection()));
-        parts.put("Torso_Bottom", createPart(Section.SectionType.Torso_Bottom.getSection()));
-        parts.put("Torso_Right", createPart(Section.SectionType.Torso_Right.getSection()));
-        parts.put("Torso_Front", createPart(Section.SectionType.Torso_Front.getSection()));
-        parts.put("Torso_Left", createPart(Section.SectionType.Torso_Left.getSection()));
-        parts.put("Torso_Back", createPart(Section.SectionType.Torso_Back.getSection()));
-        parts.put("Right_Arm_Top", createPart(Section.SectionType.Right_Arm_Top.getSection()));
-        parts.put("Right_Arm_Bottom", createPart(Section.SectionType.Right_Arm_Bottom.getSection()));
-        parts.put("Right_Arm_Right", createPart(Section.SectionType.Right_Arm_Right.getSection()));
-        parts.put("Right_Arm_Front", createPart(Section.SectionType.Right_Arm_Front.getSection()));
-        parts.put("Right_Arm_Left", createPart(Section.SectionType.Right_Arm_Left.getSection()));
-        parts.put("Right_Arm_Back", createPart(Section.SectionType.Right_Arm_Back.getSection()));
-        parts.put("Left_Leg_Top", createPart(Section.SectionType.Left_Leg_Top.getSection()));
-        parts.put("Left_Leg_Bottom", createPart(Section.SectionType.Left_Leg_Bottom.getSection()));
-        parts.put("Left_Leg_Right", createPart(Section.SectionType.Left_Leg_Right.getSection()));
-        parts.put("Left_Leg_Front", createPart(Section.SectionType.Left_Leg_Front.getSection()));
-        parts.put("Left_Leg_Left", createPart(Section.SectionType.Left_Leg_Left.getSection()));
-        parts.put("Left_Leg_Back", createPart(Section.SectionType.Left_Leg_Back.getSection()));
-        parts.put("Left_Arm_Top", createPart(Section.SectionType.Left_Arm_Top.getSection()));
-        parts.put("Left_Arm_Bottom", createPart(Section.SectionType.Left_Arm_Bottom.getSection()));
-        parts.put("Left_Arm_Right", createPart(Section.SectionType.Left_Arm_Right.getSection()));
-        parts.put("Left_Arm_Front", createPart(Section.SectionType.Left_Arm_Front.getSection()));
-        parts.put("Left_Arm_Left", createPart(Section.SectionType.Left_Arm_Left.getSection()));
-        parts.put("Left_Arm_Back", createPart(Section.SectionType.Left_Arm_Back.getSection()));
-        parts.put("Right_Pants_Leg_Top", createPart(Section.SectionType.Right_Pants_Leg_Top.getSection()));
-        parts.put("Right_Pants_Leg_Bottom", createPart(Section.SectionType.Right_Pants_Leg_Bottom.getSection()));
-        parts.put("Right_Pants_Leg_Right", createPart(Section.SectionType.Right_Pants_Leg_Right.getSection()));
-        parts.put("Right_Pants_Leg_Front", createPart(Section.SectionType.Right_Pants_Leg_Front.getSection()));
-        parts.put("Right_Pants_Leg_Left", createPart(Section.SectionType.Right_Pants_Leg_Left.getSection()));
-        parts.put("Right_Pants_Leg_Back", createPart(Section.SectionType.Right_Pants_Leg_Back.getSection()));
-        parts.put("Jacket_Top", createPart(Section.SectionType.Jacket_Top.getSection()));
-        parts.put("Jacket_Bottom", createPart(Section.SectionType.Jacket_Bottom.getSection()));
-        parts.put("Jacket_Right", createPart(Section.SectionType.Jacket_Right.getSection()));
-        parts.put("Jacket_Front", createPart(Section.SectionType.Jacket_Front.getSection()));
-        parts.put("Jacket_Left", createPart(Section.SectionType.Jacket_Left.getSection()));
-        parts.put("Jacket_Back", createPart(Section.SectionType.Jacket_Back.getSection()));
-        parts.put("Right_Sleeve_Top", createPart(Section.SectionType.Right_Sleeve_Top.getSection()));
-        parts.put("Right_Sleeve_Bottom", createPart(Section.SectionType.Right_Sleeve_Bottom.getSection()));
-        parts.put("Right_Sleeve_Right", createPart(Section.SectionType.Right_Sleeve_Right.getSection()));
-        parts.put("Right_Sleeve_Front", createPart(Section.SectionType.Right_Sleeve_Front.getSection()));
-        parts.put("Right_Sleeve_Left", createPart(Section.SectionType.Right_Sleeve_Left.getSection()));
-        parts.put("Right_Sleeve_Back", createPart(Section.SectionType.Right_Sleeve_Back.getSection()));
-        parts.put("Left_Pants_Leg_Top", createPart(Section.SectionType.Left_Pants_Leg_Top.getSection()));
-        parts.put("Left_Pants_Leg_Bottom", createPart(Section.SectionType.Left_Pants_Leg_Bottom.getSection()));
-        parts.put("Left_Pants_Leg_Right", createPart(Section.SectionType.Left_Pants_Leg_Right.getSection()));
-        parts.put("Left_Pants_Leg_Front", createPart(Section.SectionType.Left_Pants_Leg_Front.getSection()));
-        parts.put("Left_Pants_Leg_Left", createPart(Section.SectionType.Left_Pants_Leg_Left.getSection()));
-        parts.put("Left_Pants_Leg_Back", createPart(Section.SectionType.Left_Pants_Leg_Back.getSection()));
-        parts.put("Left_Sleeve_Top", createPart(Section.SectionType.Left_Sleeve_Top.getSection()));
-        parts.put("Left_Sleeve_Bottom", createPart(Section.SectionType.Left_Sleeve_Bottom.getSection()));
-        parts.put("Left_Sleeve_Right", createPart(Section.SectionType.Left_Sleeve_Right.getSection()));
-        parts.put("Left_Sleeve_Front", createPart(Section.SectionType.Left_Sleeve_Front.getSection()));
-        parts.put("Left_Sleeve_Left", createPart(Section.SectionType.Left_Sleeve_Left.getSection()));
-        parts.put("Left_Sleeve_Back", createPart(Section.SectionType.Left_Sleeve_Back.getSection()));
+        for (SectionType sectionType : SectionType.values()) {
+            parts.put(sectionType.name(), createPart(sectionType.getSection(), sectionType.name()));
+        }
     }
 
     /**
@@ -168,7 +100,7 @@ public class SkinParts {
      * @param section The section for which the part image is created.
      * @return A Part object representing the created part.
      */
-    private @NotNull Part createPart(@NotNull Section section) {
+    private @NotNull Part createPart(@NotNull Section section, String partName) {
         int x = section.x1();
         int y = section.y1();
         int width = section.width();
@@ -186,7 +118,6 @@ public class SkinParts {
             }
         }
 
-        String partName = section.getClass().getSimpleName();
         return new Part(partName, new SerializableBufferedImage(partImage), x, y, width, height, isAreaTransparent);
     }
 
