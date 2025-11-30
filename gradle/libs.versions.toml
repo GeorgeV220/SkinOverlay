@@ -1,13 +1,11 @@
 [versions]
 folia-api = "1.21.5-R0.1-SNAPSHOT"
-paperlib = "1.0.8"
 bstats = "3.1.0"
 adventure-api = "4.22.0"
 adventure-platform = "4.4.0"
 auth-lib-modern = "6.0.57"
 auth-lib-legacy = "3.11.50"
 gradleup-shadow = "8.3.5"
-jvmdowngrader = "1.2.2"
 hikari = "4.0.3"
 paperweight = "2.0.0-beta.17"
 gson = "2.13.1"
@@ -22,18 +20,15 @@ reflect = "1.5.0"
 
 [plugins]
 gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "gradleup-shadow" }
-jvmdowngrader = { id = "xyz.wagyourtail.jvmdowngrader", version.ref = "jvmdowngrader" }
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
 blossom = { id = "net.kyori.blossom", version = "2.1.0" }
 
 [libraries]
-paperlib = { module = "io.papermc:paperlib", version.ref = "paperlib" }
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 bstats-bungeecord = { module = "org.bstats:bstats-bungeecord", version.ref = "bstats" }
 bstats-velocity = { module = "org.bstats:bstats-velocity", version.ref = "bstats" }
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure-api" }
 adventure-text-serializer-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure-api" }
-adventure-text-serializer-gson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure-api" }
 adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure-api" }
 adventure-platform-api = { module = "net.kyori:adventure-platform-api", version.ref = "adventure-platform" }
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
@@ -41,7 +36,6 @@ adventure-platform-bungeecord = { module = "net.kyori:adventure-platform-bungeec
 auth-lib-modern = { module = "com.mojang:authlib", version.ref = "auth-lib-modern" }
 auth-lib-legacy = { module = "com.mojang:authlib", version.ref = "auth-lib-legacy" }
 folia-api = { module = "dev.folia:folia-api", version.ref = "folia-api" }
-jvmdowngrader = { module = "xyz.wagyourtail.jvmdowngrader:jvmdowngrader-java-api", version.ref = "jvmdowngrader" }
 hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 placeholder-api = { module = "me.clip:placeholderapi", version.ref = "placeholder-api" }
