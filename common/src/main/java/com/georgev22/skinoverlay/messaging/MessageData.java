@@ -1,4 +1,4 @@
-package com.georgev22.skinoverlay.message;
+package com.georgev22.skinoverlay.messaging;
 
 /**
  * Represents parsed message data with sub-channel and data entries.

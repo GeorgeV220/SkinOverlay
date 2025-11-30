@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.listeners.bukkit;
 
-import com.georgev22.skinoverlay.message.MessageData;
-import com.georgev22.skinoverlay.message.MessageManager;
+import com.georgev22.skinoverlay.messaging.MessageData;
+import com.georgev22.skinoverlay.messaging.MessageManager;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import org.bukkit.Bukkit;

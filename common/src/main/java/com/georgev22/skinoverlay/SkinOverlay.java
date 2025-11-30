@@ -10,7 +10,7 @@ import com.georgev22.skinoverlay.event.events.player.SPlayerJoinEvent;
 import com.georgev22.skinoverlay.event.events.player.SPlayerLeaveEvent;
 import com.georgev22.skinoverlay.hooks.SkinHook;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
-import com.georgev22.skinoverlay.message.MessageManager;
+import com.georgev22.skinoverlay.messaging.MessageManager;
 import com.georgev22.skinoverlay.providers.GameProfileProvider;
 import com.georgev22.skinoverlay.providers.PlayerProvider;
 import com.georgev22.skinoverlay.providers.SkinProvider;

@@ -1,4 +1,4 @@
-package com.georgev22.skinoverlay.message;
+package com.georgev22.skinoverlay.messaging;
 
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;

@@ -5,9 +5,9 @@ import com.georgev22.skinoverlay.command.VelocityCommandManager;
 import com.georgev22.skinoverlay.hooks.SkinHookNoop;
 import com.georgev22.skinoverlay.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
-import com.georgev22.skinoverlay.message.MessageManagerNoop;
-import com.georgev22.skinoverlay.message.RedisManager;
-import com.georgev22.skinoverlay.message.VelocityPluginMessageManager;
+import com.georgev22.skinoverlay.messaging.MessageManagerNoop;
+import com.georgev22.skinoverlay.messaging.RedisManager;
+import com.georgev22.skinoverlay.messaging.VelocityPluginMessageManager;
 import com.georgev22.skinoverlay.providers.VelocityGameProfileProvider;
 import com.georgev22.skinoverlay.providers.VelocityPlayerProvider;
 import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.nio.file.Path;
 
-import static com.georgev22.skinoverlay.message.VelocityPluginMessageManager.inChannelIdentifier;
+import static com.georgev22.skinoverlay.messaging.VelocityPluginMessageManager.inChannelIdentifier;
 
 @Plugin(
         id = BuildParameters.PLUGIN_ID,
