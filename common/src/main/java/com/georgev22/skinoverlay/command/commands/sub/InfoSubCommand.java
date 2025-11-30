@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay.command.commands.sub;
 import com.georgev22.skinoverlay.BuildParameters;
 import com.georgev22.skinoverlay.command.CommandContext;
 import com.georgev22.skinoverlay.command.CommandIssuer;
+import com.georgev22.skinoverlay.command.annotation.Default;
 import com.georgev22.skinoverlay.command.annotation.Permission;
 import com.georgev22.skinoverlay.command.annotation.Subcommand;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
@@ -12,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 @Permission("skinoverlay.info")
 public class InfoSubCommand extends SkinOverlayBaseCommand {
 
-    @Override
-    protected void handle(@NotNull CommandIssuer commandIssuer, String @NotNull [] args, @NotNull CommandContext context) {
+    @Default
+    protected void handle(@NotNull CommandIssuer commandIssuer) {
         String pluginName = BuildParameters.PLUGIN_NAME;
         String pluginVersion = BuildParameters.VERSION;
         String pluginAuthor = BuildParameters.AUTHOR;

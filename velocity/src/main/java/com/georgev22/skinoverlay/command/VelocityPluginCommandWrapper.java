@@ -23,9 +23,9 @@ public class VelocityPluginCommandWrapper implements SimpleCommand {
     public void execute(@NotNull Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-
+        CommandContext context = new CommandContext();
         try {
-            baseCommand.execute(new VelocityCommandIssuer(source), args);
+            baseCommand.execute(new VelocityCommandIssuer(source), args, context);
         } catch (Exception e) {
             SkinOverlay.getInstance().getLogger().log(Level.SEVERE, "An error occurred while executing the command.", e);
         }

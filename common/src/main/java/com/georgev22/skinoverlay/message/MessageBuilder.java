@@ -1,7 +1,10 @@
-package com.georgev22.skinoverlay.utilities;
+package com.georgev22.skinoverlay.message;
 
+import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.maps.HashObjectMap;
 import com.georgev22.skinoverlay.maps.ObjectMap;
+import com.georgev22.skinoverlay.utilities.Utils;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -14,10 +17,12 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.logging.Level;
 
 /**
  * A utility class for building and sending styled chat messages to players in a Minecraft server environment
@@ -44,7 +49,7 @@ import java.util.Collections;
  *     .clickEvent(ClickEvent.Action.RUN_COMMAND, "/help")
  *     .hoverEvent("Click to run /help")
  *     .append(" for more info.")
- *     .build();
+ *     .send(player);
  *
  * // Using MiniMessage for more complex formatting
  * messageBuilder
@@ -52,7 +57,7 @@ import java.util.Collections;
  *     .appendMiniMessage("<yellow> Click <underlined><red>here</red></underlined> for more info.</yellow>")
  *     .clickEvent(ClickEvent.Action.RUN_COMMAND, "/help")
  *     .hoverEvent("Click to run /help")
- *     .build();
+ *     .send(player);
  * }</pre>
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
@@ -274,6 +279,24 @@ public class MessageBuilder {
     }
 
     /**
+     * Sends the constructed message to the specified player.
+     *
+     * <p>Example usage:</p>
+     * <pre>{@code
+     * messageBuilder
+     *     .append("Hello, ")
+     *     .append(player.getName())
+     *     .append("!")
+     *     .send(player);
+     * }</pre>
+     *
+     * @param audience The player to send the message to.
+     */
+    public void send(@NotNull Audience audience) {
+        audience.sendMessage(componentBuilder.build());
+    }
+
+    /**
      * Builds the component for further use.
      *
      * <p>Example usage:</p>
@@ -420,6 +443,52 @@ public class MessageBuilder {
     }
 
     /**
+     * Attempts to convert this message (built as a MiniMessage string) into a Paper Adventure
+     * {@code net.kyori..adventure.text.Component} instance at runtime, without directly referencing
+     * Adventure API classes in bytecode.
+     *
+     * <p>This method is designed for environments where Adventure is shaded and relocated (e.g. Spigot),
+     * but Paper provides its own Adventure API. Direct casts or static imports would be relocated by the
+     * shadow plugin, causing runtime type mismatches. To avoid relocation, class names are constructed
+     * dynamically and reflection is used to invoke the MiniMessage deserializer on Paper.</p>
+     *
+     * <p>If running on a non-Paper server (or if the Paper MiniMessage API is not available), this
+     * method returns {@code null}. The caller must handle the {@code null} return and fall back to the
+     * relocated Adventure API.</p>
+     *
+     * @return a Paper {@code net.kyori.adventure.text.Component} instance if Paper Adventure is present,
+     * otherwise {@code null}
+     */
+    public @Nullable Object toPaperComponent() {
+        try {
+            Class<?> mmClass = Class.forName(
+                    n("net", "kyori", "adventure", "text", "minimessage", "MiniMessage")
+            );
+            Class<?> componentClass = Class.forName(
+                    n("net", "kyori", "adventure", "text", "Component")
+            );
+
+            Class<?> tagResolverClass = Class.forName(
+                    n("net", "kyori", "adventure", "text", "minimessage", "tag", "resolver", "TagResolver")
+            );
+
+            Object mm = mmClass.getMethod("miniMessage").invoke(null);
+
+            Object emptyResolvers = java.lang.reflect.Array.newInstance(tagResolverClass, 0);
+
+            return mmClass
+                    .getMethod("deserialize", String.class, java.lang.reflect.Array.newInstance(tagResolverClass, 0).getClass())
+                    .invoke(mm, buildString(), emptyResolvers);
+
+        } catch (Throwable throwable) {
+            SkinOverlay.getInstance().getLogger().log(
+                    Level.WARNING, "Could not deserialize MiniMessage", throwable
+            );
+            return null;
+        }
+    }
+
+    /**
      * Replaces placeholders in the given string with their corresponding values.
      *
      * @param input The input string containing placeholders.
@@ -427,5 +496,9 @@ public class MessageBuilder {
      */
     private String replacePlaceholders(String input) {
         return Utils.placeHolder(input, placeholders, true);
+    }
+
+    private String n(String... p) {
+        return String.join(".", p);
     }
 }

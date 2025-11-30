@@ -51,7 +51,7 @@ public class VelocityCommandIssuer implements CommandIssuer {
         if (isPlayer()) {
             return ((Player) this.source).getUniqueId();
         }
-        return Utils.generateUUID("VoidChestConsole");
+        return Utils.generateUUID("SkinOverlayConsole");
     }
 
     @Override

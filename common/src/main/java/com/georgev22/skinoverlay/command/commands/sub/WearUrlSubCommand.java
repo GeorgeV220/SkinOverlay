@@ -3,16 +3,13 @@ package com.georgev22.skinoverlay.command.commands.sub;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.CommandContext;
 import com.georgev22.skinoverlay.command.CommandIssuer;
-import com.georgev22.skinoverlay.command.annotation.CommandCompletion;
-import com.georgev22.skinoverlay.command.annotation.Description;
-import com.georgev22.skinoverlay.command.annotation.Permission;
-import com.georgev22.skinoverlay.command.annotation.Subcommand;
+import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
 import com.georgev22.skinoverlay.maps.HashObjectMap;
+import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
-import com.georgev22.skinoverlay.utilities.config.MessagesUtil;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,54 +25,37 @@ import java.util.logging.Level;
 @Subcommand("url")
 @Permission("skinoverlay.wear.url")
 @Description("Wear an overlay on a player's skin")
-@CommandCompletion("<link> false|true|@players false|true false|true false|true false|true false|true false|true @players")
+@CommandCompletion("<link> @players")
 public class WearUrlSubCommand extends SkinOverlayBaseCommand {
 
-    @Override
-    protected void handle(@NotNull CommandIssuer commandIssuer, String @NotNull [] args, @NotNull CommandContext context) {
-        if (args.length < 1) {
-            sendInsufficientArguments(commandIssuer);
-            return;
-        }
+    @Default
+    protected void handle(@NotNull CommandIssuer commandIssuer,
+                          @Argument(name = "url") String urlStr,
+                          @Argument(name = "target", completion = "@players", optional = true) SPlayer target) {
 
         try {
-            URL url = new URL(args[0]);
-            Optional<SPlayer> targetPlayer = resolveTargetPlayer(commandIssuer, args);
-            if (targetPlayer.isEmpty()) {
-                return;
-            }
+            URL url = new URL(urlStr);
 
             byte[] imageBytes = downloadImageBytes(url);
             if (imageBytes == null) {
-                MessagesUtil.INVALID_URL.msg(commandIssuer, new HashObjectMap<String, String>().append("%url%", url.toString()), true);
+                CommandMessages.COMMAND_INVALID_URL.msg(commandIssuer, new HashObjectMap<String, String>().append("%url%", url.toString()), true);
                 return;
             }
 
+            if (target == null && !commandIssuer.isPlayer()) {
+                CommandMessages.COMMAND_MISSING_ARGUMENT.msg(commandIssuer, new HashObjectMap<String, String>().append("%command%", "url <url> <player>").append("%arg%", "target"), true);
+                return;
+            }
+
+            if (target == null)
+                target = mainPlugin.getPlayerProvider().getSPlayer(commandIssuer.getUniqueId());
+
             SkinParts skinParts = createSkinPartsFromBytes(imageBytes, url);
-            applySkinToPlayer(commandIssuer, targetPlayer.get(), skinParts);
+            applySkinToPlayer(commandIssuer, target, skinParts);
 
         } catch (Exception e) {
             mainPlugin.getLogger().log(Level.SEVERE, "Error executing WearUrlSubCommand:", e);
-            MessagesUtil.ERROR.msg(commandIssuer, new HashObjectMap<String, String>().append("%error%", e.getMessage()), true);
-        }
-    }
-
-    private void sendInsufficientArguments(CommandIssuer issuer) {
-        MessagesUtil.INSUFFICIENT_ARGUMENTS.msg(
-                issuer,
-                new HashObjectMap<String, String>().append("%command%", "url <url> <player>"),
-                true
-        );
-    }
-
-    private Optional<SPlayer> resolveTargetPlayer(CommandIssuer issuer, String @NotNull [] args) {
-        if (args.length > 1) {
-            return getPlayerObject(issuer, args[1]);
-        } else if (issuer.isPlayer()) {
-            return Optional.of(mainPlugin.getPlayerProvider().getSPlayer(issuer.getUniqueId()));
-        } else {
-            sendInsufficientArguments(issuer);
-            return Optional.empty();
+            CommandMessages.COMMAND_ERROR.msg(commandIssuer, new HashObjectMap<String, String>().append("%error%", e.getMessage()), true);
         }
     }
 
@@ -101,18 +81,19 @@ public class WearUrlSubCommand extends SkinOverlayBaseCommand {
     private void applySkinToPlayer(CommandIssuer issuer, SPlayer player, SkinParts skinParts) {
         mainPlugin.getSkinProvider().retrieveOrGenerateSkin(player, skinParts).thenAcceptAsync(optionalSkin -> {
             if (optionalSkin.isEmpty()) {
-                MessagesUtil.ERROR.msg(issuer, new HashObjectMap<String, String>().append("%error%", "Failed to retrieve or generate skin."), true);
+                CommandMessages.COMMAND_ERROR.msg(issuer, new HashObjectMap<String, String>().append("%error%", "Failed to retrieve or generate skin."), true);
                 return;
             }
 
             Skin skin = optionalSkin.get();
             mainPlugin.getSkinApplier().setSkin(player, skin);
 
-            MessagesUtil.DONE.msg(
+            CommandMessages.COMMAND_OVERLAY_DONE.msg(
                     issuer,
                     new HashObjectMap<String, String>()
                             .append("%player%", player.getName())
-                            .append("%url%", skin.skinURL()),
+                            .append("%url%", skin.skinURL())
+                            .append("%overlay%", skin.getSkinParts().getSkinName()),
                     true
             );
         }, runnable -> SkinOverlay.getInstance().getScheduler().runTask(SkinOverlay.getInstance().getPlugin(), runnable));

@@ -2,14 +2,18 @@ package com.georgev22.skinoverlay;
 
 import com.georgev22.skinoverlay.appliers.SkinApplier;
 import com.georgev22.skinoverlay.command.CommandManager;
+import com.georgev22.skinoverlay.command.CompletionEngine;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayMain;
-import com.georgev22.skinoverlay.command.resolvers.PlayersResolver;
 import com.georgev22.skinoverlay.event.EventBus;
 import com.georgev22.skinoverlay.event.HandlerPriority;
 import com.georgev22.skinoverlay.event.events.player.SPlayerJoinEvent;
 import com.georgev22.skinoverlay.event.events.player.SPlayerLeaveEvent;
 import com.georgev22.skinoverlay.hooks.SkinHook;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
+import com.georgev22.skinoverlay.message.MessageEntry;
+import com.georgev22.skinoverlay.message.MessagesRegistry;
+import com.georgev22.skinoverlay.message.messages.CommandMessages;
+import com.georgev22.skinoverlay.message.messages.CoreMessages;
 import com.georgev22.skinoverlay.messaging.MessageManager;
 import com.georgev22.skinoverlay.providers.GameProfileProvider;
 import com.georgev22.skinoverlay.providers.PlayerProvider;
@@ -23,11 +27,8 @@ import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.storage.gson.*;
 import com.georgev22.skinoverlay.storage.manager.gson.PlayerFileManager;
 import com.georgev22.skinoverlay.storage.manager.gson.SkinFileManager;
-import com.georgev22.skinoverlay.utilities.Locale;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.config.FileManager;
-import com.georgev22.skinoverlay.utilities.config.MessagesUtil;
-import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.config.SkinFileCache;
 import com.georgev22.skinoverlay.utilities.skin.Part;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
@@ -99,11 +100,13 @@ public class SkinOverlay {
         this.skinFileCache.cache();
         this.skinProvider = new SkinProvider();
         try {
-            MessagesUtil.repairPaths(Locale.fromString(OptionsUtil.LOCALE.getStringValue()));
+            MessagesRegistry.registerAll(new MessageEntry[][]{
+                    CommandMessages.values(),
+                    CoreMessages.values()
+            });
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Error loading the language file: ", e);
         }
-
         PlayerFileManager playerFileManager = new PlayerFileManager(new File(getDataFolder(), "playerdata"));
         EntityManagerRegistry.registerManager(PlayerData.class, playerFileManager);
 
@@ -118,9 +121,8 @@ public class SkinOverlay {
      * Enables the plugin components. Should be called during plugin enable phase.
      */
     public void onEnable() {
-        this.commandManager.addResolver("overlays", (commandIssuer, args) ->
+        CompletionEngine.registerResolver("@overlays", (commandIssuer, args) ->
                 skinFileCache.getSkinConfigurationFiles().keySet());
-        this.commandManager.addResolver("players", new PlayersResolver());
         this.commandManager.registerCommand(new SkinOverlayMain());
         getLogger().info("Commands registered successfully!");
 

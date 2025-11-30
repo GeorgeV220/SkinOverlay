@@ -41,7 +41,7 @@ public final class CFG {
             final boolean replace,
             final Logger logger,
             final Class<?> clazz
-    ) throws Exception {
+    ) {
         this.fileName = string + ".yml";
         this.dataFolder = dataFolder;
         this.saveResource = saveResource;
@@ -61,7 +61,7 @@ public final class CFG {
      *
      * @see #reloadFile()
      */
-    public void setup() throws Exception {
+    public void setup() {
         if (!dataFolder.exists()) {
             if (dataFolder.mkdir()) {
                 logger.info("Folder " + dataFolder.getName() + " has been created!");
@@ -76,7 +76,7 @@ public final class CFG {
                     logger.info("File " + this.file.getName() + " has been created!");
                 }
             } catch (final IOException e) {
-                e.printStackTrace();
+                this.logger.log(Level.SEVERE, "Could not create file " + this.file.getName(), e);
             }
             if (saveResource) {
                 saveResource(this.fileName, this.dataFolder, this.clazz);
@@ -86,9 +86,10 @@ public final class CFG {
         this.reloadFile();
     }
 
-    private void saveResource(@NotNull String resourcePath, File dataFolder, Class<?> clazz) throws Exception {
-        if (resourcePath.equals("")) {
-            throw new Exception("ResourcePath cannot be null or empty");
+    private void saveResource(@NotNull String resourcePath, File dataFolder, Class<?> clazz) {
+        if (resourcePath.isEmpty()) {
+            this.logger.warning("ResourcePath cannot be null or empty");
+            return;
         }
 
         resourcePath = resourcePath.replace('\\', '/');

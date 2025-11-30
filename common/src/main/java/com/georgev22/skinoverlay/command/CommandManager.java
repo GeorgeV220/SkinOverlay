@@ -3,24 +3,35 @@ package com.georgev22.skinoverlay.command;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.annotation.CommandAlias;
 import com.georgev22.skinoverlay.command.annotation.Subcommand;
-import com.georgev22.skinoverlay.command.resolvers.ArgumentResolver;
+import com.georgev22.skinoverlay.command.processors.PostProcessor;
+import com.georgev22.skinoverlay.command.processors.PreProcessor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
+/**
+ * Central manager for registering and handling commands in the Core plugin.
+ * <p>
+ * Supports registration of BaseCommand instances, nested subcommands, global preprocessors
+ * and postprocessors, and argument resolvers for tab completion and value parsing.
+ */
 public abstract class CommandManager {
 
-    protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();
-    private final List<Consumer<CommandIssuer>> globalPreprocessors = new ArrayList<>();
-    private final List<BiConsumer<CommandIssuer, CommandContext>> globalPostprocessors = new ArrayList<>();
-    private final Map<String, ArgumentResolver> resolvers = new HashMap<>();
+    private final List<PreProcessor> globalPreprocessors = new ArrayList<>();
+    private final List<PostProcessor> globalPostprocessors = new ArrayList<>();
+    private final SkinOverlay plugin = SkinOverlay.getInstance();
 
+    protected CommandManager() {
+        // private constructor for singleton pattern
+    }
+
+    /**
+     * Registers a {@link BaseCommand} and all its nested subcommands.
+     *
+     * @param command the command to register
+     */
     public void registerCommand(@NotNull BaseCommand command) {
         try {
             registerCommand0(command);
@@ -35,35 +46,54 @@ public abstract class CommandManager {
                 if (innerClass.isAnnotationPresent(CommandAlias.class)) {
                     registerCommand0(subcommand);
                 }
+
+                registerCommand(subcommand);
             }
         } catch (Exception e) {
-            this.skinOverlay.getLogger().log(Level.SEVERE, "Failed to register command: " + command.getClass().getName(), e);
+            plugin.getLogger().log(Level.SEVERE, "Failed to register command: " + command.getClass().getName(), e);
         }
     }
 
-    protected abstract void registerCommand0(@NotNull BaseCommand command) throws ReflectiveOperationException;
+    /**
+     * Registers a single command.
+     *
+     * @param command the command to register
+     */
+    protected abstract void registerCommand0(@NotNull BaseCommand command);
 
-    public void addGlobalPreprocessor(Consumer<CommandIssuer> preprocessor) {
+    /**
+     * Adds a global preprocessor that runs before any command execution.
+     *
+     * @param preprocessor the preprocessor to add
+     */
+    public void addGlobalPreprocessor(PreProcessor preprocessor) {
         globalPreprocessors.add(preprocessor);
     }
 
-    public void addGlobalPostprocessor(BiConsumer<CommandIssuer, CommandContext> postprocessor) {
+    /**
+     * Adds a global postprocessor that runs after any command execution.
+     *
+     * @param postprocessor the postprocessor to add
+     */
+    public void addGlobalPostprocessor(PostProcessor postprocessor) {
         globalPostprocessors.add(postprocessor);
     }
 
-    public List<BiConsumer<CommandIssuer, CommandContext>> getGlobalPostprocessors() {
+    /**
+     * Returns a list of all global postprocessors.
+     *
+     * @return the global postprocessors
+     */
+    public List<PostProcessor> getGlobalPostprocessors() {
         return globalPostprocessors;
     }
 
-    public List<Consumer<CommandIssuer>> getGlobalPreprocessors() {
+    /**
+     * Returns a list of all global preprocessors.
+     *
+     * @return the global preprocessors
+     */
+    public List<PreProcessor> getGlobalPreprocessors() {
         return globalPreprocessors;
-    }
-
-    public ArgumentResolver getResolver(@NotNull String key) {
-        return resolvers.get(key.toLowerCase());
-    }
-
-    public void addResolver(@NotNull String key, ArgumentResolver resolver) {
-        resolvers.put(key.toLowerCase(), resolver);
     }
 }

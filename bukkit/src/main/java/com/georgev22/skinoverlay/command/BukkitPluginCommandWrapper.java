@@ -22,7 +22,8 @@ public class BukkitPluginCommandWrapper extends Command {
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String label, String @NotNull [] args) {
         CommandIssuer commandIssuer = new BukkitCommandIssuer(sender);
-        baseCommand.execute(commandIssuer, args);
+        CommandContext context = new CommandContext();
+        baseCommand.execute(commandIssuer, args, context);
         return true;
     }
 

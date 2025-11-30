@@ -7,7 +7,7 @@ import com.georgev22.skinoverlay.command.commands.sub.ClearSubCommand;
 import com.georgev22.skinoverlay.command.commands.sub.ReloadSubCommand;
 import com.georgev22.skinoverlay.command.commands.sub.WearSubCommand;
 import com.georgev22.skinoverlay.command.commands.sub.WearUrlSubCommand;
-import com.georgev22.skinoverlay.utilities.config.MessagesUtil;
+import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import org.jetbrains.annotations.NotNull;
 
 @CommandAlias({"skinoverlay", "soverlay", "skino"})
@@ -24,8 +24,8 @@ public class SkinOverlayMain extends SkinOverlayBaseCommand {
         this.addSubcommand(new ReloadSubCommand());
     }
 
-    @Override
-    protected void handle(@NotNull CommandIssuer commandIssuer, String @NotNull [] args, @NotNull CommandContext context) {
-        MessagesUtil.HELP_FORMAT.msg(commandIssuer);
+    @Default
+    protected void handle(@NotNull CommandIssuer commandIssuer) {
+        CommandMessages.COMMAND_HELP.msg(commandIssuer);
     }
 }

@@ -57,7 +57,7 @@ public class BukkitCommandIssuer implements CommandIssuer {
         if (isPlayer()) {
             return ((Player) this.sender).getUniqueId();
         }
-        return Utils.generateUUID("VoidChestConsole");
+        return Utils.generateUUID("SkinOverlayConsole");
 
     }
 

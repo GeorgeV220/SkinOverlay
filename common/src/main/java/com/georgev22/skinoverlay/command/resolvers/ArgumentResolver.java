@@ -7,5 +7,18 @@ import java.util.Collection;
 
 @FunctionalInterface
 public interface ArgumentResolver {
+
+    /**
+     * Returns a list of possible completions for tab-completion.
+     */
     Collection<String> resolve(@NotNull CommandIssuer commandIssuer, @NotNull String... args);
+
+    /**
+     * Resolves the actual argument value to pass to the method.
+     * By default, returns the raw string.
+     */
+    default Object resolveValue(@NotNull CommandIssuer commandIssuer, @NotNull String arg) {
+        return arg;
+    }
 }
+

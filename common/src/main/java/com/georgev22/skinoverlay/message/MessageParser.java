@@ -1,4 +1,4 @@
-package com.georgev22.skinoverlay.utilities;
+package com.georgev22.skinoverlay.message;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
