@@ -3,10 +3,7 @@ package com.georgev22.skinoverlay.command.commands;
 import com.georgev22.skinoverlay.command.CommandContext;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.command.annotation.*;
-import com.georgev22.skinoverlay.command.commands.sub.ClearSubCommand;
-import com.georgev22.skinoverlay.command.commands.sub.ReloadSubCommand;
-import com.georgev22.skinoverlay.command.commands.sub.WearSubCommand;
-import com.georgev22.skinoverlay.command.commands.sub.WearUrlSubCommand;
+import com.georgev22.skinoverlay.command.commands.sub.*;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +19,7 @@ public class SkinOverlayMain extends SkinOverlayBaseCommand {
         this.addSubcommand(new ClearSubCommand());
         this.addSubcommand(new WearUrlSubCommand());
         this.addSubcommand(new ReloadSubCommand());
+        this.addSubcommand(new InfoSubCommand());
     }
 
     @Default

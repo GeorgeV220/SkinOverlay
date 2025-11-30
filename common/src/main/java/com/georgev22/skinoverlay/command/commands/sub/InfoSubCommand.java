@@ -1,7 +1,6 @@
 package com.georgev22.skinoverlay.command.commands.sub;
 
 import com.georgev22.skinoverlay.BuildParameters;
-import com.georgev22.skinoverlay.command.CommandContext;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.command.annotation.CommandAlias;
 import com.georgev22.skinoverlay.command.annotation.Default;
