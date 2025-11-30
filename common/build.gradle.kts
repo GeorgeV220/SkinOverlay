@@ -51,7 +51,6 @@ dependencies {
     implementation(libs.jedis)
 
     implementation(libs.jetbrains.annotations)
-    implementation(libs.reflect)
 }
 
 configurations.configureEach {

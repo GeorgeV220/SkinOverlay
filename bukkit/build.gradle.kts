@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.adventure.platform.bukkit)
     implementation(libs.adventure.text.minimessage)
     implementation(libs.adventure.text.serializer.legacy)
+    implementation(libs.reflect)
 
     implementation(project(":common")) {
         exclude(group = "org.slf4j", module = "slf4j-api")
@@ -60,19 +61,20 @@ configurations.configureEach {
 tasks.shadowJar {
     archiveBaseName.set("skinoverlay")
     archiveClassifier.set("bukkit")
-    relocate("org.mineskin", "${project.property("packageName")}.mineskin")
-    relocate("com.google.gson", "${project.property("packageName")}.gson")
-    relocate("com.google.errorprone", "${project.property("packageName")}.gson.errorprone")
-    relocate("com.zaxxer", "${project.property("packageName")}.zaxxer")
-    relocate("org.bstats", "${project.property("packageName")}.bstats")
-    relocate("org.bspfsystems.yamlconfiguration", "${project.property("packageName")}.yaml")
-    relocate("org.yaml.snakeyaml", "${project.property("packageName")}.yaml")
-    relocate("org.intellij.lang", "${project.property("packageName")}.jetbrains")
-    relocate("org.jetbrains", "${project.property("packageName")}.jetbrains")
-    relocate("org.json", "${project.property("packageName")}.json")
-    relocate("org.apache.commons.pool2", "${project.property("packageName")}.pool2")
-    relocate("net.kyori", "${project.property("packageName")}.kyori")
-    relocate("redis.clients", "${project.property("packageName")}.jedis")
+    relocate("org.mineskin", "${project.property("packageName")}.lib.mineskin")
+    relocate("com.google.gson", "${project.property("packageName")}.lib.gson")
+    relocate("com.google.errorprone", "${project.property("packageName")}.lib.gson.errorprone")
+    relocate("com.zaxxer", "${project.property("packageName")}.lib.zaxxer")
+    relocate("org.bstats", "${project.property("packageName")}.lib.bstats")
+    relocate("org.bspfsystems.yamlconfiguration", "${project.property("packageName")}.lib.yaml")
+    relocate("org.yaml.snakeyaml", "${project.property("packageName")}.lib.yaml")
+    relocate("org.intellij.lang", "${project.property("packageName")}.lib.jetbrains")
+    relocate("org.jetbrains", "${project.property("packageName")}.lib.jetbrains")
+    relocate("org.json", "${project.property("packageName")}.lib.json")
+    relocate("org.apache.commons.pool2", "${project.property("packageName")}.lib.pool2")
+    relocate("net.kyori", "${project.property("packageName")}.lib.kyori")
+    relocate("redis.clients", "${project.property("packageName")}.lib.jedis")
+    relocate("net.lenni0451.reflect", "${project.property("packageName")}.lib.reflect")
 }
 
 tasks.named("publish") {
