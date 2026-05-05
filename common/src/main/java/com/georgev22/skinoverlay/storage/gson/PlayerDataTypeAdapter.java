@@ -29,7 +29,7 @@ public class PlayerDataTypeAdapter implements JsonSerializer<PlayerData>, JsonDe
     public JsonElement serialize(@NotNull PlayerData user, Type type, @NotNull JsonSerializationContext jsonSerializationContext) {
         JsonObject jsonObject = new JsonObject();
 
-        jsonObject.addProperty("entity_id", user.getId().toString());
+        jsonObject.addProperty("entity_id", user.getUniqueId().toString());
         jsonObject.add("defaultSkin", jsonSerializationContext.serialize(user.getDefaultSkin()));
         jsonObject.add("skin", jsonSerializationContext.serialize(user.getCurrentSkin()));
 

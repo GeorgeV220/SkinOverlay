@@ -1,9 +1,9 @@
 package com.georgev22.skinoverlay.utilities.skin;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.maps.HashObjectMap;
-import com.georgev22.skinoverlay.maps.ObjectMap;
-import com.georgev22.skinoverlay.maps.UnmodifiableObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.UnmodifiableObjectMap;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.skin.Section.SectionType;
 import org.jetbrains.annotations.NotNull;

@@ -5,8 +5,8 @@ import com.georgev22.skinoverlay.command.annotation.CommandCompletion;
 import com.georgev22.skinoverlay.command.resolvers.ArgumentResolver;
 import com.georgev22.skinoverlay.command.resolvers.PlayersResolver;
 import com.georgev22.skinoverlay.command.resolvers.RangeResolver;
-import com.georgev22.skinoverlay.maps.ConcurrentObjectMap;
-import com.georgev22.skinoverlay.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ConcurrentHashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -38,7 +38,7 @@ public class CompletionEngine {
     /**
      * Holds all registered argument resolvers, mapped by lowercase key.
      */
-    private static final ObjectMap<String, ArgumentResolver> resolvers = new ConcurrentObjectMap<>();
+    private static final ObjectMap<String, ArgumentResolver> resolvers = new ConcurrentHashObjectMap<>();
 
     static {
         registerDefaultResolvers();

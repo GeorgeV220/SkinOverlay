@@ -1,10 +1,11 @@
 package com.georgev22.skinoverlay.utilities;
 
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMaps;
+import com.georgev22.skinoverlay.datastructures.maps.TreeObjectMap;
 import com.georgev22.skinoverlay.exceptions.NotFoundException;
 import com.georgev22.skinoverlay.exceptions.ReflectionException;
-import com.georgev22.skinoverlay.maps.HashObjectMap;
-import com.georgev22.skinoverlay.maps.ObjectMap;
-import com.georgev22.skinoverlay.maps.TreeObjectMap;
 import com.google.gson.Gson;
 import org.bspfsystems.yamlconfiguration.file.FileConfiguration;
 import org.jetbrains.annotations.Contract;
@@ -12,8 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.crypto.*;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.invoke.MethodHandle;
@@ -27,12 +26,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -702,7 +697,7 @@ public final class Utils {
      * @param <T>        The class type.
      * @param <K>        Type of the key.
      * @param <V>        Type of the value.
-     * @return a {@link ObjectMap#newHashObjectMap(Map)} with the String List contents.
+     * @return a {@link HashObjectMap(Map)} with the String List contents.
      */
     public static <K, V, T> @NotNull ObjectMap<K, V> stringListToObjectMap(List<String> stringList, final Class<T> clazz) {
         return new HashObjectMap<>(stringListToHashMap(stringList, clazz));
@@ -790,7 +785,7 @@ public final class Utils {
         if (number <= 0) {
             return String.valueOf(number);
         }
-        TreeObjectMap<Integer, String> map = ObjectMap.newTreeObjectMap();
+        TreeObjectMap<Integer, String> map = ObjectMaps.newTreeObjectMap();
         map
                 .append(1000, "M")
                 .append(900, "CM")
@@ -2035,7 +2030,7 @@ public final class Utils {
     }
 
     public static class Cooldown {
-        private static final ObjectMap<String, Cooldown> cooldownManagerObjectMap = ObjectMap.newHashObjectMap();
+        private static final ObjectMap<String, Cooldown> cooldownManagerObjectMap = ObjectMaps.newHashObjectMap();
         private long start;
         private final int timeInSeconds;
         private final UUID id;

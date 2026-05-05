@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.georgev22.skinoverlay.maps.HashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
 import com.georgev22.skinoverlay.utilities.color.Color;
 import com.google.common.collect.Lists;
 import org.bukkit.*;

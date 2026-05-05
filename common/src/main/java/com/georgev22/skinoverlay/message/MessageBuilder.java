@@ -1,8 +1,8 @@
 package com.georgev22.skinoverlay.message;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.maps.HashObjectMap;
-import com.georgev22.skinoverlay.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
 import com.georgev22.skinoverlay.utilities.Utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;

@@ -62,7 +62,7 @@ public class SkinProvider {
 
     public CompletableFuture<Optional<Skin>> retrieveOrGenerateSkin(@NotNull SPlayer player, @NotNull SkinParts skinParts) {
         UUID skinUUID = Utils.generateUUID(skinParts.getSkinName() + player.getUniqueId().toString());
-        @NotNull Optional<EntityManager<Skin>> skinEntityManager = EntityManagerRegistry.getManager(Skin.class);
+        @NotNull Optional<EntityManager<Skin>> skinEntityManager = EntityManagerRegistry.getInstance().getTyped(Skin.class);
         if (skinEntityManager.isEmpty()) {
             skinOverlay.getLogger().log(Level.SEVERE, "SkinEntityManager cannot be null", new SkinException("SkinEntityManager cannot be null"));
             return CompletableFuture.completedFuture(Optional.empty());

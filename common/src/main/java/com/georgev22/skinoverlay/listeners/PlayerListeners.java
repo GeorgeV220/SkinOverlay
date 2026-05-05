@@ -39,8 +39,8 @@ public class PlayerListeners {
             return;
         }
 
-        Optional<EntityManager<PlayerData>> playerDataManagerOpt = EntityManagerRegistry.getManager(PlayerData.class);
-        Optional<EntityManager<Skin>> skinManagerOpt = EntityManagerRegistry.getManager(Skin.class);
+        Optional<EntityManager<PlayerData>> playerDataManagerOpt = EntityManagerRegistry.getInstance().getTyped(PlayerData.class);
+        Optional<EntityManager<Skin>> skinManagerOpt = EntityManagerRegistry.getInstance().getTyped(Skin.class);
 
         if (playerDataManagerOpt.isEmpty() || skinManagerOpt.isEmpty()) {
             return;
@@ -83,7 +83,7 @@ public class PlayerListeners {
 
     public void onPlayerLeave(@NotNull SPlayerLeaveEvent event) {
         SPlayer player = event.getPlayer();
-        EntityManagerRegistry.getManager(PlayerData.class)
+        EntityManagerRegistry.getInstance().getTyped(PlayerData.class)
                 .ifPresent(entityManager -> entityManager.findById(player.getUniqueId())
                         .ifPresent(entityManager::save));
     }

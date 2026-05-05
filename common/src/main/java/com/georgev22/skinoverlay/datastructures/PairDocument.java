@@ -1,9 +1,9 @@
-package com.georgev22.skinoverlay.maps;
+package com.georgev22.skinoverlay.datastructures;
 
 import com.georgev22.skinoverlay.exceptions.PairDocumentException;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -251,8 +251,8 @@ public final class PairDocument<K, V> implements Serializable {
      */
     public <T> @Nullable T get(final Object key) {
         for (Pair<K, V> pair : objectPairs) {
-            if (pair.key().equals(key)) {
-                return (T) pair.value();
+            if (pair.first().equals(key)) {
+                return (T) pair.second();
             }
         }
         return null;
@@ -265,7 +265,7 @@ public final class PairDocument<K, V> implements Serializable {
      */
     @Contract(pure = true)
     @Override
-    public @NotNull String toString() {
+    public @NonNull String toString() {
         return "PairDocument{"
                 + "pairs=" + objectPairs
                 + "}";

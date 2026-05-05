@@ -1,6 +1,7 @@
 package com.georgev22.skinoverlay.storage.data;
 
 import com.georgev22.skinoverlay.utilities.CustomData;
+import com.google.gson.JsonObject;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -16,7 +17,7 @@ import java.util.UUID;
  *
  * @author George
  */
-public class PlayerData implements Entity {
+public class PlayerData extends Entity {
 
     /**
      * The UUID of the player.
@@ -44,6 +45,7 @@ public class PlayerData implements Entity {
      * @param uuid the UUID of the player
      */
     public PlayerData(UUID uuid) {
+        super(uuid);
         this.uuid = uuid;
     }
 
@@ -53,7 +55,7 @@ public class PlayerData implements Entity {
      * @return the player's UUID
      */
     @Override
-    public UUID getId() {
+    public UUID getUniqueId() {
         return this.uuid;
     }
 
@@ -104,22 +106,6 @@ public class PlayerData implements Entity {
     }
 
     /**
-     * Checks whether this {@code PlayerData} is exactly equal to another object.
-     * This strict comparison checks UUID, default skin, current skin, and custom data.
-     *
-     * @param o the object to compare with
-     * @return {@code true} if all fields are exactly equal, otherwise {@code false}
-     */
-    @Override
-    public boolean equalsExact(Object o) {
-        if (!(o instanceof PlayerData other)) return false;
-        return Objects.equals(this.uuid, other.uuid) &&
-                Objects.equals(this.defaultSkin, other.defaultSkin) &&
-                Objects.equals(this.currentSkin, other.currentSkin) &&
-                Objects.equals(this.customData, other.customData);
-    }
-
-    /**
      * Checks whether this {@code PlayerData} is equal to another object.
      * Two {@code PlayerData} instances are considered equal if their UUIDs are equal.
      *
@@ -130,6 +116,22 @@ public class PlayerData implements Entity {
     public boolean equals(Object obj) {
         if (!(obj instanceof PlayerData other)) return false;
         return Objects.equals(this.uuid, other.uuid);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toJsonString(boolean pretty) {
+        return "";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        return null;
     }
 
     /**

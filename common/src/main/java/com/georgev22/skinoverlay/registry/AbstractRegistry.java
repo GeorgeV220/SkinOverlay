@@ -1,15 +1,15 @@
 package com.georgev22.skinoverlay.registry;
 
-import com.georgev22.skinoverlay.maps.ConcurrentObjectMap;
-import com.georgev22.skinoverlay.maps.ObjectMap;
-import com.georgev22.skinoverlay.maps.UnmodifiableObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ConcurrentHashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.UnmodifiableObjectMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
 public abstract class AbstractRegistry<K, V> implements Registry<K, V> {
 
-    protected final ObjectMap<K, V> registry = new ConcurrentObjectMap<>();
+    protected final ObjectMap<K, V> registry = new ConcurrentHashObjectMap<>();
 
     /**
      * {@inheritDoc}

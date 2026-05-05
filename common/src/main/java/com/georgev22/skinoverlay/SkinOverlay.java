@@ -20,20 +20,16 @@ import com.georgev22.skinoverlay.providers.PlayerProvider;
 import com.georgev22.skinoverlay.providers.SkinProvider;
 import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.scheduler.MinecraftScheduler;
-import com.georgev22.skinoverlay.skin.SProperty;
 import com.georgev22.skinoverlay.storage.EntityManager;
-import com.georgev22.skinoverlay.storage.data.PlayerData;
-import com.georgev22.skinoverlay.storage.data.Skin;
+import com.georgev22.skinoverlay.storage.ManagedEntity;
+import com.georgev22.skinoverlay.storage.data.Entity;
 import com.georgev22.skinoverlay.storage.gson.*;
-import com.georgev22.skinoverlay.storage.manager.gson.PlayerFileManager;
-import com.georgev22.skinoverlay.storage.manager.gson.SkinFileManager;
-import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
+import com.georgev22.skinoverlay.storage.manager.AbstractEntityManager;
+import com.georgev22.skinoverlay.storage.manager.gson.FileEntityManager;
+import com.georgev22.skinoverlay.utilities.GsonUtils;
 import com.georgev22.skinoverlay.utilities.config.FileManager;
 import com.georgev22.skinoverlay.utilities.config.SkinFileCache;
-import com.georgev22.skinoverlay.utilities.skin.Part;
-import com.georgev22.skinoverlay.utilities.skin.SkinParts;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import net.kyori.adventure.platform.AudienceProvider;
 import org.bspfsystems.yamlconfiguration.file.FileConfiguration;
 
@@ -81,15 +77,7 @@ public class SkinOverlay {
      */
     public void onLoad() {
         this.eventBus = new EventBus();
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(SerializableBufferedImage.class, new SerializableBufferedImageTypeAdapter())
-                .registerTypeAdapter(Part.class, new PartTypeAdapter())
-                .registerTypeAdapter(SkinParts.class, new SkinPartsTypeAdapter())
-                .registerTypeAdapter(SProperty.class, new SPropertyTypeAdapter())
-                .registerTypeAdapter(Skin.class, new SkinTypeAdapter())
-                .registerTypeAdapter(PlayerData.class, new PlayerDataTypeAdapter())
-                .setPrettyPrinting()
-                .create();
+        this.gson = GsonUtils.getGson(true);
         this.fileManager = FileManager.getInstance();
         try {
             this.fileManager.loadFiles();
@@ -107,14 +95,21 @@ public class SkinOverlay {
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Error loading the language file: ", e);
         }
-        PlayerFileManager playerFileManager = new PlayerFileManager(new File(getDataFolder(), "playerdata"));
-        EntityManagerRegistry.registerManager(PlayerData.class, playerFileManager);
+        EntityManagerRegistry entityManagerRegistry = EntityManagerRegistry.getInstance();
+        File folder = new File(this.dataFolder, "save-data");
 
-        SkinFileManager skinFileManager = new SkinFileManager(new File(getDataFolder(), "skindata"));
-        EntityManagerRegistry.registerManager(Skin.class, skinFileManager);
+        if (!folder.exists() && folder.mkdirs()) {
+            this.getLogger().info(
+                    "Created " + folder.getPath() + " folder"
+            );
+        }
 
-        playerFileManager.loadAll();
-        skinFileManager.loadAll();
+        for (ManagedEntity<? extends Entity> managedEntity : AbstractEntityManager.getManagedEntities()) {
+            if (entityManagerRegistry.get(managedEntity.type()).isEmpty()) {
+                registerEntityManager(entityManagerRegistry, managedEntity,
+                        new FileEntityManager<>(managedEntity, new File(folder, managedEntity.key())));
+            }
+        }
     }
 
     /**
@@ -144,8 +139,7 @@ public class SkinOverlay {
             audienceProvider = null;
         }
 
-        EntityManagerRegistry.getManager(PlayerData.class).ifPresent(EntityManager::saveAll);
-        EntityManagerRegistry.getManager(Skin.class).ifPresent(EntityManager::saveAll);
+        EntityManagerRegistry.getInstance().entries().forEach((key, value) -> value.shutdown());
     }
 
     /**
@@ -246,9 +240,9 @@ public class SkinOverlay {
      *
      * @return the MinecraftScheduler
      */
-    public <Plugin, Location, World, Chunk, Entity> MinecraftScheduler<Plugin, Location, World, Chunk, Entity> getScheduler() {
+    public <Plugin, Location, World, Chunk, E> MinecraftScheduler<Plugin, Location, World, Chunk, E> getScheduler() {
         //noinspection unchecked
-        return (MinecraftScheduler<Plugin, Location, World, Chunk, Entity>) scheduler;
+        return (MinecraftScheduler<Plugin, Location, World, Chunk, E>) scheduler;
     }
 
     /**
@@ -447,5 +441,18 @@ public class SkinOverlay {
      */
     public MessageManager getMessageManager() {
         return messageManager;
+    }
+
+    private void registerEntityManager(EntityManagerRegistry entityManagerRegistry,
+                                       ManagedEntity<? extends Entity> managedEntity,
+                                       EntityManager<?> entityManager) {
+        try {
+            entityManagerRegistry.register(managedEntity.type(), entityManager);
+            this.getLogger().info(
+                    "Registered " + managedEntity.type().getSimpleName() + " entity manager");
+        } catch (Exception e) {
+            this.getLogger().log(Level.SEVERE,
+                    "Failed to register " + managedEntity.type().getSimpleName() + " entity manager", e);
+        }
     }
 }

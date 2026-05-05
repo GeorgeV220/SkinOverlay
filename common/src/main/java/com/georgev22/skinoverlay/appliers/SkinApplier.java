@@ -20,7 +20,7 @@ public abstract class SkinApplier {
      * Apply the skin for the specified {@link SPlayer}
      *
      * @param player Player's {@link SPlayer} object.
-     * @param skin         Skin
+     * @param skin   Skin
      */
     public void setSkin(@NotNull SPlayer player, @NotNull Skin skin) {
         SGameProfile gameProfile = skinOverlay.getGameProfileProvider().getGameProfile(player);
@@ -28,7 +28,7 @@ public abstract class SkinApplier {
         skinOverlay.getGameProfileProvider().applyUpdatedGameProfile(player);
         applySkin(player, skin);
 
-        Optional<EntityManager<PlayerData>> optionalPlayerDataEntityManager = EntityManagerRegistry.getManager(PlayerData.class);
+        Optional<EntityManager<PlayerData>> optionalPlayerDataEntityManager = EntityManagerRegistry.getInstance().getTyped(PlayerData.class);
         if (optionalPlayerDataEntityManager.isEmpty()) {
             return;
         }
@@ -55,7 +55,7 @@ public abstract class SkinApplier {
      * Apply the skin for the specified {@link SPlayer}
      *
      * @param player Player's {@link SPlayer} object.
-     * @param skin         Skin
+     * @param skin   Skin
      */
     protected void applySkin(@NotNull final SPlayer player, @NotNull final Skin skin) {
         applySkin(player);

@@ -100,7 +100,7 @@ public class SkinOverlayVelocity {
                 this.skinOverlay.getLogger().info("Player " + uuid + " has joined the server.");
             }
             this.skinOverlay.getScheduler().runAsyncTask(this.skinOverlay.getPlugin(), () -> {
-                EntityManagerRegistry.getManager(PlayerData.class)
+                EntityManagerRegistry.getInstance().getTyped(PlayerData.class)
                         .flatMap(entityManager -> entityManager.findById(uuid))
                         .ifPresent(playerData -> {
                             Skin skin = playerData.getCurrentSkin();

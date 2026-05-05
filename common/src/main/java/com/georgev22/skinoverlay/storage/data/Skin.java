@@ -4,6 +4,7 @@ import com.georgev22.skinoverlay.skin.SProperty;
 import com.georgev22.skinoverlay.storage.gson.SkinTypeAdapter;
 import com.georgev22.skinoverlay.utilities.CustomData;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +23,7 @@ import java.util.UUID;
  * while {@code equalsExact} compares all fields for strict equality.
  * </p>
  */
-public class Skin implements Entity {
+public class Skin extends Entity {
 
     /**
      * The custom data associated with this skin.
@@ -50,6 +51,7 @@ public class Skin implements Entity {
      * @param id the unique identifier for the skin
      */
     public Skin(UUID id) {
+        super(id);
         this.skinUniqueId = id;
     }
 
@@ -59,7 +61,7 @@ public class Skin implements Entity {
      * @return the skin's UUID
      */
     @Override
-    public UUID getId() {
+    public UUID getUniqueId() {
         return this.skinUniqueId;
     }
 
@@ -124,21 +126,6 @@ public class Skin implements Entity {
     }
 
     /**
-     * Checks whether this {@code Skin} is exactly equal to another object.
-     * This strict comparison checks UUID, property, and custom data.
-     *
-     * @param o the object to compare with
-     * @return {@code true} if all fields are exactly equal, otherwise {@code false}
-     */
-    @Override
-    public boolean equalsExact(Object o) {
-        if (!(o instanceof Skin other)) return false;
-        return Objects.equals(this.skinUniqueId, other.skinUniqueId) &&
-                Objects.equals(this.property, other.property) &&
-                Objects.equals(this.customData, other.customData);
-    }
-
-    /**
      * Checks whether this {@code Skin} is equal to another object.
      * Two {@code Skin} instances are considered equal if their UUIDs are equal.
      *
@@ -149,6 +136,22 @@ public class Skin implements Entity {
     public boolean equals(Object obj) {
         if (!(obj instanceof Skin other)) return false;
         return Objects.equals(this.skinUniqueId, other.skinUniqueId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toJsonString(boolean pretty) {
+        return "";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        return null;
     }
 
     /**

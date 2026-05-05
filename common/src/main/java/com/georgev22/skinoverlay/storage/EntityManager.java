@@ -1,12 +1,14 @@
 package com.georgev22.skinoverlay.storage;
 
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.UnmodifiableObjectMap;
 import com.georgev22.skinoverlay.storage.data.Entity;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -17,11 +19,22 @@ import java.util.function.Consumer;
 public interface EntityManager<E extends Entity> {
 
     /**
+     * Returns the class of the entity managed by this manager.
+     *
+     * @return the entity class
+     */
+    default Class<E> getEntityClass() {
+        return getManagedEntity().type();
+    }
+
+    ManagedEntity<E> getManagedEntity();
+
+    /**
      * Saves the specified entity.
      *
      * @param entity the entity to save
      */
-    void save(@NotNull E entity);
+    void save(@NonNull E entity);
 
     /**
      * Finds an entity by its unique identifier.
@@ -29,7 +42,7 @@ public interface EntityManager<E extends Entity> {
      * @param id the unique identifier
      * @return an {@link Optional} containing the entity if found, or an empty Optional if not found
      */
-    Optional<E> findById(@NotNull String id);
+    Optional<E> findById(@NonNull String id);
 
     /**
      * Finds an entity by its unique identifier.
@@ -37,7 +50,7 @@ public interface EntityManager<E extends Entity> {
      * @param uuid the unique identifier
      * @return an {@link Optional} containing the entity if found, or an empty Optional if not found
      */
-    default Optional<E> findById(@NotNull UUID uuid) {
+    default Optional<E> findById(@NonNull UUID uuid) {
         return findById(uuid.toString());
     }
 
@@ -46,7 +59,7 @@ public interface EntityManager<E extends Entity> {
      *
      * @param entity the entity to delete
      */
-    void delete(@NotNull E entity);
+    void delete(@NonNull E entity);
 
     /**
      * Loads an entity by its unique identifier.
@@ -54,7 +67,7 @@ public interface EntityManager<E extends Entity> {
      * @param id the unique identifier
      * @return an {@link Optional} containing the entity if found, or an empty Optional if not found
      */
-    Optional<E> load(@NotNull String id);
+    CompletableFuture<Optional<E>> load(@NonNull String id);
 
     /**
      * Loads an entity by its unique identifier.
@@ -62,7 +75,7 @@ public interface EntityManager<E extends Entity> {
      * @param uuid the unique identifier
      * @return an {@link Optional} containing the entity if found, or an empty Optional if not found
      */
-    default Optional<E> load(@NotNull UUID uuid) {
+    default CompletableFuture<Optional<E>> load(@NonNull UUID uuid) {
         return load(uuid.toString());
     }
 
@@ -94,12 +107,19 @@ public interface EntityManager<E extends Entity> {
     List<E> getAll();
 
     /**
+     * Returns a view of the entities currently loaded in memory.
+     *
+     * @return an unmodifiable view of the loaded entities
+     */
+    UnmodifiableObjectMap<String, E> getLoadedEntities();
+
+    /**
      * Checks if an entity with the specified identifier exists.
      *
      * @param id the unique identifier
      * @return {@code true} if the entity exists, {@code false} otherwise
      */
-    boolean exists(@NotNull String id);
+    boolean exists(@NonNull String id);
 
     /**
      * Checks if an entity with the specified identifier exists.
@@ -107,51 +127,40 @@ public interface EntityManager<E extends Entity> {
      * @param uuid the unique identifier
      * @return {@code true} if the entity exists, {@code false} otherwise
      */
-    default boolean exists(@NotNull UUID uuid) {
+    default boolean exists(@NonNull UUID uuid) {
         return exists(uuid.toString());
     }
 
     /**
-     * Retrieves an entity by its unique identifier. Optionally, loads the entity
-     * if it exists.
+     * Creates a new entity with the specified identifier and executes the provided consumer.
      *
-     * @param id           the unique identifier
-     * @param loadIfExists whether to load the entity if it exists
-     * @return an {@link Optional} containing the entity if found, or empty if not found
+     * @param id       the unique identifier
+     * @param consumer the consumer to apply to the new entity
+     * @return an {@link Optional} containing the new entity if created, or empty if not created
      */
-    Optional<E> getEntity(@NotNull String id, boolean loadIfExists);
-
-    /**
-     * Retrieves an entity by its unique identifier. Optionally, loads the entity
-     * if it exists.
-     *
-     * @param uuid         the unique identifier
-     * @param loadIfExists whether to load the entity if it exists
-     * @return an {@link Optional} containing the entity if found, or empty if not found
-     */
-    default Optional<E> getEntity(@NotNull UUID uuid, boolean loadIfExists) {
-        return getEntity(uuid.toString(), loadIfExists);
+    default Optional<E> create(@NonNull String id, @NonNull Consumer<E> consumer) {
+        return create(UUID.fromString(id), consumer);
     }
 
     /**
      * Creates a new entity with the specified identifier and executes the provided consumer.
      *
-     * @param id           the unique identifier
-     * @param consumer     the consumer to apply to the new entity
+     * @param uuid     the unique identifier
+     * @param consumer the consumer to apply to the new entity
      * @return an {@link Optional} containing the new entity if created, or empty if not created
      */
-    Optional<E> create(@NotNull String id, @NotNull Consumer<E> consumer);
+    default Optional<E> create(@NonNull UUID uuid, @NonNull Consumer<E> consumer) {
+        return create(ObjectMap.ofEntries(ObjectMap.entry("id", uuid)), consumer);
+    }
 
     /**
      * Creates a new entity with the specified identifier and executes the provided consumer.
      *
-     * @param uuid         the unique identifier
-     * @param consumer     the consumer to apply to the new entity
+     * @param data     the data to create the entity with
+     * @param consumer the consumer to apply to the new entity
      * @return an {@link Optional} containing the new entity if created, or empty if not created
      */
-    default Optional<E> create(@NotNull UUID uuid, @NotNull Consumer<E> consumer) {
-        return create(uuid.toString(), consumer);
-    }
+    Optional<E> create(@NonNull ObjectMap<String, Object> data, @NonNull Consumer<E> consumer);
 
     /**
      * Gets the name of this entity manager.
@@ -161,16 +170,8 @@ public interface EntityManager<E extends Entity> {
     String getName();
 
     /**
-     * Gets the simple name of this entity manager.
-     *
-     * @return the simple name
-     */
-    String getSimpleName();
-
-    /**
      * Shuts down this manager.
      */
-    @ApiStatus.Internal
     default void shutdown() {
         shutdown(entity -> {
         });
@@ -181,7 +182,6 @@ public interface EntityManager<E extends Entity> {
      *
      * @param consumer the consumer to apply
      */
-    @ApiStatus.Internal
     void shutdown(Consumer<E> consumer);
 
 }

@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay.utilities;
 
-import com.georgev22.skinoverlay.maps.*;
+import com.georgev22.skinoverlay.datastructures.maps.*;
 
 import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
@@ -62,9 +62,9 @@ public final class DeepCloner {
         // === MAPS ===
         register(ObjectMap.class, o -> switch (o) {
             case ObservableObjectMap<?, ?> ignored -> new ObservableObjectMap<>();
-            case ConcurrentObjectMap<?, ?> ignored -> new ConcurrentObjectMap<>();
+            case ConcurrentHashObjectMap<?, ?> ignored -> new ConcurrentHashObjectMap<>();
             case HashObjectMap<?, ?> ignored -> new HashObjectMap<>();
-            case LinkedObjectMap<?, ?> ignored -> new LinkedObjectMap<>();
+            case LinkedHashObjectMap<?, ?> ignored -> new LinkedHashObjectMap<>();
             case TreeObjectMap<?, ?> treeObjectMap -> new TreeObjectMap<>(treeObjectMap.comparator());
             case UnmodifiableObjectMap<?, ?> ignored ->
                     throw new UnsupportedOperationException("Cannot clone unmodifiable map");

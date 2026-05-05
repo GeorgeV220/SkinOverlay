@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.registry;
 
 import com.georgev22.skinoverlay.command.CommandIssuer;
-import com.georgev22.skinoverlay.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;

@@ -4,7 +4,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.processors.PostProcessor;
 import com.georgev22.skinoverlay.command.processors.PreProcessor;
-import com.georgev22.skinoverlay.maps.HashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.registry.CommandTargetRegistry;
 import org.jetbrains.annotations.NotNull;

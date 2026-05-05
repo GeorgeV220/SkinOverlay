@@ -1,8 +1,8 @@
 package com.georgev22.skinoverlay.utilities.config;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.maps.HashObjectMap;
-import com.georgev22.skinoverlay.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ConcurrentHashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Utils;
@@ -17,9 +17,9 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 public class SkinFileCache {
-    private final ObjectMap<String, SkinConfigurationFile> skinConfigurationFiles = new HashObjectMap<>();
+    private final ObjectMap<String, SkinConfigurationFile> skinConfigurationFiles = new ConcurrentHashObjectMap<>();
 
-    private final ObjectMap<String, SerializableBufferedImage> skinImages = new HashObjectMap<>();
+    private final ObjectMap<String, SerializableBufferedImage> skinImages = new ConcurrentHashObjectMap<>();
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 

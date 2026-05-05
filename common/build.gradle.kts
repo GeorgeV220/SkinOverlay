@@ -50,7 +50,7 @@ dependencies {
 
     implementation(libs.jedis)
 
-    implementation(libs.jetbrains.annotations)
+    implementation(libs.jspecify)
 }
 
 configurations.configureEach {

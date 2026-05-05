@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.providers;
 
-import com.georgev22.skinoverlay.maps.HashObjectMap;
-import com.georgev22.skinoverlay.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
 import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.skin.SProperty;

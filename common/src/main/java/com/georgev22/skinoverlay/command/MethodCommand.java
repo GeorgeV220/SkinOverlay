@@ -2,7 +2,7 @@ package com.georgev22.skinoverlay.command;
 
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.annotation.*;
-import com.georgev22.skinoverlay.maps.HashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.player.SPlayer;
 import org.jetbrains.annotations.NotNull;

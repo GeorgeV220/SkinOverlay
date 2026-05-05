@@ -4,7 +4,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
-import com.georgev22.skinoverlay.maps.HashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.storage.data.Skin;

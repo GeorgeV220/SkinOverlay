@@ -1,81 +1,124 @@
 package com.georgev22.skinoverlay.registry;
 
-import com.georgev22.skinoverlay.maps.HashObjectMap;
-import com.georgev22.skinoverlay.maps.ObjectMap;
+import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.storage.EntityManager;
 import com.georgev22.skinoverlay.storage.data.Entity;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnmodifiableView;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 
 /**
- * Singleton registry for managing EntityManager instances by entity class.
+ * A centralized global registry for {@link EntityManager} instances.
+ * <p>
+ * Each registered manager is indexed by the {@link Class} of the entity type it manages.
+ * This enables fast and type-safe lookup of storage handlers used throughout the API.
+ * </p>
+ *
+ * <h2>Key Characteristics</h2>
+ * <ul>
+ *     <li>Singleton access via {@link #getInstance()}</li>
+ *     <li>Automatically extracts keys from registered values using {@link EntityManager#getEntityClass()}</li>
+ *     <li>Provides type-safe lookups with {@link #getTyped(Class)}</li>
+ * </ul>
+ *
+ * <p>This registry is primarily intended for internal use but remains public API for plugin extension.</p>
+ *
+ * @see EntityManager
+ * @see Entity
+ * @see AbstractRegistry
+ * @see Registry
  */
-public class EntityManagerRegistry {
-    private static final ObjectMap<Class<? extends Entity>, EntityManager<? extends Entity>> managers = new HashObjectMap<>();
+@ApiStatus.Internal
+public final class EntityManagerRegistry
+        extends AbstractRegistry<Class<? extends Entity>, EntityManager<? extends Entity>> {
 
     /**
-     * Registers an EntityManager for a specific entity class.
-     *
-     * @param entityClass the class of the entity
-     * @param manager     the manager to register
-     * @param <E>         the type of entity
-     * @throws IllegalArgumentException if a manager is already registered for the given entity class
+     * Singleton instance of this registry.
      */
-    public static <E extends Entity> void registerManager(Class<E> entityClass, EntityManager<E> manager) throws IllegalArgumentException {
-        if (managers.containsKey(entityClass)) {
-            throw new IllegalArgumentException("An EntityManager is already registered for class " + entityClass.getName());
-        }
-        managers.put(entityClass, manager);
-    }
+    private static final EntityManagerRegistry INSTANCE = new EntityManagerRegistry();
 
     /**
-     * Registers a new EntityManager for a specific entity class, replacing any existing manager.
+     * Constructs the registry.
      * <p>
-     * **Warning**: Replacing an existing manager may lead to data loss or inconsistencies if
-     * the new manager does not properly handle existing entities. Use this method with caution.
+     * Restricted as private to enforce the singleton pattern.
      * </p>
-     *
-     * @param entityClass the class of the entity
-     * @param manager     the manager to register or replace
-     * @param <E>         the type of entity
-     * @return {@code true} if an existing manager was replaced, {@code false} if this is a new registration
      */
-    public static <E extends Entity> boolean replaceOrRegisterManager(Class<E> entityClass, EntityManager<E> manager) {
-        boolean isReplacing = managers.containsKey(entityClass);
-        managers.put(entityClass, manager);
-        return isReplacing;
+    private EntityManagerRegistry() {
     }
 
     /**
-     * Retrieves the EntityManager for a specific entity class.
+     * Returns the global singleton instance of this registry.
      *
-     * @param entityClass the class of the entity
-     * @param <E>         the type of entity
-     * @return the EntityManager instance, or {@code Optional.empty()} if not registered
+     * @return the shared {@link EntityManagerRegistry} instance
+     */
+    public static EntityManagerRegistry getInstance() {
+        return INSTANCE;
+    }
+
+    /**
+     * Registers the given manager using the entity class returned by
+     * {@link EntityManager#getEntityClass()} as its key.
+     *
+     * @param value the manager to register
+     * @throws IllegalArgumentException if a manager for the same entity class is already registered
+     * @see Registry#register(Object, Object)
+     */
+    @Override
+    public void register(@NonNull EntityManager<? extends Entity> value) throws IllegalArgumentException {
+        super.register(value.getEntityClass(), value);
+    }
+
+    /**
+     * Registers or replaces a manager based on {@link EntityManager#getEntityClass()}.
+     *
+     * @param value the manager to register or replace
+     * @return {@code true} if a previous manager was replaced, {@code false} if newly registered
+     * @see Registry#replaceOrRegister(Object, Object)
+     */
+    @Override
+    public boolean replaceOrRegister(@NonNull EntityManager<? extends Entity> value) {
+        return super.replaceOrRegister(value.getEntityClass(), value);
+    }
+
+    /**
+     * Retrieves a typed {@link EntityManager} for the specified entity type.
+     *
+     * <p>This performs both lookup and runtime validation to ensure safe casting.</p>
+     * <p>If type mismatch is detected, the result is empty and—when debug mode is enabled—
+     * a detailed {@link ClassCastException} is logged.</p>
+     *
+     * @param <T>   the entity type handled by the requested manager
+     * @param clazz the entity class key
+     * @return an {@link Optional} containing the validated, typed manager if present
      */
     @SuppressWarnings("unchecked")
-    public static <E extends Entity> @NotNull Optional<EntityManager<E>> getManager(Class<E> entityClass) {
-        return Optional.ofNullable((EntityManager<E>) managers.get(entityClass));
-    }
+    public <T extends Entity> @NonNull Optional<EntityManager<T>> getTyped(Class<T> clazz) {
+        Optional<? extends EntityManager<? extends Entity>> optionalRaw = super.get(clazz);
 
-    /**
-     * Checks if an EntityManager is registered for a specific entity class.
-     *
-     * @param entityClass the class of the entity
-     * @param <E>         the type of entity
-     * @return {@code true} if an EntityManager is registered, {@code false} otherwise
-     */
-    public static <E extends Entity> boolean containsManager(Class<E> entityClass) {
-        return managers.containsKey(entityClass);
-    }
+        if (optionalRaw.isEmpty()) {
+            return Optional.empty();
+        }
 
-    @Contract(pure = true)
-    public static @NotNull @UnmodifiableView Map<Class<? extends Entity>, EntityManager<? extends Entity>> getManagers() {
-        return Collections.unmodifiableMap(managers);
+        EntityManager<? extends Entity> rawManager = optionalRaw.get();
+
+        if (!clazz.isAssignableFrom(rawManager.getEntityClass())) {
+            if (OptionsUtil.DEBUG.getBooleanValue()) {
+                SkinOverlay.getInstance().getLogger().log(
+                        Level.SEVERE,
+                        "Failed to get typed manager",
+                        new ClassCastException(
+                                "EntityManager registered for "
+                                        + rawManager.getEntityClass().getName()
+                                        + " cannot be cast to EntityManager<" + clazz.getName() + ">"
+                        )
+                );
+            }
+            return Optional.empty();
+        }
+
+        return Optional.of((EntityManager<T>) rawManager);
     }
 }

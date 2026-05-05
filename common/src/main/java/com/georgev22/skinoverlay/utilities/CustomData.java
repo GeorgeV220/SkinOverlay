@@ -1,7 +1,8 @@
 package com.georgev22.skinoverlay.utilities;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMaps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +25,7 @@ public final class CustomData implements Cloneable, Copyable<CustomData> {
     private ObjectMap<String, Object> customData;
 
     public CustomData() {
-        this.customData = ObjectMap.newConcurrentObjectMap();
+        this.customData = ObjectMaps.newConcurrentHashObjectMap();
     }
 
     /**
@@ -195,7 +196,7 @@ public final class CustomData implements Cloneable, Copyable<CustomData> {
     public @NotNull CustomData clone() {
         try {
             CustomData clone = (CustomData) super.clone();
-            clone.customData = ObjectMap.newConcurrentObjectMap();
+            clone.customData = ObjectMaps.newConcurrentHashObjectMap();
             for (Map.Entry<String, Object> entry : customData.entrySet()) {
                 clone.customData.put(entry.getKey(), DeepCloner.cloneValue(entry.getValue()));
             }
@@ -218,7 +219,7 @@ public final class CustomData implements Cloneable, Copyable<CustomData> {
     @Override
     public @NotNull CustomData deepCopy() {
         CustomData copy = new CustomData();
-        copy.customData = ObjectMap.newConcurrentObjectMap();
+        copy.customData = ObjectMaps.newConcurrentHashObjectMap();
         for (Map.Entry<String, Object> entry : customData.entrySet()) {
             copy.customData.put(entry.getKey(), DeepCloner.cloneValue(entry.getValue()));
         }
