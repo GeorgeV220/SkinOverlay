@@ -74,7 +74,7 @@ public class PlayerListeners {
         playerData.setDefaultSkin(defaultSkin);
 
         if (playerData.getCurrentSkin() != null && !playerData.getCurrentSkin().equals(defaultSkin)) {
-            mainPlugin.getSkinApplier().setSkin(player, playerData.getCurrentSkin());
+            mainPlugin.getSkinProvider().setSkin(player, playerData.getCurrentSkin());
         }
 
         skinManager.save(defaultSkin);

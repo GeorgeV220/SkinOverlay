@@ -65,7 +65,7 @@ public class WearSubCommand extends SkinOverlayBaseCommand {
                         return;
                     }
                     Skin skin = optionalSkin.get();
-                    mainPlugin.getSkinApplier()
+                    mainPlugin.getSkinProvider()
                             .setSkin(finalTarget, skin);
                     CommandMessages.COMMAND_OVERLAY_DONE.msg(
                             commandIssuer,

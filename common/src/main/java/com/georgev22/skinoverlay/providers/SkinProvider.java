@@ -7,6 +7,7 @@ import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.skin.SProperty;
 import com.georgev22.skinoverlay.storage.EntityManager;
+import com.georgev22.skinoverlay.storage.data.PlayerData;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Utils;
@@ -219,6 +220,34 @@ public class SkinProvider {
                 }
             }
         });
+    }
+
+
+    /**
+     * Apply the skin for the specified {@link SPlayer}
+     *
+     * @param player Player's {@link SPlayer} object.
+     * @param skin   Skin
+     */
+    public void setSkin(@NotNull SPlayer player, @NotNull Skin skin) {
+        SGameProfile gameProfile = skinOverlay.getGameProfileProvider().getGameProfile(player);
+        gameProfile.setProperty("textures", skin.getProperty());
+        skinOverlay.getGameProfileProvider().applyUpdatedGameProfile(player);
+        this.skinOverlay.getSkinRefresher().refresh(player, skin);
+
+        Optional<EntityManager<PlayerData>> optionalPlayerDataEntityManager = EntityManagerRegistry.getInstance().getTyped(PlayerData.class);
+        if (optionalPlayerDataEntityManager.isEmpty()) {
+            return;
+        }
+        EntityManager<PlayerData> playerDataEntityManager = optionalPlayerDataEntityManager.get();
+        Optional<PlayerData> optionalPlayerData = playerDataEntityManager.findById(player.getUniqueId());
+        if (optionalPlayerData.isEmpty()) {
+            return;
+        }
+        PlayerData playerData = optionalPlayerData.get();
+        playerData.setCurrentSkin(skin);
+
+        playerDataEntityManager.save(playerData);
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay;
 
-import com.georgev22.skinoverlay.appliers.SkinApplier;
+import com.georgev22.skinoverlay.refreshers.SkinRefresher;
 import com.georgev22.skinoverlay.command.CommandManager;
 import com.georgev22.skinoverlay.command.CompletionEngine;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayMain;
@@ -23,7 +23,6 @@ import com.georgev22.skinoverlay.scheduler.MinecraftScheduler;
 import com.georgev22.skinoverlay.storage.EntityManager;
 import com.georgev22.skinoverlay.storage.ManagedEntity;
 import com.georgev22.skinoverlay.storage.data.Entity;
-import com.georgev22.skinoverlay.storage.gson.*;
 import com.georgev22.skinoverlay.storage.manager.AbstractEntityManager;
 import com.georgev22.skinoverlay.storage.manager.gson.FileEntityManager;
 import com.georgev22.skinoverlay.utilities.GsonUtils;
@@ -65,7 +64,7 @@ public class SkinOverlay {
     private PlayerProvider playerProvider;
     private GameProfileProvider gameProfileProvider;
     private SkinProvider skinProvider;
-    private SkinApplier skinApplier;
+    private SkinRefresher skinRefresher;
     private SkinHook skinHook;
     private boolean isOnlineMode;
     private boolean isProxy;
@@ -336,21 +335,21 @@ public class SkinOverlay {
     }
 
     /**
-     * Gets the SkinApplier instance.
+     * Gets the SkinRefresher instance.
      *
-     * @return the SkinApplier
+     * @return the SkinRefresher
      */
-    public SkinApplier getSkinApplier() {
-        return skinApplier;
+    public SkinRefresher getSkinRefresher() {
+        return skinRefresher;
     }
 
     /**
-     * Sets the SkinApplier instance.
+     * Sets the SkinRefresher instance.
      *
-     * @param skinApplier the SkinApplier
+     * @param skinRefresher the SkinRefresher
      */
-    public void setSkinApplier(SkinApplier skinApplier) {
-        this.skinApplier = skinApplier;
+    public void setSkinRefresher(SkinRefresher skinRefresher) {
+        this.skinRefresher = skinRefresher;
     }
 
     /**

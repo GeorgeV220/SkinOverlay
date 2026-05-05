@@ -39,7 +39,7 @@ public class ClearSubCommand extends SkinOverlayBaseCommand {
                             return;
                         }
                         Skin skin = optionalSkin.get();
-                        mainPlugin.getSkinApplier().setSkin(player, skin);
+                        mainPlugin.getSkinProvider().setSkin(player, skin);
                         CommandMessages.COMMAND_OVERLAY_RESET.msg(
                                 commandIssuer,
                                 new HashObjectMap<String, String>().append("%player%", player.getName()),
@@ -61,7 +61,7 @@ public class ClearSubCommand extends SkinOverlayBaseCommand {
                             return;
                         }
                         Skin skin = skinOptional.get();
-                        mainPlugin.getSkinApplier().setSkin(target, skin);
+                        mainPlugin.getSkinProvider().setSkin(target, skin);
                         CommandMessages.COMMAND_OVERLAY_RESET.msg(
                                 commandIssuer,
                                 new HashObjectMap<String, String>().append("%player%", target.getName()),

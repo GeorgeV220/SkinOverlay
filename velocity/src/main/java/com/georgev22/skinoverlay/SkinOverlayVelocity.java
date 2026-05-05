@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay;
 
-import com.georgev22.skinoverlay.appliers.VelocitySkinApplier;
+import com.georgev22.skinoverlay.refreshers.VelocitySkinRefresher;
 import com.georgev22.skinoverlay.command.VelocityCommandManager;
 import com.georgev22.skinoverlay.hooks.SkinHookNoop;
 import com.georgev22.skinoverlay.hooks.SkinsRestorerHook;
@@ -76,7 +76,7 @@ public class SkinOverlayVelocity {
         } else {
             this.skinOverlay.setSkinHook(new SkinHookNoop());
         }
-        this.skinOverlay.setSkinApplier(new VelocitySkinApplier());
+        this.skinOverlay.setSkinRefresher(new VelocitySkinRefresher());
         this.skinOverlay.setGameProfileProvider(new VelocityGameProfileProvider());
         this.skinOverlay.setPlayerProvider(new VelocityPlayerProvider(server));
         this.skinOverlay.setAudienceProvider(new VelocityAudienceProvider(this, server));
@@ -105,7 +105,7 @@ public class SkinOverlayVelocity {
                         .ifPresent(playerData -> {
                             Skin skin = playerData.getCurrentSkin();
                             if (skin != null) {
-                                this.skinOverlay.getSkinApplier().setSkin(
+                                this.skinOverlay.getSkinProvider().setSkin(
                                         this.skinOverlay.getPlayerProvider().getSPlayer(uuid),
                                         skin
                                 );

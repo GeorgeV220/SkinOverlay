@@ -85,7 +85,7 @@ public class WearUrlSubCommand extends SkinOverlayBaseCommand {
             }
 
             Skin skin = optionalSkin.get();
-            mainPlugin.getSkinApplier().setSkin(player, skin);
+            mainPlugin.getSkinProvider().setSkin(player, skin);
 
             CommandMessages.COMMAND_OVERLAY_DONE.msg(
                     issuer,
