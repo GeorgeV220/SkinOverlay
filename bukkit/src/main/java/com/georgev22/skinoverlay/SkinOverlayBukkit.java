@@ -13,13 +13,13 @@ import com.georgev22.skinoverlay.providers.*;
 import com.georgev22.skinoverlay.scheduler.MinecraftBukkitScheduler;
 import com.georgev22.skinoverlay.scheduler.MinecraftFoliaScheduler;
 import com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils;
+import com.georgev22.skinoverlay.utilities.SkinOverlayVersionResolver;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.MinecraftVersion.V1_20_R1;
-import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion;
+import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.MinecraftVersion.getCurrent;
 
 public class SkinOverlayBukkit extends JavaPlugin {
 
@@ -33,91 +33,20 @@ public class SkinOverlayBukkit extends JavaPlugin {
         this.skinOverlay.setCommandManager(new BukkitCommandManager(this));
         this.skinOverlay.setPlayerProvider(new BukkitPlayerProvider());
 
-        if (BukkitMinecraftUtils.isPaper() && getCurrentVersion().isAboveOrEqual(V1_20_R1)) {
-            this.skinOverlay.setSkinRefresher(new NoopSkinRefresher());
-            this.skinOverlay.setGameProfileProvider(new PaperGameProfileProvider());
-        } else {
-            switch (getCurrentVersion()) {
-                case V1_8_R1, V1_8_R2, V1_8_R3, V1_9_R1, V1_9_R2, V1_10_R1, V1_11_R1, V1_12_R1, V1_13_R1, V1_13_R2,
-                     V1_14_R1, V1_15_R1, V1_16_R1, V1_16_R2, V1_16_R3 -> {
-                    this.skinOverlay.setGameProfileProvider(new BukkitLegacyGameProfileProvider());
-                    this.skinOverlay.setSkinRefresher(new LegacySkinRefresher());
-                }
-                case V1_17_R1 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_17_R1());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_17_R1());
-                }
-                case V1_18_R1 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_18_R1());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_18_R1());
-                }
-                case V1_18_R2 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_18_R2());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_18_R2());
-                }
-                case V1_19_R1 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_19_R1());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_19_R1());
-                }
-                case V1_19_R2 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_19_R2());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_19_R2());
-                }
-                case V1_19_R3 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_19_R3());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_19_R3());
-                }
-                case V1_20_R1 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_20_R1());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_20_R1());
-                }
-                case V1_20_R2 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_20_R2());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_20_R2());
-                }
-                case V1_20_R3 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_20_R3());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_20_R3());
-                }
-                case V1_21_R1 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_21_R1());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_21_R1());
-                }
-                case V1_21_R2 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_21_R2());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_21_R2());
-                }
-                case V1_21_R3 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_21_R3());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_21_R3());
-                }
-                case V1_21_R4 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_21_R4());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_21_R4());
-                }
-                case V1_21_R5 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_21_R5());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_21_R5());
-                }
-                case V1_21_R6 -> {
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProvider_1_21_R6());
-                    this.skinOverlay.setSkinRefresher(new SkinRefresher_1_21_R6());
-                }
-                default -> {
-                    this.skinOverlay.setSkinRefresher(new NoopSkinRefresher());
-                    this.skinOverlay.setGameProfileProvider(new GameProfileProviderNoop());
-                    this.getLogger().info("SkinOverlay does not support " + Bukkit.getBukkitVersion());
-                }
-            }
-        }
-
         if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer")) {
             this.skinOverlay.setSkinHook(new SkinsRestorerHook());
             this.skinOverlay.setGameProfileProvider(new GameProfileProvider_SkinsRestorer());
             this.skinOverlay.setSkinRefresher(new NoopSkinRefresher());
         } else {
             this.skinOverlay.setSkinHook(new SkinHookNoop());
+            if (BukkitMinecraftUtils.isPaper() && getCurrent().isAtLeast(1, 20)) {
+                this.skinOverlay.setSkinRefresher(new NoopSkinRefresher());
+                this.skinOverlay.setGameProfileProvider(new PaperGameProfileProvider());
+            } else {
+                new SkinOverlayVersionResolver(this.skinOverlay).resolve();
+            }
         }
+
         this.skinOverlay.setOnlineMode(Bukkit.getOnlineMode());
         this.skinOverlay.setProxy(false);
         if (BukkitMinecraftUtils.isFolia()) {

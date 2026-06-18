@@ -18,8 +18,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.MinecraftReflection.getNMSClass;
-import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.MinecraftReflection.getOBCClass;
+import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.MinecraftReflection.*;
 import static com.georgev22.skinoverlay.utilities.Utils.Reflection.*;
 
 @SuppressWarnings("deprecation")
@@ -36,11 +35,11 @@ public class LegacySkinRefresher extends SkinRefresher {
 
     public LegacySkinRefresher() {
         try {
-            packet = getNMSClass("Packet", "net.minecraft.network.protocol.Packet");
-            playOutHeldItemSlot = getNMSClass("PacketPlayOutHeldItemSlot", "net.minecraft.network.protocol.game.PacketPlayOutHeldItemSlot");
-            playOutPosition = getNMSClass("PacketPlayOutPosition", "net.minecraft.network.protocol.game.PacketPlayOutPosition");
-            playOutPlayerInfo = getNMSClass("PacketPlayOutPlayerInfo", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
-            playOutRespawn = getNMSClass("PacketPlayOutRespawn", "net.minecraft.network.protocol.game.PacketPlayOutRespawn");
+            packet = nmsClass("Packet", "net.minecraft.network.protocol.Packet");
+            playOutHeldItemSlot = nmsClass("PacketPlayOutHeldItemSlot", "net.minecraft.network.protocol.game.PacketPlayOutHeldItemSlot");
+            playOutPosition = nmsClass("PacketPlayOutPosition", "net.minecraft.network.protocol.game.PacketPlayOutPosition");
+            playOutPlayerInfo = nmsClass("PacketPlayOutPlayerInfo", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
+            playOutRespawn = nmsClass("PacketPlayOutRespawn", "net.minecraft.network.protocol.game.PacketPlayOutRespawn");
 
             try {
                 removePlayerEnum = getEnum(playOutPlayerInfo, "EnumPlayerInfoAction", "REMOVE_PLAYER");
@@ -57,7 +56,7 @@ public class LegacySkinRefresher extends SkinRefresher {
                         addPlayerEnum = getEnum(playOutPlayerInfo, "Action", "ADD_PLAYER");
                     } catch (Exception e3) {
                         try {
-                            Class<?> enumPlayerInfoAction = getNMSClass("EnumPlayerInfoAction", null);
+                            Class<?> enumPlayerInfoAction = nmsClass("EnumPlayerInfoAction", null);
 
                             removePlayerEnum = getEnum(enumPlayerInfoAction, "REMOVE_PLAYER");
                             addPlayerEnum = getEnum(enumPlayerInfoAction, "ADD_PLAYER");
@@ -68,7 +67,7 @@ public class LegacySkinRefresher extends SkinRefresher {
                 }
             }
 
-            getHandleMethod = getOBCClass("entity.CraftPlayer").getDeclaredMethod("getHandle");
+            getHandleMethod = obcClass("entity.CraftPlayer").getDeclaredMethod("getHandle");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -175,7 +174,7 @@ public class LegacySkinRefresher extends SkinRefresher {
                         dimensionManager = getFieldByType(worldObject, "DimensionManager");
                     } catch (ReflectionException e) {
                         try {
-                            Class<?> dimensionManagerClass = getNMSClass("DimensionManager", "net.minecraft.world.level.dimension.DimensionManager");
+                            Class<?> dimensionManagerClass = nmsClass("DimensionManager", "net.minecraft.world.level.dimension.DimensionManager");
 
                             for (Method m : dimensionManagerClass.getDeclaredMethods()) {
                                 if (m.getReturnType() == dimensionManagerClass && m.getParameterCount() == 1 && m.getParameterTypes()[0] == Integer.TYPE) {

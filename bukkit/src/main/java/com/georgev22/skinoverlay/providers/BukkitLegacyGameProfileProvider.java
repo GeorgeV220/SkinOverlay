@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
-import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.MinecraftReflection.getOBCClass;
+import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.MinecraftReflection.obcClass;
 import static com.georgev22.skinoverlay.utilities.Utils.Reflection.fetchMethodAndInvoke;
 
 public class BukkitLegacyGameProfileProvider extends GameProfileProvider {
@@ -22,7 +22,7 @@ public class BukkitLegacyGameProfileProvider extends GameProfileProvider {
     @Override
     public GameProfile getInternalGameProfile(@NotNull SPlayer player) {
         try {
-            Class<?> craftPlayerClass = getOBCClass("entity.CraftPlayer");
+            Class<?> craftPlayerClass = obcClass("entity.CraftPlayer");
             Player bukkitPlayer = player.getPlayer();
             return (GameProfile) fetchMethodAndInvoke(craftPlayerClass, "getProfile", bukkitPlayer, new Object[]{}, new Class[]{});
         } catch (Exception e) {

@@ -18,6 +18,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.io.BufferedReader;
@@ -650,254 +651,287 @@ public class BukkitMinecraftUtils {
                 || hasClass("io.papermc.paper.configuration.Configuration"));
     }
 
-    public enum MinecraftVersion {
-        V1_7_R1(new SubVersionRange("1.7", 2, 4)),
-        V1_7_R2(new SubVersionRange("1.7", 5, 7)),
-        V1_7_R3(new SubVersionRange("1.7", 8, 9)),
-        V1_7_R4(new SubVersionRange("1.7", 10)),
-        V1_8_R1(new SubVersionRange("1.8", 0, 1)),
-        V1_8_R2(new SubVersionRange("1.8", 3, 3)),
-        V1_8_R3(new SubVersionRange("1.8", 4, 9)),
-        V1_9_R1(new SubVersionRange("1.9", 0, 2)),
-        V1_9_R2(new SubVersionRange("1.9", 4)),
-        V1_10_R1(new SubVersionRange("1.10", 0, 2)),
-        V1_11_R1(new SubVersionRange("1.11", 0, 2)),
-        V1_12_R1(new SubVersionRange("1.12", 0, 2)),
-        V1_13_R1(new SubVersionRange("1.13", 0, 1)),
-        V1_13_R2(new SubVersionRange("1.13", 2)),
-        V1_14_R1(new SubVersionRange("1.14", 0, 4)),
-        V1_15_R1(new SubVersionRange("1.15", 0, 2)),
-        V1_16_R1(new SubVersionRange("1.16", 0, 1)),
-        V1_16_R2(new SubVersionRange("1.16", 2, 3)),
-        V1_16_R3(new SubVersionRange("1.16", 4, 5)),
-        V1_17_R1(new SubVersionRange("1.17", 0, 1)),
-        V1_18_R1(new SubVersionRange("1.18", 0, 1)),
-        V1_18_R2(new SubVersionRange("1.18", 2)),
-        V1_19_R1(new SubVersionRange("1.19", 0, 2)),
-        V1_19_R2(new SubVersionRange("1.19", 3)),
-        V1_19_R3(new SubVersionRange("1.19", 4)),
-        V1_20_R1(new SubVersionRange("1.20", 0, 1)),
-        V1_20_R2(new SubVersionRange("1.20", 2)),
-        V1_20_R3(new SubVersionRange("1.20", 3, 4)),
-        V1_20_R4(new SubVersionRange("1.20", 5, 6)),
-        V1_21_R1(new SubVersionRange("1.21", 0, 1)),
-        V1_21_R2(new SubVersionRange("1.21", 2, 3)),
-        V1_21_R3(new SubVersionRange("1.21", 4)),
-        V1_21_R4(new SubVersionRange("1.21", 5)),
-        V1_21_R5(new SubVersionRange("1.21", 6, 8)),
-        V1_21_R6(new SubVersionRange("1.21", 9, 10)),
-        UNKNOWN(new SubVersionRange("UNKNOWN", 0, 0)),
-        ;
+    /**
+     * Represents a Minecraft server version using a numeric format (major.minor.patch).
+     */
+    public static final class MinecraftVersion implements Comparable<MinecraftVersion> {
 
-        private static MinecraftVersion currentVersion;
+        private final int major;
+        private final int minor;
+        private final int patch;
+        private final String nmsPackage;
 
-        private static int versionNumber, releaseNumber;
+        /**
+         * The current server version, parsed once during class initialization.
+         */
+        private static final MinecraftVersion CURRENT;
 
         static {
+            CURRENT = parse(Bukkit.getServer().getBukkitVersion());
+        }
+
+        /**
+         * Constructs a new {@link MinecraftVersion}.
+         *
+         * @param major the major version (e.g. 1 or 26)
+         * @param minor the minor version (e.g. 21 or 1)
+         * @param patch the patch version (e.g. 4 or 11)
+         */
+        public MinecraftVersion(int major, int minor, int patch) {
+            this.major = major;
+            this.minor = minor;
+            this.patch = patch;
+            this.nmsPackage = parseNMSPackage();
+        }
+
+        public MinecraftVersion(int major, int minor, int patch, String nmsPackage) {
+            this.major = major;
+            this.minor = minor;
+            this.patch = patch;
+            this.nmsPackage = nmsPackage;
+        }
+
+        /**
+         * Returns the current Minecraft server version.
+         *
+         * @return the parsed server version
+         */
+        public static MinecraftVersion getCurrent() {
+            return CURRENT;
+        }
+
+        /**
+         * Parses a Bukkit version string into a {@link MinecraftVersion}.
+         * <p>
+         * Examples of supported formats:
+         * <ul>
+         *     <li>{@code 1.21.4-R0.1-SNAPSHOT}</li>
+         *     <li>{@code 26.1.1}</li>
+         * </ul>
+         *
+         * @param bukkitVersion the raw version string from Bukkit
+         * @return a parsed {@link MinecraftVersion}, or {@code 0.0.0} if parsing fails
+         */
+        @Contract("_ -> new")
+        public static @NonNull MinecraftVersion parse(String bukkitVersion) {
             try {
-                String bukkitVersion = Bukkit.getServer().getBukkitVersion();
-                String[] versionParts = bukkitVersion.split("-")[0].split("\\.");
-                if (versionParts.length >= 2) {
-                    int majorVersion = Integer.parseInt(versionParts[0]);
-                    int minorVersion = Integer.parseInt(versionParts[1]);
-                    int patchVersion = versionParts.length >= 3 ? Integer.parseInt(versionParts[2]) : 0;
-                    for (MinecraftVersion version : MinecraftVersion.values()) {
-                        if (version.subVersionRange.version.equals(majorVersion + "." + minorVersion) &&
-                                patchVersion >= version.subVersionRange.start && patchVersion <= version.subVersionRange.end) {
-                            currentVersion = version;
-                            versionNumber = Integer.parseInt(currentVersion.name().split("_")[1]);
-                            releaseNumber = Integer.parseInt(currentVersion.name().split("R")[1]);
-                            break;
-                        }
-                    }
-                }
-                if (currentVersion == null) {
-                    currentVersion = UNKNOWN;
-                }
+                String versionPart = bukkitVersion.split("-")[0];
+                String[] parts = versionPart.split("\\.");
+
+                int major = parts.length > 0 ? Integer.parseInt(parts[0]) : 0;
+                int minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+                int patch = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
+
+                return new MinecraftVersion(major, minor, patch, parseNMSPackage());
             } catch (Exception e) {
-                currentVersion = UNKNOWN;
+                return new MinecraftVersion(0, 0, 0, "unknown");
             }
         }
 
-        private final SubVersionRange subVersionRange;
+        private static String parseNMSPackage() {
+            try {
+                String packageName = Bukkit.getServer()
+                        .getClass()
+                        .getPackage()
+                        .getName();
 
-        MinecraftVersion(SubVersionRange subVersionRange) {
-            this.subVersionRange = subVersionRange;
-        }
+                String[] parts = packageName.split("\\.");
 
-        /**
-         * Returns the current minecraft server version.
-         *
-         * @return the current minecraft server version.
-         */
-        public static MinecraftVersion getCurrentVersion() {
-            return currentVersion;
-        }
-
-        /**
-         * Get the version number of the Minecraft server.
-         *
-         * @return The version number of the Minecraft server.
-         */
-        public static int getVersionNumber() {
-            return versionNumber;
-        }
-
-        /**
-         * Get the release number of the Minecraft server.
-         *
-         * @return The release number of the Minecraft server.
-         */
-        public static int getReleaseNumber() {
-            return releaseNumber;
-        }
-
-        @Contract(pure = true)
-        public static @NotNull String getCurrentVersionName() {
-            return currentVersion.name();
-        }
-
-        @Contract(pure = true)
-        public static @NotNull String getCurrentVersionNameVtoLowerCase() {
-            return currentVersion.name().replace("V", "v");
-        }
-
-        /**
-         * Check if the version is above or equal.
-         *
-         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
-         * @return if the minecraft version is above or equal.
-         */
-        public boolean isAboveOrEqual(@NotNull MinecraftVersion minecraftVersion) {
-            return this.ordinal() >= minecraftVersion.ordinal();
-        }
-
-        /**
-         * Check if the version is above.
-         *
-         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
-         * @return if the minecraft version is above.
-         */
-        public boolean isAbove(@NotNull MinecraftVersion minecraftVersion) {
-            return this.ordinal() > minecraftVersion.ordinal();
-        }
-
-        /**
-         * Check if the version is below or equal.
-         *
-         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
-         * @return if the minecraft version is below or equal.
-         */
-        public boolean isBelowOrEqual(@NotNull MinecraftVersion minecraftVersion) {
-            return this.ordinal() <= minecraftVersion.ordinal();
-        }
-
-        /**
-         * Check if the version is below.
-         *
-         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
-         * @return if the minecraft version is below.
-         */
-        public boolean isBelow(@NotNull MinecraftVersion minecraftVersion) {
-            return this.ordinal() < minecraftVersion.ordinal();
-        }
-
-        /**
-         * Check if the version is equal.
-         *
-         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
-         * @return if the minecraft version is equal.
-         */
-        public boolean isEqual(@NotNull MinecraftVersion minecraftVersion) {
-            return this.ordinal() == minecraftVersion.ordinal();
-        }
-
-        /**
-         * Get the sub version range.
-         *
-         * @return The sub version range.
-         **/
-        public SubVersionRange getSubVersionRange() {
-            return subVersionRange;
-        }
-
-        public static class SubVersionRange {
-            private final String version;
-            private final int start;
-            private final int end;
-
-            SubVersionRange(String version, int patch) {
-                this(version, patch, patch);
+                return parts[parts.length - 1];
+            } catch (Exception e) {
+                return "unknown";
             }
+        }
 
-            SubVersionRange(String version, int start, int end) {
-                this.version = version;
-                this.start = start;
-                this.end = end;
+        /**
+         * Compares this version to another version.
+         *
+         * @param other the other version
+         * @return a negative value if lower, positive if higher, 0 if equal
+         */
+        @Override
+        public int compareTo(@NonNull MinecraftVersion other) {
+            if (this.major != other.major) {
+                return Integer.compare(this.major, other.major);
             }
+            if (this.minor != other.minor) {
+                return Integer.compare(this.minor, other.minor);
+            }
+            return Integer.compare(this.patch, other.patch);
+        }
 
-            public String getVersion() {
-                return version;
-            }
+        /**
+         * Checks if this version is greater than or equal to the given version.
+         * Patch is ignored (assumes 0).
+         *
+         * @param major the major version
+         * @param minor the minor version
+         * @return {@code true} if this version is >= given version
+         */
+        public boolean isAtLeast(int major, int minor) {
+            return compareTo(new MinecraftVersion(major, minor, 0)) >= 0;
+        }
 
-            public int getStart() {
-                return start;
-            }
+        /**
+         * Checks if this version is greater than or equal to the given version.
+         *
+         * @param major the major version
+         * @param minor the minor version
+         * @param patch the patch version
+         * @return {@code true} if this version is >= given version
+         */
+        public boolean isAtLeast(int major, int minor, int patch) {
+            return compareTo(new MinecraftVersion(major, minor, patch)) >= 0;
+        }
 
-            public int getEnd() {
-                return end;
-            }
+        /**
+         * Checks if this version is strictly lower than the given version.
+         * Patch is ignored (assumes 0).
+         *
+         * @param major the major version
+         * @param minor the minor version
+         * @return {@code true} if this version is < given version
+         */
+        public boolean isBelow(int major, int minor) {
+            return isBelow(major, minor, 0);
+        }
+
+
+        public boolean isBelow(int major, int minor, int patch) {
+            return compareTo(new MinecraftVersion(major, minor, patch)) < 0;
+        }
+
+        /**
+         * Checks if this version is within a range:
+         * {@code [min, max)} (inclusive lower bound, exclusive upper bound).
+         *
+         * @param minMajor minimum major version
+         * @param minMinor minimum minor version
+         * @param maxMajor maximum major version
+         * @param maxMinor maximum minor version
+         * @return {@code true} if within the specified range
+         */
+        public boolean isBetween(
+                int minMajor, int minMinor,
+                int maxMajor, int maxMinor
+        ) {
+            return isAtLeast(minMajor, minMinor)
+                    && isBelow(maxMajor, maxMinor);
+        }
+
+        public boolean isBetween(int minMajor, int minMinor, int minPatch, int maxMajor, int maxMinor, int maxPatch) {
+            return isAtLeast(minMajor, minMinor, minPatch)
+                    && isBelow(maxMajor, maxMinor, maxPatch);
+        }
+
+        public boolean isVersion(int major, int minor, Integer patch) {
+            return this.major == major
+                    && this.minor == minor
+                    && (patch == null || this.patch == patch);
+        }
+
+        /**
+         * @return the major version
+         */
+        public int getMajor() {
+            return major;
+        }
+
+        /**
+         * @return the minor version
+         */
+        public int getMinor() {
+            return minor;
+        }
+
+        /**
+         * @return the patch version
+         */
+        public int getPatch() {
+            return patch;
+        }
+
+        public String getNMSPackage() {
+            return nmsPackage;
+        }
+
+        /**
+         * Returns the version in {@code major.minor.patch} format.
+         *
+         * @return string representation of this version
+         */
+        @Override
+        public String toString() {
+            return major + "." + minor + "." + patch;
         }
     }
 
-    public static class MinecraftReflection {
+    public static final class MinecraftReflection {
 
-        public static final String NET_MINECRAFT_PACKAGE = "net.minecraft";
-        public static final String ORG_BUKKIT_CRAFTBUKKIT_PACKAGE = "org.bukkit.craftbukkit";
-        public static final String NET_MINECRAFT_SERVER_PACKAGE = NET_MINECRAFT_PACKAGE + ".server";
+        private static final String NET_MINECRAFT_PACKAGE = "net.minecraft";
+        private static final String OBC_PACKAGE = "org.bukkit.craftbukkit";
 
-        private static volatile Object theUnsafe;
+        private static final String NMS_SERVER_BASE = NET_MINECRAFT_PACKAGE + ".server";
 
-        public static boolean isRepackaged() {
-            return MinecraftVersion.getCurrentVersion().isAboveOrEqual(MinecraftVersion.V1_17_R1);
+        private static final MinecraftVersion VERSION = MinecraftVersion.getCurrent();
+        private static final boolean REPACKAGED_NMS = VERSION.isAtLeast(1, 17);
+        private static final boolean REPACKAGED_OBC = VERSION.isAtLeast(1, 20, 5) && isPaper();
+
+        private static String resolveNmsPackage() {
+            return REPACKAGED_NMS ? NMS_SERVER_BASE : NMS_SERVER_BASE + "." + VERSION.getNMSPackage();
+        }
+
+        private static String resolveObcPackage() {
+            return REPACKAGED_OBC ? OBC_PACKAGE : OBC_PACKAGE + "." + VERSION.getNMSPackage();
+        }
+
+        private static ClassLoader loader() {
+            return Bukkit.class.getClassLoader();
         }
 
         @Contract(pure = true)
-        public static @NotNull String getNMSClassName(String className) {
-            return NET_MINECRAFT_SERVER_PACKAGE + '.' + MinecraftVersion.getCurrentVersionNameVtoLowerCase() + '.' + className;
+        public static @NonNull String nmsClassName(String className) {
+            return resolveNmsPackage() + "." + className;
         }
 
-        public static @NotNull Class<?> getNMSClass(String className) throws ClassNotFoundException {
-            return Class.forName(getNMSClassName(className));
+        public static @NonNull Class<?> nmsClass(String className) throws ClassNotFoundException {
+            return Class.forName(nmsClassName(className), false, loader());
         }
 
-        public static Optional<Class<?>> getNMSOptionalClass(String className) {
-            return Utils.Reflection.optionalClass(getNMSClassName(className), Bukkit.class.getClassLoader());
+        public static Optional<Class<?>> nmsOptionalClass(String className) {
+            return Utils.Reflection.optionalClass(nmsClassName(className), loader());
         }
 
-        public static @NotNull String getNMSClassName(String className, String fullClassName) {
-            return isRepackaged() ? fullClassName : getNMSClassName(className);
+        public static @NonNull Class<?> nmsClass(String className, String fullName) throws ClassNotFoundException {
+            return Class.forName(REPACKAGED_NMS ? fullName : nmsClassName(className), false, loader());
         }
 
-        public static @NotNull Class<?> getNMSClass(String className, String fullClassName) throws ClassNotFoundException {
-            return isRepackaged() ? Class.forName(fullClassName) : getNMSClass(className);
-        }
-
-        public static Optional<Class<?>> getNMSOptionalClass(String className, String fullClassName) {
-            return isRepackaged() ? Utils.Reflection.optionalClass(fullClassName, Bukkit.class.getClassLoader()) : getNMSOptionalClass(className);
+        public static Optional<Class<?>> nmsOptionalClass(String className, String fullName) {
+            return Utils.Reflection.optionalClass(
+                    REPACKAGED_NMS ? fullName : nmsClassName(className),
+                    loader()
+            );
         }
 
         @Contract(pure = true)
-        public static @NotNull String getOBCClassName(String className) {
-            return ORG_BUKKIT_CRAFTBUKKIT_PACKAGE + '.' + MinecraftVersion.getCurrentVersionNameVtoLowerCase() + '.' + className;
+        public static @NonNull String obcClassName(String className) {
+            return resolveObcPackage() + "." + className;
         }
 
-        public static @NotNull Class<?> getOBCClass(String className) throws ClassNotFoundException {
-            return Class.forName(getOBCClassName(className));
+        public static @NonNull Class<?> obcClass(String className) throws ClassNotFoundException {
+            return Class.forName(obcClassName(className), false, loader());
         }
 
-        public static Optional<Class<?>> getOBCOptionalClass(String className) {
-            return Utils.Reflection.optionalClass(getOBCClassName(className), Bukkit.class.getClassLoader());
+        public static Optional<Class<?>> obcOptionalClass(String className) {
+            return Utils.Reflection.optionalClass(obcClassName(className), loader());
+        }
+
+        public static boolean isNmsRepackaged() {
+            return REPACKAGED_NMS;
+        }
+
+        public static boolean isObcRepackaged() {
+            return REPACKAGED_OBC;
         }
     }
 
