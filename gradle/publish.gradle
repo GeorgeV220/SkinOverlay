@@ -50,9 +50,9 @@ publishing {
                 }
             }
             maven {
-                name = "GeorgeV22"
+                name = "ShulkerLabs"
 
-                url = uri("https://repo.georgev22.com/releases")
+                url = uri("https://repo.shulkerlabs.com/releases")
 
                 def mavenUsername = System.getenv("MAVEN_USERNAME") ? System.getenv("MAVEN_USERNAME") :
                         System.getProperty("MAVEN_USERNAME") ? System.getProperty("MAVEN_USERNAME") : null
@@ -72,9 +72,9 @@ publishing {
         }
         if (!isGitHub) {
             maven {
-                name = "GeorgeV22"
+                name = "ShulkerLabs-snapshots"
 
-                url = uri("https://repo.georgev22.com/snapshots")
+                url = uri("https://repo.shulkerlabs.com/snapshots")
 
                 def mavenUsername = System.getenv("MAVEN_USERNAME") ? System.getenv("MAVEN_USERNAME") :
                         System.getProperty("MAVEN_USERNAME") ? System.getProperty("MAVEN_USERNAME") : null

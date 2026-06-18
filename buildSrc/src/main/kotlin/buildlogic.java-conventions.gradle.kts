@@ -11,10 +11,10 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url = uri("https://repo.georgev22.com/releases/")
+        url = uri("https://repo.shulkerlabs.com/releases/")
     }
     maven {
-        url = uri("https://repo.georgev22.com/snapshots/")
+        url = uri("https://repo.shulkerlabs.com/snapshots/")
     }
     maven {
         url = uri("https://repo.codemc.org/repository/maven-public/")

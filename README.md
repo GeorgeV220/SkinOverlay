@@ -18,7 +18,7 @@ You can have your project depend on SkinOverlay as a dependency through the foll
         <repository>
             <id>reposilite-repository</id>
             <name>GeorgeV22 Repository</name>
-            <url>https://repo.georgev22.com/releases</url>
+            <url>https://repo.shulkerlabs.com/releases</url>
         </repository>
     </repositories>
 
@@ -40,7 +40,7 @@ You can include SkinOverlay into your gradle project using the following lines:
 ```groovy
 repositories {
     maven {
-        url "https://repo.georgev22.com/releases"
+        url "https://repo.shulkerlabs.com/releases"
     }
 }
 
