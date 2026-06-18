@@ -1,3 +1,22 @@
+# [8.0.0-beta.4](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.3...v8.0.0-beta.4) (2026-06-18)
+
+
+### Features
+
+* restructure data structures, storage, and task management ([d6519c9](https://github.com/GeorgeV220/SkinOverlay/commit/d6519c931d27534c406850d2c54b961a26a9b1ad))
+
+
+### BREAKING CHANGES
+
+* - Removed old `ConcurrentObjectMap`, `HashObjectMap`, `LinkedObjectMap`,
+  `ObjectMap`, `ObservableObjectMap`, `Pair`, `TreeObjectMap`,
+  `UnmodifiableObjectMap`, `PlayerEntityManager`, `SkinEntityManager`,
+  `PlayerFileManager`, `SkinFileManager`, `PairDocument`.
+- `Entity.getId()` renamed to `Entity.getUniqueId()`.
+- `EntityManagerRegistry` is now a singleton via `getInstance()` and
+  uses typed lookups via `getTyped(Class)`.
+- `EntityManager` load methods now return `CompletableFuture`.
+
 # [8.0.0-beta.3](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.2...v8.0.0-beta.3) (2025-11-30)
 
 
