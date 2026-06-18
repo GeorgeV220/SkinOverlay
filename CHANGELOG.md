@@ -1,3 +1,10 @@
+# [8.0.0-beta.5](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.4...v8.0.0-beta.5) (2026-06-18)
+
+
+### Bug Fixes
+
+* update repository URLs from GeorgeV22 to ShulkerLabs ([fecea1e](https://github.com/GeorgeV220/SkinOverlay/commit/fecea1ec7e85ee807330f8bc6f59914b1c65c551))
+
 # [8.0.0-beta.4](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.3...v8.0.0-beta.4) (2026-06-18)
 
 
