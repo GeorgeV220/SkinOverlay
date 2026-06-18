@@ -49,15 +49,9 @@ public class SkinOverlayBukkit extends JavaPlugin {
 
         this.skinOverlay.setOnlineMode(Bukkit.getOnlineMode());
         this.skinOverlay.setProxy(false);
-        if (BukkitMinecraftUtils.isFolia()) {
-            this.skinOverlay.setScheduler(
-                    new MinecraftFoliaScheduler()
-            );
-        } else {
-            this.skinOverlay.setScheduler(
-                    new MinecraftBukkitScheduler()
-            );
-        }
+        this.skinOverlay.setScheduler(
+                BukkitMinecraftUtils.isFolia() ? new MinecraftFoliaScheduler() : new MinecraftBukkitScheduler()
+        );
         this.skinOverlay.onLoad();
     }
 
