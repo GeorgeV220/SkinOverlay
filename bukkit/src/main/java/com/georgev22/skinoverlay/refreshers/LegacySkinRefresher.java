@@ -23,7 +23,7 @@ import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.Minecraft
 import static com.georgev22.skinoverlay.utilities.Utils.Reflection.*;
 
 @SuppressWarnings("deprecation")
-public class LegacySkinApplier extends SkinRefresher {
+public class LegacySkinRefresher extends SkinRefresher {
 
     private final Class<?> playOutRespawn;
     private final Class<?> playOutPlayerInfo;
@@ -34,7 +34,7 @@ public class LegacySkinApplier extends SkinRefresher {
     private Enum<?> removePlayerEnum;
     private Enum<?> addPlayerEnum;
 
-    public LegacySkinApplier() {
+    public LegacySkinRefresher() {
         try {
             packet = getNMSClass("Packet", "net.minecraft.network.protocol.Packet");
             playOutHeldItemSlot = getNMSClass("PacketPlayOutHeldItemSlot", "net.minecraft.network.protocol.game.PacketPlayOutHeldItemSlot");
