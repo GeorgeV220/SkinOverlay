@@ -22,30 +22,22 @@ public class SkinParts {
     private static final SerializableBufferedImage steveSkin;
 
     static {
-        try {
-            @SuppressWarnings("deprecation")
-            URL url = new URL("https://s.namemc.com/i/12b92a9206470fe2.png");
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
+        SerializableBufferedImage skin = null;
 
-            try (InputStream stream = url.openStream()) {
-                byte[] buffer = new byte[4096];
+        try (InputStream stream =
+                     SkinParts.class.getResourceAsStream("/steve.png")) {
 
-                while (true) {
-                    int bytesRead = stream.read(buffer);
-                    if (bytesRead < 0) {
-                        break;
-                    }
-                    output.write(buffer, 0, bytesRead);
-                }
-            } catch (IOException e) {
-                steveSkin = null;
-                throw new RuntimeException(e);
+            if (stream == null) {
+                throw new IllegalStateException("steve.png not found in resources");
             }
-            steveSkin = new SerializableBufferedImage(ImageIO.read(new ByteArrayInputStream(output.toByteArray())));
 
-        } catch (IOException e) {
+            skin = new SerializableBufferedImage(ImageIO.read(stream));
+
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        steveSkin = skin;
     }
 
     private SerializableBufferedImage fullSkin;
