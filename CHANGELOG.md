@@ -1,3 +1,10 @@
+# [8.0.0-beta.6](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.5...v8.0.0-beta.6) (2026-06-19)
+
+
+### Features
+
+* add Placeholder and PlaceholderUtils for dynamic message replacement ([c3f581e](https://github.com/GeorgeV220/SkinOverlay/commit/c3f581e8a00f3501094a292a00bd616006f51bfa))
+
 # [8.0.0-beta.5](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.4...v8.0.0-beta.5) (2026-06-18)
 
 
