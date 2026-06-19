@@ -79,7 +79,7 @@ public class SkinOverlayVelocity {
         this.skinOverlay.setSkinRefresher(new VelocitySkinRefresher());
         this.skinOverlay.setGameProfileProvider(new VelocityGameProfileProvider());
         this.skinOverlay.setPlayerProvider(new VelocityPlayerProvider(server));
-        this.skinOverlay.setAudienceProvider(new VelocityAudienceProvider(this, server));
+        this.skinOverlay.setConsoleAudience(server.getConsoleCommandSource());
         this.skinOverlay.setOnlineMode(server.getConfiguration().isOnlineMode());
         if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage")) {
             VelocityPluginMessageManager velocityPluginMessageManager = new VelocityPluginMessageManager(server);

@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay;
 
+import com.georgev22.skinoverlay.hooks.placeholder.PlaceholderAPIHook;
 import com.georgev22.skinoverlay.refreshers.*;
 import com.georgev22.skinoverlay.command.BukkitCommandManager;
 import com.georgev22.skinoverlay.hooks.SkinHookNoop;
@@ -23,10 +24,18 @@ import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.Minecraft
 
 public class SkinOverlayBukkit extends JavaPlugin {
 
+    private static SkinOverlayBukkit instance;
+
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
+    private BukkitAudiences bukkitAudiences;
+
+    public static SkinOverlayBukkit getInstance() {
+        return instance;
+    }
 
     @Override
     public void onLoad() {
+        instance = this;
         this.skinOverlay.setPlugin(this);
         this.skinOverlay.setLogger(this.getLogger());
         this.skinOverlay.setDataFolder(this.getDataFolder());
@@ -47,6 +56,10 @@ public class SkinOverlayBukkit extends JavaPlugin {
             }
         }
 
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            this.skinOverlay.setPlaceholderHook(new PlaceholderAPIHook());
+        }
+
         this.skinOverlay.setOnlineMode(Bukkit.getOnlineMode());
         this.skinOverlay.setProxy(false);
         this.skinOverlay.setScheduler(
@@ -57,8 +70,8 @@ public class SkinOverlayBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.skinOverlay.setAudienceProvider(BukkitAudiences.create(this));
-
+        this.bukkitAudiences = BukkitAudiences.create(this);
+        this.skinOverlay.setConsoleAudience(this.bukkitAudiences.console());
         BukkitMinecraftUtils.registerListeners(
                 this,
                 new PlayerListeners()
@@ -90,5 +103,13 @@ public class SkinOverlayBukkit extends JavaPlugin {
     @Override
     public void onDisable() {
         skinOverlay.onDisable();
+        if (this.bukkitAudiences != null) {
+            this.bukkitAudiences.close();
+            this.bukkitAudiences = null;
+        }
+    }
+
+    public BukkitAudiences getBukkitAudiences() {
+        return bukkitAudiences;
     }
 }

@@ -110,7 +110,7 @@ public interface MessageEntry {
         MessageBuilder builder = new MessageBuilder();
         TagResolver resolver = StandardTags.defaults();
 
-        Audience audience = SkinOverlay.getInstance().getAudienceProvider().player(issuer.getUniqueId());
+        Audience audience = issuer.audience();
 
         switch (type) {
             case ACTIONBAR -> {
@@ -165,7 +165,7 @@ public interface MessageEntry {
      */
     default void msgConsole(Map<String, String> map, boolean ignoreCase) {
         String[] messages = this.getMessages();
-        Audience console = SkinOverlay.getInstance().getAudienceProvider().console();
+        Audience console = SkinOverlay.getInstance().getConsoleAudience();
         MessageBuilder messageBuilder = new MessageBuilder();
         TagResolver resolver = StandardTags.defaults();
         if (messages.length > 1) {

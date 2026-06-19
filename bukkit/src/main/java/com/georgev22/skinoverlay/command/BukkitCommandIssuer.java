@@ -1,8 +1,9 @@
 package com.georgev22.skinoverlay.command;
 
-import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.SkinOverlayBukkit;
 import com.georgev22.skinoverlay.utilities.Utils;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -23,17 +24,12 @@ public class BukkitCommandIssuer implements CommandIssuer {
     }
 
     @Override
-    public void sendMessage(@NotNull String message) {
-        this.sender.sendMessage(message);
-    }
-
-    @Override
-    public void sendMessage(@NotNull Component component) {
-        if (!isPlayer()) {
-            SkinOverlay.getInstance().getAudienceProvider().console().sendMessage(component);
-            return;
+    public Audience audience() {
+        BukkitAudiences audienceProvider = SkinOverlayBukkit.getInstance().getBukkitAudiences();
+        if (isPlayer()) {
+            return audienceProvider.player((Player) this.sender);
         }
-        SkinOverlay.getInstance().getAudienceProvider().player(this.getUniqueId()).sendMessage(component);
+        return audienceProvider.console();
     }
 
     @Override

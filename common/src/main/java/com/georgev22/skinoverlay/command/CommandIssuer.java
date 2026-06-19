@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay.command;
 
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -20,40 +20,17 @@ public interface CommandIssuer {
     boolean isPlayer();
 
     /**
-     * Sends a plain text message to the issuer.
+     * Returns the Kyori Adventure {@link Audience} associated with this issuer.
      *
-     * @param message the message to send
-     */
-    void sendMessage(@NotNull String message);
-
-    /**
-     * Sends multiple plain text messages to the issuer.
+     * <p>An {@code Audience} represents any target that can receive messages,
+     * such as players, the console, command blocks, or other custom implementations.</p>
      *
-     * @param messages the messages to send
-     */
-    default void sendMessage(String @NotNull ... messages) {
-        for (String message : messages) {
-            sendMessage(message);
-        }
-    }
-
-    /**
-     * Sends a rich text component to the issuer.
+     * <p>This can be used to send rich chat components, titles, action bars,
+     * and other Adventure-supported message types.</p>
      *
-     * @param component the component to send
+     * @return the audience associated with this issuer
      */
-    void sendMessage(@NotNull Component component);
-
-    /**
-     * Sends multiple rich text components to the issuer.
-     *
-     * @param components the components to send
-     */
-    default void sendMessage(Component @NotNull ... components) {
-        for (Component component : components) {
-            sendMessage(component);
-        }
-    }
+    Audience audience();
 
     /**
      * Returns the underlying issuer object.

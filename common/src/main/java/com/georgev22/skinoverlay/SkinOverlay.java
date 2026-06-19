@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay;
 
+import com.georgev22.skinoverlay.hooks.placeholder.PlaceholderHook;
 import com.georgev22.skinoverlay.refreshers.SkinRefresher;
 import com.georgev22.skinoverlay.command.CommandManager;
 import com.georgev22.skinoverlay.command.CompletionEngine;
@@ -29,10 +30,12 @@ import com.georgev22.skinoverlay.utilities.GsonUtils;
 import com.georgev22.skinoverlay.utilities.config.FileManager;
 import com.georgev22.skinoverlay.utilities.config.SkinFileCache;
 import com.google.gson.Gson;
-import net.kyori.adventure.platform.AudienceProvider;
+import net.kyori.adventure.audience.Audience;
 import org.bspfsystems.yamlconfiguration.file.FileConfiguration;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,13 +62,14 @@ public class SkinOverlay {
     private CommandManager commandManager;
     private Object plugin;
     private MinecraftScheduler<?, ?, ?, ?, ?> scheduler;
-    private AudienceProvider audienceProvider;
+    private Audience consoleAudience;
     private Logger logger;
     private PlayerProvider playerProvider;
     private GameProfileProvider gameProfileProvider;
     private SkinProvider skinProvider;
     private SkinRefresher skinRefresher;
     private SkinHook skinHook;
+    private PlaceholderHook placeholderHook;
     private boolean isOnlineMode;
     private boolean isProxy;
     private File dataFolder;
@@ -115,6 +119,17 @@ public class SkinOverlay {
      * Enables the plugin components. Should be called during plugin enable phase.
      */
     public void onEnable() {
+        if (placeholderHook != null) {
+            try {
+                if (placeholderHook.register()) {
+                    getLogger().info("Placeholder hook registered successfully!");
+                } else {
+                    getLogger().warning("Placeholder hook registration failed!");
+                }
+            } catch (Exception e) {
+                getLogger().log(Level.WARNING, "Failed to register placeholder hook", e);
+            }
+        }
         CompletionEngine.registerResolver("@overlays", (commandIssuer, args) ->
                 skinFileCache.getSkinConfigurationFiles().keySet());
         this.commandManager.registerCommand(new SkinOverlayMain());
@@ -133,9 +148,17 @@ public class SkinOverlay {
         if (this.scheduler != null) {
             this.scheduler.cancelTasks(getPlugin());
         }
-        if (this.audienceProvider != null) {
-            this.audienceProvider.close();
-            audienceProvider = null;
+
+        if (placeholderHook != null) {
+            try {
+                if (placeholderHook.unregister()) {
+                    getLogger().info("Placeholder hook unregistered successfully!");
+                } else {
+                    getLogger().warning("Placeholder hook unregistration failed!");
+                }
+            } catch (Exception e) {
+                getLogger().log(Level.WARNING, "Failed to unregister placeholder hook", e);
+            }
         }
 
         EntityManagerRegistry.getInstance().entries().forEach((key, value) -> value.shutdown());
@@ -253,22 +276,12 @@ public class SkinOverlay {
         this.scheduler = scheduler;
     }
 
-    /**
-     * Gets the AudienceProvider instance.
-     *
-     * @return the AudienceProvider
-     */
-    public AudienceProvider getAudienceProvider() {
-        return audienceProvider;
+    public Audience getConsoleAudience() {
+        return consoleAudience;
     }
 
-    /**
-     * Sets the AudienceProvider instance.
-     *
-     * @param audienceProvider the AudienceProvider
-     */
-    public void setAudienceProvider(AudienceProvider audienceProvider) {
-        this.audienceProvider = audienceProvider;
+    public void setConsoleAudience(Audience consoleAudience) {
+        this.consoleAudience = consoleAudience;
     }
 
     /**
@@ -368,6 +381,44 @@ public class SkinOverlay {
      */
     public void setSkinHook(SkinHook skinHook) {
         this.skinHook = skinHook;
+    }
+
+    /**
+     * Gets the PlaceholderHook instance.
+     *
+     * @return the PlaceholderHook
+     */
+    public Optional<PlaceholderHook> getPlaceholderHook() {
+        return Optional.ofNullable(placeholderHook);
+    }
+
+    /**
+     * Sets the active {@link PlaceholderHook} implementation.
+     * <p>
+     * This method is intended for internal use only. The plugin automatically
+     * manages placeholder hook initialization and registration during its
+     * lifecycle.
+     * <p>
+     * Calling this method manually is strongly discouraged unless you fully
+     * understand the placeholder hook lifecycle. In particular, registration
+     * should be handled manually by the caller, as the plugin's normal
+     * registration process occurs during {@code onEnable()}. Replacing the
+     * hook after or during this process without properly registering it may
+     * result in errors or undefined behavior.
+     * <p>
+     * If a custom hook is supplied, it is the caller's responsibility to ensure
+     * that the hook is correctly initialized and that
+     * {@link PlaceholderHook#isRegistered()} returns {@code true} before the
+     * hook is used.
+     * <p>
+     * This method should only be called after the plugin has completed its
+     * enable phase.
+     *
+     * @param placeholderHook the placeholder hook to use
+     */
+    @ApiStatus.Internal
+    public void setPlaceholderHook(PlaceholderHook placeholderHook) {
+        this.placeholderHook = placeholderHook;
     }
 
     /**

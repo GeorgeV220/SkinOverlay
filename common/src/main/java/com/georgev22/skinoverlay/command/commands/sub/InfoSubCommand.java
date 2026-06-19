@@ -7,6 +7,7 @@ import com.georgev22.skinoverlay.command.annotation.Default;
 import com.georgev22.skinoverlay.command.annotation.Permission;
 import com.georgev22.skinoverlay.command.annotation.Subcommand;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
+import com.georgev22.skinoverlay.message.MessageBuilder;
 import org.jetbrains.annotations.NotNull;
 
 @Subcommand("info")
@@ -27,15 +28,17 @@ public class InfoSubCommand extends SkinOverlayBaseCommand {
         String branch = BuildParameters.BRANCH;
         String buildTime = BuildParameters.BUILD_TIME;
 
-        commandIssuer.sendMessage("Name: " + pluginName);
-        commandIssuer.sendMessage("Version: " + pluginVersion);
-        commandIssuer.sendMessage("Author: " + pluginAuthor);
-        commandIssuer.sendMessage("Description: " + pluginDescription);
-        commandIssuer.sendMessage("Website: " + pluginWebsite);
-        commandIssuer.sendMessage("CI Name: " + CIName);
-        commandIssuer.sendMessage("CI Build Number: " + CIBuildNumber);
-        commandIssuer.sendMessage("Commit: " + commit);
-        commandIssuer.sendMessage("Branch: " + branch);
-        commandIssuer.sendMessage("Build Time: " + buildTime);
+        MessageBuilder.builder()
+                .appendln("Name: " + pluginName)
+                .appendln("Version: " + pluginVersion)
+                .appendln("Author: " + pluginAuthor)
+                .appendln("Description: " + pluginDescription)
+                .appendln("Website: " + pluginWebsite)
+                .appendln("CI Name: " + CIName)
+                .appendln("CI Build Number: " + CIBuildNumber)
+                .appendln("Commit: " + commit)
+                .appendln("Branch: " + branch)
+                .appendln("Build Time: " + buildTime)
+                .send(commandIssuer.audience());
     }
 }

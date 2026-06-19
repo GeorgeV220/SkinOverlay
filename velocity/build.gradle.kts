@@ -17,7 +17,6 @@ dependencies {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
     implementation(libs.bstats.velocity)
-    compileOnly(libs.adventure.platform.api)
     compileOnly(libs.log4j.api)
 }
 

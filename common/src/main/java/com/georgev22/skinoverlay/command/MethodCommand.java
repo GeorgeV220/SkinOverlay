@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay.command;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
+import com.georgev22.skinoverlay.message.MessageBuilder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.player.SPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +57,7 @@ public class MethodCommand extends BaseCommand {
             method.setAccessible(true);
             invokeHandler(sender, args, context);
         } catch (Exception e) {
-            sender.sendMessage("§cError executing command.");
+            MessageBuilder.builder().appendMiniMessage("&cError executing command.").send(sender.audience());
             SkinOverlay.getInstance().getLogger()
                     .log(Level.SEVERE, "Error while executing command", e);
         }

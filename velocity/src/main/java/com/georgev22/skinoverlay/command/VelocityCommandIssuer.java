@@ -3,7 +3,7 @@ package com.georgev22.skinoverlay.command;
 import com.georgev22.skinoverlay.utilities.Utils;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -22,13 +22,8 @@ public class VelocityCommandIssuer implements CommandIssuer {
     }
 
     @Override
-    public void sendMessage(@NotNull String message) {
-        this.source.sendMessage(Component.text(message));
-    }
-
-    @Override
-    public void sendMessage(@NotNull Component component) {
-        this.source.sendMessage(component);
+    public Audience audience() {
+        return this.source;
     }
 
     @Override
