@@ -1,11 +1,8 @@
 package com.georgev22.skinoverlay.message;
 
-import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
-import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
-import com.georgev22.skinoverlay.utilities.Utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -16,13 +13,10 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.logging.Level;
+import java.util.*;
 
 /**
  * A utility class for building and sending styled chat messages to players in a Minecraft server environment
@@ -67,7 +61,7 @@ public class MessageBuilder {
     private TextColor currentColor = NamedTextColor.WHITE;
     private ClickEvent currentClickEvent;
     private HoverEvent<?> currentHoverEvent;
-    private ObjectMap<String, String> placeholders = new HashObjectMap<>();
+    private Placeholder placeholder = new Placeholder();
 
     /**
      * Constructs a new MessageBuilder instance.
@@ -83,7 +77,7 @@ public class MessageBuilder {
      * @return A new MessageBuilder instance.
      */
     @Contract(" -> new")
-    public static @NotNull MessageBuilder builder() {
+    public static @NonNull MessageBuilder builder() {
         return new MessageBuilder();
     }
 
@@ -103,7 +97,6 @@ public class MessageBuilder {
      * @return The MessageBuilder instance for method chaining.
      */
     public MessageBuilder append(String text) {
-        text = replacePlaceholders(text);
         TextComponent.Builder textComponent = Component.text()
                 .content(text)
                 .color(currentColor);
@@ -125,13 +118,46 @@ public class MessageBuilder {
     }
 
     /**
-     * Appends a component to the message.
+     * Appends a newline character to the message.
      *
-     * @param component The component to append.
+     * <p>This is equivalent to appending "\n".</p>
+     *
      * @return The MessageBuilder instance for method chaining.
      */
-    public MessageBuilder append(Component component) {
-        componentBuilder.append(component);
+    public MessageBuilder appendln() {
+        return append("\n");
+    }
+
+    /**
+     * Appends a {@link ComponentLike} object to the message, followed by a newline.
+     *
+     * <p>This method appends the {@link ComponentLike}, and then appends a newline character.</p>
+     *
+     * @param componentLike The {@link ComponentLike} object to append.
+     * @return The MessageBuilder instance for method chaining.
+     */
+    public MessageBuilder appendln(ComponentLike componentLike) {
+        return append(componentLike).append("\n");
+    }
+
+    /**
+     * Appends the given plain text to the message, followed by a newline character.
+     *
+     * @param text The text to append.
+     * @return The MessageBuilder instance for method chaining.
+     */
+    public MessageBuilder appendln(String text) {
+        return append(text).append("\n");
+    }
+
+    /**
+     * Appends a {@link ComponentLike} to the message.
+     *
+     * @param componentLike The {@link ComponentLike} to append.
+     * @return The MessageBuilder instance for method chaining.
+     */
+    public MessageBuilder append(ComponentLike componentLike) {
+        componentBuilder.append(componentLike);
         return this;
     }
 
@@ -178,8 +204,7 @@ public class MessageBuilder {
      * @param tagResolver The TagResolver to use, can be null if not needed.
      * @return The converted Component.
      */
-    private @NotNull Component miniMessage(String message, TagResolver tagResolver) {
-        message = replacePlaceholders(message);
+    private @NonNull Component miniMessage(String message, TagResolver tagResolver) {
         return MessageParser.miniMessage(message, tagResolver);
     }
 
@@ -254,7 +279,6 @@ public class MessageBuilder {
      * @return The MessageBuilder instance for method chaining.
      */
     public MessageBuilder clickEvent(ClickEvent.Action action, String value) {
-        value = replacePlaceholders(value);
         this.currentClickEvent = ClickEvent.clickEvent(action, value);
         return this;
     }
@@ -273,7 +297,6 @@ public class MessageBuilder {
      * @return The MessageBuilder instance for method chaining.
      */
     public MessageBuilder hoverEvent(String hoverText) {
-        hoverText = replacePlaceholders(hoverText);
         this.currentHoverEvent = HoverEvent.showText(miniMessage(hoverText, null));
         return this;
     }
@@ -292,8 +315,8 @@ public class MessageBuilder {
      *
      * @param audience The player to send the message to.
      */
-    public void send(@NotNull Audience audience) {
-        audience.sendMessage(componentBuilder.build());
+    public void send(@NonNull Audience audience) {
+        audience.sendMessage(build());
     }
 
     /**
@@ -309,7 +332,12 @@ public class MessageBuilder {
      * @return The constructed Component.
      */
     public Component build() {
-        return componentBuilder.build();
+        return MessageParser.miniMessage(
+                this.placeholder.resolve(
+                        MiniMessage.miniMessage().serialize(componentBuilder.build())
+                ),
+                TagResolver.empty()
+        );
     }
 
     /**
@@ -405,100 +433,108 @@ public class MessageBuilder {
 
     public MessageBuilder reset() {
         this.componentBuilder = Component.text();
-        this.placeholders.clear();
+        this.placeholder = new Placeholder();
         return this.resetStyles();
     }
 
     /**
-     * Sets the placeholders for the message.
+     * Sets the target {@link Audience} for PlaceholderAPI integration.
+     * <p>
+     * This allows placeholders to be resolved using PlaceholderAPI for the given target.
      *
-     * @param placeholders The placeholders to set.
-     * @return The MessageBuilder instance for method chaining.
+     * @param target The target player or server operator, can be null.
+     * @return The current {@link MessageBuilder} instance for method chaining.
      */
-    public MessageBuilder placeholders(ObjectMap<String, String> placeholders) {
-        this.placeholders = new HashObjectMap<>(placeholders);
+    public MessageBuilder placeholderContext(@Nullable Audience target) {
+        this.placeholder.setTarget(target);
         return this;
     }
 
     /**
-     * Clears all placeholders from the message.
+     * Adds a simple placeholder key-value pair that will be replaced in messages.
+     * <p>
+     * Example usage:
+     * <pre>{@code
+     * messageBuilder.addPlaceholder("%player%", player.getName());
+     * }</pre>
      *
-     * @return The MessageBuilder instance for method chaining.
+     * @param key   The placeholder key to replace (e.g., "%player%").
+     * @param value The value to replace the placeholder with.
+     * @return The current {@link MessageBuilder} instance for method chaining.
      */
-    public MessageBuilder clearPlaceholders() {
-        this.placeholders.clear();
+    public MessageBuilder addPlaceholder(@NonNull String key, @NonNull String value) {
+        this.placeholder.addPlaceholder(key, value);
         return this;
     }
 
     /**
-     * Adds a placeholder to the message.
+     * Adds multiple boolean states for dynamic inline switches in messages.
+     * <p>
+     * Example usage:
+     * <pre>{@code
+     * Map<String, Boolean> states = Map.of("autosell", true, "linked", false);
+     * messageBuilder.addStates(states);
+     * // Then in message: "AutoSell is {autosell:enabled|disabled}, Chest is {linked:linked|not linked}"
+     * // Output: "AutoSell is enabled, Chest is not linked"
+     * }</pre>
      *
-     * @param key   The placeholder key.
-     * @param value The placeholder value.
-     * @return The MessageBuilder instance for method chaining.
+     * @param states A map containing key-boolean pairs representing states.
+     * @return The current {@link MessageBuilder} instance for method chaining.
      */
-    public MessageBuilder addPlaceholder(String key, String value) {
-        this.placeholders.put(key, value);
+    public MessageBuilder addStates(@NonNull Map<String, Boolean> states) {
+        this.placeholder.addStates(states);
         return this;
     }
 
     /**
-     * Attempts to convert this message (built as a MiniMessage string) into a Paper Adventure
-     * {@code net.kyori..adventure.text.Component} instance at runtime, without directly referencing
-     * Adventure API classes in bytecode.
+     * Adds a single boolean state for dynamic inline switches in messages.
+     * <p>
+     * Example usage:
+     * <pre>{@code
+     * messageBuilder.addState("autosell", true);
+     * // Then in message: "AutoSell is {autosell:enabled|disabled}"
+     * // Output: "AutoSell is enabled"
+     * }</pre>
      *
-     * <p>This method is designed for environments where Adventure is shaded and relocated (e.g. Spigot),
-     * but Paper provides its own Adventure API. Direct casts or static imports would be relocated by the
-     * shadow plugin, causing runtime type mismatches. To avoid relocation, class names are constructed
-     * dynamically and reflection is used to invoke the MiniMessage deserializer on Paper.</p>
-     *
-     * <p>If running on a non-Paper server (or if the Paper MiniMessage API is not available), this
-     * method returns {@code null}. The caller must handle the {@code null} return and fall back to the
-     * relocated Adventure API.</p>
-     *
-     * @return a Paper {@code net.kyori.adventure.text.Component} instance if Paper Adventure is present,
-     * otherwise {@code null}
+     * @param key   The key representing the state.
+     * @param state The boolean value of the state.
+     * @return The current {@link MessageBuilder} instance for method chaining.
      */
-    public @Nullable Object toPaperComponent() {
-        try {
-            Class<?> mmClass = Class.forName(
-                    n("net", "kyori", "adventure", "text", "minimessage", "MiniMessage")
-            );
-            Class<?> componentClass = Class.forName(
-                    n("net", "kyori", "adventure", "text", "Component")
-            );
+    public MessageBuilder addState(@NonNull String key, boolean state) {
+        this.placeholder.addState(key, state);
+        return this;
+    }
 
-            Class<?> tagResolverClass = Class.forName(
-                    n("net", "kyori", "adventure", "text", "minimessage", "tag", "resolver", "TagResolver")
-            );
-
-            Object mm = mmClass.getMethod("miniMessage").invoke(null);
-
-            Object emptyResolvers = java.lang.reflect.Array.newInstance(tagResolverClass, 0);
-
-            return mmClass
-                    .getMethod("deserialize", String.class, java.lang.reflect.Array.newInstance(tagResolverClass, 0).getClass())
-                    .invoke(mm, buildString(), emptyResolvers);
-
-        } catch (Throwable throwable) {
-            SkinOverlay.getInstance().getLogger().log(
-                    Level.WARNING, "Could not deserialize MiniMessage", throwable
-            );
-            return null;
+    /**
+     * Replaces the current {@link Placeholder} instance with a new one.
+     * <p>
+     * This can be useful if you want to set multiple placeholders and states at once.
+     *
+     * @param placeholder The new {@link Placeholder} instance to use.
+     * @return The current {@link MessageBuilder} instance for method chaining.
+     */
+    public MessageBuilder placeholders(@Nullable Placeholder placeholder) {
+        if (placeholder == null) {
+            return this;
         }
+        this.placeholder.merge(placeholder);
+        return this;
     }
 
     /**
-     * Replaces placeholders in the given string with their corresponding values.
+     * Adds multiple string placeholders at once from a map.
+     * <p>
+     * Example usage:
+     * <pre>{@code
+     * Map<String, String> placeholders = Map.of("%player%", player.getName(), "%island%", island.getName());
+     * messageBuilder.placeholders(placeholders);
+     * }</pre>
      *
-     * @param input The input string containing placeholders.
-     * @return The input string with placeholders replaced.
+     * @param placeholders A map containing key-value pairs for placeholders.
+     * @return The current {@link MessageBuilder} instance for method chaining.
      */
-    private String replacePlaceholders(String input) {
-        return Utils.placeHolder(input, placeholders, true);
-    }
-
-    private String n(String... p) {
-        return String.join(".", p);
+    public MessageBuilder placeholders(@NonNull Map<String, String> placeholders) {
+        this.placeholder.addPlaceholders(placeholders);
+        return this;
     }
 }
