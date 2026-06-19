@@ -276,10 +276,14 @@ public class SkinOverlay {
         this.scheduler = scheduler;
     }
 
+    @ApiStatus.Internal
+    @ApiStatus.Experimental
     public Audience getConsoleAudience() {
         return consoleAudience;
     }
 
+    @ApiStatus.Internal
+    @ApiStatus.Experimental
     public void setConsoleAudience(Audience consoleAudience) {
         this.consoleAudience = consoleAudience;
     }
