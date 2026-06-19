@@ -2,8 +2,8 @@ package com.georgev22.skinoverlay.command;
 
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.annotation.*;
-import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
 import com.georgev22.skinoverlay.message.MessageBuilder;
+import com.georgev22.skinoverlay.message.Placeholder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.player.SPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -102,9 +102,9 @@ public class MethodCommand extends BaseCommand {
                 if (raw == null || raw.isEmpty()) {
                     if (!argAnno.optional() && argAnno.defaultValue().isEmpty()) {
                         CommandMessages.COMMAND_MISSING_ARGUMENT.msg(sender,
-                                new HashObjectMap<String, String>()
-                                        .append("%command%", context.getData().getOr("command", ""))
-                                        .append("%arg%", argName), true);
+                                Placeholder.builder(sender.audience())
+                                        .placeholder("%command%", context.getData().getOr("command", ""))
+                                        .placeholder("%arg%", argName).build());
                         return;
                     }
                     raw = argAnno.defaultValue();
@@ -114,9 +114,9 @@ public class MethodCommand extends BaseCommand {
 
                 if (value == null) {
                     CommandMessages.COMMAND_INVALID_ARGUMENT.msg(sender,
-                            new HashObjectMap<String, String>()
-                                    .append("%command%", context.getData().getOr("command", ""))
-                                    .append("%arg%", argName), true);
+                            Placeholder.builder(sender.audience())
+                                    .placeholder("%command%", context.getData().getOr("command", ""))
+                                    .placeholder("%arg%", argName).build());
                     return;
                 }
 

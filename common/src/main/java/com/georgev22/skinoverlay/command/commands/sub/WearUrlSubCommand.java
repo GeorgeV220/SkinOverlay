@@ -4,7 +4,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
-import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
+import com.georgev22.skinoverlay.message.Placeholder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.storage.data.Skin;
@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 import java.util.logging.Level;
 
 @Subcommand("url")
@@ -37,12 +38,16 @@ public class WearUrlSubCommand extends SkinOverlayBaseCommand {
 
             byte[] imageBytes = downloadImageBytes(url);
             if (imageBytes == null) {
-                CommandMessages.COMMAND_INVALID_URL.msg(commandIssuer, new HashObjectMap<String, String>().append("%url%", url.toString()), true);
+                CommandMessages.COMMAND_INVALID_URL.msg(commandIssuer,
+                        Placeholder.builder(commandIssuer.audience())
+                                .placeholder("%url%", url.toString()).build());
                 return;
             }
 
             if (target == null && !commandIssuer.isPlayer()) {
-                CommandMessages.COMMAND_MISSING_ARGUMENT.msg(commandIssuer, new HashObjectMap<String, String>().append("%command%", "url <url> <player>").append("%arg%", "target"), true);
+                CommandMessages.COMMAND_MISSING_ARGUMENT.msg(commandIssuer,
+                        Placeholder.builder(commandIssuer.audience())
+                                .placeholder("%command%", "url <url> <player>").placeholder("%arg%", "target").build());
                 return;
             }
 
@@ -54,7 +59,8 @@ public class WearUrlSubCommand extends SkinOverlayBaseCommand {
 
         } catch (Exception e) {
             mainPlugin.getLogger().log(Level.SEVERE, "Error executing WearUrlSubCommand:", e);
-            CommandMessages.COMMAND_ERROR.msg(commandIssuer, new HashObjectMap<String, String>().append("%error%", e.getMessage()), true);
+            CommandMessages.COMMAND_ERROR.msg(commandIssuer,
+                    Placeholder.builder(commandIssuer.audience()).placeholder("%error%", e.getMessage()).build());
         }
     }
 
@@ -80,7 +86,9 @@ public class WearUrlSubCommand extends SkinOverlayBaseCommand {
     private void applySkinToPlayer(CommandIssuer issuer, SPlayer player, SkinParts skinParts) {
         mainPlugin.getSkinProvider().retrieveOrGenerateSkin(player, skinParts).thenAcceptAsync(optionalSkin -> {
             if (optionalSkin.isEmpty()) {
-                CommandMessages.COMMAND_ERROR.msg(issuer, new HashObjectMap<String, String>().append("%error%", "Failed to retrieve or generate skin."), true);
+                CommandMessages.COMMAND_ERROR.msg(issuer,
+                        Placeholder.builder(issuer.audience())
+                                .placeholder("%error%", "Failed to retrieve or generate skin.").build());
                 return;
             }
 
@@ -89,11 +97,10 @@ public class WearUrlSubCommand extends SkinOverlayBaseCommand {
 
             CommandMessages.COMMAND_OVERLAY_DONE.msg(
                     issuer,
-                    new HashObjectMap<String, String>()
-                            .append("%player%", player.getName())
-                            .append("%url%", skin.skinURL())
-                            .append("%overlay%", skin.getSkinParts().getSkinName()),
-                    true
+                    Placeholder.builder(issuer.audience())
+                            .placeholder("%player%", player.getName())
+                            .placeholder("%url%", Objects.requireNonNullElse(skin.skinURL(), ""))
+                            .placeholder("%overlay%", skin.getSkinParts().getSkinName()).build()
             );
         }, runnable -> SkinOverlay.getInstance().getScheduler().runTask(SkinOverlay.getInstance().getPlugin(), runnable));
     }

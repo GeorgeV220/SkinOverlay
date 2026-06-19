@@ -4,7 +4,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.processors.PostProcessor;
 import com.georgev22.skinoverlay.command.processors.PreProcessor;
-import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
+import com.georgev22.skinoverlay.message.Placeholder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.registry.CommandTargetRegistry;
 import org.jetbrains.annotations.NotNull;
@@ -96,19 +96,20 @@ public abstract class BaseCommand {
         // Player-only check
         if (!CommandTargetRegistry.getInstance().matches(targets, sender)) {
             CommandMessages.COMMAND_TARGET_DENIED.msg(sender,
-                    new HashObjectMap<String, String>()
-                            .append("%command%", context.getData().getOr("command", ""))
-                            .append("%targets%", String.join(", ", targets)),
-                    true);
+                    Placeholder.builder(sender.audience())
+                            .placeholder("%command%", context.getData().getOr("command", ""))
+                            .placeholder("%targets%", String.join(", ", targets))
+                            .build()
+            );
             return;
         }
 
         // Permission check
         if (permission != null && !permission.isEmpty() && !sender.hasPermission(permission)) {
             CommandMessages.COMMAND_PERMISSION_DENIED.msg(sender,
-                    new HashObjectMap<String, String>()
-                            .append("%command%", context.getData().getOr("command", "")),
-                    true);
+                    Placeholder.builder(sender.audience())
+                            .placeholder("%command%", context.getData().getOr("command", ""))
+                            .build());
             return;
         }
 
@@ -121,10 +122,9 @@ public abstract class BaseCommand {
                         def.execute(sender, args, context);
                     } else if (!handle(sender, args, context)) {
                         CommandMessages.COMMAND_USAGE.msg(sender,
-                                new HashObjectMap<String, String>()
-                                        .append("%command%", context.getData().getOr("command", ""))
-                                        .append("%usage%", usage),
-                                true);
+                                Placeholder.builder(sender.audience())
+                                        .placeholder("%command%", context.getData().getOr("command", ""))
+                                        .placeholder("%usage%", usage).build());
                     }
                 }
 
@@ -132,9 +132,9 @@ public abstract class BaseCommand {
                 runPostprocessors(sender, context);
             } catch (Exception e) {
                 CommandMessages.COMMAND_ERROR.msg(sender,
-                        new HashObjectMap<String, String>()
-                                .append("%command%", context.getData().getOr("command", "")),
-                        true);
+                        Placeholder.builder(sender.audience())
+                                .placeholder("%command%", context.getData().getOr("command", ""))
+                                .build());
                 SkinOverlay.getInstance().getLogger()
                         .log(Level.WARNING, "Error while executing command", e);
             }
@@ -349,10 +349,9 @@ public abstract class BaseCommand {
     protected boolean handle(@NotNull CommandIssuer commandIssuer, String @NotNull [] args, @NotNull CommandContext context) {
         if (getUsage() != null) {
             CommandMessages.COMMAND_USAGE.msg(commandIssuer,
-                    new HashObjectMap<String, String>()
-                            .append("%command%", context.getData().getOr("command", ""))
-                            .append("%usage%", usage),
-                    true);
+                    Placeholder.builder(commandIssuer.audience())
+                            .placeholder("%command%", context.getData().getOr("command", ""))
+                            .placeholder("%usage%", usage).build());
         }
         return false;
     }

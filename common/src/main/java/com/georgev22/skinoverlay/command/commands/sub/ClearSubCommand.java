@@ -4,7 +4,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
-import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
+import com.georgev22.skinoverlay.message.Placeholder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.storage.data.Skin;
@@ -23,7 +23,8 @@ public class ClearSubCommand extends SkinOverlayBaseCommand {
         if (target == null) {
             if (!commandIssuer.isPlayer()) {
                 CommandMessages.COMMAND_MISSING_ARGUMENT.msg(commandIssuer,
-                        new HashObjectMap<String, String>().append("%command%", "clear <player>").append("%arg%", "target"), true);
+                        Placeholder.builder(commandIssuer.audience())
+                                .placeholder("%command%", "clear <player>").placeholder("%arg%", "target").build());
                 return;
             }
             SPlayer player = mainPlugin.getPlayerProvider().getSPlayer(commandIssuer.getUniqueId());
@@ -42,14 +43,17 @@ public class ClearSubCommand extends SkinOverlayBaseCommand {
                         mainPlugin.getSkinProvider().setSkin(player, skin);
                         CommandMessages.COMMAND_OVERLAY_RESET.msg(
                                 commandIssuer,
-                                new HashObjectMap<String, String>().append("%player%", player.getName()),
-                                true
+                                Placeholder.builder(commandIssuer.audience()).placeholder("%player%", player.getName())
+                                        .build()
                         );
 
                     }, runnable -> SkinOverlay.getInstance().getScheduler().runTask(SkinOverlay.getInstance().getPlugin(), runnable));
         } else {
             if (!target.isOnline()) {
-                CommandMessages.COMMAND_OFFLINE_PLAYER.msg(commandIssuer, new HashObjectMap<String, String>().append("%player%", target.getName()), true);
+                CommandMessages.COMMAND_OFFLINE_PLAYER.msg(
+                        commandIssuer,
+                        Placeholder.builder(commandIssuer.audience()).placeholder("%player%", target.getName())
+                                .build());
                 return;
             }
             SkinParts skinParts = new SkinParts(null, "default");
@@ -64,8 +68,7 @@ public class ClearSubCommand extends SkinOverlayBaseCommand {
                         mainPlugin.getSkinProvider().setSkin(target, skin);
                         CommandMessages.COMMAND_OVERLAY_RESET.msg(
                                 commandIssuer,
-                                new HashObjectMap<String, String>().append("%player%", target.getName()),
-                                true
+                                Placeholder.builder(commandIssuer.audience()).build()
                         );
 
                     }, runnable -> SkinOverlay.getInstance().getScheduler().runTask(SkinOverlay.getInstance().getPlugin(), runnable));

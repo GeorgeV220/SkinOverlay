@@ -1,6 +1,5 @@
 package com.georgev22.skinoverlay.message;
 
-
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
@@ -9,14 +8,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.kyori.adventure.title.Title;
-
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;
-
-import static com.georgev22.skinoverlay.utilities.Utils.placeHolder;
-
 
 /**
  * Represents a single configurable message entry in a plugin.
@@ -25,8 +22,6 @@ import static com.georgev22.skinoverlay.utilities.Utils.placeHolder;
  * a message key with its default values.
  */
 public interface MessageEntry {
-
-    MessageEntry NONE = null;
 
     /**
      * @return the path of this message in the configuration file
@@ -71,7 +66,7 @@ public interface MessageEntry {
      * @param issuer the receiver
      */
     default void msg(CommandIssuer issuer) {
-        msg(issuer, new HashObjectMap<>(), false, MessageType.CHAT);
+        msg(issuer, null, MessageType.CHAT);
     }
 
     /**
@@ -80,31 +75,29 @@ public interface MessageEntry {
      * @param issuer the receiver
      */
     default void msg(CommandIssuer issuer, MessageType type) {
-        msg(issuer, new HashObjectMap<>(), false, type);
+        msg(issuer, null, type);
     }
 
     /**
      * Sends a message with placeholder replacement.
      *
-     * @param issuer     the receiver
-     * @param map        placeholder replacements
-     * @param ignoreCase whether to ignore case when replacing
+     * @param issuer      the receiver
+     * @param placeholder placeholder replacements
      */
-    default void msg(CommandIssuer issuer, Map<String, String> map, boolean ignoreCase) {
-        msg(issuer, map, ignoreCase, MessageType.CHAT);
+    default void msg(CommandIssuer issuer, Placeholder placeholder) {
+        msg(issuer, placeholder, MessageType.CHAT);
     }
 
     /**
      * Sends a message with full customization.
      *
-     * @param issuer     the receiver
-     * @param map        placeholder replacements
-     * @param ignoreCase whether to ignore case when replacing
-     * @param type       how the message should be shown
+     * @param issuer      the receiver
+     * @param placeholder placeholder replacements
+     * @param type        how the message should be shown
      */
     default void msg(CommandIssuer issuer,
-                     Map<String, String> map, boolean ignoreCase,
-                     @NotNull MessageType type) {
+                     @Nullable Placeholder placeholder,
+                     @NonNull MessageType type) {
 
         String[] messages = this.getMessages();
         MessageBuilder builder = new MessageBuilder();
@@ -113,22 +106,26 @@ public interface MessageEntry {
         Audience audience = issuer.audience();
 
         switch (type) {
-            case ACTIONBAR -> {
-                audience.sendActionBar(
-                        builder.appendMiniMessage(
-                                        placeHolder(messages[0], map, ignoreCase),
-                                        resolver
-                                )
-                                .buildAndReset()
-                );
-            }
+            case ACTIONBAR -> audience.sendActionBar(
+                    builder
+                            .placeholderContext(audience)
+                            .placeholders(placeholder)
+                            .appendMiniMessage(messages[0], resolver)
+                            .buildAndReset()
+            );
             case TITLE -> {
                 Component title = builder
-                        .appendMiniMessage(placeHolder(messages[0], map, ignoreCase), resolver)
+                        .placeholderContext(audience)
+                        .placeholders(placeholder)
+                        .appendMiniMessage(messages[0], resolver)
                         .buildAndReset();
 
                 Component subtitle = messages.length > 1
-                        ? builder.appendMiniMessage(placeHolder(messages[1], map, ignoreCase), resolver).buildAndReset()
+                        ? builder
+                        .placeholderContext(audience)
+                        .placeholders(placeholder)
+                        .appendMiniMessage(messages[1], resolver)
+                        .buildAndReset()
                         : Component.text("");
 
                 audience.showTitle(Title.title(title, subtitle, Title.DEFAULT_TIMES));
@@ -137,12 +134,16 @@ public interface MessageEntry {
                 if (messages.length > 1) {
                     Arrays.stream(messages).forEach(msg ->
                             audience.sendMessage(builder
-                                    .appendMiniMessage(placeHolder(msg, map, ignoreCase), resolver)
+                                    .placeholderContext(audience)
+                                    .placeholders(placeholder)
+                                    .appendMiniMessage(msg, resolver)
                                     .buildAndReset())
                     );
                 } else {
                     audience.sendMessage(builder
-                            .appendMiniMessage(placeHolder(messages[0], map, ignoreCase), resolver)
+                            .placeholderContext(audience)
+                            .placeholders(placeholder)
+                            .appendMiniMessage(messages[0], resolver)
                             .buildAndReset());
                 }
             }
@@ -166,16 +167,21 @@ public interface MessageEntry {
     default void msgConsole(Map<String, String> map, boolean ignoreCase) {
         String[] messages = this.getMessages();
         Audience console = SkinOverlay.getInstance().getConsoleAudience();
-        MessageBuilder messageBuilder = new MessageBuilder();
+        MessageBuilder builder = new MessageBuilder();
         TagResolver resolver = StandardTags.defaults();
         if (messages.length > 1) {
-            for (String message : messages) {
-                messageBuilder.appendMiniMessage(placeHolder(message, map, ignoreCase), resolver);
-            }
-            messageBuilder.send(console);
+            Arrays.stream(messages).forEach(msg -> console
+                    .sendMessage(builder
+                            .placeholderContext(console)
+                            .placeholders(new HashObjectMap<>(map))
+                            .appendMiniMessage(msg, resolver)
+                            .buildAndReset()));
         } else {
-            messageBuilder.appendMiniMessage(placeHolder(messages[0], map, ignoreCase), resolver);
-            messageBuilder.send(console);
+            console.sendMessage(builder
+                    .placeholderContext(console)
+                    .placeholders(new HashObjectMap<>(map))
+                    .appendMiniMessage(messages[0], resolver)
+                    .buildAndReset());
         }
     }
 
@@ -184,17 +190,16 @@ public interface MessageEntry {
      *
      */
     default void msgAll() {
-        msgAll(Map.of(), false);
+        msgAll((Placeholder) null);
     }
 
     /**
      * Sends a message to all online players with placeholders.
      *
-     * @param map        placeholder replacements
-     * @param ignoreCase whether to ignore case
+     * @param placeholder placeholder replacements
      */
-    default void msgAll(Map<String, String> map, boolean ignoreCase) {
-        SkinOverlay.getInstance().getPlayerProvider().getOnlinePlayers().forEach(p -> msg(p, map, ignoreCase));
+    default void msgAll(@Nullable Placeholder placeholder) {
+        SkinOverlay.getInstance().getPlayerProvider().getOnlinePlayers().forEach(p -> msg(p, placeholder));
     }
 
     /**
@@ -209,11 +214,10 @@ public interface MessageEntry {
     /**
      * Sends a message to all online players with placeholders.
      *
-     * @param map        placeholder replacements
-     * @param ignoreCase whether to ignore case
-     * @param type       the message type (e.g. ACTIONBAR or CHAT)
+     * @param placeholder placeholder replacements
+     * @param type        the message type (e.g. ACTIONBAR or CHAT)
      */
-    default void msgAll(Map<String, String> map, boolean ignoreCase, MessageType type) {
-        SkinOverlay.getInstance().getPlayerProvider().getOnlinePlayers().forEach(p -> msg(p, map, ignoreCase, type));
+    default void msgAll(Placeholder placeholder, MessageType type) {
+        SkinOverlay.getInstance().getPlayerProvider().getOnlinePlayers().forEach(p -> msg(p, placeholder, type));
     }
 }
