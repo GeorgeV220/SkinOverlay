@@ -16,7 +16,7 @@ dependencies {
     compileOnly project(path: ':multiver:mc_1_20_R2', configuration: 'reobf')
     compileOnly project(path: ':multiver:mc_1_20_R3', configuration: 'reobf')
 
-    implementation "net.kyori:adventure-platform-bukkit:4.3.0"
+    implementation "net.kyori:adventure-platform-bukkit:4.4.1"
 }
 
 defaultTasks 'build'
