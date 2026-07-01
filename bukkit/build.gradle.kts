@@ -75,6 +75,8 @@ tasks.shadowJar {
     relocate("net.kyori", "${project.property("packageName")}.lib.kyori")
     relocate("redis.clients", "${project.property("packageName")}.lib.jedis")
     relocate("net.lenni0451.reflect", "${project.property("packageName")}.lib.reflect")
+    relocate("org.bson", "${project.property("packageName")}.lib.bson")
+    relocate("com.mongodb", "${project.property("packageName")}.lib.mongodb")
 }
 
 tasks.named("publish") {

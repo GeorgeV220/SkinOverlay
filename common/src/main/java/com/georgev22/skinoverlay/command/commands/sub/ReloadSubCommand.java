@@ -10,6 +10,7 @@ import com.georgev22.skinoverlay.message.MessageEntry;
 import com.georgev22.skinoverlay.message.MessagesRegistry;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.message.messages.CoreMessages;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
@@ -30,6 +31,7 @@ public class ReloadSubCommand extends SkinOverlayBaseCommand {
         } catch (Exception e) {
             mainPlugin.getLogger().log(Level.SEVERE, "Error loading the language file: ", e);
         }
+        OptionsUtil.reloadAll();
         CoreMessages.PLUGIN_RELOAD.msg(commandIssuer);
     }
 }

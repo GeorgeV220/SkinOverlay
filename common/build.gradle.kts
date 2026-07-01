@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.jedis)
 
     implementation(libs.jspecify)
+    implementation(libs.mongodb.driver.sync)
 }
 
 configurations.configureEach {

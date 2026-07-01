@@ -4,6 +4,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.utilities.color.Color;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,30 @@ public enum OptionsUtil {
     MINESKIN_API_KEY("mineskin api key", "none", Optional.empty()),
 
     COMMAND_SKINOVERLAY("commands.skinoverlay", true, Optional.empty()),
+
+    DATABASE_HOST("database.SQL.host", "localhost", Optional.empty()),
+
+    DATABASE_PORT("database.SQL.port", 3306, Optional.empty()),
+
+    DATABASE_USER("database.SQL.user", "youruser", Optional.empty()),
+
+    DATABASE_PASSWORD("database.SQL.password", "yourpassword", Optional.empty()),
+
+    DATABASE_DATABASE("database.SQL.database", "SkinOverlay", Optional.empty()),
+
+    DATABASE_FILE_NAME("database.SQL.SQLite file name", "SkinOverlay", Optional.empty()),
+
+    DATABASE_MONGO_HOST("database.MongoDB.host", "localhost", Optional.empty()),
+
+    DATABASE_MONGO_PORT("database.MongoDB.port", 27017, Optional.empty()),
+
+    DATABASE_MONGO_USER("database.MongoDB.user", "youruser", Optional.empty()),
+
+    DATABASE_MONGO_PASSWORD("database.MongoDB.password", "yourpassword", Optional.empty()),
+
+    DATABASE_MONGO_DATABASE("database.MongoDB.database", "SkinOverlay", Optional.empty()),
+
+    DATABASE_TYPE("database.type", "File", Optional.empty()),
 
     EXPERIMENTAL_FEATURES("experimental features", false, Optional.empty()),
 
@@ -38,140 +63,218 @@ public enum OptionsUtil {
     REDIS_PORT("redis.port", 6379, Optional.empty()),
     REDIS_PASSWORD("redis.password", "", Optional.empty()),
     ;
-    private static final SkinOverlay mainPlugin = SkinOverlay.getInstance();
+    private static final FileManager fileManager = FileManager.getInstance();
     private final String pathName;
-    private final Object value;
+    private final Object defaultValue;
     private final Optional<String>[] oldPaths;
+    private String resolvedPath;
+    private Object cachedValue;
 
     @SafeVarargs
-    @Contract(pure = true)
-    OptionsUtil(final String pathName, final Object value, Optional<String>... oldPaths) {
+    OptionsUtil(final String pathName, final Object defaultValue, Optional<String>... oldPaths) {
         this.pathName = pathName;
-        this.value = value;
+        this.defaultValue = defaultValue;
         this.oldPaths = oldPaths;
     }
 
+    /**
+     * Reloads and caches all configuration options.
+     *
+     * <p>
+     * This method must be called:
+     * <ul>
+     *     <li>On plugin startup</li>
+     *     <li>After a configuration reload</li>
+     * </ul>
+     *
+     * <p>
+     * After this method is called, all getters operate in O(1) time
+     * without accessing the YAML configuration.
+     */
+    public static void reloadAll() {
+        for (OptionsUtil option : values()) {
+            option.reload();
+        }
+    }
+
+    /**
+     * Reloads and caches the value of this option.
+     *
+     * <p>
+     * The configuration path is resolved once and stored.
+     * The value is then read from the configuration and cached.
+     */
+    public void reload() {
+        resolvedPath = null;
+        String path = getPath();
+        Object val = fileManager.getConfig().getFileConfiguration().get(path);
+        cachedValue = (val != null) ? val : defaultValue;
+    }
+
+    /**
+     * Returns the cached boolean value of this option.
+     *
+     * @return the boolean value
+     */
     public boolean getBooleanValue() {
-        return mainPlugin.getConfig().getBoolean(getPath(), Boolean.parseBoolean(String.valueOf(getDefaultValue())));
+        if (cachedValue instanceof Boolean b) {
+            return b;
+        }
+        return Boolean.parseBoolean(String.valueOf(cachedValue));
     }
 
-    public Object getObjectValue() {
-        return mainPlugin.getConfig().get(getPath(), getDefaultValue());
+    /**
+     * Returns the cached integer value of this option.
+     *
+     * @return the integer value
+     */
+    public @NonNull Integer getIntValue() {
+        if (cachedValue instanceof Number n) {
+            return n.intValue();
+        }
+        return Integer.parseInt(String.valueOf(cachedValue));
     }
 
+    /**
+     * Returns the cached long value of this option.
+     *
+     * @return the long value
+     */
+    public @NonNull Long getLongValue() {
+        if (cachedValue instanceof Number n) {
+            return n.longValue();
+        }
+        return Long.parseLong(String.valueOf(cachedValue));
+    }
+
+    /**
+     * Returns the cached double value of this option.
+     *
+     * @return the double value
+     */
+    public @NonNull Double getDoubleValue() {
+        if (cachedValue instanceof Number n) {
+            return n.doubleValue();
+        }
+        return Double.parseDouble(String.valueOf(cachedValue));
+    }
+
+    /**
+     * Returns the cached float value of this option.
+     *
+     * @return the float value
+     */
+    public @NonNull Float getFloatValue() {
+        if (cachedValue instanceof Number n) {
+            return n.floatValue();
+        }
+        return Float.parseFloat(String.valueOf(cachedValue));
+    }
+
+    /**
+     * Returns the cached string value of this option.
+     *
+     * @return the string value
+     */
     public String getStringValue() {
-        return mainPlugin.getConfig().getString(getPath(), String.valueOf(getDefaultValue()));
-    }
-
-    public @NotNull Long getLongValue() {
-        return mainPlugin.getConfig().getLong(getPath(), Long.parseLong(String.valueOf(getDefaultValue())));
-    }
-
-    public @NotNull Integer getIntValue() {
-        return mainPlugin.getConfig().getInt(getPath(), Integer.parseInt(String.valueOf(getDefaultValue())));
-    }
-
-    public @NotNull Double getDoubleValue() {
-        return mainPlugin.getConfig().getDouble(getPath(), Double.parseDouble(String.valueOf(getDefaultValue())));
-    }
-
-    public @NotNull List<String> getStringList() {
-        return mainPlugin.getConfig().getStringList(getPath());
+        return String.valueOf(cachedValue);
     }
 
     /**
-     * Converts and return a String List of color codes to a List of Color classes that represent the colors.
+     * Returns the cached string list value of this option.
      *
-     * @return a List of Color classes that represent the colors.
+     * @return a list of strings, or an empty list if the value is not a list
      */
-    public @NotNull List<Color> getColors() {
-        return getStringList().stream().map(Color::from).collect(Collectors.toList());
-    }
-
-    public boolean getBooleanValue(String arg) {
-        return mainPlugin.getConfig().getBoolean(String.format(getPath(), arg), Boolean.parseBoolean(String.valueOf(getDefaultValue())));
-    }
-
-    public Object getObjectValue(String arg) {
-        return mainPlugin.getConfig().get(getPath(), getDefaultValue());
-    }
-
-    public String getStringValue(String arg) {
-        return mainPlugin.getConfig().getString(getPath(), String.valueOf(getDefaultValue()));
-    }
-
-    public @NotNull Long getLongValue(String arg) {
-        return mainPlugin.getConfig().getLong(getPath(), Long.parseLong(String.valueOf(getDefaultValue())));
-    }
-
-    public @NotNull Integer getIntValue(String arg) {
-        return mainPlugin.getConfig().getInt(getPath(), Integer.parseInt(String.valueOf(getDefaultValue())));
-    }
-
-    public @NotNull Double getDoubleValue(String arg) {
-        return mainPlugin.getConfig().getDouble(getPath(), Double.parseDouble(String.valueOf(getDefaultValue())));
-    }
-
-    public @NotNull List<String> getStringList(String arg) {
-        return mainPlugin.getConfig().getStringList(getPath());
+    @SuppressWarnings("unchecked")
+    public @NonNull List<String> getStringList() {
+        return cachedValue instanceof List
+                ? (List<String>) cachedValue
+                : List.of();
     }
 
     /**
-     * Converts and return a String List of color codes to a List of Color classes that represent the colors.
+     * Converts the cached string list into a list of {@link Color} objects.
      *
-     * @return a List of Color classes that represent the colors.
+     * @return a list of parsed colors
      */
-    public @NotNull List<com.georgev22.skinoverlay.utilities.color.Color> getColors(String arg) {
-        return getStringList().stream().map(Color::from).collect(Collectors.toList());
+    public @NonNull List<Color> getColors() {
+        return getStringList().stream()
+                .map(Color::from)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Returns the path.
+     * Returns the cached string value wrapped in an {@link Optional}.
      *
-     * @return the path.
+     * @return an optional containing the string value
      */
-    public @NotNull String getPath() {
-        if (mainPlugin.getConfig().get("Options." + getDefaultPath()) == null) {
-            for (Optional<String> path : getOldPaths()) {
-                if (path.isPresent()) {
-                    if (mainPlugin.getConfig().get("Options." + path.get()) != null) {
-                        return "Options." + path.get();
-                    }
+    public @NonNull Optional<String> getOptionalStringValue() {
+        return Optional.ofNullable(getStringValue());
+    }
+
+    /**
+     * Resolves and returns the configuration path for this option.
+     *
+     * <p>
+     * The resolution order is:
+     * <ol>
+     *     <li>Cached path</li>
+     *     <li>Current path</li>
+     *     <li>Legacy paths</li>
+     * </ol>
+     *
+     * <p>
+     * The resolved path is cached after the first lookup.
+     *
+     * @return the resolved configuration path
+     */
+    public @NonNull String getPath() {
+        if (resolvedPath != null) {
+            return resolvedPath;
+        }
+
+        String base = "Options." + pathName;
+        if (fileManager.getConfig().getFileConfiguration().get(base) != null) {
+            return resolvedPath = base;
+        }
+
+        for (Optional<String> old : oldPaths) {
+            if (old.isPresent()) {
+                String oldPath = "Options." + old.get();
+                if (fileManager.getConfig().getFileConfiguration().get(oldPath) != null) {
+                    return resolvedPath = oldPath;
                 }
             }
         }
-        return "Options." + getDefaultPath();
+
+        return resolvedPath = base;
     }
 
     /**
-     * Returns the default path.
+     * Returns the default (current) path name without the "Options." prefix.
      *
-     * @return the default path.
+     * @return the default path name
      */
     @Contract(pure = true)
-    public @NotNull String getDefaultPath() {
+    public @NonNull String getDefaultPath() {
         return this.pathName;
     }
 
     /**
-     * Returns the old path if it exists.
+     * Returns the legacy paths associated with this option.
      *
-     * @return the old path if it exists.
+     * @return an array of legacy paths
      */
     public Optional<String>[] getOldPaths() {
         return oldPaths;
     }
 
     /**
-     * Returns the default value if the path have no value.
+     * Returns the default value of this option.
      *
-     * @return the default value if the path have no value.
+     * @return the default value
      */
     public Object getDefaultValue() {
-        return value;
-    }
-
-    public Optional<String> getOptionalStringValue() {
-        return Optional.ofNullable(getStringValue());
+        return defaultValue;
     }
 }

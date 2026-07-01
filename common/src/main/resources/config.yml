@@ -9,6 +9,25 @@ Options:
   locale: "en_US"
   commands: #Disable or enable plugin commands
     skinoverlay: true
+  database:
+    type: "File" #Types File, SQLite, MySQL, MongoDB
+
+    # SQL database options
+    SQL:
+      host: "localhost"                 # SQL database host
+      port: 3306                        # SQL database port
+      user: "youruser"                  # SQL database username
+      password: "yourpassword"          # SQL database password
+      database: "SkinOverlay"           # SQL database name
+      SQLite file name: "skinoverlay"   # SQLite file name
+
+    # MongoDB options
+    MongoDB:
+      host: "localhost"          # MongoDB host
+      port: 27017                # MongoDB port
+      user: "youruser"           # MongoDB username
+      password: "yourpassword"   # MongoDB password
+      database: "skinoverlay"    # MongoDB database name
   updater:
     enabled: true
   default skin uuid: "8667ba71-b85a-4004-af54-457a9734eed7"

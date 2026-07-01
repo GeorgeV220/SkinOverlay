@@ -21,13 +21,13 @@ import com.georgev22.skinoverlay.providers.PlayerProvider;
 import com.georgev22.skinoverlay.providers.SkinProvider;
 import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.scheduler.MinecraftScheduler;
+import com.georgev22.skinoverlay.storage.DatabaseManager;
 import com.georgev22.skinoverlay.storage.EntityManager;
 import com.georgev22.skinoverlay.storage.ManagedEntity;
 import com.georgev22.skinoverlay.storage.data.Entity;
-import com.georgev22.skinoverlay.storage.manager.AbstractEntityManager;
-import com.georgev22.skinoverlay.storage.manager.gson.FileEntityManager;
 import com.georgev22.skinoverlay.utilities.GsonUtils;
 import com.georgev22.skinoverlay.utilities.config.FileManager;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.config.SkinFileCache;
 import com.google.gson.Gson;
 import net.kyori.adventure.audience.Audience;
@@ -74,6 +74,7 @@ public class SkinOverlay {
     private boolean isProxy;
     private File dataFolder;
     private MessageManager messageManager;
+    private DatabaseManager databaseManager;
 
     /**
      * Loads the plugin components. Should be called during plugin load phase.
@@ -84,6 +85,7 @@ public class SkinOverlay {
         this.fileManager = FileManager.getInstance();
         try {
             this.fileManager.loadFiles();
+            OptionsUtil.reloadAll();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -98,21 +100,9 @@ public class SkinOverlay {
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Error loading the language file: ", e);
         }
-        EntityManagerRegistry entityManagerRegistry = EntityManagerRegistry.getInstance();
-        File folder = new File(this.dataFolder, "save-data");
-
-        if (!folder.exists() && folder.mkdirs()) {
-            this.getLogger().info(
-                    "Created " + folder.getPath() + " folder"
-            );
-        }
-
-        for (ManagedEntity<? extends Entity> managedEntity : AbstractEntityManager.getManagedEntities()) {
-            if (entityManagerRegistry.get(managedEntity.type()).isEmpty()) {
-                registerEntityManager(entityManagerRegistry, managedEntity,
-                        new FileEntityManager<>(managedEntity, new File(folder, managedEntity.key())));
-            }
-        }
+        this.databaseManager = new DatabaseManager(this);
+        databaseManager.setupDatabase();
+        databaseManager.loadAllData();
     }
 
     /**
@@ -163,7 +153,9 @@ public class SkinOverlay {
             }
         }
 
-        EntityManagerRegistry.getInstance().entries().forEach((key, value) -> value.shutdown());
+        if (databaseManager != null) {
+            databaseManager.shutdown();
+        }
     }
 
     /**
