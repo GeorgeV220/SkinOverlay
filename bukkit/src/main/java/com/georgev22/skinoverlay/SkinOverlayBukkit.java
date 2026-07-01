@@ -56,10 +56,6 @@ public class SkinOverlayBukkit extends JavaPlugin {
             }
         }
 
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            this.skinOverlay.setPlaceholderHook(new PlaceholderAPIHook());
-        }
-
         this.skinOverlay.setOnlineMode(Bukkit.getOnlineMode());
         this.skinOverlay.setProxy(false);
         this.skinOverlay.setScheduler(
@@ -96,6 +92,11 @@ public class SkinOverlayBukkit extends JavaPlugin {
                 }
             });
         }
+
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            this.skinOverlay.setPlaceholderHook(new PlaceholderAPIHook());
+        }
+
         // call onEnable
         skinOverlay.onEnable();
     }

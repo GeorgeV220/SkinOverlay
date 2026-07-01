@@ -129,6 +129,8 @@ public class SkinOverlay {
             } catch (Exception e) {
                 getLogger().log(Level.WARNING, "Failed to register placeholder hook", e);
             }
+        } else {
+            getLogger().info("Placeholder hook is not set!");
         }
         CompletionEngine.registerResolver("@overlays", (commandIssuer, args) ->
                 skinFileCache.getSkinConfigurationFiles().keySet());

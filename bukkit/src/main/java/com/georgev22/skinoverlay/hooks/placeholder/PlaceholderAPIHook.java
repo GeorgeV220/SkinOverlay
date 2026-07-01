@@ -42,6 +42,16 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Placehol
     }
 
     @Override
+    public boolean persist() {
+        return true;
+    }
+
+    @Override
+    public boolean canRegister() {
+        return true;
+    }
+
+    @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null) return null;
 
