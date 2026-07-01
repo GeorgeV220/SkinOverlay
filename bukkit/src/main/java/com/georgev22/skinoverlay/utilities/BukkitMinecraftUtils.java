@@ -655,6 +655,8 @@ public class BukkitMinecraftUtils {
      * Represents a Minecraft server version using a numeric format (major.minor.patch).
      */
     public static final class MinecraftVersion implements Comparable<MinecraftVersion> {
+        private static final Pattern VERSION_PATTERN =
+                Pattern.compile("^(\\d+)(?:\\.(\\d+))?(?:\\.(\\d+))?");
 
         private final int major;
         private final int minor;
@@ -712,20 +714,18 @@ public class BukkitMinecraftUtils {
          * @param bukkitVersion the raw version string from Bukkit
          * @return a parsed {@link MinecraftVersion}, or {@code 0.0.0} if parsing fails
          */
-        @Contract("_ -> new")
-        public static @NonNull MinecraftVersion parse(String bukkitVersion) {
-            try {
-                String versionPart = bukkitVersion.split("-")[0];
-                String[] parts = versionPart.split("\\.");
+        public static @NotNull MinecraftVersion parse(String bukkitVersion) {
+            Matcher matcher = VERSION_PATTERN.matcher(bukkitVersion);
 
-                int major = parts.length > 0 ? Integer.parseInt(parts[0]) : 0;
-                int minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
-                int patch = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
-
-                return new MinecraftVersion(major, minor, patch, parseNMSPackage());
-            } catch (Exception e) {
+            if (!matcher.find()) {
                 return new MinecraftVersion(0, 0, 0, "unknown");
             }
+
+            int major = Integer.parseInt(matcher.group(1));
+            int minor = matcher.group(2) != null ? Integer.parseInt(matcher.group(2)) : 0;
+            int patch = matcher.group(3) != null ? Integer.parseInt(matcher.group(3)) : 0;
+
+            return new MinecraftVersion(major, minor, patch, parseNMSPackage());
         }
 
         private static String parseNMSPackage() {
