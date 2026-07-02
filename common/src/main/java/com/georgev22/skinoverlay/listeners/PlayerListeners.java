@@ -113,6 +113,7 @@ public class PlayerListeners {
         EntityManagerRegistry.getInstance().getTyped(PlayerData.class)
                 .ifPresent(entityManager -> entityManager.findById(player.getUniqueId())
                         .ifPresent(entityManager::save));
+        this.mainPlugin.getPlayerProvider().remove(player.getUniqueId());
     }
 
 }

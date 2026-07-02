@@ -5,6 +5,7 @@ import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.player.VelocitySPlayer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,65 +20,68 @@ public class VelocityPlayerProvider extends PlayerProvider {
         this.server = server;
     }
 
+    private SPlayer getOrCreate(@NonNull Player player) {
+        return playerCache.computeIfAbsent(
+                player.getUniqueId(),
+                uuid -> new VelocitySPlayer(player)
+        );
+    }
+
     @Override
-    public SPlayer getSPlayer(Object player) {
+    public SPlayer getSPlayer(@NonNull Object player) {
         if (player instanceof Player velocityPlayer) {
-            return new VelocitySPlayer(velocityPlayer);
+            return getOrCreate(velocityPlayer);
         }
+
         if (player instanceof String name) {
-            Optional<Player> onlinePlayer = this.server.getPlayer(name);
-            if (onlinePlayer.isPresent()) {
-                return new VelocitySPlayer(onlinePlayer.get());
-            }
-            throw new IllegalArgumentException("Player " + name + " is not online");
+            return getSPlayer(name);
         }
+
         if (player instanceof UUID uuid) {
-            Optional<Player> onlinePlayer = this.server.getPlayer(uuid);
-            if (onlinePlayer.isPresent()) {
-                return new VelocitySPlayer(onlinePlayer.get());
-            }
-            throw new IllegalArgumentException("Player " + uuid + " is not online");
+            return getSPlayer(uuid);
         }
+
         if (player instanceof CommandIssuer commandIssuer) {
-            if (!commandIssuer.isPlayer()) {
-                throw new IllegalArgumentException("CommandIssuer is not a player");
-            }
-            return new VelocitySPlayer(commandIssuer.getIssuer());
+            return getSPlayer(commandIssuer);
         }
+
         return null;
     }
 
     @Override
-    public SPlayer getSPlayer(CommandIssuer commandIssuer) {
+    public SPlayer getSPlayer(@NonNull CommandIssuer commandIssuer) {
         if (!commandIssuer.isPlayer()) {
             throw new IllegalArgumentException("CommandIssuer is not a player");
         }
-        return new VelocitySPlayer(commandIssuer.getIssuer());
+
+        return getOrCreate(commandIssuer.getIssuer());
     }
 
     @Override
-    public SPlayer getSPlayer(String name) {
-        Optional<Player> onlinePlayer = server.getPlayer(name);
-        if (onlinePlayer.isPresent()) {
-            return new VelocitySPlayer(onlinePlayer.get());
+    public SPlayer getSPlayer(@NonNull String name) {
+        Optional<Player> player = server.getPlayer(name);
+        if (player.isPresent()) {
+            return getOrCreate(player.get());
         }
+
         throw new IllegalArgumentException("Player " + name + " is not online");
     }
 
     @Override
-    public SPlayer getSPlayer(UUID uuid) {
-        Optional<Player> onlinePlayer = server.getPlayer(uuid);
-        if (onlinePlayer.isPresent()) {
-            return new VelocitySPlayer(onlinePlayer.get());
+    public SPlayer getSPlayer(@NonNull UUID uuid) {
+        Optional<Player> player = server.getPlayer(uuid);
+        if (player.isPresent()) {
+            return getOrCreate(player.get());
         }
+
         throw new IllegalArgumentException("Player " + uuid + " is not online");
     }
 
     @Override
-    public List<SPlayer> getOnlinePlayers() {
+    public @NonNull List<SPlayer> getOnlinePlayers() {
         return new ArrayList<>(
                 server.getAllPlayers().stream()
-                        .map(VelocitySPlayer::new)
+                        .map(this::getOrCreate)
                         .toList()
         );
     }

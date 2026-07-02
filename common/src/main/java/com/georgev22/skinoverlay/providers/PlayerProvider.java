@@ -2,15 +2,22 @@ package com.georgev22.skinoverlay.providers;
 
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.player.SPlayer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Abstract provider responsible for resolving and managing {@link SPlayer} instances
  * across different platforms (e.g., Bukkit, Bungee, Velocity, etc.).
  */
 public abstract class PlayerProvider {
+
+    protected final ConcurrentMap<UUID, SPlayer> playerCache = new ConcurrentHashMap<>();
 
     /**
      * Resolves an {@link SPlayer} instance from a platform-specific player object.
@@ -21,7 +28,7 @@ public abstract class PlayerProvider {
      * @param player the platform-specific player object
      * @return the corresponding {@link SPlayer}, or {@code null} if not found or invalid
      */
-    public abstract SPlayer getSPlayer(Object player);
+    public abstract @Nullable SPlayer getSPlayer(@NonNull Object player);
 
     /**
      * Resolves an {@link SPlayer} instance from a {@link CommandIssuer}.
@@ -32,7 +39,7 @@ public abstract class PlayerProvider {
      * @param commandIssuer the command issuer
      * @return the corresponding {@link SPlayer}, or {@code null} if the issuer is not a player
      */
-    public abstract SPlayer getSPlayer(CommandIssuer commandIssuer);
+    public abstract @Nullable SPlayer getSPlayer(@NotNull CommandIssuer commandIssuer);
 
     /**
      * Resolves an {@link SPlayer} instance by player name.
@@ -43,7 +50,7 @@ public abstract class PlayerProvider {
      * @param name the player's name
      * @return the corresponding {@link SPlayer}, or {@code null} if not found
      */
-    public abstract SPlayer getSPlayer(String name);
+    public abstract @Nullable SPlayer getSPlayer(@NotNull String name);
 
     /**
      * Resolves an {@link SPlayer} instance by UUID.
@@ -51,7 +58,7 @@ public abstract class PlayerProvider {
      * @param uuid the player's unique identifier
      * @return the corresponding {@link SPlayer}, or {@code null} if not found
      */
-    public abstract SPlayer getSPlayer(UUID uuid);
+    public abstract @Nullable SPlayer getSPlayer(@NotNull UUID uuid);
 
     /**
      * Retrieves a list of all currently online players.
@@ -61,7 +68,7 @@ public abstract class PlayerProvider {
      *
      * @return a list of online {@link SPlayer} instances
      */
-    public abstract List<SPlayer> getOnlinePlayers();
+    public abstract @NotNull List<SPlayer> getOnlinePlayers();
 
     /**
      * Checks whether the given {@link SPlayer} is currently online.
@@ -72,7 +79,7 @@ public abstract class PlayerProvider {
      * @return {@code true} if the player is online and has a valid underlying player object,
      * otherwise {@code false}
      */
-    public boolean isOnline(SPlayer player) {
+    public boolean isOnline(@NotNull SPlayer player) {
         try {
             return player.isOnline() && player.getPlayer() != null;
         } catch (Exception e) {
@@ -89,9 +96,14 @@ public abstract class PlayerProvider {
      * @param name the player's name
      * @return {@code true} if the player is online, otherwise {@code false}
      */
-    public boolean isOnline(String name) {
+    public boolean isOnline(@NotNull String name) {
+        //noinspection ConstantValue
+        if (name == null) return false;
         try {
             SPlayer player = getSPlayer(name);
+            if (player == null) {
+                return false;
+            }
             return isOnline(player);
         } catch (Exception e) {
             return false;
@@ -107,12 +119,25 @@ public abstract class PlayerProvider {
      * @param uuid the player's unique identifier
      * @return {@code true} if the player is online, otherwise {@code false}
      */
-    public boolean isOnline(UUID uuid) {
+    public boolean isOnline(@NotNull UUID uuid) {
+        //noinspection ConstantValue
+        if (uuid == null) return false;
         try {
             SPlayer player = getSPlayer(uuid);
+            if (player == null) {
+                return false;
+            }
             return isOnline(player);
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public void remove(UUID uuid) {
+        playerCache.remove(uuid);
+    }
+
+    public void clear() {
+        playerCache.clear();
     }
 }

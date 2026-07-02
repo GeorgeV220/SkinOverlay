@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,71 +15,75 @@ import java.util.UUID;
 
 public class BukkitPlayerProvider extends PlayerProvider {
 
+    private SPlayer getOrCreate(@NonNull Player player) {
+        return playerCache.computeIfAbsent(
+                player.getUniqueId(),
+                uuid -> new BukkitSPlayer(player)
+        );
+    }
+
     @Override
-    public SPlayer getSPlayer(Object player) {
+    public SPlayer getSPlayer(@NonNull Object player) {
         if (player instanceof Player bukkitPlayer) {
-            return new BukkitSPlayer(bukkitPlayer);
+            return getOrCreate(bukkitPlayer);
         }
+
         if (player instanceof OfflinePlayer offlinePlayer) {
             if (offlinePlayer.isOnline() && offlinePlayer.getPlayer() != null) {
-                return new BukkitSPlayer(offlinePlayer.getPlayer());
+                return getOrCreate(offlinePlayer.getPlayer());
             }
-            throw new IllegalArgumentException("Player " + offlinePlayer.getName() + " is offline");
+            return null;
         }
+
         if (player instanceof String name) {
-            Player onlinePlayer = Bukkit.getPlayer(name);
-            if (onlinePlayer != null) {
-                return new BukkitSPlayer(onlinePlayer);
-            }
-            throw new IllegalArgumentException("Player " + name + " is null");
+            return getSPlayer(name);
         }
+
         if (player instanceof UUID uuid) {
-            Player onlinePlayer = Bukkit.getPlayer(uuid);
-            if (onlinePlayer != null) {
-                return new BukkitSPlayer(onlinePlayer);
-            }
-            throw new IllegalArgumentException("Player " + uuid + " is null");
+            return getSPlayer(uuid);
         }
+
         if (player instanceof CommandIssuer commandIssuer) {
-            if (!commandIssuer.isPlayer()) {
-                throw new IllegalArgumentException("CommandIssuer is not a player");
-            }
-            return new BukkitSPlayer(commandIssuer.getIssuer());
+            return getSPlayer(commandIssuer);
         }
+
         return null;
     }
 
     @Override
     public SPlayer getSPlayer(@NotNull CommandIssuer commandIssuer) {
         if (!commandIssuer.isPlayer()) {
-            throw new IllegalArgumentException("CommandIssuer is not a player");
+            return null;
         }
-        return new BukkitSPlayer(commandIssuer.getIssuer());
+
+        return getOrCreate(commandIssuer.getIssuer());
     }
 
     @Override
-    public SPlayer getSPlayer(String name) {
-        Player onlinePlayer = Bukkit.getPlayer(name);
-        if (onlinePlayer != null) {
-            return new BukkitSPlayer(onlinePlayer);
+    public SPlayer getSPlayer(@NonNull String name) {
+        Player player = Bukkit.getPlayer(name);
+        if (player != null) {
+            return getOrCreate(player);
         }
-        throw new IllegalArgumentException("Player " + name + " is null");
+
+        return null;
     }
 
     @Override
-    public SPlayer getSPlayer(UUID uuid) {
-        Player onlinePlayer = Bukkit.getPlayer(uuid);
-        if (onlinePlayer != null) {
-            return new BukkitSPlayer(onlinePlayer);
+    public SPlayer getSPlayer(@NonNull UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null) {
+            return getOrCreate(player);
         }
-        throw new IllegalArgumentException("Player " + uuid + " is null");
+
+        return null;
     }
 
     @Override
-    public List<SPlayer> getOnlinePlayers() {
+    public @NonNull List<SPlayer> getOnlinePlayers() {
         return new ArrayList<>(
                 Bukkit.getOnlinePlayers().stream()
-                        .map(BukkitSPlayer::new)
+                        .map(this::getOrCreate)
                         .toList()
         );
     }
