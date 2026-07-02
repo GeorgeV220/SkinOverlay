@@ -1,3 +1,11 @@
+# [8.0.0-beta.8](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.7...v8.0.0-beta.8) (2026-07-02)
+
+
+### Features
+
+* add placeholder field to skin configs and integrate with PlaceholderAPI ([2d04c3b](https://github.com/GeorgeV220/SkinOverlay/commit/2d04c3bcd5218d045b9636ab9327d7e9ec4b40c7))
+* improve placeholder API hook with configurable skin names ([71e990c](https://github.com/GeorgeV220/SkinOverlay/commit/71e990cc4b67af64dcb41776ddb7a484a2fb4012))
+
 # [8.0.0-beta.7](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.6...v8.0.0-beta.7) (2026-07-02)
 
 
