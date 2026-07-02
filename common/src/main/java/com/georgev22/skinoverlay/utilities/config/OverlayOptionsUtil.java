@@ -36,6 +36,8 @@ public enum OverlayOptionsUtil {
     PARTS_PLAYER_RIGHT_PANTS("player.right_pants", false, Optional.empty()),
 
     PARTS_PLAYER_HAT("player.hat", false, Optional.empty()),
+
+    PLACEHOLDER("placeholder", "", Optional.empty()),
     ;
 
     private static final SkinOverlay mainPlugin = SkinOverlay.getInstance();

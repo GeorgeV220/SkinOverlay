@@ -13,3 +13,4 @@ Options:
     jacket: true
     right_pants: true
     left_pants: true
+  placeholder: "Alley"
