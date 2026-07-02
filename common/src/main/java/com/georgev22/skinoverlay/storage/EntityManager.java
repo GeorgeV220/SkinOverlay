@@ -4,6 +4,7 @@ import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
 import com.georgev22.skinoverlay.datastructures.maps.UnmodifiableObjectMap;
 import com.georgev22.skinoverlay.storage.data.Entity;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -138,7 +139,7 @@ public interface EntityManager<E extends Entity> {
      * @param consumer the consumer to apply to the new entity
      * @return an {@link Optional} containing the new entity if created, or empty if not created
      */
-    default Optional<E> create(@NonNull String id, @NonNull Consumer<E> consumer) {
+    default Optional<E> create(@NonNull String id, @Nullable Consumer<E> consumer) {
         return create(UUID.fromString(id), consumer);
     }
 
@@ -149,7 +150,7 @@ public interface EntityManager<E extends Entity> {
      * @param consumer the consumer to apply to the new entity
      * @return an {@link Optional} containing the new entity if created, or empty if not created
      */
-    default Optional<E> create(@NonNull UUID uuid, @NonNull Consumer<E> consumer) {
+    default Optional<E> create(@NonNull UUID uuid, @Nullable Consumer<E> consumer) {
         return create(ObjectMap.ofEntries(ObjectMap.entry("id", uuid)), consumer);
     }
 
@@ -160,7 +161,7 @@ public interface EntityManager<E extends Entity> {
      * @param consumer the consumer to apply to the new entity
      * @return an {@link Optional} containing the new entity if created, or empty if not created
      */
-    Optional<E> create(@NonNull ObjectMap<String, Object> data, @NonNull Consumer<E> consumer);
+    Optional<E> create(@NonNull ObjectMap<String, Object> data, @Nullable Consumer<E> consumer);
 
     /**
      * Gets the name of this entity manager.

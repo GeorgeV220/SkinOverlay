@@ -16,6 +16,7 @@ import com.georgev22.skinoverlay.task.ExecutorManager;
 import com.georgev22.skinoverlay.task.ExecutorType;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -115,7 +116,7 @@ public abstract class AbstractEntityManager<E extends Entity> implements EntityM
 
     @Override
     public Optional<E> create(@NonNull ObjectMap<String, Object> data,
-                              @NonNull Consumer<E> consumer) {
+                              @Nullable Consumer<E> consumer) {
         EntityFactory<?> factory = FACTORIES.get(this.getEntityClass());
         if (factory == null) {
             main.getLogger().log(Level.WARNING, "No entity factory registered for " + this.getManagedEntity().key());
@@ -127,7 +128,9 @@ public abstract class AbstractEntityManager<E extends Entity> implements EntityM
         }
 
         E entity = this.getEntityClass().cast(factory.create(data));
-        consumer.accept(entity);
+        if (consumer != null) {
+            consumer.accept(entity);
+        }
 
         loadedEntities.put(entity.getUniqueId().toString(), entity);
         saveQueue.add(entity.getUniqueId());
