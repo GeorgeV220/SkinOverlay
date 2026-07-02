@@ -35,13 +35,19 @@ public class WearSubCommand extends SkinOverlayBaseCommand {
             return;
         }
 
-        if (target == null) {
-            if (!commandIssuer.isPlayer()) {
-                CommandMessages.COMMAND_MISSING_ARGUMENT.msg(commandIssuer, Placeholder.builder(commandIssuer.audience())
-                        .placeholder("%command%", "wear <overlay> <player>").placeholder("%arg%", "target").build());
-                return;
-            }
+        if (target == null && commandIssuer.isPlayer()) {
             target = mainPlugin.getPlayerProvider().getSPlayer(commandIssuer.getUniqueId());
+        }
+
+        if (target == null) {
+            CommandMessages.COMMAND_MISSING_ARGUMENT.msg(
+                    commandIssuer,
+                    Placeholder.builder(commandIssuer.audience())
+                            .placeholder("%command%", "wear <overlay> <player>")
+                            .placeholder("%arg%", "target")
+                            .build()
+            );
+            return;
         }
         SkinParts skinParts;
         try {
