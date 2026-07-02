@@ -24,7 +24,9 @@ import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import org.bxteam.quark.velocity.VelocityLibraryManager;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -48,7 +50,10 @@ public class SkinOverlayVelocity {
     private final ProxyServer server;
 
     @Inject
-    public SkinOverlayVelocity(ProxyServer server, Logger logger, @DataDirectory @NotNull Path dataDirectory) {
+    public SkinOverlayVelocity(@NonNull ProxyServer server, Logger logger, @DataDirectory @NotNull Path dataDirectory) {
+        VelocityLibraryManager<SkinOverlayVelocity> velocityLibraryManager
+                = new VelocityLibraryManager<>(this, logger, dataDirectory, server.getPluginManager());
+        velocityLibraryManager.loadFromGradle();
         this.server = server;
         this.skinOverlay.setLogger(new LoggerWrapper(logger));
         this.skinOverlay.setProxy(true);

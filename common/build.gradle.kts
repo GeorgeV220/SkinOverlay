@@ -7,7 +7,9 @@ plugins {
 apply(from = "$rootDir/gradle/publish.gradle")
 
 repositories {
-    mavenCentral()
+    maven {
+        url = uri("https://maven-central.storage-download.googleapis.com/maven2/")
+    }
 }
 
 group = project.property("group") as String
@@ -27,31 +29,31 @@ dependencies {
     compileOnly(libs.log4j.api)
 
 
-    implementation(libs.hikari) {
+    compileOnly(libs.hikari) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
-    implementation(libs.gson)
+    compileOnly(libs.gson)
 
     // MINESKIN CLIENT
-    implementation(libs.mineskinclient.client) {
+    compileOnly(libs.mineskinclient.client) {
         exclude(group = "com.google.code.gson", module = "gson")
         exclude(group = "com.google.guava", module = "guava")
     }
-    implementation(libs.mineskinclient.java11) {
+    compileOnly(libs.mineskinclient.java11) {
         exclude(group = "com.google.code.gson", module = "gson")
         exclude(group = "com.google.guava", module = "guava")
     }
 
     // YAML
-    implementation(libs.yamlconfiguration) {
+    compileOnly(libs.yamlconfiguration) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
-    implementation(libs.jedis)
+    compileOnly(libs.jedis)
 
-    implementation(libs.jspecify)
-    implementation(libs.mongodb.driver.sync)
+    compileOnly(libs.jspecify)
+    compileOnly(libs.mongodb.driver.sync)
 }
 
 configurations.configureEach {

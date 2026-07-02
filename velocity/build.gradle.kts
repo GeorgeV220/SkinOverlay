@@ -1,12 +1,15 @@
 plugins {
     id("buildlogic.java-conventions")
     alias(libs.plugins.gradleup.shadow)
+    id("org.bxteam.quark") version "1.3.0"
 }
 
 apply(from = "$rootDir/gradle/publish.gradle")
 
 repositories {
-    mavenCentral()
+    maven {
+        url = uri("https://maven-central.storage-download.googleapis.com/maven2/")
+    }
 }
 
 dependencies {
@@ -16,7 +19,34 @@ dependencies {
     implementation(project(":common")) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    implementation(libs.bstats.velocity)
+
+    quark(libs.bstats.velocity)
+    quark(libs.hikari) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+
+    quark(libs.gson)
+
+    // MINESKIN CLIENT
+    quark(libs.mineskinclient.client) {
+        exclude(group = "com.google.code.gson", module = "gson")
+        exclude(group = "com.google.guava", module = "guava")
+    }
+    quark(libs.mineskinclient.java11) {
+        exclude(group = "com.google.code.gson", module = "gson")
+        exclude(group = "com.google.guava", module = "guava")
+    }
+
+    // YAML
+    quark(libs.yamlconfiguration) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+
+    quark(libs.jedis)
+
+    quark(libs.jspecify)
+    quark(libs.mongodb.driver.sync)
+
     compileOnly(libs.log4j.api)
 }
 
@@ -24,9 +54,11 @@ configurations.configureEach {
 
 }
 
-tasks.shadowJar {
-    archiveBaseName.set("skinoverlay")
-    archiveClassifier.set("velocity")
+quark {
+    platform = "velocity"
+    repositories {
+        includeProjectRepositories();
+    }
     relocate("org.mineskin", "${project.property("packageName")}.lib.mineskin")
     relocate("com.google.gson", "${project.property("packageName")}.lib.gson")
     relocate("com.google.errorprone", "${project.property("packageName")}.lib.gson.errorprone")
@@ -39,6 +71,11 @@ tasks.shadowJar {
     relocate("org.json", "${project.property("packageName")}.lib.json")
     relocate("org.apache.commons.pool2", "${project.property("packageName")}.lib.pool2")
     relocate("redis.clients", "${project.property("packageName")}.lib.jedis")
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("skinoverlay")
+    archiveClassifier.set("velocity")
 }
 
 tasks.named("publish") {

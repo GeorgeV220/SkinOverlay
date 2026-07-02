@@ -9,7 +9,9 @@ if (file("$rootDir/build.local.gradle.kts").exists()) {
 
 repositories {
     mavenLocal()
-    mavenCentral()
+    maven {
+        url = uri("https://maven-central.storage-download.googleapis.com/maven2/")
+    }
     maven {
         url = uri("https://repo.shulkerlabs.com/releases/")
     }

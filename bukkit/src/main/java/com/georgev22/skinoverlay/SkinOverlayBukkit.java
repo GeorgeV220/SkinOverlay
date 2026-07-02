@@ -13,12 +13,13 @@ import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.providers.*;
 import com.georgev22.skinoverlay.scheduler.MinecraftBukkitScheduler;
 import com.georgev22.skinoverlay.scheduler.MinecraftFoliaScheduler;
+import com.georgev22.skinoverlay.utilities.BukkitAdventure;
 import com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils;
 import com.georgev22.skinoverlay.utilities.SkinOverlayVersionResolver;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bxteam.quark.bukkit.BukkitLibraryManager;
 
 import static com.georgev22.skinoverlay.utilities.BukkitMinecraftUtils.MinecraftVersion.getCurrent;
 
@@ -27,7 +28,6 @@ public class SkinOverlayBukkit extends JavaPlugin {
     private static SkinOverlayBukkit instance;
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
-    private BukkitAudiences bukkitAudiences;
 
     public static SkinOverlayBukkit getInstance() {
         return instance;
@@ -36,6 +36,8 @@ public class SkinOverlayBukkit extends JavaPlugin {
     @Override
     public void onLoad() {
         instance = this;
+        BukkitLibraryManager libraryManager = new BukkitLibraryManager(this);
+        libraryManager.loadFromGradle();
         this.skinOverlay.setPlugin(this);
         this.skinOverlay.setLogger(this.getLogger());
         this.skinOverlay.setDataFolder(this.getDataFolder());
@@ -66,8 +68,7 @@ public class SkinOverlayBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.bukkitAudiences = BukkitAudiences.create(this);
-        this.skinOverlay.setConsoleAudience(this.bukkitAudiences.console());
+        BukkitAdventure.init();
         BukkitMinecraftUtils.registerListeners(
                 this,
                 new PlayerListeners()
@@ -104,13 +105,7 @@ public class SkinOverlayBukkit extends JavaPlugin {
     @Override
     public void onDisable() {
         skinOverlay.onDisable();
-        if (this.bukkitAudiences != null) {
-            this.bukkitAudiences.close();
-            this.bukkitAudiences = null;
-        }
+        BukkitAdventure.close();
     }
 
-    public BukkitAudiences getBukkitAudiences() {
-        return bukkitAudiences;
-    }
 }

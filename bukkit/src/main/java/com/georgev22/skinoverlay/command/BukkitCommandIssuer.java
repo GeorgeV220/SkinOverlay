@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay.command;
 
-import com.georgev22.skinoverlay.SkinOverlayBukkit;
+import com.georgev22.skinoverlay.utilities.BukkitAdventure;
 import com.georgev22.skinoverlay.utilities.Utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -25,7 +25,7 @@ public class BukkitCommandIssuer implements CommandIssuer {
 
     @Override
     public Audience audience() {
-        BukkitAudiences audienceProvider = SkinOverlayBukkit.getInstance().getBukkitAudiences();
+        BukkitAudiences audienceProvider = BukkitAdventure.getBukkitAudiences();
         if (isPlayer()) {
             return audienceProvider.player((Player) this.sender);
         }

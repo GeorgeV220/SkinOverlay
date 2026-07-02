@@ -1,12 +1,15 @@
 plugins {
     id("buildlogic.java-conventions")
     alias(libs.plugins.gradleup.shadow)
+    id("org.bxteam.quark") version "1.3.0"
 }
 
 apply(from = "$rootDir/gradle/publish.gradle")
 
 repositories {
-    mavenCentral()
+    maven {
+        url = uri("https://maven-central.storage-download.googleapis.com/maven2/")
+    }
 }
 
 dependencies {
@@ -14,15 +17,39 @@ dependencies {
     compileOnly(libs.placeholder.api)
     compileOnly(libs.auth.lib.legacy)
 
-    implementation(libs.bstats.bukkit)
-    implementation(libs.adventure.platform.bukkit)
-    implementation(libs.adventure.text.minimessage)
-    implementation(libs.adventure.text.serializer.legacy)
-    implementation(libs.reflect)
+    quark(libs.bstats.bukkit)
+    quark(libs.adventure.platform.bukkit)
+    quark(libs.adventure.text.minimessage)
+    quark(libs.adventure.text.serializer.legacy)
+    quark(libs.reflect)
 
-    implementation(project(":common")) {
+    quark(libs.hikari) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
+
+    quark(libs.gson)
+
+    // MINESKIN CLIENT
+    quark(libs.mineskinclient.client) {
+        exclude(group = "com.google.code.gson", module = "gson")
+        exclude(group = "com.google.guava", module = "guava")
+    }
+    quark(libs.mineskinclient.java11) {
+        exclude(group = "com.google.code.gson", module = "gson")
+        exclude(group = "com.google.guava", module = "guava")
+    }
+
+    // YAML
+    quark(libs.yamlconfiguration) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+
+    quark(libs.jedis)
+
+    quark(libs.jspecify)
+    quark(libs.mongodb.driver.sync)
+
+    implementation(project(":common"))
     implementation(project(":bukkit:versions:mc1_17_R1", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_18_R1", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_18_R2", configuration = "reobf"))
@@ -39,6 +66,30 @@ dependencies {
     implementation(project(":bukkit:versions:mc1_21_R4", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_21_R5", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_21_R6", configuration = "reobf"))
+}
+
+quark {
+    platform = "bukkit"
+    repositories {
+        includeProjectRepositories();
+    }
+
+    relocate("org.mineskin", "${project.property("packageName")}.lib.mineskin")
+    relocate("com.google.gson", "${project.property("packageName")}.lib.gson")
+    relocate("com.google.errorprone", "${project.property("packageName")}.lib.gson.errorprone")
+    relocate("com.zaxxer", "${project.property("packageName")}.lib.zaxxer")
+    relocate("org.bstats", "${project.property("packageName")}.lib.bstats")
+    relocate("org.bspfsystems.yamlconfiguration", "${project.property("packageName")}.lib.yaml")
+    relocate("org.yaml.snakeyaml", "${project.property("packageName")}.lib.yaml")
+    relocate("org.intellij.lang", "${project.property("packageName")}.lib.jetbrains")
+    relocate("org.jetbrains", "${project.property("packageName")}.lib.jetbrains")
+    relocate("org.json", "${project.property("packageName")}.lib.json")
+    relocate("org.apache.commons.pool2", "${project.property("packageName")}.lib.pool2")
+    relocate("net.kyori", "${project.property("packageName")}.lib.kyori")
+    relocate("redis.clients", "${project.property("packageName")}.lib.jedis")
+    relocate("net.lenni0451.reflect", "${project.property("packageName")}.lib.reflect")
+    relocate("org.bson", "${project.property("packageName")}.lib.bson")
+    relocate("com.mongodb", "${project.property("packageName")}.lib.mongodb")
 }
 
 configurations.configureEach {
@@ -61,22 +112,6 @@ configurations.configureEach {
 tasks.shadowJar {
     archiveBaseName.set("skinoverlay")
     archiveClassifier.set("bukkit")
-    relocate("org.mineskin", "${project.property("packageName")}.lib.mineskin")
-    relocate("com.google.gson", "${project.property("packageName")}.lib.gson")
-    relocate("com.google.errorprone", "${project.property("packageName")}.lib.gson.errorprone")
-    relocate("com.zaxxer", "${project.property("packageName")}.lib.zaxxer")
-    relocate("org.bstats", "${project.property("packageName")}.lib.bstats")
-    relocate("org.bspfsystems.yamlconfiguration", "${project.property("packageName")}.lib.yaml")
-    relocate("org.yaml.snakeyaml", "${project.property("packageName")}.lib.yaml")
-    relocate("org.intellij.lang", "${project.property("packageName")}.lib.jetbrains")
-    relocate("org.jetbrains", "${project.property("packageName")}.lib.jetbrains")
-    relocate("org.json", "${project.property("packageName")}.lib.json")
-    relocate("org.apache.commons.pool2", "${project.property("packageName")}.lib.pool2")
-    relocate("net.kyori", "${project.property("packageName")}.lib.kyori")
-    relocate("redis.clients", "${project.property("packageName")}.lib.jedis")
-    relocate("net.lenni0451.reflect", "${project.property("packageName")}.lib.reflect")
-    relocate("org.bson", "${project.property("packageName")}.lib.bson")
-    relocate("com.mongodb", "${project.property("packageName")}.lib.mongodb")
 }
 
 tasks.named("publish") {
