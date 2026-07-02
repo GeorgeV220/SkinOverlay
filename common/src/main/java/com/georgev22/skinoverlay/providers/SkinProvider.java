@@ -78,15 +78,19 @@ public class SkinProvider {
                 this.skinOverlay.getLogger().warning("Default skin not found for player: " + player.getName());
                 try {
                     SProperty property = this.getSkin(player);
-                    Skin skin = new Skin(skinUUID);
-                    skin.setProperty(property);
-                    skin.setSkinParts(skinParts);
+                    Optional<Skin> skinOptional = skinManager.create(skinUUID, skin -> {
+                        skin.setProperty(property);
+                        skin.setSkinParts(skinParts);
+                    });
+                    if (skinOptional.isEmpty())
+                        throw new SkinException("Failed to create default skin for player: " + player.getName());
+                    Skin skin = skinOptional.get();
                     if (!this.skinOverlay.isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                         return Optional.of(skin);
                     }
                     skinManager.save(skin);
                     return Optional.of(skin);
-                } catch (IOException | ExecutionException | InterruptedException e) {
+                } catch (IOException | ExecutionException | InterruptedException | SkinException e) {
                     this.skinOverlay.getLogger().log(Level.SEVERE, "Failed to get skin for player: " + player.getName(), e);
                     return Optional.empty();
                 }
@@ -206,9 +210,14 @@ public class SkinProvider {
                                 return new SProperty(value, signature);
                             }).join();
 
-                    Skin skin = new Skin(skinUUID);
-                    skin.setSkinParts(skinParts);
-                    skin.setProperty(property);
+                    Optional<Skin> skinOptional = skinManager.create(skinUUID, skin -> {
+                        skin.setProperty(property);
+                        skin.setSkinParts(skinParts);
+                    });
+                    if (skinOptional.isEmpty()) {
+                        throw new SkinException("Couldn't create skin for " + player.getName() + "!");
+                    }
+                    Skin skin = skinOptional.get();
                     if (!skinOverlay.isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
                         return Optional.of(skin);
                     }
