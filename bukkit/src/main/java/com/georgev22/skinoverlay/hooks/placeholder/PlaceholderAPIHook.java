@@ -2,22 +2,20 @@ package com.georgev22.skinoverlay.hooks.placeholder;
 
 import com.georgev22.skinoverlay.BuildParameters;
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.exceptions.SkinException;
 import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.storage.EntityManager;
 import com.georgev22.skinoverlay.storage.data.PlayerData;
+import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.config.OverlayOptionsUtil;
 import com.georgev22.skinoverlay.utilities.config.SkinConfigurationFile;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.audience.Audience;
-import org.bspfsystems.yamlconfiguration.file.FileConfiguration;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.logging.Level;
 
 public class PlaceholderAPIHook extends PlaceholderExpansion implements PlaceholderHook {
 
@@ -35,17 +33,17 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Placehol
     }
 
     @Override
-    public @NotNull String getIdentifier() {
+    public @NonNull String getIdentifier() {
         return BuildParameters.PLUGIN_NAME.toLowerCase();
     }
 
     @Override
-    public @NotNull String getAuthor() {
+    public @NonNull String getAuthor() {
         return BuildParameters.AUTHOR;
     }
 
     @Override
-    public @NotNull String getVersion() {
+    public @NonNull String getVersion() {
         return BuildParameters.VERSION;
     }
 
@@ -60,8 +58,8 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Placehol
     }
 
     @Override
-    public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        if (player == null) return null;
+    public @Nullable String onRequest(OfflinePlayer player, @NonNull String params) {
+        if (player == null || params.isEmpty()) return null;
 
         Optional<EntityManager<PlayerData>> entityManagerOpt = EntityManagerRegistry.getInstance().getTyped(PlayerData.class);
         if (entityManagerOpt.isEmpty()) return null;
@@ -73,23 +71,45 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Placehol
 
         PlayerData playerData = playerDataOptional.get();
 
-        if (params.equalsIgnoreCase("overlay")) {
-            String skinName = playerData.getCurrentSkin().getSkinParts().getSkinName();
-            if (skinName.equalsIgnoreCase("custom")) {
-                return "Custom";
-            }
-            SkinConfigurationFile skinConfigurationFile = this.skinOverlay.getSkinFileCache().getCacheSkinConfig(skinName);
+        return handleParams(playerData, params);
+    }
 
-            if (skinConfigurationFile == null) {
-                this.skinOverlay.getLogger().log(Level.SEVERE, "SkinConfigurationFile cannot be null", new SkinException("SkinConfigurationFile cannot be null"));
-                return "Unknown";
-            }
+    private @Nullable String handleParams(PlayerData data, @NonNull String params) {
+        return switch (params.toLowerCase()) {
+            case "overlay" -> getOverlay(data);
+            case "overlay_raw" -> data.getCurrentSkin().getSkinParts().getSkinName();
+            default -> null;
+        };
+    }
 
-            FileConfiguration fileConfiguration = skinConfigurationFile.getFileConfiguration();
-            return OverlayOptionsUtil.PLACEHOLDER.getStringValue(fileConfiguration);
+    private String getOverlay(@NonNull PlayerData playerData) {
+        String skinName = playerData.getCurrentSkin()
+                .getSkinParts()
+                .getSkinName();
+
+        if (skinName == null) {
+            return OptionsUtil.UNKNOWN_SKIN_NAME.getStringValue();
         }
 
-        return null;
+        if (skinName.equalsIgnoreCase("default")) {
+            return OptionsUtil.DEFAULT_SKIN_NAME.getStringValue();
+        }
 
+        if (skinName.equalsIgnoreCase("custom")) {
+            return OptionsUtil.CUSTOM_SKIN_NAME.getStringValue();
+        }
+
+        if (skinName.startsWith("customURL-")) {
+            return OptionsUtil.CUSTOM_SKIN_URL_NAME.getStringValue();
+        }
+
+        SkinConfigurationFile file = skinOverlay.getSkinFileCache()
+                .getCacheSkinConfig(skinName);
+
+        if (file == null) {
+            return OptionsUtil.UNKNOWN_SKIN_NAME.getStringValue();
+        }
+
+        return OverlayOptionsUtil.PLACEHOLDER.getStringValue(file.getFileConfiguration());
     }
 }

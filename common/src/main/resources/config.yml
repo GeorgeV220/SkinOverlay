@@ -30,7 +30,13 @@ Options:
       database: "skinoverlay"    # MongoDB database name
   updater:
     enabled: true
+
   default skin uuid: "8667ba71-b85a-4004-af54-457a9734eed7"
+  default skin name: "default"
+  custom skin name: "Custom"
+  custom skin url name: "Custom URL"
+  unknown skin name: "Unknown"
+
   #Skin hooks are only used to retrieve player skin properties for offline players or players who have changed their skin.
   #Currently available Skin Hooks: None, SkinsRestorer and Custom.
   #With the custom option, you need to have your own plugin that sets the SkinOverlay.getInstance().setSkinHook(SkinHook).

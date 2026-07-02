@@ -54,6 +54,10 @@ public enum OptionsUtil {
     UPDATER("updater.enabled", true, Optional.empty()),
 
     DEFAULT_SKIN_UUID("default skin uuid", "8667ba71-b85a-4004-af54-457a9734eed7", Optional.empty()),
+    DEFAULT_SKIN_NAME("default skin name", "default", Optional.empty()),
+    CUSTOM_SKIN_NAME("custom skin name", "Custom", Optional.empty()),
+    CUSTOM_SKIN_URL_NAME("custom skin url name", "Custom URL", Optional.empty()),
+    UNKNOWN_SKIN_NAME("unknown skin name", "Unknown", Optional.empty()),
 
     SKIN_HOOK("skin hook", "SkinsRestorer", Optional.empty()),
     LOCALE("locale", "en_US", Optional.empty()),
