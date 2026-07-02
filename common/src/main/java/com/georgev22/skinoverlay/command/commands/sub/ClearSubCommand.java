@@ -68,7 +68,8 @@ public class ClearSubCommand extends SkinOverlayBaseCommand {
                         mainPlugin.getSkinProvider().setSkin(target, skin);
                         CommandMessages.COMMAND_OVERLAY_RESET.msg(
                                 commandIssuer,
-                                Placeholder.builder(commandIssuer.audience()).build()
+                                Placeholder.builder(commandIssuer.audience()).placeholder("%player%", target.getName())
+                                        .build()
                         );
 
                     }, runnable -> SkinOverlay.getInstance().getScheduler().runTask(SkinOverlay.getInstance().getPlugin(), runnable));
