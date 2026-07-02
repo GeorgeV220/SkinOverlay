@@ -1,3 +1,20 @@
+# [8.0.0-beta.7](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.6...v8.0.0-beta.7) (2026-07-02)
+
+
+### Bug Fixes
+
+* add player placeholder to overlay reset success message ([0a83c6f](https://github.com/GeorgeV220/SkinOverlay/commit/0a83c6f434010e94f3b50c734239409d47f57019))
+* register PlaceholderAPI hook after plugin initialization ([b19c54f](https://github.com/GeorgeV220/SkinOverlay/commit/b19c54f765a60cee6244988219623400df435872))
+
+
+### Features
+
+* add multi-database support with MongoDB, MySQL, and SQLite ([c00a51f](https://github.com/GeorgeV220/SkinOverlay/commit/c00a51f36aa9b119200d28a2d158ad2c01b457e6))
+* implement SPlayer caching in PlayerProvider ([7e316b4](https://github.com/GeorgeV220/SkinOverlay/commit/7e316b43a2060cdb6a0f2ec4c9ba3a0e92a25bd6))
+* integrate Quark library manager for dependency loading ([030b71a](https://github.com/GeorgeV220/SkinOverlay/commit/030b71a683c9a3c6022a2f72a012948d07d623f6))
+* make Consumer parameter nullable in entity creation methods ([75d09ee](https://github.com/GeorgeV220/SkinOverlay/commit/75d09ee875a4792b0321e17719a3d235c519df1d))
+* simplify target player resolution in WearSubCommand ([44d73a4](https://github.com/GeorgeV220/SkinOverlay/commit/44d73a40e62eafdbd218c9f067d3d6b5b86b8296))
+
 # [8.0.0-beta.6](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.5...v8.0.0-beta.6) (2026-06-19)
 
 
