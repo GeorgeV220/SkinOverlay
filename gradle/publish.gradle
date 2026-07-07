@@ -34,8 +34,6 @@ publishing {
             from components.java
             artifactId = project.name.toLowerCase()
             groupId = project.group.toString().toLowerCase()
-            artifact(tasks.sourcesJar)
-            artifact(tasks.javadocJar)
         }
     }
     repositories {
