@@ -49,9 +49,9 @@ public class SkinRefresher_1_20_R2 extends SkinRefresher {
                 Player bukkitPlayer = player.getPlayer();
                 final CraftPlayer craftPlayer = (CraftPlayer) bukkitPlayer;
                 final ServerPlayer entityPlayer = craftPlayer.getHandle();
-                ServerLevel world = entityPlayer.serverLevel();
+                ServerLevel serverLevel = entityPlayer.serverLevel();
 
-                CommonPlayerSpawnInfo spawnInfo = entityPlayer.createCommonSpawnInfo(world);
+                CommonPlayerSpawnInfo spawnInfo = entityPlayer.createCommonSpawnInfo(serverLevel);
                 ClientboundRespawnPacket respawn = new ClientboundRespawnPacket(
                         spawnInfo,
                         ClientboundRespawnPacket.KEEP_ALL_DATA
@@ -68,9 +68,9 @@ public class SkinRefresher_1_20_R2 extends SkinRefresher {
 
                 entityPlayer.resetSentInfo();
 
-                PlayerList playerList = entityPlayer.server.getPlayerList();
+                PlayerList playerList = serverLevel.getServer().getPlayerList();
                 playerList.sendPlayerPermissionLevel(entityPlayer);
-                playerList.sendLevelInfo(entityPlayer, world);
+                playerList.sendLevelInfo(entityPlayer, serverLevel);
                 playerList.sendAllPlayerInfo(entityPlayer);
 
                 for (MobEffectInstance mobEffect : entityPlayer.getActiveEffects()) {
