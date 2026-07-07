@@ -27,7 +27,7 @@ public class VelocityGameProfileProvider extends GameProfileProvider {
         ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
         GameProfile gameProfile = this.getInternalGameProfile(player);
         gameProfile.getProperties().forEach(property ->
-                propertyObjectMap.append(property.getName(), new SProperty(property.getValue(), property.getSignature())));
+                propertyObjectMap.append(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature())));
         SGameProfile sGameProfile = new SGameProfile(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
         return sGameProfiles.append(player, sGameProfile).get(player);
     }
@@ -36,8 +36,8 @@ public class VelocityGameProfileProvider extends GameProfileProvider {
     public void applyUpdatedGameProfile(@NotNull SPlayer player) {
         Player velocityPlayer = player.getPlayer();
         List<GameProfile.Property> propertyList = new ArrayList<>();
-        getGameProfile(player).getProperties().forEach((s, sProperty) -> propertyList.add(
-                new GameProfile.Property(s, sProperty.value(), sProperty.signature())));
+        getGameProfile(player).getProperties().forEach((name, property) -> propertyList.add(
+                new GameProfile.Property(property.name(), property.value(), property.signature())));
         velocityPlayer.setGameProfileProperties(propertyList);
     }
 }

@@ -48,7 +48,8 @@ public class BukkitLegacyGameProfileProvider extends GameProfileProvider {
         }
         ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
         GameProfile gameProfile = this.getInternalGameProfile(player);
-        gameProfile.getProperties().forEach((s, property) -> propertyObjectMap.append(s, new SProperty(property.getValue(), property.getSignature())));
+        gameProfile.getProperties().forEach((name, property) -> propertyObjectMap
+                .append(name, new SProperty(property.getName(), property.getValue(), property.getSignature())));
         SGameProfile sGameProfile = new SGameProfile(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
         return sGameProfiles.append(player, sGameProfile).get(player);
     }
@@ -58,7 +59,7 @@ public class BukkitLegacyGameProfileProvider extends GameProfileProvider {
         GameProfile internalGameProfile = this.getInternalGameProfile(player);
         internalGameProfile.getProperties().removeAll("textures");
         SGameProfile gameProfile = this.getGameProfile(player);
-        gameProfile.getProperties().forEach((s, property) -> internalGameProfile.getProperties()
-                .put(s, new Property(s, property.value(), property.signature())));
+        gameProfile.getProperties().forEach((name, property) -> internalGameProfile.getProperties()
+                .put(name, new Property(property.name(), property.value(), property.signature())));
     }
 }

@@ -29,10 +29,11 @@ public class SPropertyTypeAdapter implements
     public @NotNull SProperty deserialize(@NotNull JsonElement jsonElement, Type typeOfT, JsonDeserializationContext jsonDeserializationContext) {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
+        String name = jsonObject.has("name") ? jsonObject.get("name").getAsString() : "textures";
         String value = jsonObject.get("value").getAsString();
         String signature = jsonObject.get("signature").getAsString();
 
-        return new SProperty(value, signature);
+        return new SProperty(name, value, signature);
     }
 
     /**
@@ -46,6 +47,7 @@ public class SPropertyTypeAdapter implements
     @Override
     public @NotNull JsonElement serialize(@NotNull SProperty src, Type typeOfSrc, JsonSerializationContext jsonSerializationContext) {
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name", src.name());
         jsonObject.addProperty("value", src.value());
         jsonObject.addProperty("signature", src.signature());
         return jsonObject;

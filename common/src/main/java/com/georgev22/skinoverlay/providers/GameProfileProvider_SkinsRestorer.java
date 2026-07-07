@@ -28,7 +28,8 @@ public class GameProfileProvider_SkinsRestorer extends GameProfileProvider {
             property = Optional.empty();
         }
         SGameProfile gameProfile = new SGameProfile(player.getName(), player.getUniqueId());
-        property.map(skinProperty -> new SProperty(skinProperty.getValue(), skinProperty.getSignature())).ifPresent(sProperty -> gameProfile.setProperty("textures", sProperty));
+        property.map(skinProperty -> new SProperty("textures", skinProperty.getValue(), skinProperty.getSignature()))
+                .ifPresent(sProperty -> gameProfile.setProperty("textures", sProperty));
         return gameProfile;
     }
 

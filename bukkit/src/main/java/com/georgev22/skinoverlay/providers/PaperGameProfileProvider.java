@@ -24,7 +24,7 @@ public class PaperGameProfileProvider extends GameProfileProvider {
         SGameProfile gameProfile = new SGameProfile(player.getName(), player.getUniqueId());
         PlayerProfile playerProfile = getInternalGameProfile(player);
         playerProfile.getProperties().forEach(profileProperty -> gameProfile.addProperty(
-                profileProperty.getName(), new SProperty(profileProperty.getValue(), profileProperty.getSignature())
+                profileProperty.getName(), new SProperty(profileProperty.getName(), profileProperty.getValue(), profileProperty.getSignature())
         ));
         return sGameProfiles.append(player, gameProfile).get(player);
     }
@@ -36,7 +36,8 @@ public class PaperGameProfileProvider extends GameProfileProvider {
         playerProfile.getProperties().removeIf(profileProperty -> profileProperty.getName().equalsIgnoreCase("textures"));
         SGameProfile gameProfile = this.getGameProfile(player);
         gameProfile.getProperties()
-                .forEach((s, property) -> playerProfile.getProperties().add(new ProfileProperty(s, property.value(), property.signature())));
+                .forEach((name, property) -> playerProfile.getProperties()
+                        .add(new ProfileProperty(name, property.value(), property.signature())));
         bukkitPlayer.setPlayerProfile(playerProfile);
     }
 }

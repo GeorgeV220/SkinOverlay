@@ -33,7 +33,8 @@ public class GameProfileProvider_1_21_R6 extends GameProfileProvider {
         }
         ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
         GameProfile gameProfile = this.getInternalGameProfile(player);
-        gameProfile.properties().forEach((s, property) -> propertyObjectMap.append(s, new SProperty(property.value(), property.signature())));
+        gameProfile.properties().forEach((name, property) -> propertyObjectMap
+                .append(name, new SProperty(property.name(), property.value(), property.signature())));
         SGameProfile sGameProfile = new SGameProfile(gameProfile.name(), gameProfile.id(), propertyObjectMap);
         return sGameProfiles.append(player, sGameProfile).get(player);
     }
@@ -43,9 +44,9 @@ public class GameProfileProvider_1_21_R6 extends GameProfileProvider {
         GameProfile internalGameProfile = this.getInternalGameProfile(player);
         PropertyMap properties = internalGameProfile.properties();
         SGameProfile gameProfile = this.getGameProfile(player);
-        ImmutableMultimap.Builder<String, Object> newProperties = ImmutableMultimap.builder();
+        ImmutableMultimap.Builder<String, Property> newProperties = ImmutableMultimap.builder();
         for (Map.Entry<String, SProperty> entry : gameProfile.getProperties().entrySet()) {
-            newProperties.put(entry.getKey(), new Property(entry.getValue().value(), entry.getValue().signature()));
+            newProperties.put(entry.getKey(), new Property(entry.getKey(), entry.getValue().value(), entry.getValue().signature()));
         }
 
         RStream.of(properties)

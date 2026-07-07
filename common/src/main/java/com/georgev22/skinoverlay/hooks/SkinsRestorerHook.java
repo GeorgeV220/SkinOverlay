@@ -55,7 +55,7 @@ public class SkinsRestorerHook implements SkinHook {
         } catch (DataRequestException e) {
             return null;
         }
-        return property.map(skinProperty -> new SProperty(skinProperty.getValue(), skinProperty.getSignature())).orElse(null);
+        return property.map(skinProperty -> new SProperty("textures", skinProperty.getValue(), skinProperty.getSignature())).orElse(null);
     }
 
 }

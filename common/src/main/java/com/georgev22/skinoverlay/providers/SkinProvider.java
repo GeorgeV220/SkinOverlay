@@ -205,9 +205,10 @@ public class SkinProvider {
                             })
                             .thenCompose(jobReference -> jobReference.getOrLoadSkin(mineskinClient))
                             .thenApply(skinInfo -> {
+                                String name = "textures";
                                 String value = skinInfo.texture().data().value();
                                 String signature = skinInfo.texture().data().signature();
-                                return new SProperty(value, signature);
+                                return new SProperty(name, value, signature);
                             }).join();
 
                     Optional<Skin> skinOptional = skinManager.create(skinUUID, skin -> {
@@ -463,7 +464,11 @@ public class SkinProvider {
         SProperty property = null;
         for (final JsonElement object : properties) {
             if (object.getAsJsonObject().get("name").getAsString().equals("textures")) {
-                property = new SProperty(object.getAsJsonObject().get("value").getAsString(), object.getAsJsonObject().get("signature").getAsString());
+                property = new SProperty(
+                        object.getAsJsonObject().get("name").getAsString(),
+                        object.getAsJsonObject().get("value").getAsString(),
+                        object.getAsJsonObject().get("signature").getAsString()
+                );
             }
         }
         return property;
@@ -479,7 +484,7 @@ public class SkinProvider {
     public SProperty getXUIDSkin(final String xuid) throws IOException {
         final Request profileBytes = new Request().openConnection(String.format("https://api.geysermc.org/v2/skin/%s", xuid)).getRequest().finalizeRequest();
         final JsonElement json = JsonParser.parseString(new String(profileBytes.getBytes()));
-        return new SProperty(json.getAsJsonObject().get("value").getAsString(), json.getAsJsonObject().get("signature").getAsString());
+        return new SProperty("textures", json.getAsJsonObject().get("value").getAsString(), json.getAsJsonObject().get("signature").getAsString());
     }
 
     /**

@@ -28,7 +28,8 @@ public class GameProfileProvider_1_21_R4 extends GameProfileProvider {
         }
         ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
         GameProfile gameProfile = this.getInternalGameProfile(player);
-        gameProfile.getProperties().forEach((s, property) -> propertyObjectMap.append(s, new SProperty(property.value(), property.signature())));
+        gameProfile.getProperties().forEach((name, property) -> propertyObjectMap
+                .append(name, new SProperty(property.name(), property.value(), property.signature())));
         SGameProfile sGameProfile = new SGameProfile(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
         return sGameProfiles.append(player, sGameProfile).get(player);
     }
@@ -38,7 +39,7 @@ public class GameProfileProvider_1_21_R4 extends GameProfileProvider {
         GameProfile internalGameProfile = this.getInternalGameProfile(player);
         internalGameProfile.getProperties().removeAll("textures");
         SGameProfile gameProfile = this.getGameProfile(player);
-        gameProfile.getProperties().forEach((s, property) -> internalGameProfile.getProperties()
-                .put(s, new Property(s, property.value(), property.signature())));
+        gameProfile.getProperties().forEach((name, property) -> internalGameProfile.getProperties()
+                .put(name, new Property(property.name(), property.value(), property.signature())));
     }
 }
