@@ -22,7 +22,7 @@ public class BukkitCommandManager extends CommandManager {
             CommandMap commandMap;
             try {
                 commandMap = plugin.getServer().getCommandMap();
-            } catch (Exception e) {
+            } catch (NoSuchMethodError e) {
                 Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
                 commandMapField.setAccessible(true);
                 commandMap = (CommandMap) commandMapField.get(Bukkit.getServer());
