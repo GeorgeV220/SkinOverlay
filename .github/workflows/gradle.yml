@@ -15,8 +15,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: |
-            21
             25
+            21
 
       - name: Cache Gradle
         id: cache-gradle
@@ -55,8 +55,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: |
-            21
             25
+            21
 
       - name: Set up Node.js v20.x
         uses: actions/setup-node@v6
