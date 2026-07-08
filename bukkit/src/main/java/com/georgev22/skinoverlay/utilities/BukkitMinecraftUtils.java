@@ -790,7 +790,7 @@ public class BukkitMinecraftUtils {
          *
          * @param major the major version
          * @param minor the minor version
-         * @return {@code true} if this version is < given version
+         * @return {@code true} if this version is {@code <} given version
          */
         public boolean isBelow(int major, int minor) {
             return isBelow(major, minor, 0);
