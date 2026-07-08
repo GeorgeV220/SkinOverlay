@@ -1,3 +1,18 @@
+# [8.0.0-beta.9](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.8...v8.0.0-beta.9) (2026-07-08)
+
+
+### Bug Fixes
+
+* catch specific NoSuchMethodError instead of generic Exception ([787f584](https://github.com/GeorgeV220/SkinOverlay/commit/787f584495e7f8ad876e9d66aa82716a22fcce93))
+* maven publish ([cb74575](https://github.com/GeorgeV220/SkinOverlay/commit/cb74575c68b3214b10e12b1ee3718af481aa2eb6))
+* use original property names when updating GameProfile properties ([eb3fc33](https://github.com/GeorgeV220/SkinOverlay/commit/eb3fc330ea0a8fa02873442f18be3cd0dea19387))
+
+
+### Features
+
+* add Minecraft 1.21.11 version support and refactor VersionRange ([f8e4a33](https://github.com/GeorgeV220/SkinOverlay/commit/f8e4a33aab07035592ec7107498cab9f0d5b5697))
+* add support for Minecraft 26.1 and 26.2 versions ([86bf989](https://github.com/GeorgeV220/SkinOverlay/commit/86bf989b8bf1a71dcac8085d843942681b267be9))
+
 # [8.0.0-beta.8](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.7...v8.0.0-beta.8) (2026-07-02)
 
 
