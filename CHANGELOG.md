@@ -1,3 +1,176 @@
+# [8.0.0-beta.9](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.8...v8.0.0-beta.9) (2026-07-08)
+
+
+### Bug Fixes
+
+* catch specific NoSuchMethodError instead of generic Exception ([787f584](https://github.com/GeorgeV220/SkinOverlay/commit/787f584495e7f8ad876e9d66aa82716a22fcce93))
+* maven publish ([cb74575](https://github.com/GeorgeV220/SkinOverlay/commit/cb74575c68b3214b10e12b1ee3718af481aa2eb6))
+* use original property names when updating GameProfile properties ([eb3fc33](https://github.com/GeorgeV220/SkinOverlay/commit/eb3fc330ea0a8fa02873442f18be3cd0dea19387))
+
+
+### Features
+
+* add Minecraft 1.21.11 version support and refactor VersionRange ([f8e4a33](https://github.com/GeorgeV220/SkinOverlay/commit/f8e4a33aab07035592ec7107498cab9f0d5b5697))
+* add support for Minecraft 26.1 and 26.2 versions ([86bf989](https://github.com/GeorgeV220/SkinOverlay/commit/86bf989b8bf1a71dcac8085d843942681b267be9))
+
+# [8.0.0-beta.8](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.7...v8.0.0-beta.8) (2026-07-02)
+
+
+### Features
+
+* add placeholder field to skin configs and integrate with PlaceholderAPI ([2d04c3b](https://github.com/GeorgeV220/SkinOverlay/commit/2d04c3bcd5218d045b9636ab9327d7e9ec4b40c7))
+* improve placeholder API hook with configurable skin names ([71e990c](https://github.com/GeorgeV220/SkinOverlay/commit/71e990cc4b67af64dcb41776ddb7a484a2fb4012))
+
+# [8.0.0-beta.7](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.6...v8.0.0-beta.7) (2026-07-02)
+
+
+### Bug Fixes
+
+* add player placeholder to overlay reset success message ([0a83c6f](https://github.com/GeorgeV220/SkinOverlay/commit/0a83c6f434010e94f3b50c734239409d47f57019))
+* register PlaceholderAPI hook after plugin initialization ([b19c54f](https://github.com/GeorgeV220/SkinOverlay/commit/b19c54f765a60cee6244988219623400df435872))
+
+
+### Features
+
+* add multi-database support with MongoDB, MySQL, and SQLite ([c00a51f](https://github.com/GeorgeV220/SkinOverlay/commit/c00a51f36aa9b119200d28a2d158ad2c01b457e6))
+* implement SPlayer caching in PlayerProvider ([7e316b4](https://github.com/GeorgeV220/SkinOverlay/commit/7e316b43a2060cdb6a0f2ec4c9ba3a0e92a25bd6))
+* integrate Quark library manager for dependency loading ([030b71a](https://github.com/GeorgeV220/SkinOverlay/commit/030b71a683c9a3c6022a2f72a012948d07d623f6))
+* make Consumer parameter nullable in entity creation methods ([75d09ee](https://github.com/GeorgeV220/SkinOverlay/commit/75d09ee875a4792b0321e17719a3d235c519df1d))
+* simplify target player resolution in WearSubCommand ([44d73a4](https://github.com/GeorgeV220/SkinOverlay/commit/44d73a40e62eafdbd218c9f067d3d6b5b86b8296))
+
+# [8.0.0-beta.6](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.5...v8.0.0-beta.6) (2026-06-19)
+
+
+### Features
+
+* add Placeholder and PlaceholderUtils for dynamic message replacement ([c3f581e](https://github.com/GeorgeV220/SkinOverlay/commit/c3f581e8a00f3501094a292a00bd616006f51bfa))
+
+# [8.0.0-beta.5](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.4...v8.0.0-beta.5) (2026-06-18)
+
+
+### Bug Fixes
+
+* update repository URLs from GeorgeV22 to ShulkerLabs ([fecea1e](https://github.com/GeorgeV220/SkinOverlay/commit/fecea1ec7e85ee807330f8bc6f59914b1c65c551))
+
+# [8.0.0-beta.4](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.3...v8.0.0-beta.4) (2026-06-18)
+
+
+### Features
+
+* restructure data structures, storage, and task management ([d6519c9](https://github.com/GeorgeV220/SkinOverlay/commit/d6519c931d27534c406850d2c54b961a26a9b1ad))
+
+
+### BREAKING CHANGES
+
+* - Removed old `ConcurrentObjectMap`, `HashObjectMap`, `LinkedObjectMap`,
+  `ObjectMap`, `ObservableObjectMap`, `Pair`, `TreeObjectMap`,
+  `UnmodifiableObjectMap`, `PlayerEntityManager`, `SkinEntityManager`,
+  `PlayerFileManager`, `SkinFileManager`, `PairDocument`.
+- `Entity.getId()` renamed to `Entity.getUniqueId()`.
+- `EntityManagerRegistry` is now a singleton via `getInstance()` and
+  uses typed lookups via `getTyped(Class)`.
+- `EntityManager` load methods now return `CompletableFuture`.
+
+# [8.0.0-beta.3](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.2...v8.0.0-beta.3) (2025-11-30)
+
+
+* feat(core)!: introduce new command architecture and remove legacy message utilities ([f7768af](https://github.com/GeorgeV220/SkinOverlay/commit/f7768af1de07742f9f330c6b8b2fc462c8aaf25d))
+
+
+### Features
+
+* add command aliases for subcommands ([7a4f837](https://github.com/GeorgeV220/SkinOverlay/commit/7a4f8372629cd8252ab99fb05f9834f705b3c8d2))
+* add info subcommand to main command ([26939ea](https://github.com/GeorgeV220/SkinOverlay/commit/26939eae5a8477f986f5a77963f58547169fa673))
+* add no-op game profile provider and handle unsupported versions ([1dae36e](https://github.com/GeorgeV220/SkinOverlay/commit/1dae36eb1861b590be88349904e0cbe29b079924))
+* add reflect library and update package relocation paths ([7632063](https://github.com/GeorgeV220/SkinOverlay/commit/76320631a4f4e924b87ff9f968e73f244a75cc6b))
+* add SkinsRestorer integration and refactor skin applier ([b073d48](https://github.com/GeorgeV220/SkinOverlay/commit/b073d48ebd5f2ff70103d8f6b4b0e1f629cb5c6f))
+* add support for Minecraft 1.21.10-R0.1-SNAPSHOT ([85f5fce](https://github.com/GeorgeV220/SkinOverlay/commit/85f5fce25f26b8b9e94a43a07ec5b29ebaf700bf))
+* extend Minecraft 1.21 support range for Bukkit ([6942d02](https://github.com/GeorgeV220/SkinOverlay/commit/6942d021e1607a23bcb6c9e2a662a5fbf8cf5da0))
+
+
+### BREAKING CHANGES
+
+* - Removed legacy message system (MessageBuilder, MessageParser, MessagesUtil)
+- Removed PlayerOnly annotation
+- Replaced old message configuration with new MessageEntry-based system
+- Existing message configs and command usages must be updated to the new architecture
+
+feat(commands):
+- Added new annotations: Default, CommandTarget
+- Added MethodCommand for method-based command handling
+- Added registry system for extensible command targets (Registry, AbstractRegistry, CommandTargetRegistry)
+
+feat(messages):
+- Introduced new MessageEntry interface and MessageBuilder
+- Added MessagesRegistry for message management
+- Added CoreMessages and CommandMessages enums
+
+refactor(commands):
+- Reworked annotation processing with improved documentation and functionality
+- Enhanced CompletionEngine with a more robust resolver system
+- Added PreProcessor and PostProcessor interfaces
+- Rebuilt argument resolution and tab completion
+- Updated all command implementations and subcommands to the new system
+- Migrated all subcommands to use @Default
+- Improved command aliases, permissions, and descriptions
+
+refactor(config):
+- Updated CFG class with improved error handling
+- Removed legacy message configuration support
+
+refactor(utils):
+- Updated CustomData with cloning capabilities
+- Added Copyable interface and DeepCloner utility
+- General improvements across various utility functions
+
+chore(commands):
+- Refactored SkinOverlayMain and all subcommands to new architecture
+- Updated command completions and implementations
+
+Overall, this commit removes outdated messaging utilities and introduces a fully redesigned, extensible command and message system with better annotations, processors, registries, and utilities.
+
+# [8.0.0-beta.2](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.1...v8.0.0-beta.2) (2025-07-16)
+
+
+### Bug Fixes
+
+* **provider:** handle default skin not found case ([4ae9cd6](https://github.com/GeorgeV220/SkinOverlay/commit/4ae9cd62e22b184bf9c63f222ef2637b783f58eb))
+
+
+### Features
+
+* **logging:** add LoggerWrapper for unified logging integration ([82b1121](https://github.com/GeorgeV220/SkinOverlay/commit/82b112180486cca39592993afde599d7852c9af0))
+* **velocity:** add player event listeners and debug logging ([a626d79](https://github.com/GeorgeV220/SkinOverlay/commit/a626d793c6eb0161c0f2b8547486260d1f97b8a0))
+
+# [8.0.0-beta.1](https://github.com/GeorgeV220/SkinOverlay/compare/v7.1.0...v8.0.0-beta.1) (2025-07-15)
+
+
+### Bug Fixes
+
+* **completion:** handle empty args array in tab completion ([9dffca3](https://github.com/GeorgeV220/SkinOverlay/commit/9dffca35a088c4b460354a880a7ca8ebf71f19a1))
+* prevent saving entities in non-proxy mode when proxy enabled ([1381f51](https://github.com/GeorgeV220/SkinOverlay/commit/1381f515fd828813a4c9127c9879cd93b69bcab2))
+* **velocity:** pass plugin instance to audience provider ([2996a13](https://github.com/GeorgeV220/SkinOverlay/commit/2996a136fad4f9e99d0e560636700350f0ed650c))
+
+
+### Features
+
+* add Redis and PluginMessage support for skin synchronization ([a649393](https://github.com/GeorgeV220/SkinOverlay/commit/a64939330c35bbe5aa2cc3ef9fe912c57d2a504a))
+* conditionally initialize message handling based on proxy setting ([d77f772](https://github.com/GeorgeV220/SkinOverlay/commit/d77f772a828c7d02c88bc1a54102fb37660e6c4c))
+* **messaging:** recode messaging system with encryption and channels ([9deaaf1](https://github.com/GeorgeV220/SkinOverlay/commit/9deaaf1c25dfa24f9d47d8bf07004fd32dd25736))
+* **player:** delay publishPlayerJoin when PROXY enabled and not proxy ([07ae9a5](https://github.com/GeorgeV220/SkinOverlay/commit/07ae9a599559e6eb13b506cd1230a9a4f92527c3))
+* recode encryption and message handling ([0c901ef](https://github.com/GeorgeV220/SkinOverlay/commit/0c901ef9066b34dce5615c3d0bfb8503408380d9))
+* Recode of the entire plugin ([2ec6cf8](https://github.com/GeorgeV220/SkinOverlay/commit/2ec6cf855e7e29e9c157fff5e984a0a978dfe417))
+* Start recode ([6470152](https://github.com/GeorgeV220/SkinOverlay/commit/6470152d4d02eb8fb1faeff376539b9546efba98))
+* **utilities:** refactor message handling and add MessageParser ([2f35d09](https://github.com/GeorgeV220/SkinOverlay/commit/2f35d09962416ae0c759087cb37d21541c44f944))
+* Velocity support ([345924c](https://github.com/GeorgeV220/SkinOverlay/commit/345924c6c4e105ffb2129e4c2686a07cdfaec1c3))
+* **velocity:** add VelocityCommandManager initialization ([f9b59c5](https://github.com/GeorgeV220/SkinOverlay/commit/f9b59c5afc5c43b63d49dc1f8b5b71bcdecfe224))
+
+
+### BREAKING CHANGES
+
+* Old configs and save data may not be compatible with the new version
+* Removed all old classes for the recode
+
 # [7.1.0](https://github.com/GeorgeV220/SkinOverlay/compare/v7.0.0...v7.1.0) (2024-01-04)
 
 

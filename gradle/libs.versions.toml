@@ -1,0 +1,51 @@
+[versions]
+folia-api = "1.21.5-R0.1-SNAPSHOT"
+bstats = "3.1.0"
+adventure-api = "4.22.0"
+adventure-platform = "4.4.0"
+auth-lib-modern = "6.0.57"
+auth-lib-legacy = "3.11.50"
+gradleup-shadow = "9.4.1"
+hikari = "4.0.3"
+paperweight = "2.0.0-beta.21"
+gson = "2.13.1"
+placeholder-api = "2.11.6"
+mineskinclient = "3.2.6"
+skinsrestorer = "15.7.3"
+yamlconfiguration = "3.0.2"
+jedis = "6.0.0"
+jetbrains-annotations = "26.0.2"
+jspecify = "1.0.0"
+log4j-api = "3.0.0-beta2"
+mongodb-driver-sync = "5.2.1"
+
+[plugins]
+gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "gradleup-shadow" }
+paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+blossom = { id = "net.kyori.blossom", version = "2.2.0" }
+
+[libraries]
+bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
+bstats-bungeecord = { module = "org.bstats:bstats-bungeecord", version.ref = "bstats" }
+bstats-velocity = { module = "org.bstats:bstats-velocity", version.ref = "bstats" }
+adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure-api" }
+adventure-text-serializer-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure-api" }
+adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure-api" }
+adventure-platform-api = { module = "net.kyori:adventure-platform-api", version.ref = "adventure-platform" }
+adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
+adventure-platform-bungeecord = { module = "net.kyori:adventure-platform-bungeecord", version.ref = "adventure-platform" }
+auth-lib-modern = { module = "com.mojang:authlib", version.ref = "auth-lib-modern" }
+auth-lib-legacy = { module = "com.mojang:authlib", version.ref = "auth-lib-legacy" }
+folia-api = { module = "dev.folia:folia-api", version.ref = "folia-api" }
+hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+placeholder-api = { module = "me.clip:placeholderapi", version.ref = "placeholder-api" }
+mineskinclient-client = { module = "org.mineskin:java-client", version.ref = "mineskinclient" }
+mineskinclient-java11 = { module = "org.mineskin:java-client-java11", version.ref = "mineskinclient" }
+skinsrestorer-api = { module = "net.skinsrestorer:skinsrestorer-api", version.ref = "skinsrestorer" }
+yamlconfiguration = { module = "org.bspfsystems:yamlconfiguration", version.ref = "yamlconfiguration" }
+jedis = { module = "redis.clients:jedis", version.ref = "jedis" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j-api" }
+mongodb-driver-sync = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongodb-driver-sync" }

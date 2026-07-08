@@ -1,12 +1,12 @@
 apply plugin: 'maven-publish'
 
-static def getBranch() {
+static String getBranch() {
     def process = 'git branch --show-current'.execute()
     process.waitFor()
     return process.text.trim()
 }
 
-static def getHash() {
+static String getHash() {
     def process = 'git rev-parse HEAD'.execute()
     process.waitFor()
     return process.text.trim()
@@ -17,7 +17,7 @@ java {
     withSourcesJar()
 }
 
-jar {
+tasks.jar {
     manifest {
         attributes(
                 'Build-Jdk': "${System.properties['java.vendor']} ${System.properties['java.vm.version']}",
@@ -30,72 +30,25 @@ jar {
 
 publishing {
     publications {
-        shadow(MavenPublication) { publication ->
-            project.shadow.component(publication)
-            artifactId = project.getName().toLowerCase()
-            groupId = ((String) project.getGroup()).toLowerCase()
-            artifact sourcesJar
-            artifact javadocJar
+        shadow(MavenPublication) {
+            from components.java
+            artifactId = project.name.toLowerCase()
+            groupId = project.group.toString().toLowerCase()
         }
     }
     repositories {
-        def isGitHub = System.getenv("GITHUB_REPOSITORY") ? true : false
-        if (isGitHub) {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/${project.findProperty("GITHUB_REPOSITORY") ?: System.getenv("GITHUB_REPOSITORY")}")
-                credentials {
-                    username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-                    password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-                }
-            }
-            maven {
-                name = "GeorgeV22"
-
-                url = uri("https://repo.georgev22.com/releases")
-
-                def mavenUsername = System.getenv("MAVEN_USERNAME") ? System.getenv("MAVEN_USERNAME") :
-                        System.getProperty("MAVEN_USERNAME") ? System.getProperty("MAVEN_USERNAME") : null
-                def mavenPassword = System.getenv("MAVEN_PASSWORD") ? System.getenv("MAVEN_PASSWORD") :
-                        System.getProperty("MAVEN_PASSWORD") ? System.getProperty("MAVEN_PASSWORD") : null
-
-                if (mavenUsername != null && mavenPassword != null) {
-                    credentials {
-                        username = mavenUsername
-                        password = mavenPassword
-                    }
-                    authentication {
-                        basic(BasicAuthentication)
-                    }
-                }
-            }
-        }
-        if (!isGitHub) {
-            maven {
-                name = "GeorgeV22"
-
-                url = uri("https://repo.georgev22.com/snapshots")
-
-                def mavenUsername = System.getenv("MAVEN_USERNAME") ? System.getenv("MAVEN_USERNAME") :
-                        System.getProperty("MAVEN_USERNAME") ? System.getProperty("MAVEN_USERNAME") : null
-                def mavenPassword = System.getenv("MAVEN_PASSWORD") ? System.getenv("MAVEN_PASSWORD") :
-                        System.getProperty("MAVEN_PASSWORD") ? System.getProperty("MAVEN_PASSWORD") : null
-
-                if (mavenUsername != null && mavenPassword != null) {
-                    credentials {
-                        username = mavenUsername
-                        password = mavenPassword
-                    }
-                    authentication {
-                        basic(BasicAuthentication)
-                    }
-                }
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/${project.findProperty('GITHUB_REPOSITORY') ?: System.getenv('GITHUB_REPOSITORY')}")
+            credentials {
+                username = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
+                password = project.findProperty('gpr.token') ?: System.getenv('GITHUB_TOKEN')
             }
         }
     }
 }
 
-javadoc {
+tasks.javadoc {
     if (JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
         options.addStringOption('Xdoclint:none', '-quiet')
