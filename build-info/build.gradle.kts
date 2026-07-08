@@ -15,7 +15,7 @@ sourceSets {
                 property("pluginId", project.property("pluginName").toString().lowercase())
                 property("pluginName", project.property("pluginName").toString())
                 property("version", version.toString())
-                property("description", rootProject.description)
+                property("description", rootProject.description ?: "unknown")
                 property("author", project.property("author").toString())
                 property("url", "https://github.com/GeorgeV220/SkinOverlay")
                 property("commit", indraGit.commit()?.name ?: "unknown")

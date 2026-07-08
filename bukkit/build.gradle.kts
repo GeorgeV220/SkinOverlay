@@ -65,6 +65,7 @@ dependencies {
     implementation(project(":bukkit:versions:mc1_21_5", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_21_6", configuration = "reobf"))
     implementation(project(":bukkit:versions:mc1_21_9", configuration = "reobf"))
+    implementation(project(":bukkit:versions:mc1_21_11", configuration = "reobf"))
 }
 
 quark {

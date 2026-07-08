@@ -7,7 +7,7 @@ auth-lib-modern = "6.0.57"
 auth-lib-legacy = "3.11.50"
 gradleup-shadow = "9.4.1"
 hikari = "4.0.3"
-paperweight = "2.0.0-beta.17"
+paperweight = "2.0.0-beta.21"
 gson = "2.13.1"
 placeholder-api = "2.11.6"
 mineskinclient = "3.2.6"
@@ -22,7 +22,7 @@ mongodb-driver-sync = "5.2.1"
 [plugins]
 gradleup-shadow = { id = "com.gradleup.shadow", version.ref = "gradleup-shadow" }
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
-blossom = { id = "net.kyori.blossom", version = "2.1.0" }
+blossom = { id = "net.kyori.blossom", version = "2.2.0" }
 
 [libraries]
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }

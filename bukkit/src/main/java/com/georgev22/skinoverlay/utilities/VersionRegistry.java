@@ -36,7 +36,6 @@ public final class VersionRegistry {
 
             new VersionRange(
                     new MinecraftVersion(1, 18, 2),
-                    new MinecraftVersion(1, 18, 2),
                     GameProfileProvider_1_18_2::new,
                     SkinRefresher_1_18_2::new
             ),
@@ -50,13 +49,11 @@ public final class VersionRegistry {
 
             new VersionRange(
                     new MinecraftVersion(1, 19, 3),
-                    new MinecraftVersion(1, 19, 3),
                     GameProfileProvider_1_19_3::new,
                     SkinRefresher_1_19_3::new
             ),
 
             new VersionRange(
-                    new MinecraftVersion(1, 19, 4),
                     new MinecraftVersion(1, 19, 4),
                     GameProfileProvider_1_19_4::new,
                     SkinRefresher_1_19_4::new
@@ -70,7 +67,6 @@ public final class VersionRegistry {
             ),
 
             new VersionRange(
-                    new MinecraftVersion(1, 20, 2),
                     new MinecraftVersion(1, 20, 2),
                     GameProfileProvider_1_20_2::new,
                     SkinRefresher_1_20_2::new
@@ -106,13 +102,11 @@ public final class VersionRegistry {
 
             new VersionRange(
                     new MinecraftVersion(1, 21, 4),
-                    new MinecraftVersion(1, 21, 4),
                     GameProfileProvider_1_21_4::new,
                     SkinRefresher_1_21_4::new
             ),
 
             new VersionRange(
-                    new MinecraftVersion(1, 21, 5),
                     new MinecraftVersion(1, 21, 5),
                     GameProfileProvider_1_21_5::new,
                     SkinRefresher_1_21_5::new
@@ -130,6 +124,12 @@ public final class VersionRegistry {
                     new MinecraftVersion(1, 21, 10),
                     GameProfileProvider_1_21_9::new,
                     SkinRefresher_1_21_9::new
+            ),
+
+            new VersionRange(
+                    new MinecraftVersion(1, 21, 11),
+                    GameProfileProvider_1_21_11::new,
+                    SkinRefresher_1_21_11::new
             )
     );
 }
