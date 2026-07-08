@@ -130,6 +130,13 @@ public final class VersionRegistry {
                     new MinecraftVersion(1, 21, 11),
                     GameProfileProvider_1_21_11::new,
                     SkinRefresher_1_21_11::new
+            ),
+
+            new VersionRange(
+                    new MinecraftVersion(26, 1, 0),
+                    new MinecraftVersion(26, 2, 99),
+                    GameProfileProvider_26_1::new,
+                    SkinRefresher_26_1::new
             )
     );
 }

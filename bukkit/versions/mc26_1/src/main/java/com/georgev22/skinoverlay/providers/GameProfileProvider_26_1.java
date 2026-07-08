@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class GameProfileProvider_1_21_11 extends GameProfileProvider {
+public class GameProfileProvider_26_1 extends GameProfileProvider {
 
     private static final Field PROPERTIES_FIELD;
 
