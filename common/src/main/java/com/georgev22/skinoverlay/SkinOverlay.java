@@ -19,12 +19,8 @@ import com.georgev22.skinoverlay.messaging.MessageManager;
 import com.georgev22.skinoverlay.providers.GameProfileProvider;
 import com.georgev22.skinoverlay.providers.PlayerProvider;
 import com.georgev22.skinoverlay.providers.SkinProvider;
-import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.scheduler.MinecraftScheduler;
 import com.georgev22.skinoverlay.storage.DatabaseManager;
-import com.georgev22.skinoverlay.storage.EntityManager;
-import com.georgev22.skinoverlay.storage.ManagedEntity;
-import com.georgev22.skinoverlay.storage.data.Entity;
 import com.georgev22.skinoverlay.utilities.GsonUtils;
 import com.georgev22.skinoverlay.utilities.config.FileManager;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
@@ -489,18 +485,5 @@ public class SkinOverlay {
      */
     public MessageManager getMessageManager() {
         return messageManager;
-    }
-
-    private void registerEntityManager(EntityManagerRegistry entityManagerRegistry,
-                                       ManagedEntity<? extends Entity> managedEntity,
-                                       EntityManager<?> entityManager) {
-        try {
-            entityManagerRegistry.register(managedEntity.type(), entityManager);
-            this.getLogger().info(
-                    "Registered " + managedEntity.type().getSimpleName() + " entity manager");
-        } catch (Exception e) {
-            this.getLogger().log(Level.SEVERE,
-                    "Failed to register " + managedEntity.type().getSimpleName() + " entity manager", e);
-        }
     }
 }
