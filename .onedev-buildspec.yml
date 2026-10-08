@@ -15,6 +15,9 @@ jobs:
     key: gradle-paperweight-v1
     checksumFiles: '**/build.gradle **/build.gradle.kts **/gradle.properties **/settings.gradle **/settings.gradle.kts'
     entries:
+    - path: /root/.gradle/caches
+    - path: /root/.gradle/jdks
+    - path: /root/.gradle/wrapper
     - path: bukkit/versions/mc1_17/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_18/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_18_2/.gradle/caches/paperweight
@@ -67,6 +70,12 @@ jobs:
         echo "User: $(whoami)"
         echo "HOME: $HOME"
         echo "GRADLE_USER_HOME: ${GRADLE_USER_HOME:-not set}"
+        echo "Gradle directory:"
+        ls -ld /root/.gradle /home/gradle/.gradle 2>/dev/null || true
+        echo "Resolved path:"
+        readlink -f /root/.gradle
+        echo "Contents:"
+        du -sh /root/.gradle/* 2>/dev/null || true
         gradle --version
         gradle build -x test
     runAs: 0:0
@@ -104,6 +113,9 @@ jobs:
     key: gradle-paperweight-v1
     checksumFiles: '**/build.gradle **/build.gradle.kts **/gradle.properties **/settings.gradle **/settings.gradle.kts'
     entries:
+    - path: /root/.gradle/caches
+    - path: /root/.gradle/jdks
+    - path: /root/.gradle/wrapper
     - path: bukkit/versions/mc1_17/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_18/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_18_2/.gradle/caches/paperweight
