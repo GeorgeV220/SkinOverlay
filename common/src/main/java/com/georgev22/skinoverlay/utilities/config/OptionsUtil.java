@@ -59,7 +59,7 @@ public enum OptionsUtil {
     CUSTOM_SKIN_URL_NAME("custom skin url name", "Custom URL", Optional.empty()),
     UNKNOWN_SKIN_NAME("unknown skin name", "Unknown", Optional.empty()),
 
-    SKIN_HOOK("skin hook", "SkinsRestorer", Optional.empty()),
+    SKIN_HOOK("skin hook", "skinoverlay:skinsrestorer", Optional.empty()),
     LOCALE("locale", "en_US", Optional.empty()),
     SAVE_INTERVAL("save interval", 20, Optional.empty()),
     CONNECTION_TYPE("connection type", "PluginMessage", Optional.empty()),

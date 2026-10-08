@@ -3,6 +3,7 @@ package com.georgev22.skinoverlay.hooks;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.skin.SProperty;
+import com.georgev22.skinoverlay.utilities.NamespacedKey;
 import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
 import net.skinsrestorer.api.exception.DataRequestException;
@@ -20,6 +21,9 @@ import java.util.Optional;
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
 public class SkinsRestorerHook implements SkinHook {
+
+    private static final NamespacedKey key = new NamespacedKey("skinoverlay", "skinsrestorer");
+
     /**
      * SkinsRestorerAPI object for accessing the SkinsRestorer API.
      */
@@ -58,4 +62,13 @@ public class SkinsRestorerHook implements SkinHook {
         return property.map(skinProperty -> new SProperty("textures", skinProperty.getValue(), skinProperty.getSignature())).orElse(null);
     }
 
+    @Override
+    public @NotNull NamespacedKey getKey() {
+        return key;
+    }
+
+    @Override
+    public String getName() {
+        return "SkinsRestorer";
+    }
 }

@@ -2,14 +2,38 @@ package com.georgev22.skinoverlay.registry;
 
 import com.georgev22.skinoverlay.datastructures.maps.ConcurrentHashObjectMap;
 import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMaps;
 import com.georgev22.skinoverlay.datastructures.maps.UnmodifiableObjectMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
+/**
+ * A base implementation of {@link Registry} that stores key–value
+ * pairs inside a thread-safe {@link ConcurrentHashObjectMap}.
+ * <p>
+ * Subclasses may extend this to customize key extraction behavior
+ * for the {@code register(V)} and {@code replaceOrRegister(V)} methods.
+ * </p>
+ *
+ * @param <K> the key type used for lookup
+ * @param <V> the stored value type
+ * @see Registry
+ */
 public abstract class AbstractRegistry<K, V> implements Registry<K, V> {
 
-    protected final ObjectMap<K, V> registry = new ConcurrentHashObjectMap<>();
+    protected final ObjectMap<K, V> registry;
+
+    /**
+     * Creates a new abstract registry backed by a {@link ConcurrentHashObjectMap}.
+     * <p>
+     * The default constructor ensures a thread-safe underlying storage,
+     * while allowing subclasses to build additional behavior.
+     * </p>
+     */
+    protected AbstractRegistry() {
+        this.registry = ObjectMaps.newConcurrentHashObjectMap();
+    }
 
     /**
      * {@inheritDoc}
@@ -45,7 +69,7 @@ public abstract class AbstractRegistry<K, V> implements Registry<K, V> {
      */
     @Override
     public @NotNull Optional<V> get(K key) {
-        if (!registry.containsKey(key)) {
+        if (key == null) {
             return Optional.empty();
         }
         return Optional.ofNullable(registry.get(key));
@@ -65,5 +89,13 @@ public abstract class AbstractRegistry<K, V> implements Registry<K, V> {
     @Override
     public @NotNull ObjectMap<K, V> entries() {
         return new UnmodifiableObjectMap<>(registry);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        registry.clear();
     }
 }

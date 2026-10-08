@@ -1,10 +1,22 @@
 package com.georgev22.skinoverlay.registry;
 
 import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
+/**
+ * A generic key-to-value registry with support for querying, replacement,
+ * and optional automatic key extraction. This acts as a central mechanism
+ * for storing configurable and extensible API components.
+ *
+ * @param <K> the type used as the registry key
+ * @param <V> the type of values stored in the registry
+ * @see SelectableRegistry
+ * @see KeyedRegistry
+ * @see AbstractRegistry
+ */
 public interface Registry<K, V> {
 
     /**
@@ -81,4 +93,14 @@ public interface Registry<K, V> {
      * @return an {@link ObjectMap} containing all key–value pairs currently registered
      */
     @NotNull ObjectMap<K, V> entries();
+
+    /**
+     * Clears all entries from the registry.
+     * <p>
+     * If you don't know what this does, you probably don't need it.<br>
+     * Intended for internal use only but kept public for API purposes.
+     * </p>
+     */
+    @ApiStatus.Internal
+    void clear();
 }

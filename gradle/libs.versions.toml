@@ -29,11 +29,13 @@ bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 bstats-bungeecord = { module = "org.bstats:bstats-bungeecord", version.ref = "bstats" }
 bstats-velocity = { module = "org.bstats:bstats-velocity", version.ref = "bstats" }
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure-api" }
+adventure-key = { module = "net.kyori:adventure-key", version.ref = "adventure-api" }
 adventure-text-serializer-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure-api" }
 adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure-api" }
 adventure-platform-api = { module = "net.kyori:adventure-platform-api", version.ref = "adventure-platform" }
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
 adventure-platform-bungeecord = { module = "net.kyori:adventure-platform-bungeecord", version.ref = "adventure-platform" }
+adventure-component-logger = { module = "net.kyori:adventure-text-logger-slf4j", version.ref = "adventure-api" }
 auth-lib-modern = { module = "com.mojang:authlib", version.ref = "auth-lib-modern" }
 auth-lib-legacy = { module = "com.mojang:authlib", version.ref = "auth-lib-legacy" }
 folia-api = { module = "dev.folia:folia-api", version.ref = "folia-api" }

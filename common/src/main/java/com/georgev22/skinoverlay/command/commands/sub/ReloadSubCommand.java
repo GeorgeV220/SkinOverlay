@@ -32,6 +32,7 @@ public class ReloadSubCommand extends SkinOverlayBaseCommand {
             mainPlugin.getLogger().log(Level.SEVERE, "Error loading the language file: ", e);
         }
         OptionsUtil.reloadAll();
+        mainPlugin.getRegistryManager().reload();
         CoreMessages.PLUGIN_RELOAD.msg(commandIssuer);
     }
 }

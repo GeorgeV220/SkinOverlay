@@ -2,17 +2,15 @@ package com.georgev22.skinoverlay.hooks;
 
 import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.skin.SProperty;
+import com.georgev22.skinoverlay.utilities.Keyed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 /**
  * The SkinHook interface defines the methods required for a skin hook.
  * A skin hook is responsible for retrieving the skin property for a given player object.
  */
-public interface SkinHook {
+public interface SkinHook extends Keyed {
 
     /**
      * Retrieves the SProperty for the given {@link SPlayer}.
@@ -21,5 +19,12 @@ public interface SkinHook {
      * @return The SProperty for the given {@link SPlayer}, or null if the property cannot be retrieved.
      */
     @Nullable SProperty getProperty(@NotNull SPlayer player);
+
+    /**
+     * Retrieves the simple name of the SkinHook (e.g. SkinsRestorer)
+     *
+     * @return The simple name of the SkinHook
+     */
+    String getName();
 
 }

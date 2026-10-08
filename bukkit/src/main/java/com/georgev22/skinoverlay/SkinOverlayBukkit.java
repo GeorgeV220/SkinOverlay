@@ -3,8 +3,6 @@ package com.georgev22.skinoverlay;
 import com.georgev22.skinoverlay.hooks.placeholder.PlaceholderAPIHook;
 import com.georgev22.skinoverlay.refreshers.*;
 import com.georgev22.skinoverlay.command.BukkitCommandManager;
-import com.georgev22.skinoverlay.hooks.SkinHookNoop;
-import com.georgev22.skinoverlay.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
 import com.georgev22.skinoverlay.listeners.bukkit.PluginMessageListenerImpl;
 import com.georgev22.skinoverlay.messaging.MessageManagerNoop;
@@ -44,18 +42,11 @@ public class SkinOverlayBukkit extends JavaPlugin {
         this.skinOverlay.setCommandManager(new BukkitCommandManager(this));
         this.skinOverlay.setPlayerProvider(new BukkitPlayerProvider());
 
-        if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer")) {
-            this.skinOverlay.setSkinHook(new SkinsRestorerHook());
-            this.skinOverlay.setGameProfileProvider(new GameProfileProvider_SkinsRestorer());
+        if (BukkitMinecraftUtils.isPaper() && getCurrent().isAtLeast(1, 20)) {
             this.skinOverlay.setSkinRefresher(new NoopSkinRefresher());
+            this.skinOverlay.setGameProfileProvider(new PaperGameProfileProvider());
         } else {
-            this.skinOverlay.setSkinHook(new SkinHookNoop());
-            if (BukkitMinecraftUtils.isPaper() && getCurrent().isAtLeast(1, 20)) {
-                this.skinOverlay.setSkinRefresher(new NoopSkinRefresher());
-                this.skinOverlay.setGameProfileProvider(new PaperGameProfileProvider());
-            } else {
-                new SkinOverlayVersionResolver(this.skinOverlay).resolve();
-            }
+            new SkinOverlayVersionResolver(this.skinOverlay).resolve();
         }
 
         this.skinOverlay.setOnlineMode(Bukkit.getOnlineMode());
@@ -63,6 +54,7 @@ public class SkinOverlayBukkit extends JavaPlugin {
         this.skinOverlay.setScheduler(
                 BukkitMinecraftUtils.isFolia() ? new MinecraftFoliaScheduler() : new MinecraftBukkitScheduler()
         );
+        this.skinOverlay.setPluginProvider(pluginName -> Bukkit.getPluginManager().isPluginEnabled(pluginName));
         this.skinOverlay.onLoad();
     }
 

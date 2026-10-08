@@ -21,6 +21,7 @@ dependencies {
     quark(libs.adventure.platform.bukkit)
     quark(libs.adventure.text.minimessage)
     quark(libs.adventure.text.serializer.legacy)
+    quark(libs.adventure.component.logger)
 
     quark(libs.hikari) {
         exclude(group = "org.slf4j", module = "slf4j-api")

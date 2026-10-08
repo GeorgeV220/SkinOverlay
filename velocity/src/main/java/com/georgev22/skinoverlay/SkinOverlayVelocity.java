@@ -2,8 +2,6 @@ package com.georgev22.skinoverlay;
 
 import com.georgev22.skinoverlay.refreshers.VelocitySkinRefresher;
 import com.georgev22.skinoverlay.command.VelocityCommandManager;
-import com.georgev22.skinoverlay.hooks.SkinHookNoop;
-import com.georgev22.skinoverlay.hooks.SkinsRestorerHook;
 import com.georgev22.skinoverlay.listeners.velocity.PlayerListeners;
 import com.georgev22.skinoverlay.messaging.MessageManagerNoop;
 import com.georgev22.skinoverlay.messaging.RedisManager;
@@ -31,6 +29,7 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Locale;
 
 import static com.georgev22.skinoverlay.messaging.VelocityPluginMessageManager.inChannelIdentifier;
 
@@ -69,6 +68,7 @@ public class SkinOverlayVelocity {
         this.skinOverlay.setPlugin(this);
         this.skinOverlay.setScheduler(new VelocityMinecraftScheduler<>(server));
         this.skinOverlay.setCommandManager(new VelocityCommandManager(server));
+        this.skinOverlay.setPluginProvider(pluginName -> server.getPluginManager().isLoaded(pluginName.toLowerCase(Locale.ROOT)));
         this.skinOverlay.onLoad();
         if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage"))
             this.server.getChannelRegistrar().register(inChannelIdentifier);
@@ -76,11 +76,6 @@ public class SkinOverlayVelocity {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        if (server.getPluginManager().getPlugin("skinsrestorer").isPresent()) {
-            this.skinOverlay.setSkinHook(new SkinsRestorerHook());
-        } else {
-            this.skinOverlay.setSkinHook(new SkinHookNoop());
-        }
         this.skinOverlay.setSkinRefresher(new VelocitySkinRefresher());
         this.skinOverlay.setGameProfileProvider(new VelocityGameProfileProvider());
         this.skinOverlay.setPlayerProvider(new VelocityPlayerProvider(server));

@@ -4,6 +4,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.exceptions.SkinException;
 import com.georgev22.skinoverlay.player.SPlayer;
 import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
+import com.georgev22.skinoverlay.registry.Registries;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.skin.SProperty;
 import com.georgev22.skinoverlay.storage.EntityManager;
@@ -105,7 +106,8 @@ public class SkinProvider {
 
                     FileConfiguration fileConfiguration = skinConfigurationFile.getFileConfiguration();
 
-                    BufferedImage currentSkin = this.getSkinImage(this.getProfileBytes(player, this.skinOverlay.getSkinHook().getProperty(player)));
+                    BufferedImage currentSkin = this.getSkinImage(this.getProfileBytes(player, Registries.SKIN_HOOK.getSelected()
+                            .map(skinHook -> skinHook.getProperty(player)).orElse(null)));
 
                     SkinParts currentSkinParts = new SkinParts(new SerializableBufferedImage(currentSkin), "currentSkin");
                     currentSkinParts.createParts();
@@ -456,12 +458,15 @@ public class SkinProvider {
      * @throws IOException When an I/O exception to some sort has occurred.
      */
     public SProperty getJavaSkin(final SPlayer player) throws IOException {
-        if (skinOverlay.getSkinHook().getProperty(player) != null) {
-            return skinOverlay.getSkinHook().getProperty(player);
+        SProperty property = Registries.SKIN_HOOK.getSelected()
+                .map(skinHook -> skinHook.getProperty(player))
+                .orElse(null);
+
+        if (property != null) {
+            return property;
         }
         final JsonElement json = JsonParser.parseString(new String(this.getProfileBytes(player, null)));
         final JsonArray properties = json.getAsJsonObject().get("properties").getAsJsonArray();
-        SProperty property = null;
         for (final JsonElement object : properties) {
             if (object.getAsJsonObject().get("name").getAsString().equals("textures")) {
                 property = new SProperty(
