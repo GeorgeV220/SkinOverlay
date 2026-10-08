@@ -1,0 +1,176 @@
+version: 55
+jobs:
+- name: build
+  steps:
+  - type: CheckoutStep
+    name: checkout code
+    cloneCredential:
+      type: DefaultCredential
+    withLfs: false
+    withSubmodules: false
+    condition: SUCCESSFUL
+    optional: false
+  - type: SetupCacheStep
+    name: set up gradle cache
+    key: gradle-paperweight-v1
+    checksumFiles: '**/build.gradle **/build.gradle.kts **/gradle.properties **/settings.gradle **/settings.gradle.kts'
+    entries:
+    - path: bukkit/versions/mc1_17/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_18/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_18_2/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_19/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_19_3/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_19_4/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_20/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_20_2/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_20_3/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_20_5/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_2/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_4/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_5/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_6/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_9/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_11/.gradle/caches/paperweight
+    - path: bukkit/versions/mc26_1/.gradle/caches/paperweight
+    uploadStrategy: UPLOAD_IF_NOT_EXACT_MATCH
+    uploadAccessTokenSecret: skinoverlay-token
+    condition: SUCCESSFUL
+    optional: false
+  - type: CommandStep
+    name: detect build version
+    runInContainer: true
+    image: git.shulkerlabs.com/ci-images/gradle-jdk21-25:1
+    interpreter:
+      type: PosixInterpreter
+      shell: sh
+      commands: |
+        echo "Detecting project version (may require some time while downloading gradle dependencies)..."
+        echo $(gradle properties | grep ^version: | grep -v unspecified | cut -c10-) > buildVersion
+    runAs: 0:0
+    useTTY: true
+    condition: SUCCESSFUL
+    optional: false
+  - type: SetBuildVersionStep
+    name: set build version
+    buildVersion: '@file:buildVersion@'
+    condition: SUCCESSFUL
+    optional: false
+  - type: CommandStep
+    name: build
+    runInContainer: true
+    image: git.shulkerlabs.com/ci-images/gradle-jdk21-25:1
+    interpreter:
+      type: PosixInterpreter
+      shell: sh
+      commands: |
+        echo "User: $(whoami)"
+        echo "HOME: $HOME"
+        echo "GRADLE_USER_HOME: ${GRADLE_USER_HOME:-not set}"
+        gradle --version
+        gradle build -x test
+    runAs: 0:0
+    useTTY: true
+    condition: SUCCESSFUL
+    optional: false
+  - type: PublishArtifactStep
+    name: build output
+    artifacts: '**/build/libs/*.jar'
+    condition: SUCCESSFUL
+    optional: false
+  triggers:
+  - type: BranchUpdateTrigger
+    userMatch: anyone
+  - type: PullRequestUpdateTrigger
+  retryCondition: never
+  maxAttempts: 3
+  retryDelay: 30
+  includeUpstreamWhenRebuild: false
+  includeDownstreamWhenRebuild: false
+  timeout: 14400
+- name: release
+  steps:
+  - type: CheckoutStep
+    name: checkout code
+    cloneCredential:
+      type: HttpCredential
+      accessTokenSecret: release-token
+    withLfs: false
+    withSubmodules: false
+    condition: SUCCESSFUL
+    optional: false
+  - type: SetupCacheStep
+    name: set up gradle cache
+    key: gradle-paperweight-v1
+    checksumFiles: '**/build.gradle **/build.gradle.kts **/gradle.properties **/settings.gradle **/settings.gradle.kts'
+    entries:
+    - path: bukkit/versions/mc1_17/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_18/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_18_2/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_19/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_19_3/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_19_4/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_20/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_20_2/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_20_3/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_20_5/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_2/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_4/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_5/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_6/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_9/.gradle/caches/paperweight
+    - path: bukkit/versions/mc1_21_11/.gradle/caches/paperweight
+    - path: bukkit/versions/mc26_1/.gradle/caches/paperweight
+    uploadStrategy: UPLOAD_IF_NOT_EXACT_MATCH
+    uploadAccessTokenSecret: skinoverlay-token
+    condition: SUCCESSFUL
+    optional: false
+  - type: CommandStep
+    name: semantic release
+    runInContainer: true
+    image: git.shulkerlabs.com/ci-images/gradle-semantic-release:1
+    interpreter:
+      type: PosixInterpreter
+      shell: sh
+      commands: |
+        set -eu
+
+        chmod +x gradlew
+
+        if [ -f update-versions.sh ]; then
+          chmod +x update-versions.sh
+        fi
+
+        git fetch origin "@branch@" --tags --force
+        git checkout -B "@branch@" "origin/@branch@"
+
+        git config user.name "semantic-release"
+        git config user.email "semantic-release@@shulkerlabs.com"
+
+        export MAVEN_USERNAME='@job_token@'
+        export MAVEN_PASSWORD='@secret:skinoverlay-token@'
+
+        semantic-release --no-ci
+    runAs: 0:0
+    useTTY: true
+    condition: SUCCESSFUL
+    optional: false
+  - type: PublishArtifactStep
+    name: release jars
+    artifacts: '**/build/libs/*.jar'
+    condition: SUCCESSFUL
+    optional: true
+  triggers:
+  - type: BranchUpdateTrigger
+    branches: master beta alpha
+    userMatch: anyone
+  jobDependencies:
+  - jobName: build
+    requireSuccessful: true
+  retryCondition: never
+  maxAttempts: 3
+  retryDelay: 30
+  includeUpstreamWhenRebuild: false
+  includeDownstreamWhenRebuild: false
+  timeout: 14400

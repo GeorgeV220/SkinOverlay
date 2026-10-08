@@ -3,11 +3,11 @@
     "master",
     {
       "name": "beta",
-      "prerelease": true
+      "prerelease": "beta"
     },
     {
       "name": "alpha",
-      "prerelease": true
+      "prerelease": "alpha"
     }
   ],
   "plugins": [
@@ -22,23 +22,14 @@
     "@semantic-release/changelog",
     "gradle-semantic-release-plugin",
     [
-      "@semantic-release/github",
-      {
-        "assets": [
-          {
-            "path": "**/build/libs/*.jar"
-          }
-        ]
-      }
-    ],
-    [
       "@semantic-release/git",
       {
         "assets": [
           "gradle.properties",
           "CHANGELOG.md",
           "README.md"
-        ]
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ]
   ]

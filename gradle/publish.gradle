@@ -38,11 +38,11 @@ publishing {
     }
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/${project.findProperty('GITHUB_REPOSITORY') ?: System.getenv('GITHUB_REPOSITORY')}")
+            name = "ShulkerLabs"
+            url = uri("https://git.shulkerlabs.com/SkinOverlay/~maven")
             credentials {
-                username = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
-                password = project.findProperty('gpr.token') ?: System.getenv('GITHUB_TOKEN')
+                username = project.findProperty('gpr.user') ?: System.getenv('MAVEN_USERNAME')
+                password = project.findProperty('gpr.token') ?: System.getenv('MAVEN_PASSWORD')
             }
         }
     }
