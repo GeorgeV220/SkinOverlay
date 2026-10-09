@@ -15,9 +15,9 @@ jobs:
     key: gradle-paperweight-v1
     checksumFiles: '**/build.gradle **/build.gradle.kts **/gradle.properties **/settings.gradle **/settings.gradle.kts'
     entries:
-    - path: /root/.gradle/caches
-    - path: /root/.gradle/jdks
-    - path: /root/.gradle/wrapper
+    - path: .gradle-user-home/caches
+    - path: .gradle-user-home/jdks
+    - path: .gradle-user-home/wrapper
     - path: bukkit/versions/mc1_17/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_18/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_18_2/.gradle/caches/paperweight
@@ -36,7 +36,7 @@ jobs:
     - path: bukkit/versions/mc1_21_9/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_21_11/.gradle/caches/paperweight
     - path: bukkit/versions/mc26_1/.gradle/caches/paperweight
-    uploadStrategy: UPLOAD_IF_NOT_EXACT_MATCH
+    uploadStrategy: UPLOAD_IF_CHANGED
     uploadAccessTokenSecret: skinoverlay-token
     condition: SUCCESSFUL
     optional: false
@@ -49,6 +49,9 @@ jobs:
       shell: sh
       commands: |
         echo "Detecting project version (may require some time while downloading gradle dependencies)..."
+        export GRADLE_USER_HOME="$PWD/.gradle-user-home"
+        mkdir -p "$GRADLE_USER_HOME"
+        echo "Using Gradle cache: $GRADLE_USER_HOME"
         echo $(gradle properties | grep ^version: | grep -v unspecified | cut -c10-) > buildVersion
     runAs: 0:0
     useTTY: true
@@ -67,17 +70,16 @@ jobs:
       type: PosixInterpreter
       shell: sh
       commands: |
+        export GRADLE_USER_HOME="$PWD/.gradle-user-home"
+        mkdir -p "$GRADLE_USER_HOME"
         echo "User: $(whoami)"
         echo "HOME: $HOME"
         echo "GRADLE_USER_HOME: ${GRADLE_USER_HOME:-not set}"
-        echo "Gradle directory:"
-        ls -ld /root/.gradle /home/gradle/.gradle 2>/dev/null || true
-        echo "Resolved path:"
-        readlink -f /root/.gradle
-        echo "Contents:"
-        du -sh /root/.gradle/* 2>/dev/null || true
         gradle --version
         gradle build -x test
+        echo "Gradle home: $GRADLE_USER_HOME"
+        ls -lah "$GRADLE_USER_HOME"
+        du -sh "$GRADLE_USER_HOME"/* 2>/dev/null || true
     runAs: 0:0
     useTTY: true
     condition: SUCCESSFUL
@@ -113,9 +115,9 @@ jobs:
     key: gradle-paperweight-v1
     checksumFiles: '**/build.gradle **/build.gradle.kts **/gradle.properties **/settings.gradle **/settings.gradle.kts'
     entries:
-    - path: /root/.gradle/caches
-    - path: /root/.gradle/jdks
-    - path: /root/.gradle/wrapper
+    - path: .gradle-user-home/caches
+    - path: .gradle-user-home/jdks
+    - path: .gradle-user-home/wrapper
     - path: bukkit/versions/mc1_17/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_18/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_18_2/.gradle/caches/paperweight
@@ -134,7 +136,7 @@ jobs:
     - path: bukkit/versions/mc1_21_9/.gradle/caches/paperweight
     - path: bukkit/versions/mc1_21_11/.gradle/caches/paperweight
     - path: bukkit/versions/mc26_1/.gradle/caches/paperweight
-    uploadStrategy: UPLOAD_IF_NOT_EXACT_MATCH
+    uploadStrategy: UPLOAD_IF_CHANGED
     uploadAccessTokenSecret: skinoverlay-token
     condition: SUCCESSFUL
     optional: false
@@ -162,6 +164,9 @@ jobs:
 
         export MAVEN_USERNAME='@job_token@'
         export MAVEN_PASSWORD='@secret:skinoverlay-token@'
+        
+        export GRADLE_USER_HOME="$PWD/.gradle-user-home"
+        mkdir -p "$GRADLE_USER_HOME"
 
         semantic-release --no-ci
     runAs: 0:0
