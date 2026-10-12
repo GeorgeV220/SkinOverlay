@@ -23,7 +23,7 @@ public class BukkitLegacyGameProfileProvider extends GameProfileProvider {
     public GameProfile getInternalGameProfile(@NotNull SkinOverlayPlayer player) {
         try {
             Class<?> craftPlayerClass = obcClass("entity.CraftPlayer");
-            Player bukkitPlayer = player.getPlayer();
+            Player bukkitPlayer = player.getPlatformPlayer();
             return (GameProfile) fetchMethodAndInvoke(craftPlayerClass, "getProfile", bukkitPlayer, new Object[]{}, new Class[]{});
         } catch (Exception e) {
             skinOverlay.getLogger().log(Level.SEVERE, "Error while trying to retrieve internal game profile: ", e);

@@ -81,7 +81,7 @@ public abstract class PlayerProvider {
      */
     public boolean isOnline(@NotNull SkinOverlayPlayer player) {
         try {
-            return player.isOnline() && player.getPlayer() != null;
+            return player.isOnline() && player.getPlatformPlayer() != null;
         } catch (Exception e) {
             return false;
         }

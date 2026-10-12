@@ -18,7 +18,7 @@ public class VelocitySkinOverlayPlayer extends VelocityCommandIssuer implements 
     }
 
     @Override
-    public <T> T getPlayer() {
+    public <T> T getPlatformPlayer() {
         return (T) this.player;
     }
 }

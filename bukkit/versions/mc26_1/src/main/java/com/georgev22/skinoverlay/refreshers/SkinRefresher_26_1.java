@@ -22,7 +22,7 @@ public class SkinRefresher_26_1 extends SkinRefresher {
     @Override
     public void refresh(@NotNull SkinOverlayPlayer player) {
         this.skinOverlay.getScheduler().createDelayedTask(skinOverlay.getPlugin(), () -> {
-            Player bukkitPlayer = player.getPlayer();
+            Player bukkitPlayer = player.getPlatformPlayer();
             bukkitPlayer.hidePlayer(skinOverlay.getPlugin(), bukkitPlayer);
             bukkitPlayer.showPlayer(skinOverlay.getPlugin(), bukkitPlayer);
             this.sendPackets(player).handleAsync((result, throwable) -> {
@@ -35,7 +35,7 @@ public class SkinRefresher_26_1 extends SkinRefresher {
                 if (result)
                     skinOverlay.getPlayerProvider().getOnlinePlayers().stream()
                             .filter(onlinePlayer -> onlinePlayer != player).forEach(onlinePlayer -> {
-                                Player p = onlinePlayer.getPlayer();
+                                Player p = onlinePlayer.getPlatformPlayer();
                                 p.hidePlayer(skinOverlay.getPlugin(), bukkitPlayer);
                                 p.showPlayer(skinOverlay.getPlugin(), bukkitPlayer);
                             });
@@ -47,7 +47,7 @@ public class SkinRefresher_26_1 extends SkinRefresher {
     protected @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SkinOverlayPlayer player) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Player bukkitPlayer = player.getPlayer();
+                Player bukkitPlayer = player.getPlatformPlayer();
                 final CraftPlayer craftPlayer = (CraftPlayer) bukkitPlayer;
                 final ServerPlayer entityPlayer = craftPlayer.getHandle();
 

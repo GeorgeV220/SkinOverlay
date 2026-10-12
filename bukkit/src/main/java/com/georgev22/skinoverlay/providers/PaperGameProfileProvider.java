@@ -12,7 +12,7 @@ public class PaperGameProfileProvider extends GameProfileProvider {
 
     @Override
     public PlayerProfile getInternalGameProfile(@NotNull SkinOverlayPlayer player) {
-        Player bukkitPlayer = player.getPlayer();
+        Player bukkitPlayer = player.getPlatformPlayer();
         return bukkitPlayer.getPlayerProfile();
     }
 
@@ -31,7 +31,7 @@ public class PaperGameProfileProvider extends GameProfileProvider {
 
     @Override
     public void applyUpdatedGameProfile(@NotNull SkinOverlayPlayer player) {
-        Player bukkitPlayer = player.getPlayer();
+        Player bukkitPlayer = player.getPlatformPlayer();
         PlayerProfile playerProfile = bukkitPlayer.getPlayerProfile();
         playerProfile.getProperties().removeIf(profileProperty -> profileProperty.getName().equalsIgnoreCase("textures"));
         SGameProfile gameProfile = this.getGameProfile(player);

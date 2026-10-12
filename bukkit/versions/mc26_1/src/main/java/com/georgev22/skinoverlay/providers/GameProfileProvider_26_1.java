@@ -32,7 +32,7 @@ public class GameProfileProvider_26_1 extends GameProfileProvider {
 
     @Override
     public @NotNull GameProfile getInternalGameProfile(@NotNull SkinOverlayPlayer player) {
-        Player bukkitPlayer = player.getPlayer();
+        Player bukkitPlayer = player.getPlatformPlayer();
         final CraftPlayer craftPlayer = (CraftPlayer) bukkitPlayer;
         final ServerPlayer entityPlayer = craftPlayer.getHandle();
         return entityPlayer.getGameProfile();

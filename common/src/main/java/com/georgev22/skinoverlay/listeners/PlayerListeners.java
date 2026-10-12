@@ -36,7 +36,7 @@ public class PlayerListeners {
                     () -> mainPlugin.getMessageManager().publishPlayerJoin(player.getUniqueId()),
                     () -> {
                     },
-                    player.getPlayer(),
+                    player.getPlatformPlayer(),
                     20L
             );
             return;

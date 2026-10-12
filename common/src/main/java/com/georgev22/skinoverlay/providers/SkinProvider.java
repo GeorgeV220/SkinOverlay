@@ -746,7 +746,7 @@ public class SkinProvider {
             @NotNull SkinOverlayPlayer player,
             @Nullable SProperty property
     ) throws IOException {
-        return player.isBedrock()
+        return player.isBedrockPlayer()
                 ? getBedrockProfileBytes(player, property)
                 : getJavaProfileBytes(player, property);
     }
@@ -811,7 +811,7 @@ public class SkinProvider {
     public SProperty getSkin(
             @NotNull SkinOverlayPlayer player
     ) throws IOException, ExecutionException, InterruptedException {
-        return player.isBedrock()
+        return player.isBedrockPlayer()
                 ? getXUIDSkin(getXUID(player))
                 : getJavaSkin(player);
     }

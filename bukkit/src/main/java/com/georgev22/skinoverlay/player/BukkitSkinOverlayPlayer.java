@@ -19,7 +19,7 @@ public class BukkitSkinOverlayPlayer extends BukkitCommandIssuer implements Skin
     }
 
     @Override
-    public <T> T getPlayer() {
+    public <T> T getPlatformPlayer() {
         //noinspection unchecked
         return (T) this.player;
     }

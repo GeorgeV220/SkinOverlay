@@ -76,7 +76,7 @@ public class LegacySkinRefresher extends SkinRefresher {
     @Override
     public void refresh(@NotNull SkinOverlayPlayer player) {
         this.skinOverlay.getScheduler().createDelayedTask(this.skinOverlay.getPlugin(), () -> {
-            Player bukkitPlayer = player.getPlayer();
+            Player bukkitPlayer = player.getPlatformPlayer();
             bukkitPlayer.hidePlayer(bukkitPlayer);
             bukkitPlayer.showPlayer(bukkitPlayer);
             this.sendPackets(player).handleAsync((result, throwable) -> {
@@ -88,7 +88,7 @@ public class LegacySkinRefresher extends SkinRefresher {
             }).thenAccept(result -> this.skinOverlay.getScheduler().runTask(this.skinOverlay.getPlugin(), () -> {
                 if (result)
                     skinOverlay.getPlayerProvider().getOnlinePlayers().stream().filter(online -> online != player).forEach(online -> {
-                        Player p = online.getPlayer();
+                        Player p = online.getPlatformPlayer();
                         p.hidePlayer(bukkitPlayer);
                         p.showPlayer(bukkitPlayer);
                     });
@@ -104,7 +104,7 @@ public class LegacySkinRefresher extends SkinRefresher {
     protected @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SkinOverlayPlayer player) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Player bukkitPlayer = player.getPlayer();
+                Player bukkitPlayer = player.getPlatformPlayer();
 
                 final Object entityPlayer = getHandleMethod.invoke(player);
                 Object removePlayer;

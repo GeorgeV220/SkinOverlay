@@ -16,7 +16,7 @@ public class VelocityGameProfileProvider extends GameProfileProvider {
 
     @Override
     public GameProfile getInternalGameProfile(@NotNull SkinOverlayPlayer player) {
-        return ((Player) player.getPlayer()).getGameProfile();
+        return ((Player) player.getPlatformPlayer()).getGameProfile();
     }
 
     @Override
@@ -34,7 +34,7 @@ public class VelocityGameProfileProvider extends GameProfileProvider {
 
     @Override
     public void applyUpdatedGameProfile(@NotNull SkinOverlayPlayer player) {
-        Player velocityPlayer = player.getPlayer();
+        Player velocityPlayer = player.getPlatformPlayer();
         List<GameProfile.Property> propertyList = new ArrayList<>();
         getGameProfile(player).getProperties().forEach((name, property) -> propertyList.add(
                 new GameProfile.Property(property.name(), property.value(), property.signature())));

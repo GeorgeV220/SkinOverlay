@@ -50,6 +50,6 @@ public class GameProfileProvider_SkinsRestorer extends GameProfileProvider {
             return;
         }
         SkinProperty skinProperty = SkinProperty.of(property.value(), property.signature());
-        skinsRestorerAPI.getSkinApplier(player.getPlayer().getClass()).applySkin(player.getPlayer(), skinProperty);
+        skinsRestorerAPI.getSkinApplier(player.getPlatformPlayer().getClass()).applySkin(player.getPlatformPlayer(), skinProperty);
     }
 }
