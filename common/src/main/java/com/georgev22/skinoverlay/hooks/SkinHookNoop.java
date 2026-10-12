@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay.hooks;
 
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.skin.SProperty;
 import com.georgev22.skinoverlay.utilities.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ public class SkinHookNoop implements SkinHook {
     private static final NamespacedKey key = new NamespacedKey("skinoverlay", "noop");
 
     @Override
-    public @Nullable SProperty getProperty(@NotNull SPlayer player) {
+    public @Nullable SProperty getProperty(@NotNull SkinOverlayPlayer player) {
         return null;
     }
 

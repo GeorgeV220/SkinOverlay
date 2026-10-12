@@ -4,7 +4,7 @@ import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 
-public interface SPlayer extends CommandIssuer {
+public interface SkinOverlayPlayer extends CommandIssuer {
 
     boolean isOnline();
 

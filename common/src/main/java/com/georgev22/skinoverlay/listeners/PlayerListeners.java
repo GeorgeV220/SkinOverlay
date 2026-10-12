@@ -1,9 +1,9 @@
 package com.georgev22.skinoverlay.listeners;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.event.events.player.SPlayerJoinEvent;
-import com.georgev22.skinoverlay.event.events.player.SPlayerLeaveEvent;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerJoinEvent;
+import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerLeaveEvent;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.skin.SProperty;
@@ -26,8 +26,8 @@ public class PlayerListeners {
 
     private final SkinOverlay mainPlugin = SkinOverlay.getInstance();
 
-    public void onPlayerJoin(@NotNull SPlayerJoinEvent event) {
-        SPlayer player = event.getPlayer();
+    public void onPlayerJoin(@NotNull SkinOverlayPlayerJoinEvent event) {
+        SkinOverlayPlayer player = event.getPlayer();
 
         if (!mainPlugin.isProxy() && OptionsUtil.PROXY.getBooleanValue()) {
             // If we don't delay the publishPlayerJoin, the proxy won't receive the plugin message (idk why)
@@ -108,8 +108,8 @@ public class PlayerListeners {
         playerDataManager.save(playerData);
     }
 
-    public void onPlayerLeave(@NotNull SPlayerLeaveEvent event) {
-        SPlayer player = event.getPlayer();
+    public void onPlayerLeave(@NotNull SkinOverlayPlayerLeaveEvent event) {
+        SkinOverlayPlayer player = event.getPlayer();
         EntityManagerRegistry.getInstance().getTyped(PlayerData.class)
                 .ifPresent(entityManager -> entityManager.findById(player.getUniqueId())
                         .ifPresent(entityManager::save));

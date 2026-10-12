@@ -1,8 +1,8 @@
 package com.georgev22.skinoverlay.providers;
 
 import com.georgev22.skinoverlay.command.CommandIssuer;
-import com.georgev22.skinoverlay.player.SPlayer;
-import com.georgev22.skinoverlay.player.VelocitySPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
+import com.georgev22.skinoverlay.player.VelocitySkinOverlayPlayer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.jspecify.annotations.NonNull;
@@ -20,36 +20,36 @@ public class VelocityPlayerProvider extends PlayerProvider {
         this.server = server;
     }
 
-    private SPlayer getOrCreate(@NonNull Player player) {
+    private SkinOverlayPlayer getOrCreate(@NonNull Player player) {
         return playerCache.computeIfAbsent(
                 player.getUniqueId(),
-                uuid -> new VelocitySPlayer(player)
+                uuid -> new VelocitySkinOverlayPlayer(player)
         );
     }
 
     @Override
-    public SPlayer getSPlayer(@NonNull Object player) {
+    public SkinOverlayPlayer getSkinOverlayPlayer(@NonNull Object player) {
         if (player instanceof Player velocityPlayer) {
             return getOrCreate(velocityPlayer);
         }
 
         if (player instanceof String name) {
-            return getSPlayer(name);
+            return getSkinOverlayPlayer(name);
         }
 
         if (player instanceof UUID uuid) {
-            return getSPlayer(uuid);
+            return getSkinOverlayPlayer(uuid);
         }
 
         if (player instanceof CommandIssuer commandIssuer) {
-            return getSPlayer(commandIssuer);
+            return getSkinOverlayPlayer(commandIssuer);
         }
 
         return null;
     }
 
     @Override
-    public SPlayer getSPlayer(@NonNull CommandIssuer commandIssuer) {
+    public SkinOverlayPlayer getSkinOverlayPlayer(@NonNull CommandIssuer commandIssuer) {
         if (!commandIssuer.isPlayer()) {
             throw new IllegalArgumentException("CommandIssuer is not a player");
         }
@@ -58,7 +58,7 @@ public class VelocityPlayerProvider extends PlayerProvider {
     }
 
     @Override
-    public SPlayer getSPlayer(@NonNull String name) {
+    public SkinOverlayPlayer getSkinOverlayPlayer(@NonNull String name) {
         Optional<Player> player = server.getPlayer(name);
         if (player.isPresent()) {
             return getOrCreate(player.get());
@@ -68,7 +68,7 @@ public class VelocityPlayerProvider extends PlayerProvider {
     }
 
     @Override
-    public SPlayer getSPlayer(@NonNull UUID uuid) {
+    public SkinOverlayPlayer getSkinOverlayPlayer(@NonNull UUID uuid) {
         Optional<Player> player = server.getPlayer(uuid);
         if (player.isPresent()) {
             return getOrCreate(player.get());
@@ -78,7 +78,7 @@ public class VelocityPlayerProvider extends PlayerProvider {
     }
 
     @Override
-    public @NonNull List<SPlayer> getOnlinePlayers() {
+    public @NonNull List<SkinOverlayPlayer> getOnlinePlayers() {
         return new ArrayList<>(
                 server.getAllPlayers().stream()
                         .map(this::getOrCreate)

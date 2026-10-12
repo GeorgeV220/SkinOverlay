@@ -6,7 +6,7 @@ import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
 import com.georgev22.skinoverlay.message.Placeholder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public class ClearSubCommand extends SkinOverlayBaseCommand {
 
     @Default
-    protected void handle(@NotNull CommandIssuer commandIssuer, @Argument(name = "target", completion = "@players", optional = true) SPlayer target) {
+    protected void handle(@NotNull CommandIssuer commandIssuer, @Argument(name = "target", completion = "@players", optional = true) SkinOverlayPlayer target) {
         if (target == null) {
             if (!commandIssuer.isPlayer()) {
                 CommandMessages.COMMAND_MISSING_ARGUMENT.msg(commandIssuer,
@@ -27,7 +27,7 @@ public class ClearSubCommand extends SkinOverlayBaseCommand {
                                 .placeholder("%command%", "clear <player>").placeholder("%arg%", "target").build());
                 return;
             }
-            SPlayer player = mainPlugin.getPlayerProvider().getSPlayer(commandIssuer.getUniqueId());
+            SkinOverlayPlayer player = mainPlugin.getPlayerProvider().getSkinOverlayPlayer(commandIssuer.getUniqueId());
             if (player == null) {
                 return;
             }

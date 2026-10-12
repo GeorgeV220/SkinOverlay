@@ -1,9 +1,9 @@
 package com.georgev22.skinoverlay.listeners.bukkit;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.event.events.player.SPlayerJoinEvent;
-import com.georgev22.skinoverlay.event.events.player.SPlayerLeaveEvent;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerJoinEvent;
+import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerLeaveEvent;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,18 +18,18 @@ public class PlayerListeners implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        SPlayer sPlayer = mainPlugin.getPlayerProvider().getSPlayer(player);
-        if (sPlayer != null) {
-            mainPlugin.getEventBus().post(new SPlayerJoinEvent(sPlayer));
+        SkinOverlayPlayer skinOverlayPlayer = mainPlugin.getPlayerProvider().getSkinOverlayPlayer(player);
+        if (skinOverlayPlayer != null) {
+            mainPlugin.getEventBus().post(new SkinOverlayPlayerJoinEvent(skinOverlayPlayer));
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        SPlayer sPlayer = mainPlugin.getPlayerProvider().getSPlayer(player);
-        if (sPlayer != null) {
-            mainPlugin.getEventBus().post(new SPlayerLeaveEvent(sPlayer));
+        SkinOverlayPlayer skinOverlayPlayer = mainPlugin.getPlayerProvider().getSkinOverlayPlayer(player);
+        if (skinOverlayPlayer != null) {
+            mainPlugin.getEventBus().post(new SkinOverlayPlayerLeaveEvent(skinOverlayPlayer));
         }
     }
 

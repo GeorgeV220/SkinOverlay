@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.refreshers;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,7 @@ public abstract class SkinRefresher {
     protected SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     /**
-     * Triggers a client-side refresh for the given {@link SPlayer}.
+     * Triggers a client-side refresh for the given {@link SkinOverlayPlayer}.
      *
      * <p>This method should ensure that any previously applied changes to the player's
      * {@link SGameProfile} (such as skin updates) become visible to the player and
@@ -33,11 +33,11 @@ public abstract class SkinRefresher {
      *
      * @param player the player whose client state should be refreshed
      */
-    public void refresh(@NotNull final SPlayer player) {
+    public void refresh(@NotNull final SkinOverlayPlayer player) {
     }
 
     /**
-     * Triggers a client-side refresh for the given {@link SPlayer} after a specific
+     * Triggers a client-side refresh for the given {@link SkinOverlayPlayer} after a specific
      * {@link Skin} has been applied.
      *
      * <p>This overload allows implementations to optionally use the provided
@@ -46,7 +46,7 @@ public abstract class SkinRefresher {
      * @param player the player whose client state should be refreshed
      * @param skin   the skin that was applied prior to the refresh
      */
-    public void refresh(@NotNull final SPlayer player, @NotNull final Skin skin) {
+    public void refresh(@NotNull final SkinOverlayPlayer player, @NotNull final Skin skin) {
         refresh(player);
     }
 
@@ -61,6 +61,6 @@ public abstract class SkinRefresher {
      * @return a {@link CompletableFuture} that completes with {@code true} if the
      * update was successful, or {@code false} otherwise
      */
-    protected abstract @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SPlayer player);
+    protected abstract @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SkinOverlayPlayer player);
 
 }

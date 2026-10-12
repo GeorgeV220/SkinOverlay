@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.hooks;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.skin.SProperty;
 import com.georgev22.skinoverlay.utilities.NamespacedKey;
 import net.skinsrestorer.api.SkinsRestorer;
@@ -47,12 +47,12 @@ public class SkinsRestorerHook implements SkinHook {
      * If the player does not have a skin set or the skin data cannot be retrieved,
      * the method returns null and the skin data is retrieved using SkinOverlay.
      *
-     * @param player the {@link SPlayer} to retrieve skin property data for
+     * @param player the {@link SkinOverlayPlayer} to retrieve skin property data for
      * @return the SProperty object containing the skin property data, or null if the skin data could not be retrieved
      */
     @Override
     @Nullable
-    public SProperty getProperty(@NotNull SPlayer player) {
+    public SProperty getProperty(@NotNull SkinOverlayPlayer player) {
         Optional<SkinProperty> property;
         try {
             property = skinsRestorerAPI.getPlayerStorage().getSkinForPlayer(player.getUniqueId(), player.getName());

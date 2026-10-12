@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.refreshers;
 
 import com.georgev22.skinoverlay.exceptions.SkinException;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
@@ -23,7 +23,7 @@ import java.util.logging.Level;
 public class SkinRefresher_1_19 extends SkinRefresher {
 
     @Override
-    public void refresh(@NotNull SPlayer player) {
+    public void refresh(@NotNull SkinOverlayPlayer player) {
         this.skinOverlay.getScheduler().createDelayedTask(skinOverlay.getPlugin(), () -> {
             Player bukkitPlayer = player.getPlayer();
             bukkitPlayer.hidePlayer(skinOverlay.getPlugin(), bukkitPlayer);
@@ -47,7 +47,7 @@ public class SkinRefresher_1_19 extends SkinRefresher {
     }
 
     @Override
-    protected @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SPlayer player) {
+    protected @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SkinOverlayPlayer player) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Player bukkitPlayer = player.getPlayer();

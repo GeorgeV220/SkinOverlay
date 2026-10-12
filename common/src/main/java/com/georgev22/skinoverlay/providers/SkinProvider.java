@@ -2,7 +2,7 @@ package com.georgev22.skinoverlay.providers;
 
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.exceptions.SkinException;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.registry.Registries;
 import com.georgev22.skinoverlay.skin.SGameProfile;
@@ -83,7 +83,7 @@ public class SkinProvider {
     }
 
     public CompletableFuture<Optional<Skin>> retrieveOrGenerateSkin(
-            @NotNull SPlayer player,
+            @NotNull SkinOverlayPlayer player,
             @NotNull SkinParts skinParts
     ) {
         Optional<EntityManager<Skin>> optionalSkinManager =
@@ -159,7 +159,7 @@ public class SkinProvider {
     }
 
     private @NonNull CompletableFuture<Optional<Skin>> retrieveOrCreateDefaultSkin(
-            SPlayer player,
+            SkinOverlayPlayer player,
             SkinParts skinParts,
             EntityManager<Skin> skinManager
     ) {
@@ -238,7 +238,7 @@ public class SkinProvider {
     }
 
     private PreparedOverlaySkin prepareOverlaySkin(
-            SPlayer player,
+            SkinOverlayPlayer player,
             @NonNull SkinParts skinParts,
             EntityManager<Skin> skinManager
     ) throws IOException, ExecutionException, InterruptedException {
@@ -307,7 +307,7 @@ public class SkinProvider {
     }
 
     private @NonNull CompletableFuture<Optional<Skin>> generateMineSkin(
-            @NonNull SPlayer player,
+            @NonNull SkinOverlayPlayer player,
             @NonNull SkinParts skinParts,
             UUID skinUUID,
             BufferedImage image,
@@ -404,7 +404,7 @@ public class SkinProvider {
     }
 
     private Optional<Skin> createAndSaveSkin(
-            SPlayer player,
+            SkinOverlayPlayer player,
             SkinParts skinParts,
             UUID skinUUID,
             SProperty property,
@@ -610,7 +610,7 @@ public class SkinProvider {
     }
 
     private @NonNull UUID createPropertyCacheUUID(
-            @NonNull SPlayer player,
+            @NonNull SkinOverlayPlayer player,
             String skinName,
             @NonNull SProperty property
     ) {
@@ -631,7 +631,7 @@ public class SkinProvider {
     }
 
     private @NonNull UUID createImageCacheUUID(
-            SPlayer player,
+            SkinOverlayPlayer player,
             String skinName,
             BufferedImage image
     ) throws IOException {
@@ -683,13 +683,13 @@ public class SkinProvider {
     }
 
     /**
-     * Apply the skin for the specified {@link SPlayer}
+     * Apply the skin for the specified {@link SkinOverlayPlayer}
      *
-     * @param player Player's {@link SPlayer} object.
+     * @param player Player's {@link SkinOverlayPlayer} object.
      * @param skin   Skin
      */
     public void setSkin(
-            @NotNull SPlayer player,
+            @NotNull SkinOverlayPlayer player,
             @NotNull Skin skin
     ) {
         SGameProfile gameProfile =
@@ -740,10 +740,10 @@ public class SkinProvider {
     }
 
     /**
-     * Retrieves {@link SPlayer}'s profile bytes.
+     * Retrieves {@link SkinOverlayPlayer}'s profile bytes.
      */
     public byte[] getProfileBytes(
-            @NotNull SPlayer player,
+            @NotNull SkinOverlayPlayer player,
             @Nullable SProperty property
     ) throws IOException {
         return player.isBedrock()
@@ -752,7 +752,7 @@ public class SkinProvider {
     }
 
     public byte[] getBedrockProfileBytes(
-            @NotNull SPlayer player,
+            @NotNull SkinOverlayPlayer player,
             @Nullable SProperty property
     ) throws IOException {
         JsonObject json = property != null
@@ -765,7 +765,7 @@ public class SkinProvider {
     }
 
     public byte[] getJavaProfileBytes(
-            @NotNull SPlayer player,
+            @NotNull SkinOverlayPlayer player,
             @Nullable SProperty property
     ) throws IOException {
         if (property != null) {
@@ -791,7 +791,7 @@ public class SkinProvider {
     }
 
     public BufferedImage getSkinImage(
-            @NotNull SPlayer player
+            @NotNull SkinOverlayPlayer player
     ) throws IOException, ExecutionException, InterruptedException {
         SGameProfile gameProfile =
                 skinOverlay
@@ -809,7 +809,7 @@ public class SkinProvider {
     }
 
     public SProperty getSkin(
-            @NotNull SPlayer player
+            @NotNull SkinOverlayPlayer player
     ) throws IOException, ExecutionException, InterruptedException {
         return player.isBedrock()
                 ? getXUIDSkin(getXUID(player))
@@ -968,7 +968,7 @@ public class SkinProvider {
     }
 
     public SProperty getJavaSkin(
-            SPlayer player
+            SkinOverlayPlayer player
     ) throws IOException {
         SProperty hookProperty =
                 Registries.SKIN_HOOK.getSelected()
@@ -1049,7 +1049,7 @@ public class SkinProvider {
     }
 
     public String getXUID(
-            @NotNull SPlayer player
+            @NotNull SkinOverlayPlayer player
     ) throws IOException {
         String username =
                 player.getName().replace(".", "");
@@ -1090,7 +1090,7 @@ public class SkinProvider {
     }
 
     public JsonObject createJsonForBedrock(
-            @NotNull SPlayer player
+            @NotNull SkinOverlayPlayer player
     ) throws IOException {
         return createJsonFromProperty(
                 player,
@@ -1099,7 +1099,7 @@ public class SkinProvider {
     }
 
     public JsonObject createJsonFromProperty(
-            @NotNull SPlayer player,
+            @NotNull SkinOverlayPlayer player,
             @Nullable SProperty property
     ) {
         if (property == null) {

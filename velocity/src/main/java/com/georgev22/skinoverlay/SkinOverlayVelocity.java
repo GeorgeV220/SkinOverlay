@@ -106,7 +106,7 @@ public class SkinOverlayVelocity {
                             Skin skin = playerData.getCurrentSkin();
                             if (skin != null) {
                                 this.skinOverlay.getSkinProvider().setSkin(
-                                        this.skinOverlay.getPlayerProvider().getSPlayer(uuid),
+                                        this.skinOverlay.getPlayerProvider().getSkinOverlayPlayer(uuid),
                                         skin
                                 );
                             }

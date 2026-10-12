@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.refreshers;
 
 import com.georgev22.skinoverlay.exceptions.ReflectionException;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
 import org.bukkit.Location;
@@ -74,7 +74,7 @@ public class LegacySkinRefresher extends SkinRefresher {
     }
 
     @Override
-    public void refresh(@NotNull SPlayer player) {
+    public void refresh(@NotNull SkinOverlayPlayer player) {
         this.skinOverlay.getScheduler().createDelayedTask(this.skinOverlay.getPlugin(), () -> {
             Player bukkitPlayer = player.getPlayer();
             bukkitPlayer.hidePlayer(bukkitPlayer);
@@ -101,7 +101,7 @@ public class LegacySkinRefresher extends SkinRefresher {
     }
 
     @Contract("_ -> new")
-    protected @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SPlayer player) {
+    protected @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SkinOverlayPlayer player) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Player bukkitPlayer = player.getPlayer();

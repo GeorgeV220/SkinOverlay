@@ -2,7 +2,7 @@ package com.georgev22.skinoverlay.providers;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.skin.SProperty;
 import org.bukkit.entity.Player;
@@ -11,13 +11,13 @@ import org.jetbrains.annotations.NotNull;
 public class PaperGameProfileProvider extends GameProfileProvider {
 
     @Override
-    public PlayerProfile getInternalGameProfile(@NotNull SPlayer player) {
+    public PlayerProfile getInternalGameProfile(@NotNull SkinOverlayPlayer player) {
         Player bukkitPlayer = player.getPlayer();
         return bukkitPlayer.getPlayerProfile();
     }
 
     @Override
-    public SGameProfile getGameProfile(@NotNull SPlayer player) {
+    public SGameProfile getGameProfile(@NotNull SkinOverlayPlayer player) {
         if (sGameProfiles.containsKey(player)) {
             return sGameProfiles.get(player);
         }
@@ -30,7 +30,7 @@ public class PaperGameProfileProvider extends GameProfileProvider {
     }
 
     @Override
-    public void applyUpdatedGameProfile(@NotNull SPlayer player) {
+    public void applyUpdatedGameProfile(@NotNull SkinOverlayPlayer player) {
         Player bukkitPlayer = player.getPlayer();
         PlayerProfile playerProfile = bukkitPlayer.getPlayerProfile();
         playerProfile.getProperties().removeIf(profileProperty -> profileProperty.getName().equalsIgnoreCase("textures"));

@@ -3,11 +3,11 @@ package com.georgev22.skinoverlay.player;
 import com.georgev22.skinoverlay.command.VelocityCommandIssuer;
 import com.velocitypowered.api.proxy.Player;
 
-public class VelocitySPlayer extends VelocityCommandIssuer implements SPlayer {
+public class VelocitySkinOverlayPlayer extends VelocityCommandIssuer implements SkinOverlayPlayer {
 
     private final Player player;
 
-    public VelocitySPlayer(Player player) {
+    public VelocitySkinOverlayPlayer(Player player) {
         super(player);
         this.player = player;
     }

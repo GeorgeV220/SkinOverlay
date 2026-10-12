@@ -1,6 +1,6 @@
 package com.georgev22.skinoverlay.providers;
 
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.skin.SProperty;
 import net.skinsrestorer.api.SkinsRestorer;
@@ -20,7 +20,7 @@ public class GameProfileProvider_SkinsRestorer extends GameProfileProvider {
     }
 
     @Override
-    public SGameProfile getInternalGameProfile(@NotNull SPlayer player) {
+    public SGameProfile getInternalGameProfile(@NotNull SkinOverlayPlayer player) {
         Optional<SkinProperty> property;
         try {
             property = skinsRestorerAPI.getPlayerStorage().getSkinForPlayer(player.getUniqueId(), player.getName());
@@ -34,7 +34,7 @@ public class GameProfileProvider_SkinsRestorer extends GameProfileProvider {
     }
 
     @Override
-    public SGameProfile getGameProfile(@NotNull SPlayer player) {
+    public SGameProfile getGameProfile(@NotNull SkinOverlayPlayer player) {
         if (sGameProfiles.containsKey(player)) {
             return sGameProfiles.get(player);
         }
@@ -42,7 +42,7 @@ public class GameProfileProvider_SkinsRestorer extends GameProfileProvider {
     }
 
     @Override
-    public void applyUpdatedGameProfile(@NotNull SPlayer player) {
+    public void applyUpdatedGameProfile(@NotNull SkinOverlayPlayer player) {
         SGameProfile gameProfile = getGameProfile(player);
         SProperty property = gameProfile.getProperty("textures");
         if (property == null) {

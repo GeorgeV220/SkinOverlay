@@ -3,18 +3,18 @@ package com.georgev22.skinoverlay.providers;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
 import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Abstract provider responsible for handling {@link SGameProfile} retrieval,
- * caching, and application for {@link SPlayer} instances.
+ * caching, and application for {@link SkinOverlayPlayer} instances.
  */
 public abstract class GameProfileProvider {
 
     protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();
-    protected final ObjectMap<SPlayer, SGameProfile> sGameProfiles = new HashObjectMap<>();
+    protected final ObjectMap<SkinOverlayPlayer, SGameProfile> sGameProfiles = new HashObjectMap<>();
 
     /**
      * Retrieves the underlying platform-specific game profile object
@@ -26,7 +26,7 @@ public abstract class GameProfileProvider {
      * @param player the player whose internal profile is requested
      * @return the platform-specific game profile object (never {@code null})
      */
-    public abstract Object getInternalGameProfile(@NotNull SPlayer player);
+    public abstract Object getInternalGameProfile(@NotNull SkinOverlayPlayer player);
 
     /**
      * Retrieves the {@link SGameProfile} associated with the given player.
@@ -37,11 +37,11 @@ public abstract class GameProfileProvider {
      * @param player the player whose profile is requested
      * @return the corresponding {@link SGameProfile} (never {@code null})
      */
-    public abstract SGameProfile getGameProfile(@NotNull SPlayer player);
+    public abstract SGameProfile getGameProfile(@NotNull SkinOverlayPlayer player);
 
     /**
      * Retrieves a cached {@link SGameProfile} if available,
-     * otherwise falls back to {@link #getGameProfile(SPlayer)}.
+     * otherwise falls back to {@link #getGameProfile(SkinOverlayPlayer)}.
      *
      * <p>This method does not automatically store the result in the cache;
      * caching behavior should be handled by the implementation if needed.</p>
@@ -49,7 +49,7 @@ public abstract class GameProfileProvider {
      * @param player the player whose profile is requested
      * @return the cached or newly retrieved {@link SGameProfile}
      */
-    public SGameProfile getCachedGameProfile(@NotNull SPlayer player) {
+    public SGameProfile getCachedGameProfile(@NotNull SkinOverlayPlayer player) {
         if (sGameProfiles.containsKey(player)) {
             return sGameProfiles.get(player);
         }
@@ -65,6 +65,6 @@ public abstract class GameProfileProvider {
      *
      * @param player the player whose updated profile should be applied
      */
-    public abstract void applyUpdatedGameProfile(@NotNull SPlayer player);
+    public abstract void applyUpdatedGameProfile(@NotNull SkinOverlayPlayer player);
 
 }

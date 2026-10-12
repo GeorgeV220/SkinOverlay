@@ -6,7 +6,7 @@ import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
 import com.georgev22.skinoverlay.message.Placeholder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
@@ -28,7 +28,7 @@ public class WearSubCommand extends SkinOverlayBaseCommand {
     @Default
     protected void handle(@NotNull CommandIssuer commandIssuer,
                           @Argument(name = "overlay", completion = "@overlays") String overlay,
-                          @Argument(name = "target", completion = "@players", optional = true) SPlayer target) {
+                          @Argument(name = "target", completion = "@players", optional = true) SkinOverlayPlayer target) {
         if (overlay == null || overlay.isEmpty()) {
             CommandMessages.COMMAND_MISSING_ARGUMENT.msg(commandIssuer, Placeholder.builder(commandIssuer.audience())
                     .placeholder("%command%", "wear <overlay> <player>").placeholder("%arg%", "overlay").build());
@@ -36,7 +36,7 @@ public class WearSubCommand extends SkinOverlayBaseCommand {
         }
 
         if (target == null && commandIssuer.isPlayer()) {
-            target = mainPlugin.getPlayerProvider().getSPlayer(commandIssuer.getUniqueId());
+            target = mainPlugin.getPlayerProvider().getSkinOverlayPlayer(commandIssuer.getUniqueId());
         }
 
         if (target == null) {
@@ -63,7 +63,7 @@ public class WearSubCommand extends SkinOverlayBaseCommand {
             mainPlugin.getLogger().log(Level.SEVERE, "Error while trying to load the skin: ", e);
             return;
         }
-        SPlayer finalTarget = target;
+        SkinOverlayPlayer finalTarget = target;
         mainPlugin.getSkinProvider()
                 .retrieveOrGenerateSkin(
                         target,

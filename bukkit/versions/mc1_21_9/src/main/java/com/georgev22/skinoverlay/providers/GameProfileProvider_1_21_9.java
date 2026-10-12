@@ -2,7 +2,7 @@ package com.georgev22.skinoverlay.providers;
 
 import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
 import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.skin.SProperty;
 import com.google.common.collect.ImmutableMultimap;
@@ -32,7 +32,7 @@ public class GameProfileProvider_1_21_9 extends GameProfileProvider {
 
 
     @Override
-    public @NotNull GameProfile getInternalGameProfile(@NotNull SPlayer player) {
+    public @NotNull GameProfile getInternalGameProfile(@NotNull SkinOverlayPlayer player) {
         Player bukkitPlayer = player.getPlayer();
         final CraftPlayer craftPlayer = (CraftPlayer) bukkitPlayer;
         final ServerPlayer entityPlayer = craftPlayer.getHandle();
@@ -40,7 +40,7 @@ public class GameProfileProvider_1_21_9 extends GameProfileProvider {
     }
 
     @Override
-    public SGameProfile getGameProfile(@NotNull SPlayer player) {
+    public SGameProfile getGameProfile(@NotNull SkinOverlayPlayer player) {
         if (sGameProfiles.containsKey(player)) {
             return sGameProfiles.get(player);
         }
@@ -53,7 +53,7 @@ public class GameProfileProvider_1_21_9 extends GameProfileProvider {
     }
 
     @Override
-    public void applyUpdatedGameProfile(@NotNull SPlayer player) {
+    public void applyUpdatedGameProfile(@NotNull SkinOverlayPlayer player) {
         GameProfile internalGameProfile = this.getInternalGameProfile(player);
         PropertyMap properties = internalGameProfile.properties();
         SGameProfile gameProfile = this.getGameProfile(player);

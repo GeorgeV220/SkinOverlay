@@ -7,7 +7,7 @@ import com.georgev22.skinoverlay.listeners.bukkit.PlayerListeners;
 import com.georgev22.skinoverlay.listeners.bukkit.PluginMessageListenerImpl;
 import com.georgev22.skinoverlay.messaging.MessageManagerNoop;
 import com.georgev22.skinoverlay.messaging.RedisManager;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.providers.*;
 import com.georgev22.skinoverlay.scheduler.MinecraftBukkitScheduler;
 import com.georgev22.skinoverlay.scheduler.MinecraftFoliaScheduler;
@@ -79,7 +79,7 @@ public class SkinOverlayBukkit extends JavaPlugin {
                 this.skinOverlay.setMessageManager(new MessageManagerNoop());
             }
             skinOverlay.getMessageManager().subscribeSkinProperty((uuid, skin) -> {
-                SPlayer player = this.skinOverlay.getPlayerProvider().getSPlayer(uuid);
+                SkinOverlayPlayer player = this.skinOverlay.getPlayerProvider().getSkinOverlayPlayer(uuid);
                 if (player != null) {
                     skinOverlay.getSkinProvider().setSkin(player, skin);
                 }

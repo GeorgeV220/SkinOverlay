@@ -6,7 +6,7 @@ import com.georgev22.skinoverlay.command.annotation.*;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
 import com.georgev22.skinoverlay.message.Placeholder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
@@ -31,7 +31,7 @@ public class WearUrlSubCommand extends SkinOverlayBaseCommand {
     @Default
     protected void handle(@NotNull CommandIssuer commandIssuer,
                           @Argument(name = "url") String urlStr,
-                          @Argument(name = "target", completion = "@players", optional = true) SPlayer target) {
+                          @Argument(name = "target", completion = "@players", optional = true) SkinOverlayPlayer target) {
 
         try {
             URL url = new URL(urlStr);
@@ -52,7 +52,7 @@ public class WearUrlSubCommand extends SkinOverlayBaseCommand {
             }
 
             if (target == null)
-                target = mainPlugin.getPlayerProvider().getSPlayer(commandIssuer.getUniqueId());
+                target = mainPlugin.getPlayerProvider().getSkinOverlayPlayer(commandIssuer.getUniqueId());
 
             SkinParts skinParts = createSkinPartsFromBytes(imageBytes, url);
             applySkinToPlayer(commandIssuer, target, skinParts);
@@ -83,7 +83,7 @@ public class WearUrlSubCommand extends SkinOverlayBaseCommand {
         return new SkinParts(bufferedImage, "customURL-" + url);
     }
 
-    private void applySkinToPlayer(CommandIssuer issuer, SPlayer player, SkinParts skinParts) {
+    private void applySkinToPlayer(CommandIssuer issuer, SkinOverlayPlayer player, SkinParts skinParts) {
         mainPlugin.getSkinProvider().retrieveOrGenerateSkin(player, skinParts).thenAcceptAsync(optionalSkin -> {
             if (optionalSkin.isEmpty()) {
                 CommandMessages.COMMAND_ERROR.msg(issuer,
