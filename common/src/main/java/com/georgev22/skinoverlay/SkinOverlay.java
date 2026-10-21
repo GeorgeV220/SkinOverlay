@@ -7,9 +7,6 @@ import com.georgev22.skinoverlay.command.CommandManager;
 import com.georgev22.skinoverlay.command.CompletionEngine;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayMain;
 import com.georgev22.skinoverlay.event.EventBus;
-import com.georgev22.skinoverlay.event.HandlerPriority;
-import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerJoinEvent;
-import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerLeaveEvent;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
 import com.georgev22.skinoverlay.message.MessageEntry;
 import com.georgev22.skinoverlay.message.MessagesRegistry;
@@ -150,9 +147,7 @@ public class SkinOverlay {
         getLogger().info("Commands registered successfully!");
 
         // Register event listeners
-        PlayerListeners playerListeners = new PlayerListeners();
-        this.getEventBus().register(SkinOverlayPlayerJoinEvent.class, playerListeners::onPlayerJoin, HandlerPriority.LOWEST);
-        this.getEventBus().register(SkinOverlayPlayerLeaveEvent.class, playerListeners::onPlayerLeave, HandlerPriority.LOWEST);
+        this.getEventBus().registerListeners(new PlayerListeners());
     }
 
     /**

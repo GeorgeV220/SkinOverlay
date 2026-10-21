@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.event;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -38,6 +39,46 @@ public class EventBus {
     public <T extends Event> void register(Class<T> eventClass, EventHandler<T> handler, HandlerPriority priority) {
         handlers.computeIfAbsent(eventClass, k -> new ArrayList<>()).add(new HandlerWrapper<>(handler, priority));
         handlers.get(eventClass).sort(Comparator.comparing(h -> h.priority.ordinal()));
+    }
+
+    /**
+     * Automatically registers all methods annotated with {@link EventHandlerAnnotation}
+     * from the given listener object.
+     *
+     * @param listener the listener object containing annotated methods
+     */
+    public void registerListeners(Object listener) {
+        for (Method method : listener.getClass().getDeclaredMethods()) {
+            EventHandlerAnnotation annotation = method.getAnnotation(EventHandlerAnnotation.class);
+            if (annotation == null) {
+                continue;
+            }
+
+            if (method.getParameterCount() != 1) {
+                throw new IllegalArgumentException("Method " + method.getName() + " must have exactly one parameter");
+            }
+
+            Class<?> paramType = method.getParameterTypes()[0];
+            if (!Event.class.isAssignableFrom(paramType)) {
+                throw new IllegalArgumentException("Method " + method.getName() + " parameter must extend Event");
+            }
+
+            if (method.getReturnType() != void.class) {
+                throw new IllegalArgumentException("Method " + method.getName() + " must return void");
+            }
+
+            @SuppressWarnings("unchecked")
+            Class<? extends Event> eventClass = (Class<? extends Event>) paramType;
+            HandlerPriority priority = annotation.priority();
+
+            register(eventClass, event -> {
+                try {
+                    method.invoke(listener, event);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error invoking event handler " + method.getName(), e);
+                }
+            }, priority);
+        }
     }
 
     /**
