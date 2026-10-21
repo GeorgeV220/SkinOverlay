@@ -145,7 +145,7 @@ public class SkinOverlay {
             getLogger().info("Placeholder hook is not set!");
         }
         CompletionEngine.registerResolver("@overlays", (commandIssuer, args) ->
-                skinFileCache.getSkinConfigurationFiles().keySet());
+                skinFileCache.getOverlayMap().keySet());
         this.commandManager.registerCommand(new SkinOverlayMain());
         getLogger().info("Commands registered successfully!");
 

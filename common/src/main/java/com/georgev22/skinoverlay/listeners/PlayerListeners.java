@@ -1,6 +1,8 @@
 package com.georgev22.skinoverlay.listeners;
 
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.event.EventHandlerAnnotation;
+import com.georgev22.skinoverlay.event.HandlerPriority;
 import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerJoinEvent;
 import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerLeaveEvent;
 import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
@@ -26,6 +28,7 @@ public class PlayerListeners {
 
     private final SkinOverlay mainPlugin = SkinOverlay.getInstance();
 
+    @EventHandlerAnnotation(priority = HandlerPriority.LOWEST)
     public void onPlayerJoin(@NotNull SkinOverlayPlayerJoinEvent event) {
         SkinOverlayPlayer player = event.getPlayer();
 
@@ -108,6 +111,7 @@ public class PlayerListeners {
         playerDataManager.save(playerData);
     }
 
+    @EventHandlerAnnotation(priority = HandlerPriority.LOWEST)
     public void onPlayerLeave(@NotNull SkinOverlayPlayerLeaveEvent event) {
         SkinOverlayPlayer player = event.getPlayer();
         EntityManagerRegistry.getInstance().getTyped(PlayerData.class)

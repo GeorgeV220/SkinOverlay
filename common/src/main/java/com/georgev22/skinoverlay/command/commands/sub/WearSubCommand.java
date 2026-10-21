@@ -8,15 +8,10 @@ import com.georgev22.skinoverlay.message.Placeholder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.storage.data.Skin;
-import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
-import com.georgev22.skinoverlay.utilities.skin.SkinParts;
+import com.georgev22.skinoverlay.utilities.skin.Overlay;
 import org.jetbrains.annotations.NotNull;
 
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
 import java.util.Objects;
-import java.util.logging.Level;
 
 @Subcommand({"wear", "overlay"})
 @CommandAlias("sowear")
@@ -27,13 +22,15 @@ public class WearSubCommand extends SkinOverlayBaseCommand {
 
     @Default
     protected void handle(@NotNull CommandIssuer commandIssuer,
-                          @Argument(name = "overlay", completion = "@overlays") String overlay,
+                          @Argument(name = "overlay", completion = "@overlays") Overlay overlay,
                           @Argument(name = "target", completion = "@players", optional = true) SkinOverlayPlayer target) {
-        if (overlay == null || overlay.isEmpty()) {
+        if (overlay == null) {
             CommandMessages.COMMAND_MISSING_ARGUMENT.msg(commandIssuer, Placeholder.builder(commandIssuer.audience())
                     .placeholder("%command%", "wear <overlay> <player>").placeholder("%arg%", "overlay").build());
             return;
         }
+
+        mainPlugin.getLogger().info("Overlay: " + overlay.key());
 
         if (target == null && commandIssuer.isPlayer()) {
             target = mainPlugin.getPlayerProvider().getSkinOverlayPlayer(commandIssuer.getUniqueId());
@@ -49,25 +46,12 @@ public class WearSubCommand extends SkinOverlayBaseCommand {
             );
             return;
         }
-        SkinParts skinParts;
-        try {
-            File overlayFile = new File(mainPlugin.getSkinsDataFolder(), overlay + ".png");
-            if (!overlayFile.exists()) {
-                CommandMessages.COMMAND_OVERLAY_NOT_FOUND.msg(
-                        commandIssuer,
-                        Placeholder.builder(commandIssuer.audience()).placeholder("%overlay%", overlay).build());
-                return;
-            }
-            skinParts = new SkinParts(new SerializableBufferedImage(ImageIO.read(overlayFile)), overlay);
-        } catch (IOException e) {
-            mainPlugin.getLogger().log(Level.SEVERE, "Error while trying to load the skin: ", e);
-            return;
-        }
+
         SkinOverlayPlayer finalTarget = target;
         mainPlugin.getSkinProvider()
                 .retrieveOrGenerateSkin(
                         target,
-                        skinParts
+                        overlay
                 ).thenAcceptAsync(optionalSkin -> {
                     if (optionalSkin.isEmpty()) {
                         mainPlugin.getLogger().info("Skin is null");

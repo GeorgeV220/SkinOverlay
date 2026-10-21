@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URL;
 import java.util.Map;
 
 /**
@@ -59,30 +58,40 @@ public class SkinParts {
      * @param fullSkin The full skin image.
      * @param skinName The name of the skin.
      */
-    public SkinParts(SerializableBufferedImage fullSkin, String skinName) {
+    public SkinParts(
+            SerializableBufferedImage fullSkin,
+            String skinName
+    ) {
         this.parts = new HashObjectMap<>();
+
         if (fullSkin != null) {
             this.fullSkin = fullSkin;
         }
+
         if (skinName != null) {
             this.skinName = skinName;
         }
-        createParts();
     }
 
     /**
      * Creates different parts based on the full skin image.
      */
-    public void createParts() {
+    public void createParts(Model model) {
         if (fullSkin == null) {
             return;
         }
         if (isOldSkin()) {
             SerializableBufferedImage fullSkin = this.fullSkin;
-            this.fullSkin = convertSkin(fullSkin);
+            this.fullSkin = SkinConverter.convertSkin(fullSkin);
         }
         for (SectionType sectionType : SectionType.values()) {
-            parts.put(sectionType.name(), createPart(sectionType.getSection(), sectionType.name()));
+            parts.put(
+                    sectionType.name(),
+                    createPart(
+                            sectionType.getSection(model),
+                            sectionType.name()
+                    )
+            );
         }
     }
 
@@ -157,30 +166,6 @@ public class SkinParts {
      */
     public SerializableBufferedImage getFullSkin() {
         return fullSkin;
-    }
-
-    /**
-     * Converts an old format skin to the new format (64x64).
-     *
-     * @param original The original skin image in old format.
-     * @return The converted skin image in new format.
-     */
-    public SerializableBufferedImage convertSkin(@NotNull SerializableBufferedImage original) {
-        BufferedImage orig = original.getBufferedImage();
-        BufferedImage newImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
-
-        // Copy top half of the original image
-        newImage.getGraphics().drawImage(orig, 0, 0, 64, 32, null);
-
-        // Copy left leg from the original image
-        BufferedImage leftLeg = orig.getSubimage(0, 16, 16, 16);
-        newImage.getGraphics().drawImage(leftLeg, 16, 48, null);
-
-        // Copy right leg from the original image
-        BufferedImage rightLeg = orig.getSubimage(40, 16, 16, 16);
-        newImage.getGraphics().drawImage(rightLeg, 32, 48, null);
-
-        return new SerializableBufferedImage(newImage);
     }
 
     /**

@@ -103,13 +103,13 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Placehol
             return OptionsUtil.CUSTOM_SKIN_URL_NAME.getStringValue();
         }
 
-        SkinConfigurationFile file = skinOverlay.getSkinFileCache()
-                .getCacheSkinConfig(skinName);
+        Optional<SkinConfigurationFile> file = skinOverlay.getSkinFileCache()
+                .resolveConfiguration(skinName);
 
-        if (file == null) {
+        if (file.isEmpty()) {
             return OptionsUtil.UNKNOWN_SKIN_NAME.getStringValue();
         }
 
-        return OverlayOptionsUtil.PLACEHOLDER.getStringValue(file.getFileConfiguration());
+        return OverlayOptionsUtil.PLACEHOLDER.getStringValue(file.get().getFileConfiguration());
     }
 }

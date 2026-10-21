@@ -16,9 +16,7 @@ import com.georgev22.skinoverlay.utilities.Utils.Request;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.config.OverlayOptionsUtil;
 import com.georgev22.skinoverlay.utilities.config.SkinConfigurationFile;
-import com.georgev22.skinoverlay.utilities.skin.MinecraftSkinRenderer;
-import com.georgev22.skinoverlay.utilities.skin.Part;
-import com.georgev22.skinoverlay.utilities.skin.SkinParts;
+import com.georgev22.skinoverlay.utilities.skin.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 import org.mineskin.Java11RequestHandler;
 import org.mineskin.MineSkinClient;
-import org.mineskin.data.JobInfo;
 import org.mineskin.data.Visibility;
 import org.mineskin.request.GenerateRequest;
 
@@ -84,7 +81,7 @@ public class SkinProvider {
 
     public CompletableFuture<Optional<Skin>> retrieveOrGenerateSkin(
             @NotNull SkinOverlayPlayer player,
-            @NotNull SkinParts skinParts
+            @NotNull Overlay overlay
     ) {
         Optional<EntityManager<Skin>> optionalSkinManager =
                 EntityManagerRegistry.getInstance().getTyped(Skin.class);
@@ -99,18 +96,20 @@ public class SkinProvider {
             return CompletableFuture.completedFuture(Optional.empty());
         }
 
-        EntityManager<Skin> skinManager = optionalSkinManager.get();
+        Optional<PlayerData> playerDataOptional = player.getPlayerData();
 
-        if (skinParts.getSkinName().equalsIgnoreCase("default")) {
-            return retrieveOrCreateDefaultSkin(player, skinParts, skinManager);
+        if (playerDataOptional.isEmpty()) {
+            return CompletableFuture.completedFuture(Optional.empty());
         }
+
+        EntityManager<Skin> skinManager = optionalSkinManager.get();
 
         return CompletableFuture
                 .supplyAsync(() -> {
                     try {
                         return prepareOverlaySkin(
                                 player,
-                                skinParts,
+                                overlay,
                                 skinManager
                         );
                     } catch (InterruptedException exception) {
@@ -121,115 +120,38 @@ public class SkinProvider {
                     }
                 })
                 .thenCompose(prepared -> {
-                    if (prepared.cachedSkin.isPresent()) {
+                    if (prepared.cachedSkin().isPresent()) {
                         skinOverlay.getLogger().info(
-                                "Skin: " + prepared.skinUUID +
+                                "Skin: " + prepared.skinUUID() +
                                         " found for player: " +
                                         player.getName()
                         );
 
                         return CompletableFuture.completedFuture(
-                                prepared.cachedSkin
+                                prepared.cachedSkin()
                         );
                     }
 
                     return generateDeduplicated(
-                            prepared.skinUUID,
+                            prepared.skinUUID(),
                             () -> generateMineSkin(
                                     player,
-                                    skinParts,
-                                    prepared.skinUUID,
-                                    prepared.image,
+                                    overlay,
+                                    prepared.skinUUID(),
+                                    prepared.image(),
                                     skinManager
                             )
                     );
                 })
                 .exceptionally(throwable -> {
-                    Throwable actual = unwrapCompletionException(throwable);
+                    Throwable actual =
+                            unwrapCompletionException(throwable);
 
                     skinOverlay.getLogger().log(
                             Level.SEVERE,
                             "Error generating or retrieving skin for " +
-                                    player.getName(),
-                            actual
-                    );
-
-                    return Optional.empty();
-                });
-    }
-
-    private @NonNull CompletableFuture<Optional<Skin>> retrieveOrCreateDefaultSkin(
-            SkinOverlayPlayer player,
-            SkinParts skinParts,
-            EntityManager<Skin> skinManager
-    ) {
-        return CompletableFuture
-                .supplyAsync(() -> {
-                    try {
-                        SProperty property = getSkin(player);
-
-                        UUID skinUUID = createPropertyCacheUUID(
-                                player,
-                                skinParts.getSkinName(),
-                                property
-                        );
-
-                        Optional<Skin> existing =
-                                skinManager.findById(skinUUID);
-
-                        if (existing.isPresent()) {
-                            skinOverlay.getLogger().info(
-                                    "Skin: " + skinUUID +
-                                            " found for player: " +
-                                            player.getName()
-                            );
-
-                            return new PreparedDefaultSkin(
-                                    skinUUID,
-                                    property,
-                                    existing
-                            );
-                        }
-
-                        return new PreparedDefaultSkin(
-                                skinUUID,
-                                property,
-                                Optional.empty()
-                        );
-                    } catch (InterruptedException exception) {
-                        Thread.currentThread().interrupt();
-                        throw new CompletionException(exception);
-                    } catch (IOException | ExecutionException exception) {
-                        throw new CompletionException(exception);
-                    }
-                })
-                .thenCompose(prepared -> {
-                    if (prepared.cachedSkin.isPresent()) {
-                        return CompletableFuture.completedFuture(
-                                prepared.cachedSkin
-                        );
-                    }
-
-                    return generateDeduplicated(
-                            prepared.skinUUID,
-                            () -> CompletableFuture.supplyAsync(
-                                    () -> createAndSaveSkin(
-                                            player,
-                                            skinParts,
-                                            prepared.skinUUID,
-                                            prepared.property,
-                                            skinManager
-                                    )
-                            )
-                    );
-                })
-                .exceptionally(throwable -> {
-                    Throwable actual = unwrapCompletionException(throwable);
-
-                    skinOverlay.getLogger().log(
-                            Level.SEVERE,
-                            "Failed to get default skin for player: " +
-                                    player.getName(),
+                                    player.getName() +
+                                    " using overlay " + overlay.key(),
                             actual
                     );
 
@@ -239,18 +161,16 @@ public class SkinProvider {
 
     private PreparedOverlaySkin prepareOverlaySkin(
             SkinOverlayPlayer player,
-            @NonNull SkinParts skinParts,
+            Overlay overlay,
             EntityManager<Skin> skinManager
     ) throws IOException, ExecutionException, InterruptedException {
 
-        SkinConfigurationFile skinConfigurationFile =
-                skinOverlay.getSkinFileCache()
-                        .getCacheSkinConfig(skinParts.getSkinName());
+        SkinConfigurationFile skinConfigurationFile = overlay.configurationFile();
 
         if (skinConfigurationFile == null) {
             throw new IOException(
                     "SkinConfigurationFile cannot be null for skin " +
-                            skinParts.getSkinName()
+                            overlay.key()
             );
         }
 
@@ -273,7 +193,8 @@ public class SkinProvider {
                 "currentSkin"
         );
 
-        currentSkinParts.createParts();
+        overlay.getSkinParts().createParts(overlay.model());
+        currentSkinParts.createParts(overlay.model());
 
         List<Part> playerParts = filterPlayerParts(
                 currentSkinParts,
@@ -281,7 +202,7 @@ public class SkinProvider {
         );
 
         List<Part> overlayParts = filterOverlayParts(
-                skinParts,
+                overlay.getSkinParts(),
                 configuration
         );
 
@@ -293,7 +214,7 @@ public class SkinProvider {
 
         UUID skinUUID = createImageCacheUUID(
                 player,
-                skinParts.getSkinName(),
+                overlay.key(),
                 renderedSkin
         );
 
@@ -308,7 +229,7 @@ public class SkinProvider {
 
     private @NonNull CompletableFuture<Optional<Skin>> generateMineSkin(
             @NonNull SkinOverlayPlayer player,
-            @NonNull SkinParts skinParts,
+            @NonNull Overlay overlay,
             UUID skinUUID,
             BufferedImage image,
             EntityManager<Skin> skinManager
@@ -319,38 +240,29 @@ public class SkinProvider {
                         "SkinOverlay-" +
                                 player.getName() +
                                 "-" +
-                                skinParts.getSkinName()
+                                overlay.key()
                 )
                 .visibility(Visibility.UNLISTED);
 
         return mineskinClient
                 .queue()
                 .submit(generateRequest)
-                .thenCompose(queueResponse -> {
-                    JobInfo job = queueResponse.getJob();
-                    return job.waitForCompletion(mineskinClient);
-                })
-                .thenCompose(
-                        jobReference ->
-                                jobReference.getOrLoadSkin(mineskinClient)
+                .thenCompose(queueResponse ->
+                        queueResponse.getJob()
+                                .waitForCompletion(mineskinClient)
                 )
-                .thenApply(skinInfo -> {
-                    String value =
-                            skinInfo.texture().data().value();
-
-                    String signature =
-                            skinInfo.texture().data().signature();
-
-                    return new SProperty(
-                            "textures",
-                            value,
-                            signature
-                    );
-                })
-                .thenApplyAsync(
-                        property -> createAndSaveSkin(
+                .thenCompose(jobReference ->
+                        jobReference.getOrLoadSkin(mineskinClient)
+                )
+                .thenApply(skinInfo -> new SProperty(
+                        "textures",
+                        skinInfo.texture().data().value(),
+                        skinInfo.texture().data().signature()
+                ))
+                .thenApplyAsync(property ->
+                        createAndSaveSkin(
                                 player,
-                                skinParts,
+                                overlay.getSkinParts(),
                                 skinUUID,
                                 property,
                                 skinManager
@@ -857,7 +769,7 @@ public class SkinProvider {
         );
     }
 
-    private String extractSkinURL(
+    public String extractSkinURL(
             String base64Texture
     ) throws IOException {
         try {
@@ -891,6 +803,52 @@ public class SkinProvider {
             }
 
             return skin.get("url").getAsString();
+        } catch (IllegalArgumentException exception) {
+            throw new IOException(
+                    "Invalid Base64 texture property",
+                    exception
+            );
+        }
+    }
+
+    public Model extractSkinModel(SProperty property) throws IOException {
+        if (property == null) {
+            return Model.CLASSIC;
+        }
+        try {
+            String decodedTexture = new String(
+                    Base64.getDecoder().decode(property.value()),
+                    StandardCharsets.UTF_8
+            );
+
+            JsonObject textureJson = JsonParser.parseString(decodedTexture)
+                    .getAsJsonObject();
+
+            JsonObject textures = textureJson.getAsJsonObject("textures");
+            if (textures == null) {
+                throw new IOException(
+                        "Texture payload does not contain 'textures'"
+                );
+            }
+
+            JsonObject skin = textures.getAsJsonObject("SKIN");
+            if (skin == null) {
+                throw new IOException(
+                        "Texture payload does not contain a skin"
+                );
+            }
+
+            JsonObject metadata = skin.getAsJsonObject("metadata");
+            if (metadata == null || !metadata.has("model")) {
+                return Model.CLASSIC;
+            }
+
+            String model = metadata.get("model").getAsString();
+
+            return "slim".equalsIgnoreCase(model)
+                    ? Model.SLIM
+                    : Model.CLASSIC;
+
         } catch (IllegalArgumentException exception) {
             throw new IOException(
                     "Invalid Base64 texture property",

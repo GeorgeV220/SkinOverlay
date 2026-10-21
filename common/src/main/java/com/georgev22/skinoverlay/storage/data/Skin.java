@@ -3,11 +3,13 @@ package com.georgev22.skinoverlay.storage.data;
 import com.georgev22.skinoverlay.skin.SProperty;
 import com.georgev22.skinoverlay.storage.gson.SkinTypeAdapter;
 import com.georgev22.skinoverlay.utilities.CustomData;
+import com.georgev22.skinoverlay.utilities.skin.Model;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -44,6 +46,11 @@ public class Skin extends Entity {
      * The skin parts associated with this skin.
      */
     private SkinParts skinParts;
+
+    /**
+     * The model of the skin.
+     */
+    private Model model;
 
     /**
      * Constructs a new {@code Skin} instance with the specified UUID.
@@ -113,6 +120,51 @@ public class Skin extends Entity {
                 .getAsJsonObject("SKIN")
                 .get("url")
                 .getAsString();
+    }
+
+    /**
+     * Returns the model of the skin.
+     *
+     * @return the model of the skin, defaulting to {@link Model#CLASSIC}
+     * if the model metadata is missing
+     */
+    public @NonNull Model skinModel() {
+        Model model = this.model;
+        if (model != null) {
+            return model;
+        }
+
+        model = Model.CLASSIC;
+
+        try {
+            JsonObject textureJson = JsonParser.parseString(
+                    new String(
+                            Base64.getDecoder().decode(property.value()),
+                            StandardCharsets.UTF_8
+                    )
+            ).getAsJsonObject();
+
+            JsonObject textures = textureJson.getAsJsonObject("textures");
+            JsonObject skin = textures == null
+                    ? null
+                    : textures.getAsJsonObject("SKIN");
+
+            JsonObject metadata = skin == null
+                    ? null
+                    : skin.getAsJsonObject("metadata");
+
+            if (metadata != null && metadata.has("model")) {
+                String modelStr = metadata.get("model").getAsString();
+
+                if ("slim".equalsIgnoreCase(modelStr)) {
+                    model = Model.SLIM;
+                }
+            }
+        } catch (IllegalArgumentException | IllegalStateException ignored) {
+        }
+
+        this.model = model;
+        return model;
     }
 
     /**

@@ -1,154 +1,375 @@
 package com.georgev22.skinoverlay.utilities.config;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.datastructures.maps.ConcurrentHashObjectMap;
 import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
-import com.georgev22.skinoverlay.storage.data.Skin;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMaps;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Utils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.georgev22.skinoverlay.utilities.skin.Model;
+import com.georgev22.skinoverlay.utilities.skin.Overlay;
+import org.jetbrains.annotations.Unmodifiable;
+import org.jspecify.annotations.NonNull;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map.Entry;
-import java.util.Objects;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 
+/**
+ * Manages the discovery, extraction, loading, and caching of skin overlays.
+ *
+ * <p>Overlay images are stored under the following directory structure:</p>
+ *
+ * <pre>
+ * skins/
+ * ├── classic/
+ * │   └── mustache.png
+ * └── slim/
+ *     └── mustache.png
+ * </pre>
+ *
+ * <p>Each overlay has a corresponding YAML configuration under
+ * {@code skins-cfg/}, named after the overlay:</p>
+ *
+ * <pre>
+ * skins-cfg/
+ * └── mustache.yml
+ * </pre>
+ *
+ * <p>An overlay may have a classic image, a slim image, or both. Configurations
+ * without at least one corresponding image are ignored.</p>
+ *
+ * <p>Cached overlays are indexed by model and overlay key. For example,
+ * {@code classic/mustache} and {@code slim/mustache} are separate entries.</p>
+ */
 public class SkinFileCache {
-    private final ObjectMap<String, SkinConfigurationFile> skinConfigurationFiles = new ConcurrentHashObjectMap<>();
-
-    private final ObjectMap<String, SerializableBufferedImage> skinImages = new ConcurrentHashObjectMap<>();
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
-    @NotNull
-    public ObjectMap<String, SkinConfigurationFile> getSkinConfigurationFiles() {
-        return skinConfigurationFiles;
-    }
+    private final ObjectMap<String, Overlay> overlayMap =
+            ObjectMaps.newConcurrentHashObjectMap();
 
-    public ObjectMap<String, SerializableBufferedImage> getSkinImages() {
-        return skinImages;
-    }
-
+    /**
+     * Extracts bundled default resources when necessary and loads the available
+     * overlay configurations and images into the cache.
+     *
+     * <p>Existing user resources are preserved by passing {@code false} to
+     * {@link Utils#saveResource(String, boolean, File, Class)}.</p>
+     *
+     * <p>The cache is cleared before loading begins. If loading fails partway
+     * through, the cache may contain only the overlays loaded successfully.</p>
+     */
     public void cache() {
-        this.skinOverlay.getLogger().info("Attempting to load skins and its configuration files in memory.");
-        this.skinConfigurationFiles.clear();
-        this.skinImages.clear();
+        File dataFolder = skinOverlay.getDataFolder();
+        File skinsFolder = new File(dataFolder, "skins");
+        File classicFolder = new File(skinsFolder, "classic");
+        File slimFolder = new File(skinsFolder, "slim");
+        File configFolder = new File(dataFolder, "skins-cfg");
 
-        final File folder = new File(skinOverlay.getDataFolder(), "skins-cfg");
-        if (!folder.exists()) {
-            if (folder.mkdirs()) {
-                this.skinOverlay.getLogger().log(Level.INFO, "skins-cfg folder was successfully created.");
-            }
-            this.copyFilesToFolder(false);
-            this.skinOverlay.getLogger().info("skins-cfg folder didn't exist, creating one and copy the default skins configuration files for it.");
+        if (!createDirectory(classicFolder)
+                || !createDirectory(slimFolder)
+                || !createDirectory(configFolder)) {
+            return;
         }
 
-        if (!this.skinOverlay.getSkinsDataFolder().exists()) {
-            if (this.skinOverlay.getSkinsDataFolder().mkdirs()) {
-                this.skinOverlay.getLogger().log(Level.INFO, "skins data folder was successfully created!!");
-            }
-            this.copyFilesToFolder(true);
-            this.skinOverlay.getLogger().info("skins folder didn't exist, creating one and copy the default skins for it.");
+        saveDefaultOverlays("skins/classic", ".png");
+        saveDefaultOverlays("skins/slim", ".png");
+        saveDefaultOverlays("skins-cfg", ".yml");
+
+        overlayMap.clear();
+
+        File[] configs = configFolder.listFiles(file ->
+                file.isFile()
+                        && file.getName().toLowerCase(Locale.ROOT).endsWith(".yml")
+        );
+
+        if (configs == null) {
+            skinOverlay.getLogger().warning(
+                    "Failed to list skin configurations in " + configFolder
+            );
+            return;
         }
 
-        for (File file : Objects.requireNonNull(this.skinOverlay.getSkinsDataFolder().listFiles((dir, name) -> name.endsWith(".png")))) {
-            final String skinName = file.getName().substring(0, file.getName().length() - 4);
+        for (File configFile : configs) {
+            String filename = configFile.getName();
+            String key = filename.substring(0, filename.length() - ".yml".length());
 
-            if (skinName.isEmpty()) {
-                this.skinOverlay.getLogger().info("Invalid skin file name: " + skinName);
+            File classicFile = new File(classicFolder, key + ".png");
+            File slimFile = new File(slimFolder, key + ".png");
+
+            boolean hasClassic = classicFile.isFile();
+            boolean hasSlim = slimFile.isFile();
+
+            if (!hasClassic && !hasSlim) {
+                skinOverlay.getLogger().fine(
+                        "Skipping overlay '" + key + "': no PNG files found"
+                );
                 continue;
             }
 
             try {
-                SerializableBufferedImage serializableBufferedImage = new SerializableBufferedImage(ImageIO.read(file));
-                this.skinImages.put(skinName, serializableBufferedImage);
-                this.skinOverlay.getLogger().info("Skin image file: " + skinName + " successfully loaded in memory.");
-            } catch (IOException e) {
-                this.skinOverlay.getLogger().log(Level.WARNING, "Cannot load skin image file: " + skinName, e);
+                SkinConfigurationFile configurationFile =
+                        new SkinConfigurationFile(configFile);
+                configurationFile.setupFile();
+
+                if (hasClassic) {
+                    try {
+                        loadOverlay(
+                                key,
+                                Model.CLASSIC,
+                                configurationFile,
+                                classicFile
+                        );
+                    } catch (Exception e) {
+                        logOverlayFailure(key, Model.CLASSIC, e);
+                    }
+                }
+
+                if (hasSlim) {
+                    try {
+                        loadOverlay(
+                                key,
+                                Model.SLIM,
+                                configurationFile,
+                                slimFile
+                        );
+                    } catch (Exception e) {
+                        logOverlayFailure(key, Model.SLIM, e);
+                    }
+                }
+            } catch (Exception e) {
+                skinOverlay.getLogger().log(
+                        Level.SEVERE,
+                        "Failed to load overlay configuration: " + filename,
+                        e
+                );
             }
         }
 
-        for (File file : Objects.requireNonNull(folder.listFiles((dir, name) -> name.endsWith(".yml")))) {
-            final String skinName = file.getName().substring(0, file.getName().length() - 4);
-
-            if (skinName.isEmpty()) {
-                this.skinOverlay.getLogger().info("Invalid skin configuration file name: " + skinName);
-                continue;
-            }
-
-            final SkinConfigurationFile skinFile = new SkinConfigurationFile(skinName);
-            skinFile.setupFile();
-            this.skinConfigurationFiles.put(skinName, skinFile);
-            this.skinOverlay.getLogger().info("Skin configuration file: " + skinName + " successfully loaded in memory.");
-        }
-
+        skinOverlay.getLogger().info(
+                "Loaded " + overlayMap.size() + " overlay model(s)"
+        );
     }
 
-    private void copyFilesToFolder(boolean b) {
-        String[] resources = new String[]{"alley", "frog_pijama", "bubbo_transparent", "fire_demon", "flame", "glare", "hoodie", "migrator", "pirate", "smoking", "policeman", "mustache"};
-        if (b) {
-            for (String resource : resources) {
-                if (new File(this.skinOverlay.getSkinsDataFolder(), resource + ".png").exists()) continue;
-                try {
-                    Utils.saveResource("skins/" + resource + ".png", false, this.skinOverlay.getDataFolder(), this.getClass());
-                } catch (Exception e) {
-                    this.skinOverlay.getLogger().log(Level.WARNING, "Cannot save default skins: ", e.getCause());
-                }
-            }
-        } else {
-            for (String resource : resources) {
-                if (new File(this.skinOverlay.getDataFolder(), "skins-cfg/" + resource + ".yml").exists()) continue;
-                try {
-                    Utils.saveResource("skins-cfg/" + resource + ".yml", false, this.skinOverlay.getDataFolder(), this.skinOverlay.getClass());
-                } catch (Exception e) {
-                    this.skinOverlay.getLogger().log(Level.WARNING, "Cannot save default skin configuration files: ", e.getCause());
-                }
-            }
-        }
-    }
-
-    /*
-     * Returns a cached or attempts to cache a possible SkinFile object from
-     * a specific key.
+    /**
+     * Creates a directory if it does not already exist.
+     *
+     * @param directory directory to create
+     * @return {@code true} if the directory exists or was created successfully;
+     * {@code false} otherwise
      */
-    @Nullable
-    public SkinConfigurationFile getCacheSkinConfig(final String name) {
-        SkinConfigurationFile cache = this.skinConfigurationFiles.get(name);
-        if (cache != null) {
-            return cache;
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private boolean createDirectory(@NonNull File directory) {
+        if (directory.isDirectory()) {
+            return true;
         }
-        for (Entry<String, SkinConfigurationFile> entry : this.skinConfigurationFiles.entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(name)) {
-                return entry.getValue();
+
+        if (directory.exists() || directory.mkdirs()) {
+            if (directory.isDirectory()) {
+                return true;
             }
         }
-        return null;
+
+        skinOverlay.getLogger().severe(
+                "Failed to create directory: " + directory
+        );
+        return false;
     }
 
-    @Nullable
-    public SkinConfigurationFile getCacheSkinConfig(final @NotNull Skin skin) {
-        return this.getCacheSkinConfig(skin.getSkinParts().getSkinName());
-    }
+    /**
+     * Loads an overlay image and registers it in the cache.
+     *
+     * @param key               logical overlay identifier, derived from the
+     *                          configuration filename
+     * @param model             player skin model represented by the image
+     * @param configurationFile configuration shared by this overlay's models
+     * @param imageFile         PNG image to load
+     * @throws IOException if the image cannot be read
+     */
+    private void loadOverlay(
+            @NonNull String key,
+            @NonNull Model model,
+            @NonNull SkinConfigurationFile configurationFile,
+            @NonNull File imageFile
+    ) throws IOException {
+        BufferedImage image = ImageIO.read(imageFile);
 
-    @Nullable
-    public SerializableBufferedImage getSkinImage(final String skinName) {
-        SerializableBufferedImage cache = this.skinImages.get(skinName);
-        if (cache != null) {
-            return cache;
+        if (image == null) {
+            throw new IOException("Unsupported or invalid image: " + imageFile);
         }
-        for (Entry<String, SerializableBufferedImage> entry : this.skinImages.entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(skinName)) {
-                return entry.getValue();
+
+        SerializableBufferedImage bufferedImage =
+                new SerializableBufferedImage(image);
+
+        Overlay overlay = new Overlay(
+                key,
+                model,
+                configurationFile,
+                bufferedImage
+        );
+
+        String mapKey = model.name().toLowerCase(Locale.ROOT) + "/" + key;
+
+        overlayMap.put(mapKey, overlay);
+    }
+
+    /**
+     * Logs a model-specific overlay loading failure.
+     *
+     * @param key   overlay identifier
+     * @param model skin model that failed to load
+     * @param cause underlying failure
+     */
+    private void logOverlayFailure(
+            @NonNull String key,
+            @NonNull Model model,
+            @NonNull Exception cause
+    ) {
+        skinOverlay.getLogger().log(
+                Level.SEVERE,
+                "Failed to load " + model + " overlay: " + key,
+                cause
+        );
+    }
+
+    /**
+     * Lists resources directly inside a folder in the plugin's packaged JAR.
+     *
+     * <p>Subdirectories are not traversed. Matching is case-insensitive for
+     * the file extension.</p>
+     *
+     * <p>This method enumerates JAR entries directly and does not depend on
+     * directory entries being present in the archive.</p>
+     *
+     * @param folder    resource folder relative to the JAR root, such as
+     *                  {@code skins/classic}
+     * @param extension file extension to match, such as {@code .png}
+     * @return resource paths relative to the JAR root; an empty list if the
+     * resources cannot be enumerated
+     */
+    public @NonNull List<String> listResources(
+            @NonNull String folder,
+            @NonNull String extension
+    ) {
+        String prefix = folder.endsWith("/") ? folder : folder + "/";
+        String suffix = extension.toLowerCase(Locale.ROOT);
+
+        List<String> files = new ArrayList<>();
+
+        try {
+            URL location = SkinOverlay.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation();
+
+            Path jarPath = Path.of(location.toURI());
+
+            if (!Files.isRegularFile(jarPath)
+                    || !jarPath.getFileName().toString()
+                    .toLowerCase(Locale.ROOT).endsWith(".jar")) {
+                skinOverlay.getLogger().warning(
+                        "Cannot enumerate JAR resources outside a packaged JAR: "
+                                + folder
+                );
+                return files;
             }
+
+            try (JarFile jar = new JarFile(jarPath.toFile())) {
+                Enumeration<JarEntry> entries = jar.entries();
+
+                while (entries.hasMoreElements()) {
+                    JarEntry entry = entries.nextElement();
+                    String name = entry.getName();
+
+                    if (!entry.isDirectory()
+                            && name.startsWith(prefix)
+                            && name.toLowerCase(Locale.ROOT).endsWith(suffix)
+                            && name.indexOf('/', prefix.length()) == -1) {
+                        files.add(name);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            skinOverlay.getLogger().log(
+                    Level.SEVERE,
+                    "Failed to list resources in: " + folder,
+                    e
+            );
         }
-        return null;
+
+        return files;
     }
 
-    @Nullable
-    public SerializableBufferedImage getSkinImage(final @NotNull Skin skin) {
-        return this.getSkinImage(skin.getSkinParts().getSkinName());
+    /**
+     * Copies bundled resources of the specified extension into the plugin's
+     * data folder without overwriting existing files.
+     *
+     * @param path      resource folder relative to the JAR root
+     * @param extension resource extension, such as {@code .png} or {@code .yml}
+     */
+    private void saveDefaultOverlays(
+            @NonNull String path,
+            @NonNull String extension
+    ) {
+        listResources(path, extension).forEach(resource -> {
+            try {
+                Utils.saveResource(
+                        resource,
+                        false,
+                        skinOverlay.getDataFolder(),
+                        SkinOverlay.class
+                );
+            } catch (Exception e) {
+                skinOverlay.getLogger().log(
+                        Level.SEVERE,
+                        "Failed to save default resource: " + resource,
+                        e
+                );
+            }
+        });
+    }
+
+    /**
+     * Returns an unmodifiable snapshot of the cached overlays.
+     *
+     * <p>Keys use the format {@code model/overlayKey}, for example
+     * {@code slim/mustache}. Changes to the internal cache after this method
+     * returns are not reflected in the returned map.</p>
+     *
+     * @return unmodifiable map containing the cached overlays
+     */
+    @Unmodifiable
+    public @NonNull ObjectMap<String, Overlay> getOverlayMap() {
+        return overlayMap.toUnmodifiableObjectMap();
+    }
+
+    /**
+     * Resolves an overlay identifier to its cached configuration.
+     *
+     * @param identifier overlay name or {@code model/name}, e.g.
+     *                   {@code mustache}, {@code classic/mustache}
+     * @return the cached configuration, or an empty optional if no matching overlay exists
+     */
+    public Optional<SkinConfigurationFile> resolveConfiguration(@NonNull String identifier) {
+        Overlay overlay = overlayMap.get(identifier);
+
+        if (overlay != null) {
+            return Optional.of(overlay.configurationFile());
+        }
+
+        overlay = overlayMap.get(Model.CLASSIC.name().toLowerCase(Locale.ROOT) + "/" + identifier);
+
+        if (overlay == null) {
+            overlay = overlayMap.get(Model.SLIM.name().toLowerCase(Locale.ROOT) + "/" + identifier);
+        }
+
+        return overlay != null ? Optional.of(overlay.configurationFile()) : Optional.empty();
     }
 }

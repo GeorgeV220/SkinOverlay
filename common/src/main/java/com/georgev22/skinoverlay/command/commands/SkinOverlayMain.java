@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 @CommandAlias({"skinoverlay", "soverlay", "skino"})
 @Permission("skinoverlay.help")
-@CommandCompletion("help|reload|wear|reset|url")
+@CommandCompletion("help|reload|wear|reset")
 @Description("SkinOverlay commands")
 @Usage("/skinoverlay [arguments]")
 public class SkinOverlayMain extends SkinOverlayBaseCommand {
@@ -17,7 +17,7 @@ public class SkinOverlayMain extends SkinOverlayBaseCommand {
     public SkinOverlayMain() {
         this.addSubcommand(new WearSubCommand());
         this.addSubcommand(new ClearSubCommand());
-        this.addSubcommand(new WearUrlSubCommand());
+        // TODO re implement wearurl
         this.addSubcommand(new ReloadSubCommand());
         this.addSubcommand(new InfoSubCommand());
     }

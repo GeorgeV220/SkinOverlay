@@ -3,6 +3,9 @@ package com.georgev22.skinoverlay.player;
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.CommandIssuer;
 import com.georgev22.skinoverlay.skin.SGameProfile;
+import com.georgev22.skinoverlay.storage.data.PlayerData;
+
+import java.util.Optional;
 
 /**
  * Represents a player supported by SkinOverlay, providing a platform-independent
@@ -13,6 +16,14 @@ import com.georgev22.skinoverlay.skin.SGameProfile;
  * {@code Player} or a Velocity {@code Player}.</p>
  */
 public interface SkinOverlayPlayer extends CommandIssuer {
+
+    /**
+     * Retrieves the player data.
+     *
+     * @return an Optional containing the player data if available
+     * , or an empty Optional if no player data is available
+     */
+    Optional<PlayerData> getPlayerData();
 
     /**
      * Checks whether this player is currently online.

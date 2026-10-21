@@ -8,43 +8,34 @@ import java.util.Optional;
 /**
  * Represents a rectangular section of a skin texture.
  *
- * @param x1 The starting X coordinate.
- * @param y1 The starting Y coordinate.
- * @param x2 The ending X coordinate.
- * @param y2 The ending Y coordinate.
- * @param width The width of the section.
- * @param height The height of the section.
+ * @param x1     the starting X coordinate
+ * @param y1     the starting Y coordinate
+ * @param x2     the ending X coordinate
+ * @param y2     the ending Y coordinate
+ * @param width  the width of the section
+ * @param height the height of the section
  */
-public record Section(int x1, int y1, int x2, int y2, int width, int height) {
+public record Section(
+        int x1,
+        int y1,
+        int x2,
+        int y2,
+        int width,
+        int height
+) {
 
-    /**
-     * Creates a Section based on two points. Calculates width and height automatically.
-     *
-     * @param x1 The starting X coordinate.
-     * @param y1 The starting Y coordinate.
-     * @param x2 The ending X coordinate.
-     * @param y2 The ending Y coordinate.
-     */
     public Section(int x1, int y1, int x2, int y2) {
-        this(x1, y1, x2, y2, x2 - x1, Math.max(y1, y2) - Math.min(y1, y2));
-    }
-
-    @Override
-    public String toString() {
-        return "Section{" +
-                "x1=" + x1 +
-                ", y1=" + y1 +
-                ", x2=" + x2 +
-                ", y2=" + y2 +
-                ", width=" + width +
-                ", height=" + height +
-                '}';
+        this(x1, y1, x2, y2, x2 - x1, y2 - y1);
     }
 
     /**
-     * Enum representing all skin texture sections with their coordinates.
+     * Defines skin texture sections for both Minecraft player models.
+     * <p>
+     * Non-arm sections are identical between models. Arm and sleeve
+     * sections use their respective model-specific UV coordinates.
      */
     public enum SectionType {
+
         // Head
         Head_Top(8, 0, 16, 8),
         Head_Bottom(16, 0, 24, 8),
@@ -52,6 +43,7 @@ public record Section(int x1, int y1, int x2, int y2, int width, int height) {
         Head_Front(8, 8, 16, 16),
         Head_Left(16, 8, 24, 16),
         Head_Back(24, 8, 32, 16),
+
         // Hat
         Hat_Top(40, 0, 48, 8),
         Hat_Bottom(48, 0, 56, 8),
@@ -59,6 +51,7 @@ public record Section(int x1, int y1, int x2, int y2, int width, int height) {
         Hat_Front(40, 8, 48, 16),
         Hat_Left(48, 8, 56, 16),
         Hat_Back(56, 8, 64, 16),
+
         // Right Leg
         Right_Leg_Top(4, 16, 8, 20),
         Right_Leg_Bottom(8, 16, 12, 20),
@@ -66,6 +59,7 @@ public record Section(int x1, int y1, int x2, int y2, int width, int height) {
         Right_Leg_Front(4, 20, 8, 32),
         Right_Leg_Left(8, 20, 12, 32),
         Right_Leg_Back(12, 20, 16, 32),
+
         // Torso
         Torso_Top(20, 16, 28, 20),
         Torso_Bottom(28, 16, 36, 20),
@@ -73,13 +67,33 @@ public record Section(int x1, int y1, int x2, int y2, int width, int height) {
         Torso_Front(20, 20, 28, 32),
         Torso_Left(36, 20, 40, 32),
         Torso_Back(28, 20, 36, 32),
+
         // Right Arm
-        Right_Arm_Top(44, 16, 48, 20),
-        Right_Arm_Bottom(48, 16, 52, 20),
-        Right_Arm_Right(40, 20, 44, 32),
-        Right_Arm_Front(44, 20, 48, 32),
-        Right_Arm_Left(48, 20, 52, 32),
-        Right_Arm_Back(52, 20, 56, 32),
+        Right_Arm_Top(
+                44, 16, 48, 20,
+                44, 16, 47, 20
+        ),
+        Right_Arm_Bottom(
+                48, 16, 52, 20,
+                47, 16, 50, 20
+        ),
+        Right_Arm_Right(
+                40, 20, 44, 32,
+                40, 20, 44, 32
+        ),
+        Right_Arm_Front(
+                44, 20, 48, 32,
+                44, 20, 47, 32
+        ),
+        Right_Arm_Left(
+                48, 20, 52, 32,
+                47, 20, 51, 32
+        ),
+        Right_Arm_Back(
+                52, 20, 56, 32,
+                51, 20, 54, 32
+        ),
+
         // Left Leg
         Left_Leg_Top(20, 48, 24, 52),
         Left_Leg_Bottom(24, 48, 28, 52),
@@ -87,13 +101,33 @@ public record Section(int x1, int y1, int x2, int y2, int width, int height) {
         Left_Leg_Front(20, 52, 24, 64),
         Left_Leg_Left(24, 52, 28, 64),
         Left_Leg_Back(28, 52, 32, 64),
+
         // Left Arm
-        Left_Arm_Top(36, 48, 40, 52),
-        Left_Arm_Bottom(40, 48, 44, 52),
-        Left_Arm_Right(32, 52, 36, 64),
-        Left_Arm_Front(36, 52, 40, 64),
-        Left_Arm_Left(40, 52, 44, 64),
-        Left_Arm_Back(44, 52, 48, 64),
+        Left_Arm_Top(
+                36, 48, 40, 52,
+                36, 48, 39, 52
+        ),
+        Left_Arm_Bottom(
+                40, 48, 44, 52,
+                39, 48, 42, 52
+        ),
+        Left_Arm_Right(
+                32, 52, 36, 64,
+                32, 52, 36, 64
+        ),
+        Left_Arm_Front(
+                36, 52, 40, 64,
+                36, 52, 39, 64
+        ),
+        Left_Arm_Left(
+                40, 52, 44, 64,
+                39, 52, 43, 64
+        ),
+        Left_Arm_Back(
+                44, 52, 48, 64,
+                43, 52, 46, 64
+        ),
+
         // Right Pants Leg
         Right_Pants_Leg_Top(4, 32, 8, 36),
         Right_Pants_Leg_Bottom(8, 32, 12, 36),
@@ -101,6 +135,7 @@ public record Section(int x1, int y1, int x2, int y2, int width, int height) {
         Right_Pants_Leg_Front(4, 36, 8, 48),
         Right_Pants_Leg_Left(8, 36, 12, 48),
         Right_Pants_Leg_Back(12, 36, 16, 48),
+
         // Jacket
         Jacket_Top(20, 32, 28, 36),
         Jacket_Bottom(28, 32, 36, 36),
@@ -108,13 +143,33 @@ public record Section(int x1, int y1, int x2, int y2, int width, int height) {
         Jacket_Front(20, 36, 28, 48),
         Jacket_Left(36, 36, 40, 48),
         Jacket_Back(28, 36, 36, 48),
+
         // Right Sleeve
-        Right_Sleeve_Top(44, 32, 48, 36),
-        Right_Sleeve_Bottom(48, 32, 52, 36),
-        Right_Sleeve_Right(40, 36, 44, 48),
-        Right_Sleeve_Front(44, 36, 48, 48),
-        Right_Sleeve_Left(48, 36, 52, 48),
-        Right_Sleeve_Back(52, 36, 56, 48),
+        Right_Sleeve_Top(
+                44, 32, 48, 36,
+                44, 32, 47, 36
+        ),
+        Right_Sleeve_Bottom(
+                48, 32, 52, 36,
+                47, 32, 50, 36
+        ),
+        Right_Sleeve_Right(
+                40, 36, 44, 48,
+                40, 36, 44, 48
+        ),
+        Right_Sleeve_Front(
+                44, 36, 48, 48,
+                44, 36, 47, 48
+        ),
+        Right_Sleeve_Left(
+                48, 36, 52, 48,
+                47, 36, 51, 48
+        ),
+        Right_Sleeve_Back(
+                52, 36, 56, 48,
+                51, 36, 54, 48
+        ),
+
         // Left Pants Leg
         Left_Pants_Leg_Top(4, 48, 8, 52),
         Left_Pants_Leg_Bottom(8, 48, 12, 52),
@@ -122,58 +177,95 @@ public record Section(int x1, int y1, int x2, int y2, int width, int height) {
         Left_Pants_Leg_Front(4, 52, 8, 64),
         Left_Pants_Leg_Left(8, 52, 12, 64),
         Left_Pants_Leg_Back(12, 52, 16, 64),
+
         // Left Sleeve
-        Left_Sleeve_Top(52, 48, 56, 52),
-        Left_Sleeve_Bottom(56, 48, 60, 52),
-        Left_Sleeve_Right(48, 52, 52, 64),
-        Left_Sleeve_Front(52, 52, 56, 64),
-        Left_Sleeve_Left(56, 52, 60, 64),
-        Left_Sleeve_Back(60, 52, 64, 64);
+        Left_Sleeve_Top(
+                52, 48, 56, 52,
+                52, 48, 55, 52
+        ),
+        Left_Sleeve_Bottom(
+                56, 48, 60, 52,
+                55, 48, 58, 52
+        ),
+        Left_Sleeve_Right(
+                48, 52, 52, 64,
+                48, 52, 52, 64
+        ),
+        Left_Sleeve_Front(
+                52, 52, 56, 64,
+                52, 52, 55, 64
+        ),
+        Left_Sleeve_Left(
+                56, 52, 60, 64,
+                55, 52, 59, 64
+        ),
+        Left_Sleeve_Back(
+                60, 52, 64, 64,
+                59, 52, 62, 64
+        ),
+        ;
 
-        private final Section section;
+        private final Section classic;
+        private final Section slim;
 
-        /**
-         * Constructs a SectionType with the specified section coordinates.
-         *
-         * @param x1 The starting X coordinate.
-         * @param y1 The starting Y coordinate.
-         * @param x2 The ending X coordinate.
-         * @param y2 The ending Y coordinate.
-         */
         SectionType(int x1, int y1, int x2, int y2) {
-            this.section = new Section(x1, y1, x2, y2);
+            this(x1, y1, x2, y2, x1, y1, x2, y2);
+        }
+
+        SectionType(
+                int classicX1,
+                int classicY1,
+                int classicX2,
+                int classicY2,
+                int slimX1,
+                int slimY1,
+                int slimX2,
+                int slimY2
+        ) {
+            this.classic = new Section(
+                    classicX1, classicY1, classicX2, classicY2
+            );
+            this.slim = new Section(
+                    slimX1, slimY1, slimX2, slimY2
+            );
         }
 
         /**
-         * Gets the Section represented by this SectionType.
+         * Gets the classic section for backwards compatibility.
          *
-         * @return The Section.
+         * @return the classic section
          */
-        public Section getSection() {
-            return section;
+        @Deprecated
+        public @NotNull Section getSection() {
+            return classic;
         }
 
         /**
-         * Retrieves a SectionType by its name (case-insensitive).
+         * Gets the section for the specified player model.
          *
-         * @param name The name to search for.
-         * @return An Optional containing the SectionType if found, otherwise empty.
+         * @param model the player model
+         * @return the model-specific section
          */
-        public static @NotNull Optional<SectionType> getByName(String name) {
+        public @NotNull Section getSection(@NotNull Model model) {
+            return switch (model) {
+                case CLASSIC -> classic;
+                case SLIM -> slim;
+            };
+        }
+
+        public static @NotNull Optional<SectionType> getByName(
+                String name
+        ) {
             return Arrays.stream(values())
-                    .filter(sectionType -> sectionType.name().equalsIgnoreCase(name))
+                    .filter(type -> type.name().equalsIgnoreCase(name))
                     .findFirst();
         }
 
-        /**
-         * Filters SectionTypes that start with the specified prefix.
-         *
-         * @param prefix The prefix to filter by.
-         * @return An array of matching SectionTypes.
-         */
-        public static SectionType @NotNull [] filterByPrefix(String prefix) {
+        public static @NotNull SectionType[] filterByPrefix(
+                String prefix
+        ) {
             return Arrays.stream(values())
-                    .filter(sectionType -> sectionType.name().startsWith(prefix))
+                    .filter(type -> type.name().startsWith(prefix))
                     .toArray(SectionType[]::new);
         }
     }

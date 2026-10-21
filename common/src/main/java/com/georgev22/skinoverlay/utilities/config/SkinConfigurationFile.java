@@ -1,24 +1,19 @@
 package com.georgev22.skinoverlay.utilities.config;
 
-import com.georgev22.skinoverlay.SkinOverlay;
 import org.bspfsystems.yamlconfiguration.file.FileConfiguration;
 import org.bspfsystems.yamlconfiguration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
 
 public class SkinConfigurationFile {
 
-    private final String name;
-    private FileConfiguration fileConfiguration;
-    private File file;
+    private final File file;
     private boolean setup = false;
+    private FileConfiguration fileConfiguration;
 
-    public SkinConfigurationFile(final String name) {
-        this.name = name;
-
+    public SkinConfigurationFile(final File file) {
+        this.file = file;
     }
 
     public File getFile() {
@@ -29,25 +24,10 @@ public class SkinConfigurationFile {
 
         if (setup) {
             throw new RuntimeException(
-                    "The void file with the name: " + this.name + " can't be setup twice!\n" +
+                    "The void file with the name: " + this.file.getName() + " can't be setup twice!\n" +
                             "If you believe this is an issue, contact GeorgeV22.");
         }
 
-        final SkinOverlay plugin = SkinOverlay.getInstance();
-
-        if (!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdirs();
-        }
-
-        this.file = new File(plugin.getDataFolder(), "skins-cfg" + File.separator + this.name + ".yml");
-
-        if (!this.file.exists()) {
-            try {
-                this.file.createNewFile();
-            } catch (final IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Error while creating a new file:", e);
-            }
-        }
         this.reloadFile();
         setup = true;
     }

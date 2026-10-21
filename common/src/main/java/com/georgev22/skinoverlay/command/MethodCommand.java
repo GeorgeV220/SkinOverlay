@@ -6,6 +6,7 @@ import com.georgev22.skinoverlay.message.MessageBuilder;
 import com.georgev22.skinoverlay.message.Placeholder;
 import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
+import com.georgev22.skinoverlay.utilities.skin.Overlay;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -154,7 +155,11 @@ public class MethodCommand extends BaseCommand {
             if (type.equals(BigInteger.class)) return new BigInteger(raw);
             if (type.equals(BigDecimal.class)) return new BigDecimal(raw);
 
-            if (type.equals(SkinOverlayPlayer.class)) return SkinOverlay.getInstance().getPlayerProvider().getSkinOverlayPlayer(raw);
+            if (type.equals(Overlay.class))
+                return SkinOverlay.getInstance().getSkinFileCache().getOverlayMap().get(raw);
+
+            if (type.equals(SkinOverlayPlayer.class))
+                return SkinOverlay.getInstance().getPlayerProvider().getSkinOverlayPlayer(raw);
 
             // Fallback: raw string
             return raw;
