@@ -85,3 +85,7 @@ tasks.shadowJar {
     archiveBaseName.set("skinoverlay")
     archiveClassifier.set("common")
 }
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}

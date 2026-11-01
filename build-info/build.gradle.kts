@@ -40,3 +40,7 @@ fun getRunnerName(): String {
 fun getBuildNumber(): String {
     return System.getenv("BUILD_NUMBER") ?: System.getenv("GITHUB_RUN_NUMBER") ?: "local"
 }
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
