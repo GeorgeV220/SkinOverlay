@@ -1,7 +1,7 @@
 package com.georgev22.skinoverlay.fabric.refreshers;
 
 import com.georgev22.skinoverlay.exceptions.SkinException;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.refreshers.SkinRefresher;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
@@ -18,9 +18,8 @@ import java.util.logging.Level;
 public class FabricSkinRefresher extends SkinRefresher {
 
     @Override
-    public void refresh(@NotNull SPlayer player) {
+    public void refresh(@NotNull SkinOverlayPlayer player) {
         this.skinOverlay.getScheduler().createDelayedTask(skinOverlay.getPlugin(), () -> {
-            ServerPlayer serverPlayer = player.getPlayer();
             this.sendPackets(player).handleAsync((result, throwable) -> {
                 if (throwable != null) {
                     skinOverlay.getLogger().log(Level.SEVERE, "Error updating skin", throwable);
@@ -32,10 +31,10 @@ public class FabricSkinRefresher extends SkinRefresher {
     }
 
     @Override
-    protected @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SPlayer player) {
+    protected @NotNull CompletableFuture<Boolean> sendPackets(@NotNull SkinOverlayPlayer player) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                ServerPlayer serverPlayer = player.getPlayer();
+                ServerPlayer serverPlayer = player.getPlatformPlayer();
 
                 ServerLevel serverLevel = serverPlayer.level();
 

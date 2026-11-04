@@ -1,20 +1,19 @@
 package com.georgev22.skinoverlay.fabric;
 
 import com.georgev22.skinoverlay.SkinOverlay;
-import com.georgev22.skinoverlay.event.events.player.SPlayerJoinEvent;
-import com.georgev22.skinoverlay.event.events.player.SPlayerLeaveEvent;
+import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerJoinEvent;
+import com.georgev22.skinoverlay.event.events.player.SkinOverlayPlayerLeaveEvent;
 import com.georgev22.skinoverlay.fabric.command.FabricCommandManager;
 import com.georgev22.skinoverlay.fabric.providers.FabricGameProfileProvider;
 import com.georgev22.skinoverlay.fabric.providers.FabricPlayerProvider;
 import com.georgev22.skinoverlay.fabric.refreshers.FabricSkinRefresher;
 import com.georgev22.skinoverlay.fabric.scheduler.FabricMinecraftScheduler;
 import com.georgev22.skinoverlay.fabric.utilities.FabricAdventure;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.utilities.LoggerWrapper;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 
@@ -58,15 +57,15 @@ final class FabricSkinOverlayRuntime {
         ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
         ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStopping);
         ServerPlayerEvents.JOIN.register(player -> {
-            SPlayer sPlayer = skinOverlay.getPlayerProvider().getSPlayer(player);
+            SkinOverlayPlayer sPlayer = skinOverlay.getPlayerProvider().getSkinOverlayPlayer(player);
             if (sPlayer != null) {
-                skinOverlay.getEventBus().post(new SPlayerJoinEvent(sPlayer));
+                skinOverlay.getEventBus().post(new SkinOverlayPlayerJoinEvent(sPlayer));
             }
         });
         ServerPlayerEvents.LEAVE.register(player -> {
-            SPlayer sPlayer = skinOverlay.getPlayerProvider().getSPlayer(player);
+            SkinOverlayPlayer sPlayer = skinOverlay.getPlayerProvider().getSkinOverlayPlayer(player);
             if (sPlayer != null) {
-                skinOverlay.getEventBus().post(new SPlayerLeaveEvent(sPlayer));
+                skinOverlay.getEventBus().post(new SkinOverlayPlayerLeaveEvent(sPlayer));
             }
         });
         CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {

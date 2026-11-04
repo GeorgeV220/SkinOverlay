@@ -2,7 +2,7 @@ package com.georgev22.skinoverlay.fabric.providers;
 
 import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
 import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import com.georgev22.skinoverlay.providers.GameProfileProvider;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.skin.SProperty;
@@ -30,13 +30,13 @@ public class FabricGameProfileProvider extends GameProfileProvider {
     }
 
     @Override
-    public GameProfile getInternalGameProfile(@NotNull SPlayer player) {
-        ServerPlayer serverPlayer = player.getPlayer();
+    public GameProfile getInternalGameProfile(@NotNull SkinOverlayPlayer player) {
+        ServerPlayer serverPlayer = player.getPlatformPlayer();
         return serverPlayer.getGameProfile();
     }
 
     @Override
-    public SGameProfile getGameProfile(@NotNull SPlayer player) {
+    public SGameProfile getGameProfile(@NotNull SkinOverlayPlayer player) {
         if (sGameProfiles.containsKey(player)) {
             return sGameProfiles.get(player);
         }
@@ -49,7 +49,7 @@ public class FabricGameProfileProvider extends GameProfileProvider {
     }
 
     @Override
-    public void applyUpdatedGameProfile(@NotNull SPlayer player) {
+    public void applyUpdatedGameProfile(@NotNull SkinOverlayPlayer player) {
         GameProfile internalGameProfile = this.getInternalGameProfile(player);
         PropertyMap properties = internalGameProfile.properties();
         SGameProfile gameProfile = this.getGameProfile(player);

@@ -2,6 +2,7 @@ package com.georgev22.skinoverlay.player;
 
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.command.CommandIssuer;
+import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
 import com.georgev22.skinoverlay.skin.SGameProfile;
 import com.georgev22.skinoverlay.storage.data.PlayerData;
 
@@ -18,12 +19,16 @@ import java.util.Optional;
 public interface SkinOverlayPlayer extends CommandIssuer {
 
     /**
-     * Retrieves the player data.
+     * Retrieves the current player data from the entity manager's cache.
      *
      * @return an Optional containing the player data if available
      * , or an empty Optional if no player data is available
      */
-    Optional<PlayerData> getPlayerData();
+    default Optional<PlayerData> getPlayerData() {
+        return EntityManagerRegistry.getInstance()
+                .getTyped(PlayerData.class)
+                .flatMap(manager -> manager.findById(getUniqueId()));
+    }
 
     /**
      * Checks whether this player is currently online.

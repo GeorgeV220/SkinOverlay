@@ -1,17 +1,17 @@
 package com.georgev22.skinoverlay.fabric.player;
 
 import com.georgev22.skinoverlay.fabric.command.FabricCommandIssuer;
-import com.georgev22.skinoverlay.player.SPlayer;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
-public final class FabricSPlayer extends FabricCommandIssuer implements SPlayer {
+public final class FabricSkinOverlayPlayer extends FabricCommandIssuer implements SkinOverlayPlayer {
 
     private final ServerPlayer player;
     private final MinecraftServer server;
 
-    public FabricSPlayer(@NotNull ServerPlayer player, @NotNull MinecraftServer server) {
+    public FabricSkinOverlayPlayer(@NotNull ServerPlayer player, @NotNull MinecraftServer server) {
         super(player.createCommandSourceStack());
         this.player = player;
         this.server = server;
@@ -24,7 +24,7 @@ public final class FabricSPlayer extends FabricCommandIssuer implements SPlayer 
     }
 
     @Override
-    public <T> T getPlayer() {
+    public <T> T getPlatformPlayer() {
         //noinspection unchecked
         return (T) player;
     }
