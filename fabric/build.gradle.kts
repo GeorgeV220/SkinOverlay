@@ -9,6 +9,8 @@ plugins {
     id("net.fabricmc.fabric-loom") version "1.19.3"
 }
 
+apply(from = "$rootDir/gradle/publish.gradle")
+
 base {
     archivesName.set(providers.gradleProperty("artifact"))
 }
@@ -148,3 +150,7 @@ tasks.named<ShadowJar>("shadowJar") {
 }
 
 loom.nestJars(tasks.named<ShadowJar>("shadowJar"), adventureInclude)
+
+tasks.named("publish") {
+    dependsOn(tasks.named("shadowJar"))
+}
