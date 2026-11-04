@@ -59,7 +59,8 @@ public class RegistryManager {
     private void registerSkinHooks() {
         SelectableKeyedRegistry<SkinHook> registry = Registries.SKIN_HOOK;
         int before = registry.entries().size();
-        registry.register(new SkinHookNoop());
+        SkinHookNoop noop = new SkinHookNoop();
+        registry.register(noop);
         if (skinOverlay.getPluginProvider().isPluginEnabled("SkinsRestorer"))
             registry.register(new SkinsRestorerHook());
 
@@ -73,7 +74,11 @@ public class RegistryManager {
                         ))
         );
 
-        registry.setSelected(NamespacedKey.fromString(OptionsUtil.SKIN_HOOK.getStringValue()));
+        try {
+            registry.setSelected(NamespacedKey.fromString(OptionsUtil.SKIN_HOOK.getStringValue()));
+        } catch (Exception ignored) {
+            registry.setSelected(noop);
+        }
 
     }
 }

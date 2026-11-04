@@ -5,7 +5,7 @@ adventure-api = "4.22.0"
 adventure-platform = "4.4.0"
 auth-lib-modern = "6.0.57"
 auth-lib-legacy = "3.11.50"
-gradleup-shadow = "9.4.1"
+gradleup-shadow = "9.6.1"
 hikari = "4.0.3"
 paperweight = "2.0.0-beta.21"
 gson = "2.13.1"
@@ -34,6 +34,8 @@ adventure-text-serializer-legacy = { module = "net.kyori:adventure-text-serializ
 adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure-api" }
 adventure-platform-api = { module = "net.kyori:adventure-platform-api", version.ref = "adventure-platform" }
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
+adventure-platform-fabric = { module = "net.kyori:adventure-platform-fabric", version = "7.2.0" }
+adventure-fabric-serializer-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version = "5.2.0" }
 adventure-platform-bungeecord = { module = "net.kyori:adventure-platform-bungeecord", version.ref = "adventure-platform" }
 adventure-component-logger = { module = "net.kyori:adventure-text-logger-slf4j", version.ref = "adventure-api" }
 auth-lib-modern = { module = "com.mojang:authlib", version.ref = "auth-lib-modern" }

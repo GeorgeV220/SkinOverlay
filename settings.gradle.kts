@@ -1,4 +1,9 @@
 pluginManagement {
+    check(file("Quark/gradle-plugin/build.gradle.kts").isFile) {
+        "Quark submodule is missing. Run: git submodule update --init --recursive"
+    }
+    includeBuild("Quark/gradle-plugin")
+
     repositories {
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.maven.apache.org/maven2/")
@@ -35,3 +40,13 @@ include("bukkit:versions:mc1_21_9")
 include("bukkit:versions:mc1_21_11")
 include("bukkit:versions:mc26_1")
 include("velocity")
+include("fabric")
+
+includeBuild("Quark") {
+    dependencySubstitution {
+        listOf("core", "fabric", "bukkit", "velocity").forEach { platform ->
+            substitute(module("org.bxteam.quark:$platform"))
+                .using(project(":quark-$platform"))
+        }
+    }
+}

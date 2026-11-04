@@ -51,6 +51,12 @@ dependencies {
 
 # Building SkinOverlay
 
+Clone with `git clone --recurse-submodules <repository-url>`. For an existing checkout, run
+`git submodule update --init --recursive` before building.
+
+The build compiles the Quark Gradle plugin and runtime libraries directly from the pinned
+`Quark/` submodule for Fabric, Bukkit, and Velocity. No Maven-local publishing step is needed.
+
 ### Gradle
 SkinOverlay can be built by running the following: 
 `gradle clean build reobfJar shadowJar`.

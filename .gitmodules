@@ -1,0 +1,3 @@
+[submodule "Quark"]
+	path = Quark
+	url = https://git.shulkerlabs.com/Quark.git

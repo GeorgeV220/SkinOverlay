@@ -1,7 +1,7 @@
 plugins {
     id("buildlogic.java-conventions")
     alias(libs.plugins.gradleup.shadow)
-    id("org.bxteam.quark") version "1.3.0"
+    id("org.bxteam.quark")
 }
 
 apply(from = "$rootDir/gradle/publish.gradle")

@@ -7,7 +7,7 @@ jobs:
         cloneCredential:
           type: DefaultCredential
         withLfs: false
-        withSubmodules: false
+        withSubmodules: true
         condition: SUCCESSFUL
         optional: false
       - type: SetupCacheStep
@@ -107,7 +107,7 @@ jobs:
           type: HttpCredential
           accessTokenSecret: release-token
         withLfs: false
-        withSubmodules: false
+        withSubmodules: true
         condition: SUCCESSFUL
         optional: false
       - type: SetupCacheStep
@@ -158,6 +158,8 @@ jobs:
             
             git fetch origin "@branch@" --tags --force
             git checkout -B "@branch@" "origin/@branch@"
+            git submodule sync --recursive
+            git submodule update --init --recursive
             
             git config user.name "semantic-release"
             git config user.email "semantic-release@@shulkerlabs.com"

@@ -38,9 +38,10 @@ Options:
   unknown skin name: "Unknown"
 
   #Skin hooks are only used to retrieve player skin properties for offline players or players who have changed their skin.
-  #Currently available Skin Hooks: skinoverlay:none and skinoverlay:skinsrestorer
-  #With the custom option, you need to have your own plugin that adds to the skin hook registry
-  skin hook: skinoverlay:none
+  #Currently available Skin Hooks: skinoverlay:noop and skinoverlay:skinsrestorer.
+  #Developers can add their own skin hook to the registry.
+  #The value must be in the format: namespace:key
+  skin hook: "skinoverlay:noop"
 
   # WARNING: Only use this feature if you fully understand the implications.
   # The value represents the time (in SECONDS) between automatic saves of player and skin data.
