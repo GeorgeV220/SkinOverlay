@@ -1,6 +1,5 @@
 package com.georgev22.skinoverlay.command;
 
-import com.georgev22.skinoverlay.SkinOverlay;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,7 @@ public class VelocityCommandManager extends CommandManager {
     protected void registerCommand0(@NotNull BaseCommand command) {
         for (String alias : command.getAliases(false)) {
             CommandMeta commandMeta = velocityServerCommandManager.metaBuilder(alias)
-                    .plugin(SkinOverlay.getInstance().getPlugin())
+                    .plugin(skinOverlay.getPlugin())
                     .build();
             proxyServer.getCommandManager().register(commandMeta, new VelocityPluginCommandWrapper(command));
         }

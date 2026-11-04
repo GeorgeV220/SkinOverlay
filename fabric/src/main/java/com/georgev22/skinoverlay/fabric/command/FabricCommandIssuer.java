@@ -21,7 +21,7 @@ public class FabricCommandIssuer implements CommandIssuer {
 
     @Override
     public boolean isPlayer() {
-        return source.getEntity() instanceof ServerPlayer;
+        return source.isPlayer();
     }
 
     @Override
@@ -31,7 +31,7 @@ public class FabricCommandIssuer implements CommandIssuer {
 
     @Override
     public <T> @NotNull T getIssuer() {
-        Object issuer = isPlayer() ? source.getPlayer() : source;
+        Object issuer = isPlayer() ? (source.getPlayer() != null ? source.getPlayer() : source) : source;
         //noinspection unchecked
         return (T) issuer;
     }

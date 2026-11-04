@@ -108,6 +108,11 @@ public class MethodCommand extends BaseCommand {
                                         .placeholder("%arg%", argName).build());
                         return;
                     }
+                    if (argAnno.optional() && argAnno.defaultValue().isEmpty() && !type.isPrimitive()) {
+                        resolved.add(null);
+                        argIndex++;
+                        continue;
+                    }
                     raw = argAnno.defaultValue();
                 }
 

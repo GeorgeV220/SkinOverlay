@@ -6,6 +6,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -13,11 +14,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class FabricCommandManager extends CommandManager {
 
@@ -68,7 +70,7 @@ public final class FabricCommandManager extends CommandManager {
 
                 dispatcher.register(root);
             } catch (RuntimeException exception) {
-                getLogger().log(Level.SEVERE, "Failed to register Fabric command: " + alias, exception);
+                skinOverlay.getLogger().log(Level.SEVERE, "Failed to register Fabric command: " + alias, exception);
             }
         }
     }
@@ -86,30 +88,17 @@ public final class FabricCommandManager extends CommandManager {
         return 1;
     }
 
-    private java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggest(
+    private CompletableFuture<Suggestions> suggest(
             @NotNull BaseCommand command,
             @NotNull CommandContext<CommandSourceStack> context,
             @NotNull SuggestionsBuilder builder,
             @NotNull String alias
     ) {
         try {
-            String input = context.getInput();
-            int argumentStart = Math.min(input.length(), alias.length());
-            String remainder = input.substring(argumentStart);
-            if (remainder.startsWith(" ")) {
-                remainder = remainder.substring(1);
-            }
-
-            String[] args = remainder.isEmpty()
-                    ? new String[]{""}
-                    : splitArguments(remainder);
-            Collection<String> completions = command.tabComplete(
-                    new FabricCommandIssuer(context.getSource()),
-                    args
-            );
-            completions.forEach(builder::suggest);
+            return CommandSuggestions.suggest(builder, args -> command.tabComplete(
+                    new FabricCommandIssuer(context.getSource()), args));
         } catch (RuntimeException exception) {
-            getLogger().log(Level.WARNING, "Failed to complete Fabric command: " + alias, exception);
+            skinOverlay.getLogger().log(Level.WARNING, "Failed to complete Fabric command: " + alias, exception);
         }
         return builder.buildFuture();
     }
@@ -125,9 +114,5 @@ public final class FabricCommandManager extends CommandManager {
 
     private static boolean hasPermission(CommandSourceStack source, String permission) {
         return permission == null || permission.isBlank() || new FabricCommandIssuer(source).isOp();
-    }
-
-    private java.util.logging.Logger getLogger() {
-        return com.georgev22.skinoverlay.SkinOverlay.getInstance().getLogger();
     }
 }

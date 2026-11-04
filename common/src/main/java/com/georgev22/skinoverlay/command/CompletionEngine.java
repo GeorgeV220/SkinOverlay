@@ -65,11 +65,12 @@ public class CompletionEngine {
         String pattern = clazz.getAnnotation(CommandCompletion.class).value();
         String[] parts = pattern.split(" ");
 
-        if (args.length > parts.length) {
+        int argumentIndex = Math.max(0, args.length - 1);
+        if (argumentIndex >= parts.length) {
             return new ArrayList<>();
         }
 
-        String segment = parts[args.length - 1];
+        String segment = parts[argumentIndex];
         return getStrings(commandIssuer, args, segment);
     }
 
@@ -94,11 +95,12 @@ public class CompletionEngine {
                 .filter(p -> p.isAnnotationPresent(Argument.class))
                 .toArray(Parameter[]::new);
 
-        if (args.length > parameters.length) {
+        int argumentIndex = Math.max(0, args.length - 1);
+        if (argumentIndex >= parameters.length) {
             return List.of();
         }
 
-        Parameter param = parameters[args.length - 1];
+        Parameter param = parameters[argumentIndex];
         Argument argAnno = param.getAnnotation(Argument.class);
         if (argAnno == null) {
             return List.of();
@@ -203,7 +205,7 @@ public class CompletionEngine {
             }
         }
 
-        String currentInput = args[args.length - 1];
+        String currentInput = args.length == 0 ? "" : args[args.length - 1];
         return completions.stream()
                 .filter(s -> s.toLowerCase().startsWith(currentInput.toLowerCase()))
                 .sorted(Comparator.comparingInt(s -> s.equalsIgnoreCase(currentInput) ? 0 : s.toLowerCase().indexOf(currentInput.toLowerCase())))

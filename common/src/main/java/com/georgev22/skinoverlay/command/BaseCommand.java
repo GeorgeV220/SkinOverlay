@@ -186,12 +186,7 @@ public abstract class BaseCommand {
      */
     public Collection<String> tabComplete(CommandIssuer sender, String @NotNull [] args) {
         if (args.length == 0) {
-            // Try default handler if there’s no explicit subcommand
-            MethodCommand defaultCmd = (MethodCommand) subcommands.get("__default__");
-            if (defaultCmd != null) {
-                return defaultCmd.tabComplete(sender, args);
-            }
-            return getAvailableSubcommands(sender);
+            args = new String[]{""};
         }
 
         if (args.length == 1) {

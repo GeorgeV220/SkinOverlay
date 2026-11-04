@@ -19,9 +19,9 @@ import java.util.logging.Level;
  */
 public abstract class CommandManager {
 
-    private final List<PreProcessor> globalPreprocessors = new ArrayList<>();
-    private final List<PostProcessor> globalPostprocessors = new ArrayList<>();
-    private final SkinOverlay plugin = SkinOverlay.getInstance();
+    protected final List<PreProcessor> globalPreprocessors = new ArrayList<>();
+    protected final List<PostProcessor> globalPostprocessors = new ArrayList<>();
+    protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
     protected CommandManager() {
         // private constructor for singleton pattern
@@ -50,7 +50,7 @@ public abstract class CommandManager {
                 registerCommand(subcommand);
             }
         } catch (Exception e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to register command: " + command.getClass().getName(), e);
+            skinOverlay.getLogger().log(Level.SEVERE, "Failed to register command: " + command.getClass().getName(), e);
         }
     }
 
