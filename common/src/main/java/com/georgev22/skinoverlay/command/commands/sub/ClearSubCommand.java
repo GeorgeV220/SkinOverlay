@@ -30,10 +30,14 @@ public class ClearSubCommand extends SkinOverlayBaseCommand {
             }
         }
         CommandIssuer resetTarget = target == null ? commandIssuer : target;
-        SkinOverlayPlayer player = mainPlugin.getPlayerProvider().getSkinOverlayPlayer(commandIssuer.getUniqueId());
+        SkinOverlayPlayer player = mainPlugin.getPlayerProvider()
+                .getSkinOverlayPlayer(resetTarget.getUniqueId());
+
         if (player == null) {
-            CommandMessages.COMMAND_OFFLINE_PLAYER.msg(resetTarget, Placeholder.builder(commandIssuer.audience())
-                    .placeholder("%player%", resetTarget.getName()).build());
+            CommandMessages.COMMAND_OFFLINE_PLAYER.msg(commandIssuer,
+                    Placeholder.builder(commandIssuer.audience())
+                            .placeholder("%player%", resetTarget.getName())
+                            .build());
             return;
         }
 
