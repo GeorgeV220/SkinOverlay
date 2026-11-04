@@ -45,15 +45,24 @@ import static com.georgev22.skinoverlay.messaging.VelocityPluginMessageManager.i
         }
 )
 public class SkinOverlayVelocity {
-    private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
+    private SkinOverlay skinOverlay;
     private final ProxyServer server;
+    private final Logger logger;
+    private final Path dataDirectory;
 
     @Inject
     public SkinOverlayVelocity(@NonNull ProxyServer server, Logger logger, @DataDirectory @NotNull Path dataDirectory) {
+        this.server = server;
+        this.logger = logger;
+        this.dataDirectory = dataDirectory;
+    }
+
+    @Subscribe
+    public void onProxyInitialization(ProxyInitializeEvent event) {
         VelocityLibraryManager<SkinOverlayVelocity> velocityLibraryManager
                 = new VelocityLibraryManager<>(this, logger, dataDirectory, server.getPluginManager());
         velocityLibraryManager.loadFromGradle();
-        this.server = server;
+        this.skinOverlay = SkinOverlay.getInstance();
         this.skinOverlay.setLogger(new LoggerWrapper(logger));
         this.skinOverlay.setProxy(true);
         File dataDirectoryFile = dataDirectory.toFile();
@@ -72,10 +81,7 @@ public class SkinOverlayVelocity {
         this.skinOverlay.onLoad();
         if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage"))
             this.server.getChannelRegistrar().register(inChannelIdentifier);
-    }
 
-    @Subscribe
-    public void onProxyInitialization(ProxyInitializeEvent event) {
         this.skinOverlay.setSkinRefresher(new VelocitySkinRefresher());
         this.skinOverlay.setGameProfileProvider(new VelocityGameProfileProvider());
         this.skinOverlay.setPlayerProvider(new VelocityPlayerProvider(server));
@@ -120,6 +126,8 @@ public class SkinOverlayVelocity {
 
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
-        this.skinOverlay.onDisable();
+        if (this.skinOverlay != null) {
+            this.skinOverlay.onDisable();
+        }
     }
 }
