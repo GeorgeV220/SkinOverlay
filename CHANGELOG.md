@@ -1,3 +1,55 @@
+# [8.0.0-beta.10](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.9...v8.0.0-beta.10) (2026-11-12)
+
+
+* refactor!: rename platform player accessors ([0717524](https://github.com/GeorgeV220/SkinOverlay/commit/07175249467d24a2f0e39e21808c5d2f4b08f4eb))
+
+
+### Bug Fixes
+
+* correct command tab completion and optional argument handling ([14250bd](https://github.com/GeorgeV220/SkinOverlay/commit/14250bd77f082661240ed9086ebb725214626ad7))
+* defer SkinOverlay initialization until proxy startup ([4d4b228](https://github.com/GeorgeV220/SkinOverlay/commit/4d4b2282c49fb3a4464b02fa3373522b2150b15c))
+* relocate Quark library in shaded platform jars ([8f6a23b](https://github.com/GeorgeV220/SkinOverlay/commit/8f6a23b56fc2060a5be685fb6aac7a51cc420a57))
+* use target player when clearing skin overlay for another user ([6981bab](https://github.com/GeorgeV220/SkinOverlay/commit/6981bab62dd5105551bfc0e5d0b42c9a53428c44))
+
+
+### Code Refactoring
+
+* return SerializableBufferedImage from skin image APIs ([43ec5e3](https://github.com/GeorgeV220/SkinOverlay/commit/43ec5e3503dd38782274334c98f71875e2536982))
+* use namespaced skin hook identifiers in config ([e1440f8](https://github.com/GeorgeV220/SkinOverlay/commit/e1440f80415f9db9a90db739ff643533ede5dd0f))
+
+
+### Features
+
+* add annotation-based event listener registration ([febb2b2](https://github.com/GeorgeV220/SkinOverlay/commit/febb2b2d229f8d44a7d5edd2f6fb9266bb6d14e0))
+* add deterministic skin cache and generation deduplication ([f849219](https://github.com/GeorgeV220/SkinOverlay/commit/f8492190697cc0c6d3dcc4ee2f48baadd6617f04))
+* add Fabric platform support ([db7a911](https://github.com/GeorgeV220/SkinOverlay/commit/db7a911500de696d5811444dbf3eea52458b178a))
+* add Fabric plugin message support for proxy skin updates ([bfb63a0](https://github.com/GeorgeV220/SkinOverlay/commit/bfb63a05a19b073e721579c48df496989dd95cad))
+* add model-aware skin overlays and converter ([88caef5](https://github.com/GeorgeV220/SkinOverlay/commit/88caef54f9fa82faa97c665e0367d625c431186e)), closes [SkinParts#createParts](https://github.com/SkinParts/issues/createParts)
+* **build:** add foojay-resolver-convention plugin to settings ([c2fe79a](https://github.com/GeorgeV220/SkinOverlay/commit/c2fe79a6c60ae3082405d0ba97892b3f69b0182e))
+* integrate Fabric Permissions API for command checks ([13bd79d](https://github.com/GeorgeV220/SkinOverlay/commit/13bd79d9018749acbaeda13dab7c905bdd9dccc0))
+* introduce selectable registry for skin hooks ([cee4453](https://github.com/GeorgeV220/SkinOverlay/commit/cee4453b94340a7ddcc3cd8aeb8281e920ef42e3))
+* **overlays:** support persistent layered overlay combinations ([1a6c7ca](https://github.com/GeorgeV220/SkinOverlay/commit/1a6c7ca401a5cbd53fc9609aa037ef776891f3be))
+
+
+### BREAKING CHANGES
+
+* SkinProvider#getSkinImage now returns
+SerializableBufferedImage instead of BufferedImage.
+* skin hook config now uses namespace:key; use
+skinoverlay:noop. Existing checkouts must initialize the Quark
+submodule with git submodule update --init --recursive.
+* Existing configs using "None", "SkinsRestorer", or
+"Custom" must be updated to the new namespaced identifiers.
+* - Skin resources now use skins/classic and skins/slim directories.
+- SkinConfigurationFile now accepts a File.
+- retrieveOrGenerateSkin now accepts Overlay instead of SkinParts.
+* Rename `SkinOverlayPlayer#getPlayer` to `getPlatformPlayer` and `SkinOverlayPlayer#isBedrock` to `isBedrockPlayer`. Existing implementations, subclasses, and consumers must update their method declarations and invocations to remain compatible.
+* The "skin hook" configuration option now
+expects a namespaced key such as
+"skinoverlay:skinsrestorer". Existing configurations using
+the old value ("SkinsRestorer") must be updated to avoid
+selection errors.
+
 # [8.0.0-beta.9](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.8...v8.0.0-beta.9) (2026-07-08)
 
 
