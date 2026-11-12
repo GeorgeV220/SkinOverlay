@@ -8,6 +8,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class FabricCommandManager extends CommandManager {
 
@@ -113,6 +113,6 @@ public final class FabricCommandManager extends CommandManager {
     }
 
     private static boolean hasPermission(CommandSourceStack source, String permission) {
-        return permission == null || permission.isBlank() || new FabricCommandIssuer(source).isOp();
+        return Permissions.check(source, permission);
     }
 }

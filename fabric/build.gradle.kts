@@ -20,11 +20,11 @@ val shade by configurations.creating {
     isTransitive = false
 }
 
-val quarkShade by configurations.creating {
+val shadeTransitive by configurations.creating {
     isTransitive = true
 }
 
-val adventureInclude = configurations.create("adventureInclude") {
+val modInclude = configurations.create("modInclude") {
     isTransitive = false
 }
 
@@ -57,12 +57,14 @@ dependencies {
     implementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_version")}")
 
     shade(implementation(project(":common"))!!)
-    quarkShade(implementation("org.bxteam.quark:fabric:1.3.0")!!)
+    shadeTransitive(implementation("org.bxteam.quark:fabric:1.3.0")!!)
 
     implementation(libs.adventure.platform.fabric)
-    adventureInclude(libs.adventure.platform.fabric)
+    modInclude(libs.adventure.platform.fabric)
     implementation(libs.adventure.fabric.serializer.legacy)
-    adventureInclude(libs.adventure.fabric.serializer.legacy)
+    modInclude(libs.adventure.fabric.serializer.legacy)
+    implementation("me.lucko:fabric-permissions-api:0.7.0")
+    modInclude("me.lucko:fabric-permissions-api:0.7.0")
 
     quark(libs.hikari) {
         exclude(group = "org.slf4j", module = "slf4j-api")
@@ -144,12 +146,12 @@ java {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-    configurations = listOf(shade, quarkShade)
+    configurations = listOf(shade, shadeTransitive)
 
     archiveClassifier.set("fabric")
 }
 
-loom.nestJars(tasks.named<ShadowJar>("shadowJar"), adventureInclude)
+loom.nestJars(tasks.named<ShadowJar>("shadowJar"), modInclude)
 
 tasks.named("publish") {
     dependsOn(tasks.named("shadowJar"))
