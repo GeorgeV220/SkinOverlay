@@ -3,6 +3,8 @@ package com.georgev22.skinoverlay.storage.data;
 import com.georgev22.skinoverlay.utilities.CustomData;
 import com.google.gson.JsonObject;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -40,6 +42,11 @@ public class PlayerData extends Entity {
     private Skin currentSkin;
 
     /**
+     * Immutable snapshot of model-qualified source identifiers represented by the current skin.
+     */
+    private volatile List<String> equippedOverlays = List.of();
+
+    /**
      * Constructs a new {@code PlayerData} instance for the specified player UUID.
      *
      * @param uuid the UUID of the player
@@ -75,6 +82,29 @@ public class PlayerData extends Entity {
      */
     public Skin getCurrentSkin() {
         return currentSkin;
+    }
+
+    /**
+     * Returns the source overlay identifiers recorded independently of the signed skin.
+     *
+     * @return an immutable snapshot in rendering order, or an empty list for a cleared or legacy loadout
+     */
+    public List<String> getEquippedOverlays() {
+        return equippedOverlays;
+    }
+
+    /**
+     * Replaces the recorded loadout with a defensive copy of the supplied identifiers.
+     * <p>
+     * This method does not validate, render, apply or save the loadout. Player-facing changes
+     * should use the overlay provider so the visible skin and recorded identifiers stay in sync.
+     * </p>
+     *
+     * @param overlays model-qualified leaf identifiers in rendering order; may be empty
+     * @throws NullPointerException if the collection or one of its identifiers is {@code null}
+     */
+    public void setEquippedOverlays(Collection<String> overlays) {
+        equippedOverlays = List.copyOf(overlays);
     }
 
     /**

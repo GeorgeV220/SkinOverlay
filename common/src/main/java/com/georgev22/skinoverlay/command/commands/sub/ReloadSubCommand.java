@@ -21,7 +21,6 @@ import java.util.logging.Level;
 public class ReloadSubCommand extends SkinOverlayBaseCommand {
     @Default
     protected void handle(@NotNull CommandIssuer commandIssuer) {
-        //TODO RELOAD SKIN HANDLER
         mainPlugin.getFileManager().getConfig().reloadFile();
         try {
             MessagesRegistry.registerAll(new MessageEntry[][]{
@@ -33,6 +32,7 @@ public class ReloadSubCommand extends SkinOverlayBaseCommand {
         }
         OptionsUtil.reloadAll();
         mainPlugin.getRegistryManager().reload();
+        mainPlugin.getSkinFileCache().cache();
         CoreMessages.PLUGIN_RELOAD.msg(commandIssuer);
     }
 }

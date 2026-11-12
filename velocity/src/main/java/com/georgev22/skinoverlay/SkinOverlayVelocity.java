@@ -113,7 +113,8 @@ public class SkinOverlayVelocity {
                             if (skin != null) {
                                 this.skinOverlay.getSkinProvider().setSkin(
                                         this.skinOverlay.getPlayerProvider().getSkinOverlayPlayer(uuid),
-                                        skin
+                                        skin,
+                                        playerData.getEquippedOverlays()
                                 );
                             }
                         });

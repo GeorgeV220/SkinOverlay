@@ -161,7 +161,7 @@ public class MethodCommand extends BaseCommand {
             if (type.equals(BigDecimal.class)) return new BigDecimal(raw);
 
             if (type.equals(Overlay.class))
-                return SkinOverlay.getInstance().getSkinFileCache().getOverlayMap().get(raw);
+                return SkinOverlay.getInstance().getOverlayRegistry().require(raw);
 
             if (type.equals(SkinOverlayPlayer.class))
                 return SkinOverlay.getInstance().getPlayerProvider().getSkinOverlayPlayer(raw);

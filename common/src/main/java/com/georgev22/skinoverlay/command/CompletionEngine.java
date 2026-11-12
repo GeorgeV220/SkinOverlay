@@ -198,7 +198,7 @@ public class CompletionEngine {
 
                 ArgumentResolver resolver = resolve(resolverName);
                 if (resolver != null) {
-                    completions.addAll(resolver.resolve(commandIssuer, resolverArgs));
+                    completions.addAll(resolver.suggest(commandIssuer, args, resolverArgs));
                 }
             } else {
                 completions.add(option);

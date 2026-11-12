@@ -14,7 +14,6 @@ import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Utils;
 import com.georgev22.skinoverlay.utilities.Utils.Request;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
-import com.georgev22.skinoverlay.utilities.config.OverlayOptionsUtil;
 import com.georgev22.skinoverlay.utilities.config.SkinConfigurationFile;
 import com.georgev22.skinoverlay.utilities.skin.*;
 import com.google.gson.JsonArray;
@@ -29,6 +28,7 @@ import org.jspecify.annotations.NonNull;
 import org.mineskin.Java11RequestHandler;
 import org.mineskin.MineSkinClient;
 import org.mineskin.data.Visibility;
+import org.mineskin.data.Variant;
 import org.mineskin.request.GenerateRequest;
 
 import javax.imageio.ImageIO;
@@ -43,8 +43,8 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -177,10 +177,13 @@ public class SkinProvider {
         FileConfiguration configuration =
                 skinConfigurationFile.getFileConfiguration();
 
-        SProperty property =
-                Registries.SKIN_HOOK.getSelected()
+        Skin baseSkin = player.getPlayerData().map(PlayerData::getDefaultSkin).orElse(null);
+        SProperty property = baseSkin == null ? null : baseSkin.getProperty();
+        if (property == null) {
+            property = Registries.SKIN_HOOK.getSelected()
                         .map(skinHook -> skinHook.getProperty(player))
                         .orElse(null);
+        }
 
         if (property == null) {
             property = getSkin(player);
@@ -188,7 +191,8 @@ public class SkinProvider {
 
         Model currentModel = extractSkinModel(property);
 
-        SerializableBufferedImage currentSkin = getSkinImage(property);
+        SerializableBufferedImage currentSkin = baseSkin != null && baseSkin.getSkinParts() != null
+                ? baseSkin.getSkinParts().getFullSkin() : getSkinImage(property);
 
         // convert player skin to overlay model
         if (currentModel != overlay.model()) {
@@ -200,17 +204,20 @@ public class SkinProvider {
                 "currentSkin"
         );
 
-        overlay.getSkinParts().createParts(overlay.model());
+        SkinParts overlaySkinParts = new SkinParts(overlay.getBufferedImage(), overlay.key());
+        overlaySkinParts.createParts(overlay.model());
         currentSkinParts.createParts(overlay.model());
 
-        List<Part> playerParts = filterPlayerParts(
+        List<Part> playerParts = OverlayRenderer.parts(
                 currentSkinParts,
-                configuration
+                configuration,
+                true
         );
 
-        List<Part> overlayParts = filterOverlayParts(
-                overlay.getSkinParts(),
-                configuration
+        List<Part> overlayParts = OverlayRenderer.parts(
+                overlaySkinParts,
+                configuration,
+                false
         );
 
         BufferedImage renderedSkin = renderSkin(
@@ -221,7 +228,7 @@ public class SkinProvider {
 
         UUID skinUUID = createImageCacheUUID(
                 player,
-                overlay.key(),
+                overlay.identifier(),
                 renderedSkin
         );
 
@@ -243,13 +250,10 @@ public class SkinProvider {
     ) {
         GenerateRequest generateRequest = GenerateRequest
                 .upload(image)
-                .name(
-                        "SkinOverlay-" +
-                                player.getName() +
-                                "-" +
-                                overlay.key()
-                )
-                .visibility(Visibility.UNLISTED);
+                // Generated overlay keys contain a full hash; keep the upload label within API limits.
+                .name("SkinOverlay-" + skinUUID.toString().substring(0, 8))
+                .visibility(Visibility.UNLISTED)
+                .variant(overlay.model() == Model.SLIM ? Variant.SLIM : Variant.CLASSIC);
 
         return mineskinClient
                 .queue()
@@ -269,7 +273,7 @@ public class SkinProvider {
                 .thenApplyAsync(property ->
                         createAndSaveSkin(
                                 player,
-                                overlay.getSkinParts(),
+                                new SkinParts(new SerializableBufferedImage(image), overlay.key()),
                                 skinUUID,
                                 property,
                                 skinManager
@@ -358,122 +362,6 @@ public class SkinProvider {
         skinManager.save(skin);
 
         return Optional.of(skin);
-    }
-
-    private @NonNull List<Part> filterOverlayParts(
-            @NonNull SkinParts skinParts,
-            FileConfiguration configuration
-    ) {
-        List<Part> result = new ArrayList<>();
-
-        for (Part part : skinParts.getParts().values()) {
-            if (shouldIncludeOverlayPart(part, configuration)) {
-                result.add(part);
-            }
-        }
-
-        return result;
-    }
-
-    private @NonNull List<Part> filterPlayerParts(
-            @NonNull SkinParts skinParts,
-            FileConfiguration configuration
-    ) {
-        List<Part> result = new ArrayList<>();
-
-        for (Part part : skinParts.getParts().values()) {
-            if (shouldIncludePlayerPart(part, configuration)) {
-                result.add(part);
-            }
-        }
-
-        return result;
-    }
-
-    private boolean shouldIncludeOverlayPart(
-            @NonNull Part part,
-            FileConfiguration configuration
-    ) {
-        if (part.isEmpty()) {
-            return true;
-        }
-
-        String name = part.name();
-
-        if (name.startsWith("Jacket")) {
-            return OverlayOptionsUtil.PARTS_OVERLAY_JACKET
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Hat")) {
-            return OverlayOptionsUtil.PARTS_OVERLAY_HAT
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Left_Sleeve")) {
-            return OverlayOptionsUtil.PARTS_OVERLAY_LEFT_SLEEVE
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Right_Sleeve")) {
-            return OverlayOptionsUtil.PARTS_OVERLAY_RIGHT_SLEEVE
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Left_Pants")) {
-            return OverlayOptionsUtil.PARTS_OVERLAY_LEFT_PANTS
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Right_Pants")) {
-            return OverlayOptionsUtil.PARTS_OVERLAY_RIGHT_PANTS
-                    .getBooleanValue(configuration);
-        }
-
-        return true;
-    }
-
-    private boolean shouldIncludePlayerPart(
-            @NonNull Part part,
-            FileConfiguration configuration
-    ) {
-        if (part.isEmpty()) {
-            return true;
-        }
-
-        String name = part.name();
-
-        if (name.startsWith("Jacket")) {
-            return OverlayOptionsUtil.PARTS_PLAYER_JACKET
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Hat")) {
-            return OverlayOptionsUtil.PARTS_PLAYER_HAT
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Left_Sleeve")) {
-            return OverlayOptionsUtil.PARTS_PLAYER_LEFT_SLEEVE
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Right_Sleeve")) {
-            return OverlayOptionsUtil.PARTS_PLAYER_RIGHT_SLEEVE
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Left_Pants")) {
-            return OverlayOptionsUtil.PARTS_PLAYER_LEFT_PANTS
-                    .getBooleanValue(configuration);
-        }
-
-        if (name.startsWith("Right_Pants")) {
-            return OverlayOptionsUtil.PARTS_PLAYER_RIGHT_PANTS
-                    .getBooleanValue(configuration);
-        }
-
-        return true;
     }
 
     private @NonNull BufferedImage renderSkin(
@@ -602,14 +490,40 @@ public class SkinProvider {
     }
 
     /**
-     * Apply the skin for the specified {@link SkinOverlayPlayer}
+     * Applies a signed skin and clears any recorded overlay loadout.
+     * <p>
+     * Use the overload accepting equipped identifiers when restoring a skin that already
+     * represents a loadout. Call this method through the player's entity scheduler.
+     * </p>
      *
-     * @param player Player's {@link SkinOverlayPlayer} object.
-     * @param skin   Skin
+     * @param player player whose game profile and visible skin should be updated
+     * @param skin signed skin to apply
      */
     public void setSkin(
             @NotNull SkinOverlayPlayer player,
             @NotNull Skin skin
+    ) {
+        setSkin(player, skin, List.of());
+    }
+
+    /**
+     * Applies a signed skin and records the source overlays represented by it.
+     * <p>
+     * The current skin and equipped identifiers are saved in the same player-data update
+     * when the player's entity is loaded. A save request may be batched according to the
+     * configured save interval. This method does not validate overlay identifiers or render
+     * artwork; callers must supply identifiers matching the skin and use the player's entity scheduler.
+     * </p>
+     *
+     * @param player player whose game profile and visible skin should be updated
+     * @param skin signed skin to apply
+     * @param equippedOverlays model-qualified leaf identifiers represented by the skin;
+     *                         an empty collection clears the recorded loadout
+     */
+    public void setSkin(
+            @NotNull SkinOverlayPlayer player,
+            @NotNull Skin skin,
+            @NotNull Collection<String> equippedOverlays
     ) {
         SGameProfile gameProfile =
                 skinOverlay
@@ -654,6 +568,7 @@ public class SkinProvider {
                 optionalPlayerData.get();
 
         playerData.setCurrentSkin(skin);
+        playerData.setEquippedOverlays(equippedOverlays);
 
         playerDataManager.save(playerData);
     }

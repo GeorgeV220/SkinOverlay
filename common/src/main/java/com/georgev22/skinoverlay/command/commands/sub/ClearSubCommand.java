@@ -1,66 +1,42 @@
 package com.georgev22.skinoverlay.command.commands.sub;
 
 import com.georgev22.skinoverlay.command.CommandIssuer;
-import com.georgev22.skinoverlay.command.annotation.*;
-import com.georgev22.skinoverlay.command.commands.SkinOverlayBaseCommand;
-import com.georgev22.skinoverlay.message.Placeholder;
-import com.georgev22.skinoverlay.message.messages.CommandMessages;
+import com.georgev22.skinoverlay.command.annotation.Argument;
+import com.georgev22.skinoverlay.command.annotation.CommandAlias;
+import com.georgev22.skinoverlay.command.annotation.Default;
+import com.georgev22.skinoverlay.command.annotation.Description;
+import com.georgev22.skinoverlay.command.annotation.Permission;
+import com.georgev22.skinoverlay.command.annotation.Subcommand;
+import com.georgev22.skinoverlay.command.annotation.Usage;
 import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
-import com.georgev22.skinoverlay.registry.EntityManagerRegistry;
-import com.georgev22.skinoverlay.storage.EntityManager;
-import com.georgev22.skinoverlay.storage.data.PlayerData;
-import com.georgev22.skinoverlay.storage.data.Skin;
-import org.jetbrains.annotations.NotNull;
 
+/**
+ * Restores a player's default skin or removes selected pieces through the nested {@code overlay} command.
+ * Both operations use the same per-player queue as wear and add requests.
+ */
 @Subcommand({"clear", "reset"})
 @CommandAlias("soclear")
-@CommandCompletion("@players")
-@Description("Removes the skin overlay")
 @Permission("skinoverlay.wear.clear")
-public class ClearSubCommand extends SkinOverlayBaseCommand {
-
+@Description("Remove all overlays or selected pieces of clothing")
+@Usage("/skinoverlay clear [player] | clear overlay <overlay,...> [player]")
+public class ClearSubCommand extends OverlayCommandSupport {
     @Default
-    protected void handle(@NotNull CommandIssuer commandIssuer, @Argument(name = "target", completion = "@players", optional = true) SkinOverlayPlayer target) {
-        if (target == null) {
-            if (!commandIssuer.isPlayer()) {
-                CommandMessages.COMMAND_MISSING_ARGUMENT.msg(commandIssuer,
-                        Placeholder.builder(commandIssuer.audience())
-                                .placeholder("%command%", "clear <player>").placeholder("%arg%", "target").build());
-                return;
-            }
+    protected void handle(CommandIssuer issuer,
+                          @Argument(name = "target", completion = "@players", optional = true) SkinOverlayPlayer target) {
+        SkinOverlayPlayer player = target(issuer, target);
+        if (player != null) result(issuer, player, mainPlugin.getOverlayProvider().clear(player), true);
+    }
+
+    @Subcommand("overlay")
+    protected void remove(CommandIssuer issuer,
+                          @Argument(name = "overlays", completion = "@overlay-list") String overlays,
+                          @Argument(name = "target", completion = "@players", optional = true) SkinOverlayPlayer target) {
+        SkinOverlayPlayer player = target(issuer, target);
+        if (player == null) return;
+        try {
+            result(issuer, player, mainPlugin.getOverlayProvider().remove(player, identifiers(overlays)), false);
+        } catch (IllegalArgumentException exception) {
+            error(issuer, exception);
         }
-        CommandIssuer resetTarget = target == null ? commandIssuer : target;
-        SkinOverlayPlayer player = mainPlugin.getPlayerProvider()
-                .getSkinOverlayPlayer(resetTarget.getUniqueId());
-
-        if (player == null) {
-            CommandMessages.COMMAND_OFFLINE_PLAYER.msg(commandIssuer,
-                    Placeholder.builder(commandIssuer.audience())
-                            .placeholder("%player%", resetTarget.getName())
-                            .build());
-            return;
-        }
-
-        EntityManager<PlayerData> entityManager = EntityManagerRegistry.getInstance()
-                .getTyped(PlayerData.class).orElse(null);
-
-        if (entityManager == null) {
-            return;
-        }
-
-        PlayerData playerData = entityManager.findById(resetTarget.getUniqueId()).orElse(null);
-
-        if (playerData == null) {
-            return;
-        }
-
-        Skin defaultPlayerSkin = playerData.getDefaultSkin();
-
-        mainPlugin.getSkinProvider().setSkin(player, defaultPlayerSkin);
-        CommandMessages.COMMAND_OVERLAY_RESET.msg(
-                commandIssuer,
-                Placeholder.builder(commandIssuer.audience()).placeholder("%player%", player.getName())
-                        .build()
-        );
     }
 }

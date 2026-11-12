@@ -6,6 +6,7 @@ import com.georgev22.skinoverlay.refreshers.SkinRefresher;
 import com.georgev22.skinoverlay.command.CommandManager;
 import com.georgev22.skinoverlay.command.CompletionEngine;
 import com.georgev22.skinoverlay.command.commands.SkinOverlayMain;
+import com.georgev22.skinoverlay.command.resolvers.OverlayListResolver;
 import com.georgev22.skinoverlay.event.EventBus;
 import com.georgev22.skinoverlay.listeners.PlayerListeners;
 import com.georgev22.skinoverlay.message.MessageEntry;
@@ -14,8 +15,10 @@ import com.georgev22.skinoverlay.message.messages.CommandMessages;
 import com.georgev22.skinoverlay.message.messages.CoreMessages;
 import com.georgev22.skinoverlay.messaging.MessageManager;
 import com.georgev22.skinoverlay.providers.GameProfileProvider;
+import com.georgev22.skinoverlay.providers.OverlayProvider;
 import com.georgev22.skinoverlay.providers.PlayerProvider;
 import com.georgev22.skinoverlay.providers.SkinProvider;
+import com.georgev22.skinoverlay.registry.OverlayRegistry;
 import com.georgev22.skinoverlay.registry.RegistryManager;
 import com.georgev22.skinoverlay.scheduler.MinecraftScheduler;
 import com.georgev22.skinoverlay.storage.DatabaseManager;
@@ -56,6 +59,8 @@ public class SkinOverlay {
     private EventBus eventBus;
     private FileManager fileManager;
     private SkinFileCache skinFileCache;
+    private OverlayRegistry overlayRegistry;
+    private OverlayProvider overlayProvider;
     private Gson gson;
     private CommandManager commandManager;
     private Object plugin;
@@ -98,9 +103,11 @@ public class SkinOverlay {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        this.overlayRegistry = new OverlayRegistry(dataFolder.toPath().resolve("generated-overlays"));
         this.skinFileCache = new SkinFileCache();
         this.skinFileCache.cache();
         this.skinProvider = new SkinProvider();
+        this.overlayProvider = new OverlayProvider(this);
         try {
             MessagesRegistry.registerAll(new MessageEntry[][]{
                     CommandMessages.values(),
@@ -142,7 +149,8 @@ public class SkinOverlay {
             getLogger().info("Placeholder hook is not set!");
         }
         CompletionEngine.registerResolver("@overlays", (commandIssuer, args) ->
-                skinFileCache.getOverlayMap().keySet());
+                overlayRegistry.entries().keySet());
+        CompletionEngine.registerResolver("@overlay-list", new OverlayListResolver(overlayRegistry));
         this.commandManager.registerCommand(new SkinOverlayMain());
         getLogger().info("Commands registered successfully!");
 
@@ -410,6 +418,24 @@ public class SkinOverlay {
      */
     public SkinProvider getSkinProvider() {
         return skinProvider;
+    }
+
+    /**
+     * Returns the registry containing configured overlays and saved runtime overlays.
+     *
+     * @return the overlay registry initialized during {@link #onLoad()}
+     */
+    public OverlayRegistry getOverlayRegistry() {
+        return overlayRegistry;
+    }
+
+    /**
+     * Returns the API for queued overlay loadout changes and current equipment queries.
+     *
+     * @return the overlay provider initialized during {@link #onLoad()}
+     */
+    public OverlayProvider getOverlayProvider() {
+        return overlayProvider;
     }
 
     /**

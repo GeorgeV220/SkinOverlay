@@ -1,8 +1,9 @@
 package com.georgev22.skinoverlay.utilities.config;
 
 import com.georgev22.skinoverlay.SkinOverlay;
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
 import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
-import com.georgev22.skinoverlay.datastructures.maps.ObjectMaps;
+import com.georgev22.skinoverlay.registry.OverlayRegistry;
 import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Utils;
 import com.georgev22.skinoverlay.utilities.skin.Model;
@@ -35,7 +36,7 @@ import java.util.logging.Level;
  *     └── mustache.png
  * </pre>
  *
- * <p>Each overlay has a corresponding YAML configuration under
+ * <p>Each configured overlay has a corresponding YAML configuration under
  * {@code skins-cfg/}, named after the overlay:</p>
  *
  * <pre>
@@ -48,23 +49,28 @@ import java.util.logging.Level;
  *
  * <p>Cached overlays are indexed by model and overlay key. For example,
  * {@code classic/mustache} and {@code slim/mustache} are separate entries.</p>
+ *
+ * <p>The shared {@link OverlayRegistry} also contains saved runtime overlays
+ * from {@code generated-overlays/}. These files include their own image data
+ * and do not require matching PNG files under {@code skins/}.</p>
  */
 public class SkinFileCache {
 
     private final SkinOverlay skinOverlay = SkinOverlay.getInstance();
 
-    private final ObjectMap<String, Overlay> overlayMap =
-            ObjectMaps.newConcurrentHashObjectMap();
+    private final OverlayRegistry overlayRegistry = skinOverlay.getOverlayRegistry();
 
     /**
      * Extracts bundled default resources when necessary and loads the available
-     * overlay configurations and images into the cache.
+     * overlay configurations and images into the shared registry. Saved runtime
+     * overlays are loaded after configured overlays.
      *
      * <p>Existing user resources are preserved by passing {@code false} to
      * {@link Utils#saveResource(String, boolean, File, Class)}.</p>
      *
-     * <p>The cache is cleared before loading begins. If loading fails partway
-     * through, the cache may contain only the overlays loaded successfully.</p>
+     * <p>The registry is cleared before loading begins, discarding registrations
+     * that were not saved to disk. If loading fails partway through, the registry
+     * may contain only the overlays loaded successfully.</p>
      */
     public void cache() {
         File dataFolder = skinOverlay.getDataFolder();
@@ -83,7 +89,7 @@ public class SkinFileCache {
         saveDefaultOverlays("skins/slim", ".png");
         saveDefaultOverlays("skins-cfg", ".yml");
 
-        overlayMap.clear();
+        overlayRegistry.clear();
 
         File[] configs = configFolder.listFiles(file ->
                 file.isFile()
@@ -153,8 +159,15 @@ public class SkinFileCache {
             }
         }
 
+        try {
+            overlayRegistry.loadSaved((file, exception) -> skinOverlay.getLogger().log(
+                    Level.SEVERE, "Failed to load generated overlay: " + file, exception));
+        } catch (IOException exception) {
+            skinOverlay.getLogger().log(Level.SEVERE, "Failed to load generated overlays", exception);
+        }
+
         skinOverlay.getLogger().info(
-                "Loaded " + overlayMap.size() + " overlay model(s)"
+                "Loaded " + overlayRegistry.entries().size() + " overlay model(s)"
         );
     }
 
@@ -215,9 +228,7 @@ public class SkinFileCache {
                 bufferedImage
         );
 
-        String mapKey = model.name().toLowerCase(Locale.ROOT) + "/" + key;
-
-        overlayMap.put(mapKey, overlay);
+        overlayRegistry.register(overlay);
     }
 
     /**
@@ -337,37 +348,43 @@ public class SkinFileCache {
     }
 
     /**
-     * Returns an unmodifiable snapshot of the cached overlays.
+     * Returns an unmodifiable snapshot of configured and runtime overlay registrations.
      *
      * <p>Keys use the format {@code model/overlayKey}, for example
      * {@code slim/mustache}. Changes to the internal cache after this method
-     * returns are not reflected in the returned map.</p>
+     * returns are not reflected in the returned map. The overlay instances themselves
+     * are shared with the registry and remain mutable.</p>
      *
      * @return unmodifiable map containing the cached overlays
      */
     @Unmodifiable
     public @NonNull ObjectMap<String, Overlay> getOverlayMap() {
-        return overlayMap.toUnmodifiableObjectMap();
+        return new HashObjectMap<>(overlayRegistry.entries()).toUnmodifiableObjectMap();
     }
 
     /**
      * Resolves an overlay identifier to its cached configuration.
+     * <p>
+     * Unqualified keys prefer the classic model when both models exist, preserving
+     * legacy configuration lookup behavior. Use a model-qualified identifier for an
+     * exact lookup; command resolution through the registry requires disambiguation.
+     * </p>
      *
      * @param identifier overlay name or {@code model/name}, e.g.
      *                   {@code mustache}, {@code classic/mustache}
      * @return the cached configuration, or an empty optional if no matching overlay exists
      */
     public Optional<SkinConfigurationFile> resolveConfiguration(@NonNull String identifier) {
-        Overlay overlay = overlayMap.get(identifier);
+        Overlay overlay = overlayRegistry.get(identifier).orElse(null);
 
         if (overlay != null) {
             return Optional.of(overlay.configurationFile());
         }
 
-        overlay = overlayMap.get(Model.CLASSIC.name().toLowerCase(Locale.ROOT) + "/" + identifier);
+        overlay = overlayRegistry.get(Model.CLASSIC.name().toLowerCase(Locale.ROOT) + "/" + identifier).orElse(null);
 
         if (overlay == null) {
-            overlay = overlayMap.get(Model.SLIM.name().toLowerCase(Locale.ROOT) + "/" + identifier);
+            overlay = overlayRegistry.get(Model.SLIM.name().toLowerCase(Locale.ROOT) + "/" + identifier).orElse(null);
         }
 
         return overlay != null ? Optional.of(overlay.configurationFile()) : Optional.empty();

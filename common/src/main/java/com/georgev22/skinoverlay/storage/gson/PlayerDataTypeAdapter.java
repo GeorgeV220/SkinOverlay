@@ -7,6 +7,8 @@ import com.google.gson.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,6 +34,7 @@ public class PlayerDataTypeAdapter implements JsonSerializer<PlayerData>, JsonDe
         jsonObject.addProperty("entity_id", user.getUniqueId().toString());
         jsonObject.add("defaultSkin", jsonSerializationContext.serialize(user.getDefaultSkin()));
         jsonObject.add("skin", jsonSerializationContext.serialize(user.getCurrentSkin()));
+        jsonObject.add("equippedOverlays", jsonSerializationContext.serialize(user.getEquippedOverlays()));
 
         return jsonObject;
     }
@@ -55,6 +58,11 @@ public class PlayerDataTypeAdapter implements JsonSerializer<PlayerData>, JsonDe
         PlayerData user = new PlayerData(entityId);
         user.setDefaultSkin(defaultSkin);
         user.setCurrentSkin(skin);
+        if (jsonObject.has("equippedOverlays") && jsonObject.get("equippedOverlays").isJsonArray()) {
+            List<String> overlays = new ArrayList<>();
+            for (JsonElement element : jsonObject.getAsJsonArray("equippedOverlays")) overlays.add(element.getAsString());
+            user.setEquippedOverlays(overlays);
+        }
 
         return user;
     }

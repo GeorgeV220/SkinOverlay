@@ -11,6 +11,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public enum OverlayOptionsUtil {
+    TYPE("type", "", Optional.empty()),
+
+    LAYER("layer", 0, Optional.empty()),
+
     PARTS_OVERLAY_JACKET("overlay.jacket", false, Optional.empty()),
 
     PARTS_OVERLAY_LEFT_SLEEVE("overlay.left_sleeve", false, Optional.empty()),

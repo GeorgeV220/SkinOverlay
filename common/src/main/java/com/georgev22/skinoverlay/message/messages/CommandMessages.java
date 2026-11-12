@@ -16,13 +16,19 @@ public enum CommandMessages implements MessageEntry {
             "",
             "&c&l(!) &cSkinOverlay Commands:",
             "&8» &7/skinoverlay &ehelp &7- &oShows this help.",
-            "&8» &7/skinoverlay &eoverlay &o<overlay> &7- &oWear a specific overlay from the plugin files.",
-            "&8» &7/skinoverlay &eurl &o<url> &7- &oWear a specific overlay from a URL.",
-            "&8» &7/skinoverlay &ereset &7- &oReset the player's skin.",
+            "&8» &7/skinoverlay &ewear &o<overlay,...> [player] &7- &oReplace the equipped overlays.",
+            "&8» &7/skinoverlay &eadd &o<overlay,...> [player] &7- &oAdd overlays to the equipped clothing.",
+            "&8» &7/skinoverlay &ecombine &o<name> <overlay,...> &7- &oSave a reusable combination.",
+            "&8» &7/skinoverlay &eclear overlay &o<overlay,...> [player] &7- &oRemove selected overlays.",
+            "&8» &7/skinoverlay &eclear &o[player] &7- &oReset the player's skin.",
             "&8» &7/skinoverlay &ereload &7- &oReload the plugin configuration files (some settings need server restart).",
             ""),
 
     COMMAND_OVERLAY_NOT_FOUND("Messages.command.overlay.not-found", "&c&l(!)&c Overlay %overlay% not found!"),
+
+    COMMAND_OVERLAY_ERROR("Messages.command.overlay.error", "&c&l(!)&c %error%"),
+
+    COMMAND_OVERLAY_SAVED("Messages.command.overlay.saved", "&a&l(!)&a Overlay %overlay% saved!"),
 
     COMMAND_OVERLAY_DONE("Messages.command.overlay.done", "&a&l(!)&a Overlay %url% applied!"),
 
