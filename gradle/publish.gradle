@@ -37,9 +37,20 @@ publishing {
         }
     }
     repositories {
+        def isGitHub = System.getenv("GITHUB_REPOSITORY") ? true : false
+        if (isGitHub) {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/${project.findProperty("GITHUB_REPOSITORY") ?: System.getenv("GITHUB_REPOSITORY")}")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                    password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
         maven {
             name = "ShulkerLabs"
-            url = uri("https://git.shulkerlabs.com/SkinOverlay/~maven")
+            url = uri("https://repo.shulkerlabs.com/releases")
             credentials {
                 username = project.findProperty('gpr.user') ?: System.getenv('MAVEN_USERNAME')
                 password = project.findProperty('gpr.token') ?: System.getenv('MAVEN_PASSWORD')
