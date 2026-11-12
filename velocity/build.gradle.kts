@@ -76,6 +76,8 @@ quark {
 tasks.shadowJar {
     archiveBaseName.set("skinoverlay")
     archiveClassifier.set("velocity")
+
+    relocate("org.bxteam.quark", "${project.property("packageName")}.lib.quark")
 }
 
 tasks.named("publish") {

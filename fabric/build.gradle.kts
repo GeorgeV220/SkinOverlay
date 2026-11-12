@@ -147,6 +147,7 @@ java {
 
 tasks.named<ShadowJar>("shadowJar") {
     configurations = listOf(shade, shadeTransitive)
+    relocate("org.bxteam.quark", "${project.property("packageName")}.lib.quark")
 
     archiveClassifier.set("fabric")
 }

@@ -113,6 +113,8 @@ configurations.configureEach {
 tasks.shadowJar {
     archiveBaseName.set("skinoverlay")
     archiveClassifier.set("bukkit")
+
+    relocate("org.bxteam.quark", "${project.property("packageName")}.lib.quark")
 }
 
 tasks.named("publish") {
