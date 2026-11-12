@@ -31,8 +31,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Locale;
 
-import static com.georgev22.skinoverlay.messaging.VelocityPluginMessageManager.inChannelIdentifier;
-
 @Plugin(
         id = BuildParameters.PLUGIN_ID,
         name = BuildParameters.PLUGIN_NAME,
@@ -79,8 +77,6 @@ public class SkinOverlayVelocity {
         this.skinOverlay.setCommandManager(new VelocityCommandManager(server));
         this.skinOverlay.setPluginProvider(pluginName -> server.getPluginManager().isLoaded(pluginName.toLowerCase(Locale.ROOT)));
         this.skinOverlay.onLoad();
-        if (OptionsUtil.CONNECTION_TYPE.getStringValue().equalsIgnoreCase("PluginMessage"))
-            this.server.getChannelRegistrar().register(inChannelIdentifier);
 
         this.skinOverlay.setSkinRefresher(new VelocitySkinRefresher());
         this.skinOverlay.setGameProfileProvider(new VelocityGameProfileProvider());

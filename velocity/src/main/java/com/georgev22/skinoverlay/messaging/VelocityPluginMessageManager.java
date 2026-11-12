@@ -1,5 +1,6 @@
 package com.georgev22.skinoverlay.messaging;
 
+import com.georgev22.skinoverlay.exceptions.MessageEncryptionException;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.velocitypowered.api.event.Subscribe;
@@ -12,7 +13,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -30,6 +30,7 @@ public class VelocityPluginMessageManager extends MessageManager {
 
     public VelocityPluginMessageManager(@NotNull ProxyServer proxyServer) {
         this.proxyServer = proxyServer;
+        proxyServer.getChannelRegistrar().register(inChannelIdentifier, outChannelIdentifier);
     }
 
     @Override
@@ -78,25 +79,27 @@ public class VelocityPluginMessageManager extends MessageManager {
 
     @Override
     public void close() {
-        proxyServer.getChannelRegistrar().unregister(inChannelIdentifier);
+        proxyServer.getChannelRegistrar().unregister(inChannelIdentifier, outChannelIdentifier);
     }
 
 
     @Subscribe
     public void onPluginMessageFromPlayer(PluginMessageEvent event) {
-        if (!inChannelIdentifier.equals(event.getIdentifier())) {
-            this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing channel from plugin message");
+        if (!inChannelIdentifier.equals(event.getIdentifier())
+                && !outChannelIdentifier.equals(event.getIdentifier())) {
             return;
         }
 
-        if (!(event.getSource() instanceof ServerConnection serverConnection)) {
+        event.setResult(PluginMessageEvent.ForwardResult.handled());
+        if (!inChannelIdentifier.equals(event.getIdentifier())
+                || !(event.getSource() instanceof ServerConnection)) {
             return;
         }
 
         MessageData data;
         try {
             data = this.readByteArray(event.getData());
-        } catch (IOException e) {
+        } catch (IOException | MessageEncryptionException | IllegalArgumentException e) {
             this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing plugin message", e);
             return;
         }
@@ -108,12 +111,16 @@ public class VelocityPluginMessageManager extends MessageManager {
             this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing channel from plugin message");
             return;
         }
+        if (data.dataEntries().length != 1) {
+            this.mainPlugin.getLogger().severe("Invalid player join message: expected one entry");
+            return;
+        }
         String stringUUID = data.dataEntries()[0];
         UUID uuid;
         try {
             uuid = UUID.fromString(stringUUID);
-        } catch (Exception e) {
-            this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing UUID from plugin message: " + Arrays.toString(data.dataEntries()), e);
+        } catch (IllegalArgumentException e) {
+            this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing UUID from plugin message", e);
             return;
         }
         playerJoinHandler.accept(uuid);
