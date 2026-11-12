@@ -1,0 +1,11 @@
+Messages:
+  No Permission: '&c&l(!)&c You do not have the correct permissions to do this!'
+  Only Player Command: '&c&l(!)&c Only players can run this command!'
+  Offline Player: '&c&l(!)&c Player %player% is offline!'
+  Overlay Applied: '&a&l(!)&a Overlay %url% applied!'
+  Overlay Reset: '&a&l(!)&a Default skin applied (%player%)!'
+  Overlay Not Found: '&c&l(!)&c Overlay %overlay% not found!'
+  Insufficient arguments: '&c&l(!)&c Insufficient arguments (%command%)'
+  Invalid URL: '&c&l(!)&c Invalid URL or failed to download image: %url%'
+  Error: '&c&l(!)&c An error occurred: %error%'
+  Failed To Retrieve Or Generate Skin: '&c&l(!)&c Failed to retrieve or generate skin for %player%!'

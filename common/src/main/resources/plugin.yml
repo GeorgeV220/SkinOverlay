@@ -1,0 +1,11 @@
+main: ${bukkitMain}
+name: ${pluginName}
+version: ${version}
+authors:
+  - ${author}
+api-version: 1.13
+load: POSTWORLD
+folia-supported: true
+softdepend:
+  - PlaceholderAPI
+  - SkinsRestorer

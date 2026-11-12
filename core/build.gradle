@@ -1,3 +1,0 @@
-dependencies {
-    compileOnly "net.kyori:adventure-platform-api:${adventurePlatformVersion}"
-}
