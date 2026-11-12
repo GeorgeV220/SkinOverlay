@@ -186,10 +186,17 @@ public class SkinProvider {
             property = getSkin(player);
         }
 
-        BufferedImage currentSkin = getSkinImage(property);
+        Model currentModel = extractSkinModel(property);
+
+        SerializableBufferedImage currentSkin = getSkinImage(property);
+
+        // convert player skin to overlay model
+        if (currentModel != overlay.model()) {
+            currentSkin = SkinConverter.convert(currentSkin, currentModel, overlay.model());
+        }
 
         SkinParts currentSkinParts = new SkinParts(
-                new SerializableBufferedImage(currentSkin),
+                currentSkin,
                 "currentSkin"
         );
 
@@ -207,7 +214,7 @@ public class SkinProvider {
         );
 
         BufferedImage renderedSkin = renderSkin(
-                currentSkin,
+                currentSkin.getBufferedImage(),
                 playerParts,
                 overlayParts
         );
@@ -702,7 +709,15 @@ public class SkinProvider {
                 .getBytes();
     }
 
-    public BufferedImage getSkinImage(
+    public SProperty getSkin(
+            @NotNull SkinOverlayPlayer player
+    ) throws IOException, ExecutionException, InterruptedException {
+        return player.isBedrockPlayer()
+                ? getXUIDSkin(getXUID(player))
+                : getJavaSkin(player);
+    }
+
+    public SerializableBufferedImage getSkinImage(
             @NotNull SkinOverlayPlayer player
     ) throws IOException, ExecutionException, InterruptedException {
         SGameProfile gameProfile =
@@ -720,22 +735,14 @@ public class SkinProvider {
         return getSkinImage(property);
     }
 
-    public SProperty getSkin(
-            @NotNull SkinOverlayPlayer player
-    ) throws IOException, ExecutionException, InterruptedException {
-        return player.isBedrockPlayer()
-                ? getXUIDSkin(getXUID(player))
-                : getJavaSkin(player);
-    }
-
-    public BufferedImage getSkinImage(
+    public SerializableBufferedImage getSkinImage(
             @NotNull SProperty property
     ) throws IOException {
         String url = extractSkinURL(property.value());
         return downloadImage(url);
     }
 
-    public BufferedImage getSkinImage(
+    public SerializableBufferedImage getSkinImage(
             byte @NotNull [] profileBytes
     ) throws IOException {
         JsonElement json = JsonParser.parseString(
@@ -857,7 +864,7 @@ public class SkinProvider {
         }
     }
 
-    private @NonNull BufferedImage downloadImage(
+    private @NonNull SerializableBufferedImage downloadImage(
             String url
     ) throws IOException {
         BufferedImage image;
@@ -879,7 +886,7 @@ public class SkinProvider {
             );
         }
 
-        return image;
+        return new SerializableBufferedImage(image);
     }
 
     public JsonElement findTexturesProperty(
@@ -1238,10 +1245,6 @@ public class SkinProvider {
     }
 
     private record PreparedOverlaySkin(UUID skinUUID, BufferedImage image, Optional<Skin> cachedSkin) {
-
-    }
-
-    private record PreparedDefaultSkin(UUID skinUUID, SProperty property, Optional<Skin> cachedSkin) {
 
     }
 }

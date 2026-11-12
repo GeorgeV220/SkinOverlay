@@ -79,7 +79,7 @@ public class PlayerListeners {
 
         BufferedImage defaultSkinImage;
         try {
-            defaultSkinImage = mainPlugin.getSkinProvider().getSkinImage(property);
+            defaultSkinImage = mainPlugin.getSkinProvider().getSkinImage(property).getBufferedImage();
         } catch (IOException e) {
             mainPlugin.getLogger().log(Level.SEVERE, "Error loading Default Skin:", e);
             return;

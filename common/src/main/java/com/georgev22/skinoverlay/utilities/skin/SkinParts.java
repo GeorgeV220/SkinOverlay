@@ -81,8 +81,7 @@ public class SkinParts {
             return;
         }
         if (isOldSkin()) {
-            SerializableBufferedImage fullSkin = this.fullSkin;
-            this.fullSkin = SkinConverter.convertSkin(fullSkin);
+            this.fullSkin = SkinConverter.convertSkin(this.fullSkin);
         }
         for (SectionType sectionType : SectionType.values()) {
             parts.put(
