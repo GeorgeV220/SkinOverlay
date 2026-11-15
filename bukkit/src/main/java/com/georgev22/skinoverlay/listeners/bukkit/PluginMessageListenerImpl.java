@@ -71,7 +71,7 @@ public class PluginMessageListenerImpl extends MessageManager implements PluginM
             return;
         }
         String message = playerUUID.toString();
-        byte[] data = this.toByteArray("playerjoin", message);
+        byte[] data = this.toByteArray("playerjoin", message, currentSkinFingerprint(playerUUID));
         player.sendPluginMessage(this.mainPlugin.getPlugin(), CHANNEL_FROM_BACKEND, data);
         if (OptionsUtil.DEBUG.getBooleanValue())
             this.mainPlugin.getLogger().info("Sent player join message to " + CHANNEL_FROM_BACKEND + ": " + message + " (" + data.length + " bytes) to " + player.getName());

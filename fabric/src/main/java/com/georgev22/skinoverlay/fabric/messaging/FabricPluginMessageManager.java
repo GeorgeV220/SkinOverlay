@@ -93,7 +93,7 @@ public final class FabricPluginMessageManager extends MessageManager {
                 mainPlugin.getLogger().warning("Player " + playerUUID + " not found");
                 return;
             }
-            byte[] data = toByteArray("playerjoin", playerUUID.toString());
+            byte[] data = toByteArray("playerjoin", playerUUID.toString(), currentSkinFingerprint(playerUUID));
             ServerPlayNetworking.send(player, new FromBackendPayload(data));
             if (OptionsUtil.DEBUG.getBooleanValue()) {
                 mainPlugin.getLogger().info("Sent player join message to " + CHANNEL_FROM_BACKEND

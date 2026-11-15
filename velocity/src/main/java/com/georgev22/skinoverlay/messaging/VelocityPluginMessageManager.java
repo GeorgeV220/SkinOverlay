@@ -25,7 +25,7 @@ public class VelocityPluginMessageManager extends MessageManager {
     @ApiStatus.Internal
     public static final MinecraftChannelIdentifier inChannelIdentifier = MinecraftChannelIdentifier.from(CHANNEL_FROM_BACKEND);
     private final ProxyServer proxyServer;
-    private Consumer<UUID> playerJoinHandler = uuid -> {
+    private BiConsumer<UUID, String> playerJoinHandler = (_, _) -> {
     };
 
     public VelocityPluginMessageManager(@NotNull ProxyServer proxyServer) {
@@ -74,6 +74,11 @@ public class VelocityPluginMessageManager extends MessageManager {
 
     @Override
     public void subscribePlayerJoin(Consumer<UUID> handler) {
+        subscribePlayerJoin((uuid, _) -> handler.accept(uuid));
+    }
+
+    @Override
+    public void subscribePlayerJoin(BiConsumer<UUID, String> handler) {
         this.playerJoinHandler = handler;
     }
 
@@ -92,7 +97,7 @@ public class VelocityPluginMessageManager extends MessageManager {
 
         event.setResult(PluginMessageEvent.ForwardResult.handled());
         if (!inChannelIdentifier.equals(event.getIdentifier())
-                || !(event.getSource() instanceof ServerConnection)) {
+                || !(event.getSource() instanceof ServerConnection source)) {
             return;
         }
 
@@ -111,8 +116,8 @@ public class VelocityPluginMessageManager extends MessageManager {
             this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing channel from plugin message");
             return;
         }
-        if (data.dataEntries().length != 1) {
-            this.mainPlugin.getLogger().severe("Invalid player join message: expected one entry");
+        if (data.dataEntries().length < 1 || data.dataEntries().length > 2) {
+            this.mainPlugin.getLogger().severe("Invalid player join message: expected UUID and optional textures fingerprint");
             return;
         }
         String stringUUID = data.dataEntries()[0];
@@ -123,6 +128,10 @@ public class VelocityPluginMessageManager extends MessageManager {
             this.mainPlugin.getLogger().log(Level.SEVERE, "Error parsing UUID from plugin message", e);
             return;
         }
-        playerJoinHandler.accept(uuid);
+        if (!source.getPlayer().getUniqueId().equals(uuid)
+                || source.getPlayer().getCurrentServer().filter(source::equals).isEmpty()) {
+            return;
+        }
+        playerJoinHandler.accept(uuid, data.dataEntries().length == 2 ? data.dataEntries()[1] : "");
     }
 }

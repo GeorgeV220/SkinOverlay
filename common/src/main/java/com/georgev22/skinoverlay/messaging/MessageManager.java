@@ -2,6 +2,8 @@ package com.georgev22.skinoverlay.messaging;
 
 import com.georgev22.skinoverlay.SkinOverlay;
 import com.georgev22.skinoverlay.exceptions.MessageEncryptionException;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
+import com.georgev22.skinoverlay.skin.SProperty;
 import com.georgev22.skinoverlay.storage.data.Skin;
 import com.georgev22.skinoverlay.utilities.EncryptUtils;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
@@ -58,9 +60,14 @@ public abstract class MessageManager {
     public abstract void subscribeSkinProperty(@NotNull BiConsumer<UUID, Skin> handler);
 
     /**
-     * Publishes a player join event.
+     * Reports a backend join and the fingerprint of the player's current textures property.
+     * <p>
+     * The proxy uses the observed fingerprint to decide whether the backend already has the
+     * session skin. Call through the player's entity scheduler after the backend connection
+     * is ready for plugin messages. A missing property is reported as an empty fingerprint.
+     * </p>
      *
-     * @param playerUUID UUID of the joined player
+     * @param playerUUID UUID of the player who joined the backend
      */
     public abstract void publishPlayerJoin(@NotNull UUID playerUUID);
 
@@ -70,6 +77,39 @@ public abstract class MessageManager {
      * @param handler Consumer to handle player join events with player UUID
      */
     public abstract void subscribePlayerJoin(Consumer<UUID> handler);
+
+    /**
+     * Subscribes to backend join reports containing the observed textures fingerprint.
+     * <p>
+     * The handler receives the player UUID and a digest produced by {@link SProperty#fingerprint()}.
+     * An empty fingerprint means that the backend has no textures property or that a legacy
+     * transport supplied only the UUID. Such a report cannot prove that the skin is current.
+     * Transport callbacks may run off the entity thread; schedule player access as needed.
+     * The default implementation adapts transports that only support UUID reports.
+     * </p>
+     *
+     * @param handler callback receiving the player UUID and a non-null fingerprint, possibly empty
+     */
+    public void subscribePlayerJoin(BiConsumer<UUID, String> handler) {
+        subscribePlayerJoin(uuid -> handler.accept(uuid, ""));
+    }
+
+    /**
+     * Reads the fingerprint of the textures property currently held by a backend player.
+     * <p>
+     * Call on the player's entity thread immediately before publishing a join report, so
+     * updates applied since login are included. This does not read the saved overlay loadout.
+     * </p>
+     *
+     * @param playerUUID UUID of the backend player whose profile should be inspected
+     * @return the textures fingerprint, or an empty string if the player or property is absent
+     */
+    protected String currentSkinFingerprint(UUID playerUUID) {
+        SkinOverlayPlayer player = mainPlugin.getPlayerProvider().getSkinOverlayPlayer(playerUUID);
+        if (player == null) return "";
+        SProperty property = player.getGameProfile().getProperty("textures");
+        return property == null ? "" : property.fingerprint();
+    }
 
     /**
      * Closes the message manager, cleaning up any resources such as channels or listeners.

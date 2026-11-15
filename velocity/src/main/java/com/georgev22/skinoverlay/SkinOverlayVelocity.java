@@ -97,21 +97,21 @@ public class SkinOverlayVelocity {
         } else {
             this.skinOverlay.setMessageManager(new MessageManagerNoop());
         }
-        this.skinOverlay.getMessageManager().subscribePlayerJoin(uuid -> {
+        this.skinOverlay.getMessageManager().subscribePlayerJoin((uuid, fingerprint) -> {
             if (OptionsUtil.DEBUG.getBooleanValue()) {
                 this.skinOverlay.getLogger().info("Player " + uuid + " has joined the server.");
             }
+            var player = this.skinOverlay.getPlayerProvider().getSkinOverlayPlayer(uuid);
+            if (player == null) return;
             this.skinOverlay.getScheduler().runAsyncTask(this.skinOverlay.getPlugin(), () -> {
+                if (!player.isOnline()) return;
                 EntityManagerRegistry.getInstance().getTyped(PlayerData.class)
                         .flatMap(entityManager -> entityManager.findById(uuid))
                         .ifPresent(playerData -> {
                             Skin skin = playerData.getCurrentSkin();
-                            if (skin != null) {
-                                this.skinOverlay.getSkinProvider().setSkin(
-                                        this.skinOverlay.getPlayerProvider().getSkinOverlayPlayer(uuid),
-                                        skin,
-                                        playerData.getEquippedOverlays()
-                                );
+                            if (skin != null && skin.getProperty() != null
+                                    && !skin.getProperty().fingerprint().equals(fingerprint)) {
+                                this.skinOverlay.getMessageManager().publishSkinProperty(uuid, skin);
                             }
                         });
             });

@@ -53,6 +53,39 @@ public class Skin extends Entity {
     private Model model;
 
     /**
+     * Content UUID of the unmodified base image used to generate this skin.
+     */
+    private UUID baseImageUUID;
+
+    /**
+     * Returns the content UUID of the original image used to generate this skin.
+     * <p>
+     * This identifies the image before model conversion or overlay rendering, independently
+     * of this skin entity's UUID. Generated single and combined overlays retain the same
+     * base UUID when built from identical source pixels. Legacy records may omit it.
+     * </p>
+     *
+     * @return the base image's content UUID, or {@code null} if its provenance is unknown
+     */
+    public @Nullable UUID getBaseImageUUID() {
+        return baseImageUUID;
+    }
+
+    /**
+     * Records the original image's content UUID for cache validation on subsequent joins.
+     * <p>
+     * Use the UUID calculated before applying overlays or converting the base model.
+     * This changes provenance metadata only; it does not regenerate, apply or save the skin.
+     * </p>
+     *
+     * @param baseImageUUID content UUID of the unmodified base image, or {@code null} to
+     *                      mark the provenance as unknown
+     */
+    public void setBaseImageUUID(@Nullable UUID baseImageUUID) {
+        this.baseImageUUID = baseImageUUID;
+    }
+
+    /**
      * Constructs a new {@code Skin} instance with the specified UUID.
      *
      * @param id the unique identifier for the skin
@@ -88,6 +121,7 @@ public class Skin extends Entity {
      */
     public void setProperty(SProperty property) {
         this.property = property;
+        this.model = null;
     }
 
     /**

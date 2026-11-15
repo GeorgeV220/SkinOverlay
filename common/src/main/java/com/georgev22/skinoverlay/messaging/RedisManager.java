@@ -24,7 +24,7 @@ public class RedisManager extends MessageManager {
 
     private BiConsumer<UUID, Skin> skinPropertyHandler = (uuid, skin) -> {
     };
-    private Consumer<UUID> playerJoinHandler = uuid -> {
+    private BiConsumer<UUID, String> playerJoinHandler = (uuid, fingerprint) -> {
     };
 
     public RedisManager(String host, int port, String password) {
@@ -100,6 +100,11 @@ public class RedisManager extends MessageManager {
 
     @Override
     public void subscribePlayerJoin(Consumer<UUID> handler) {
+        subscribePlayerJoin((uuid, fingerprint) -> handler.accept(uuid));
+    }
+
+    @Override
+    public void subscribePlayerJoin(BiConsumer<UUID, String> handler) {
         this.playerJoinHandler = handler;
         if (publisherThread != null) {
             publisherThread.interrupt();
@@ -115,13 +120,14 @@ public class RedisManager extends MessageManager {
                         @Override
                         public void onMessage(String ch, String message) {
                             UUID uuid;
+                            String[] parts = message.split("\\|", 2);
                             try {
-                                uuid = UUID.fromString(message);
+                                uuid = UUID.fromString(parts[0]);
                             } catch (Exception e) {
                                 skinOverlay.getLogger().log(Level.SEVERE, "Error parsing UUID from redis message: " + message, e);
                                 return;
                             }
-                            playerJoinHandler.accept(uuid);
+                            playerJoinHandler.accept(uuid, parts.length == 2 ? parts[1] : "");
                         }
                     }, CHANNEL_FROM_BACKEND);
                 } catch (Exception e) {
@@ -141,7 +147,7 @@ public class RedisManager extends MessageManager {
     }
 
     public void publishPlayerJoin(@NotNull UUID playerUUID) {
-        jedis.publish(CHANNEL_FROM_BACKEND, playerUUID.toString());
+        jedis.publish(CHANNEL_FROM_BACKEND, playerUUID + "|" + currentSkinFingerprint(playerUUID));
     }
 
     @Override

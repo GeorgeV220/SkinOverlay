@@ -25,6 +25,9 @@ public class SkinTypeAdapter implements JsonSerializer<Skin>, JsonDeserializer<S
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.addProperty("entity_id", skin.getUniqueId().toString());
+        if (skin.getBaseImageUUID() != null) {
+            jsonObject.addProperty("baseImageUUID", skin.getBaseImageUUID().toString());
+        }
         jsonObject.add("property", jsonSerializationContext.serialize(skin.getProperty()));
         jsonObject.add("skinParts", jsonSerializationContext.serialize(skin.getSkinParts()));
 
@@ -49,6 +52,9 @@ public class SkinTypeAdapter implements JsonSerializer<Skin>, JsonDeserializer<S
 
         Skin skin = new Skin(entityId);
         skin.setProperty(property);
+        if (jsonObject.has("baseImageUUID") && !jsonObject.get("baseImageUUID").isJsonNull()) {
+            skin.setBaseImageUUID(UUID.fromString(jsonObject.get("baseImageUUID").getAsString()));
+        }
         skin.setSkinParts(skinParts);
 
         return skin;

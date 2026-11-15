@@ -57,7 +57,7 @@ import java.util.logging.Level;
 
 public class SkinProvider {
 
-    private static final String CACHE_VERSION = "v2";
+    private static final String CACHE_VERSION = "v3";
 
     protected final SkinOverlay skinOverlay = SkinOverlay.getInstance();
     protected final MineSkinClient mineskinClient;
@@ -138,6 +138,7 @@ public class SkinProvider {
                                     player,
                                     overlay,
                                     prepared.skinUUID(),
+                                    prepared.baseImageUUID(),
                                     prepared.image(),
                                     skinManager
                             )
@@ -194,6 +195,8 @@ public class SkinProvider {
         SerializableBufferedImage currentSkin = baseSkin != null && baseSkin.getSkinParts() != null
                 ? baseSkin.getSkinParts().getFullSkin() : getSkinImage(property);
 
+        UUID baseImageUUID = createBaseImageUUID(currentSkin.getBufferedImage());
+
         // convert player skin to overlay model
         if (currentModel != overlay.model()) {
             currentSkin = SkinConverter.convert(currentSkin, currentModel, overlay.model());
@@ -228,7 +231,7 @@ public class SkinProvider {
 
         UUID skinUUID = createImageCacheUUID(
                 player,
-                overlay.identifier(),
+                overlay.identifier() + "|" + baseImageUUID,
                 renderedSkin
         );
 
@@ -237,7 +240,8 @@ public class SkinProvider {
         return new PreparedOverlaySkin(
                 skinUUID,
                 renderedSkin,
-                existing
+                baseImageUUID,
+                existing.filter(skin -> baseImageUUID.equals(skin.getBaseImageUUID()))
         );
     }
 
@@ -245,6 +249,7 @@ public class SkinProvider {
             @NonNull SkinOverlayPlayer player,
             @NonNull Overlay overlay,
             UUID skinUUID,
+            UUID baseImageUUID,
             BufferedImage image,
             EntityManager<Skin> skinManager
     ) {
@@ -275,6 +280,7 @@ public class SkinProvider {
                                 player,
                                 new SkinParts(new SerializableBufferedImage(image), overlay.key()),
                                 skinUUID,
+                                baseImageUUID,
                                 property,
                                 skinManager
                         )
@@ -330,6 +336,7 @@ public class SkinProvider {
             SkinOverlayPlayer player,
             SkinParts skinParts,
             UUID skinUUID,
+            UUID baseImageUUID,
             SProperty property,
             @NonNull EntityManager<Skin> skinManager
     ) {
@@ -338,6 +345,7 @@ public class SkinProvider {
                         skinUUID,
                         skin -> {
                             skin.setProperty(property);
+                            skin.setBaseImageUUID(baseImageUUID);
                             skin.setSkinParts(skinParts);
                         }
                 );
@@ -464,6 +472,25 @@ public class SkinProvider {
         );
     }
 
+    /**
+     * Calculates a content UUID from a base image's dimensions and ARGB pixels.
+     * <p>
+     * Call before model conversion or overlay rendering. Images with identical dimensions
+     * and pixels produce the same UUID regardless of their buffered-image storage format.
+     * The UUID changes when the source pixels change, even if an overlay would hide those
+     * pixels. This method does not modify the image or access remote services or storage.
+     * </p>
+     *
+     * @param image unmodified base skin image
+     * @return a deterministic UUID identifying the base image's pixel content and dimensions
+     */
+    public UUID createBaseImageUUID(@NotNull BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        byte[] pixels = SerializableBufferedImage.toByteArray(image.getRGB(0, 0, width, height, null, 0, width));
+        return Utils.generateUUID(width + "x" + height + "|" + sha256(pixels));
+    }
+
     private @NonNull String sha256(byte[] bytes) {
         try {
             MessageDigest digest =
@@ -525,10 +552,41 @@ public class SkinProvider {
             @NotNull Skin skin,
             @NotNull Collection<String> equippedOverlays
     ) {
-        SGameProfile gameProfile =
-                skinOverlay
-                        .getGameProfileProvider()
-                        .getGameProfile(player);
+        applySkin(player, skin, equippedOverlays, true);
+    }
+
+    /**
+     * Restores a saved skin and its overlay loadout during the player's initial login.
+     * <p>
+     * On a proxy, this updates the session profile forwarded to backends without publishing
+     * a redundant skin refresh. Standalone servers also refresh the visible skin. Both
+     * paths update the loaded player's current skin and equipped identifiers and request
+     * a player-data save. Overlay sources are not validated or rendered by this method.
+     * Call through the platform's login flow or the player's entity scheduler; use
+     * {@link #setSkin(SkinOverlayPlayer, Skin, Collection)} for changes after login.
+     * </p>
+     *
+     * @param player player whose initial profile should be restored
+     * @param skin signed skin to apply to the session profile
+     * @param equippedOverlays source overlay identifiers represented by the saved skin,
+     *                         or an empty collection if no overlays are equipped
+     */
+    public void setSkinOnJoin(@NotNull SkinOverlayPlayer player, @NotNull Skin skin,
+                              @NotNull Collection<String> equippedOverlays) {
+        applySkin(player, skin, equippedOverlays, !skinOverlay.isProxy());
+    }
+
+    /**
+     * Updates the platform profile and loaded player data, optionally refreshing the visible skin.
+     *
+     * @param player player whose profile and saved loadout should change
+     * @param skin signed skin represented by the new profile
+     * @param equippedOverlays source identifiers to persist with the skin
+     * @param refresh whether to invoke the platform refresher after updating the profile;
+     *                {@code false} allows a proxy login to rely on normal profile forwarding
+     */
+    private void applySkin(SkinOverlayPlayer player, Skin skin, Collection<String> equippedOverlays, boolean refresh) {
+        SGameProfile gameProfile = skinOverlay.getGameProfileProvider().getGameProfile(player);
 
         gameProfile.setProperty(
                 "textures",
@@ -539,9 +597,9 @@ public class SkinProvider {
                 .getGameProfileProvider()
                 .applyUpdatedGameProfile(player);
 
-        skinOverlay
-                .getSkinRefresher()
-                .refresh(player, skin);
+        if (refresh) {
+            skinOverlay.getSkinRefresher().refresh(player, skin);
+        }
 
         Optional<EntityManager<PlayerData>> optionalManager =
                 EntityManagerRegistry
@@ -1159,7 +1217,7 @@ public class SkinProvider {
         return throwable;
     }
 
-    private record PreparedOverlaySkin(UUID skinUUID, BufferedImage image, Optional<Skin> cachedSkin) {
+    private record PreparedOverlaySkin(UUID skinUUID, BufferedImage image, UUID baseImageUUID, Optional<Skin> cachedSkin) {
 
     }
 }

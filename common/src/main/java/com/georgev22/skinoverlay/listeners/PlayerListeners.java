@@ -16,11 +16,13 @@ import com.georgev22.skinoverlay.utilities.SerializableBufferedImage;
 import com.georgev22.skinoverlay.utilities.Utils;
 import com.georgev22.skinoverlay.utilities.config.OptionsUtil;
 import com.georgev22.skinoverlay.utilities.skin.SkinParts;
+import com.georgev22.skinoverlay.utilities.skin.Model;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -96,19 +98,42 @@ public class PlayerListeners {
             }
         }
         Skin defaultSkin = defaultSkinOptional.get();
+        Skin previousDefault = playerData.getDefaultSkin();
+        Model previousModel = previousDefault == null ? null : previousDefault.skinModel();
         defaultSkin.setSkinParts(new SkinParts(defaultSkinImageSerializable, "default"));
         defaultSkin.setProperty(property);
+        defaultSkin.setBaseImageUUID(mainPlugin.getSkinProvider().createBaseImageUUID(defaultSkinImage));
 
         playerData.setDefaultSkin(defaultSkin);
 
-        if (playerData.getCurrentSkin() == null) {
+        Skin currentSkin = playerData.getCurrentSkin();
+        List<String> equipped = playerData.getEquippedOverlays();
+        boolean modelChanged = previousModel != null && previousModel != defaultSkin.skinModel();
+        boolean rebuild = !equipped.isEmpty() && (currentSkin == null
+                || currentSkin.equals(defaultSkin) || modelChanged
+                || !defaultSkin.getBaseImageUUID().equals(currentSkin.getBaseImageUUID()));
+
+        if (currentSkin == null || currentSkin.equals(defaultSkin) || rebuild) {
             playerData.setCurrentSkin(defaultSkin);
-        } else if (!playerData.getCurrentSkin().equals(defaultSkin)) {
-            mainPlugin.getSkinProvider().setSkin(player, playerData.getCurrentSkin(), playerData.getEquippedOverlays());
+        } else {
+            mainPlugin.getSkinProvider().setSkinOnJoin(player, currentSkin, equipped);
         }
 
         skinManager.save(defaultSkin);
         playerDataManager.save(playerData);
+
+        if (rebuild) {
+            try {
+                mainPlugin.getOverlayProvider().wear(player, mainPlugin.getOverlayProvider().equipped(player))
+                        .whenComplete((skin, error) -> {
+                            if (error != null) {
+                                mainPlugin.getLogger().log(Level.SEVERE, "Error rebuilding overlays for " + player.getName(), error);
+                            }
+                        });
+            } catch (RuntimeException exception) {
+                mainPlugin.getLogger().log(Level.SEVERE, "Error resolving overlays for " + player.getName(), exception);
+            }
+        }
     }
 
     @EventHandlerAnnotation(priority = HandlerPriority.LOWEST)
