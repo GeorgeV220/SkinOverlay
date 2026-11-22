@@ -1,6 +1,18 @@
 # [8.0.0-beta.11](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.10...v8.0.0-beta.11) (2026-11-22)
 
 
+### Bug Fixes
+
+* **ci:** prevent duplicate release assets and correct workflow gating ([3087580](https://github.com/GeorgeV220/SkinOverlay/commit/308758055a2cfce9aa46014feec4b55b24623734))
+
+
+### Features
+
+* validate skins with texture fingerprints on join ([c6138a9](https://github.com/GeorgeV220/SkinOverlay/commit/c6138a99b7dba27de5199750078c7f50adc25d44))
+
+# [8.0.0-beta.11](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.10...v8.0.0-beta.11) (2026-11-22)
+
+
 ### Features
 
 * validate skins with texture fingerprints on join ([c6138a9](https://github.com/GeorgeV220/SkinOverlay/commit/c6138a99b7dba27de5199750078c7f50adc25d44))
