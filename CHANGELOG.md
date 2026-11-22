@@ -1,3 +1,10 @@
+# [8.0.0-beta.12](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.11...v8.0.0-beta.12) (2026-11-22)
+
+
+### Bug Fixes
+
+* **release:** advance past already published beta.11 packages ([2ca3841](https://github.com/GeorgeV220/SkinOverlay/commit/2ca3841b08bf7c86394393e54dfa0d2cc72de7e5))
+
 # [8.0.0-beta.11](https://github.com/GeorgeV220/SkinOverlay/compare/v8.0.0-beta.10...v8.0.0-beta.11) (2026-11-22)
 
 
