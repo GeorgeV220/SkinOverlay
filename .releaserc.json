@@ -26,7 +26,19 @@
       {
         "assets": [
           {
-            "path": "**/build/libs/*.jar"
+            "path": "bukkit/build/libs/*.jar"
+          },
+          {
+            "path": "fabric/build/libs/*.jar"
+          },
+          {
+            "path": "velocity/build/libs/*.jar"
+          },
+          {
+            "path": "common/build/libs/*.jar"
+          },
+          {
+            "path": "build-info/build/libs/*.jar"
           }
         ]
       }

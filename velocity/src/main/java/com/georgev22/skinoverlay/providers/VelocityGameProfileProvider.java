@@ -1,0 +1,43 @@
+package com.georgev22.skinoverlay.providers;
+
+import com.georgev22.skinoverlay.datastructures.maps.HashObjectMap;
+import com.georgev22.skinoverlay.datastructures.maps.ObjectMap;
+import com.georgev22.skinoverlay.player.SkinOverlayPlayer;
+import com.georgev22.skinoverlay.skin.SGameProfile;
+import com.georgev22.skinoverlay.skin.SProperty;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.util.GameProfile;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class VelocityGameProfileProvider extends GameProfileProvider {
+
+    @Override
+    public GameProfile getInternalGameProfile(@NotNull SkinOverlayPlayer player) {
+        return ((Player) player.getPlatformPlayer()).getGameProfile();
+    }
+
+    @Override
+    public SGameProfile getGameProfile(@NotNull SkinOverlayPlayer player) {
+        if (sGameProfiles.containsKey(player)) {
+            return sGameProfiles.get(player);
+        }
+        ObjectMap<String, SProperty> propertyObjectMap = new HashObjectMap<>();
+        GameProfile gameProfile = this.getInternalGameProfile(player);
+        gameProfile.getProperties().forEach(property ->
+                propertyObjectMap.append(property.getName(), new SProperty(property.getName(), property.getValue(), property.getSignature())));
+        SGameProfile sGameProfile = new SGameProfile(gameProfile.getName(), gameProfile.getId(), propertyObjectMap);
+        return sGameProfiles.append(player, sGameProfile).get(player);
+    }
+
+    @Override
+    public void applyUpdatedGameProfile(@NotNull SkinOverlayPlayer player) {
+        Player velocityPlayer = player.getPlatformPlayer();
+        List<GameProfile.Property> propertyList = new ArrayList<>();
+        getGameProfile(player).getProperties().forEach((name, property) -> propertyList.add(
+                new GameProfile.Property(property.name(), property.value(), property.signature())));
+        velocityPlayer.setGameProfileProperties(propertyList);
+    }
+}
